@@ -1,0 +1,2196 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module DataManager
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _RemoveInputScripts
+                                     12 	.globl _UIReset
+                                     13 	.globl _InitScroll
+                                     14 	.globl _ScriptCtxPoolReset
+                                     15 	.globl _ProjectilesInit
+                                     16 	.globl _PopBank
+                                     17 	.globl _PushBank
+                                     18 	.globl _ActivateActor
+                                     19 	.globl _InitPlayer
+                                     20 	.globl _SpritePoolReset
+                                     21 	.globl _memcpy
+                                     22 	.globl _set_sprite_data
+                                     23 	.globl _set_bkg_data
+                                     24 	.globl _scene_events_start_ptr
+                                     25 	.globl _scene_type
+                                     26 	.globl _actors_len
+                                     27 	.globl _sprites_len
+                                     28 	.globl _image_height
+                                     29 	.globl _image_width
+                                     30 	.globl _image_tile_height
+                                     31 	.globl _image_tile_width
+                                     32 	.globl _collision_ptr
+                                     33 	.globl _image_attr_ptr
+                                     34 	.globl _image_ptr
+                                     35 	.globl _collision_bank
+                                     36 	.globl _image_attr_bank
+                                     37 	.globl _image_bank
+                                     38 	.globl _bank_ptr
+                                     39 	.globl _LoadTiles
+                                     40 	.globl _LoadImage
+                                     41 	.globl _LoadImageAttr
+                                     42 	.globl _LoadPalette
+                                     43 	.globl _LoadUIPalette
+                                     44 	.globl _LoadSpritePalette
+                                     45 	.globl _LoadPlayerSpritePalette
+                                     46 	.globl _LoadSprite
+                                     47 	.globl _LoadScene
+                                     48 ;--------------------------------------------------------
+                                     49 ; special function registers
+                                     50 ;--------------------------------------------------------
+                                     51 ;--------------------------------------------------------
+                                     52 ; ram data
+                                     53 ;--------------------------------------------------------
+                                     54 	.area _DATA
+      000000                         55 _bank_ptr::
+      000000                         56 	.ds 3
+      000003                         57 _image_bank::
+      000003                         58 	.ds 1
+      000004                         59 _image_attr_bank::
+      000004                         60 	.ds 1
+      000005                         61 _collision_bank::
+      000005                         62 	.ds 1
+      000006                         63 _image_ptr::
+      000006                         64 	.ds 2
+      000008                         65 _image_attr_ptr::
+      000008                         66 	.ds 2
+      00000A                         67 _collision_ptr::
+      00000A                         68 	.ds 2
+      00000C                         69 _image_tile_width::
+      00000C                         70 	.ds 1
+      00000D                         71 _image_tile_height::
+      00000D                         72 	.ds 1
+      00000E                         73 _image_width::
+      00000E                         74 	.ds 2
+      000010                         75 _image_height::
+      000010                         76 	.ds 2
+      000012                         77 _sprites_len::
+      000012                         78 	.ds 1
+      000013                         79 _actors_len::
+      000013                         80 	.ds 1
+      000014                         81 _scene_type::
+      000014                         82 	.ds 1
+      000015                         83 _scene_events_start_ptr::
+      000015                         84 	.ds 3
+                                     85 ;--------------------------------------------------------
+                                     86 ; absolute external ram data
+                                     87 ;--------------------------------------------------------
+                                     88 	.area _DABS (ABS)
+                                     89 ;--------------------------------------------------------
+                                     90 ; global & static initialisations
+                                     91 ;--------------------------------------------------------
+                                     92 	.area _HOME
+                                     93 	.area _GSINIT
+                                     94 	.area _GSFINAL
+                                     95 	.area _GSINIT
+                                     96 ;/tmp/_gbsbuild/src/core/DataManager.c:31: UBYTE actors_len = 0;
+      000000 21r13r00                97 	ld	hl, #_actors_len
+      000003 36 00                   98 	ld	(hl), #0x00
+                                     99 ;--------------------------------------------------------
+                                    100 ; Home
+                                    101 ;--------------------------------------------------------
+                                    102 	.area _HOME
+                                    103 	.area _HOME
+                                    104 ;--------------------------------------------------------
+                                    105 ; code
+                                    106 ;--------------------------------------------------------
+                                    107 	.area _CODE
+                                    108 ;/tmp/_gbsbuild/src/core/DataManager.c:35: void LoadTiles(UINT16 index) {
+                                    109 ;	---------------------------------
+                                    110 ; Function LoadTiles
+                                    111 ; ---------------------------------
+      000000                        112 _LoadTiles::
+                                    113 ;/tmp/_gbsbuild/src/core/DataManager.c:39: PUSH_BANK(DATA_PTRS_BANK);
+      000000 3E 05                  114 	ld	a, #0x05
+      000002 F5                     115 	push	af
+      000003 33                     116 	inc	sp
+      000004 CDr00r00               117 	call	_PushBank
+      000007 33                     118 	inc	sp
+                                    119 ;/tmp/_gbsbuild/src/core/DataManager.c:40: bank = tileset_bank_ptrs[index].bank;
+      000008 F8 02                  120 	ldhl	sp,#2
+      00000A 2A                     121 	ld	a, (hl+)
+      00000B 4F                     122 	ld	c, a
+      00000C 46                     123 	ld	b, (hl)
+      00000D 69                     124 	ld	l, c
+      00000E 60                     125 	ld	h, b
+      00000F 29                     126 	add	hl, hl
+      000010 09                     127 	add	hl, bc
+      000011 01r00r00               128 	ld	bc,#_tileset_bank_ptrs
+      000014 09                     129 	add	hl,bc
+                                    130 ;/tmp/_gbsbuild/src/core/DataManager.c:41: data_ptr = (UBYTE*)(tileset_bank_ptrs[index].offset + (BankDataPtr(bank)));
+      000015 2A                     131 	ld	a, (hl+)
+      000016 47                     132 	ld	b, a
+      000017 2A                     133 	ld	a, (hl+)
+      000018 4E                     134 	ld	c, (hl)
+      000019 5F                     135 	ld	e, a
+      00001A 79                     136 	ld	a, c
+      00001B C6 40                  137 	add	a, #0x40
+      00001D 57                     138 	ld	d, a
+                                    139 ;/tmp/_gbsbuild/src/core/DataManager.c:42: POP_BANK;
+      00001E C5                     140 	push	bc
+      00001F D5                     141 	push	de
+      000020 CDr00r00               142 	call	_PopBank
+      000023 D1                     143 	pop	de
+      000024 C1                     144 	pop	bc
+                                    145 ;/tmp/_gbsbuild/src/core/DataManager.c:44: PUSH_BANK(bank);
+      000025 D5                     146 	push	de
+      000026 C5                     147 	push	bc
+      000027 33                     148 	inc	sp
+      000028 CDr00r00               149 	call	_PushBank
+      00002B 33                     150 	inc	sp
+      00002C D1                     151 	pop	de
+                                    152 ;/tmp/_gbsbuild/src/core/DataManager.c:45: size = *(data_ptr++);
+      00002D 1A                     153 	ld	a, (de)
+      00002E 13                     154 	inc	de
+                                    155 ;/tmp/_gbsbuild/src/core/DataManager.c:46: set_bkg_data(0, size, data_ptr);
+      00002F D5                     156 	push	de
+      000030 F5                     157 	push	af
+      000031 33                     158 	inc	sp
+      000032 AF                     159 	xor	a, a
+      000033 F5                     160 	push	af
+      000034 33                     161 	inc	sp
+      000035 CDr00r00               162 	call	_set_bkg_data
+      000038 E8 04                  163 	add	sp, #4
+                                    164 ;/tmp/_gbsbuild/src/core/DataManager.c:47: POP_BANK;
+                                    165 ;/tmp/_gbsbuild/src/core/DataManager.c:48: }
+      00003A C3r00r00               166 	jp  _PopBank
+                                    167 ;/tmp/_gbsbuild/src/core/DataManager.c:50: void LoadImage(UINT16 index) {
+                                    168 ;	---------------------------------
+                                    169 ; Function LoadImage
+                                    170 ; ---------------------------------
+      00003D                        171 _LoadImage::
+                                    172 ;/tmp/_gbsbuild/src/core/DataManager.c:53: PUSH_BANK(DATA_PTRS_BANK);
+      00003D 3E 05                  173 	ld	a, #0x05
+      00003F F5                     174 	push	af
+      000040 33                     175 	inc	sp
+      000041 CDr00r00               176 	call	_PushBank
+      000044 33                     177 	inc	sp
+                                    178 ;/tmp/_gbsbuild/src/core/DataManager.c:54: image_bank = background_bank_ptrs[index].bank;
+      000045 F8 02                  179 	ldhl	sp,#2
+      000047 2A                     180 	ld	a, (hl+)
+      000048 4F                     181 	ld	c, a
+      000049 46                     182 	ld	b, (hl)
+      00004A 69                     183 	ld	l, c
+      00004B 60                     184 	ld	h, b
+      00004C 29                     185 	add	hl, hl
+      00004D 09                     186 	add	hl, bc
+      00004E 01r00r00               187 	ld	bc,#_background_bank_ptrs
+      000051 09                     188 	add	hl,bc
+      000052 4D                     189 	ld	c, l
+      000053 44                     190 	ld	b, h
+      000054 0A                     191 	ld	a, (bc)
+      000055 EAr03r00               192 	ld	(#_image_bank),a
+                                    193 ;/tmp/_gbsbuild/src/core/DataManager.c:55: data_ptr = (UBYTE*)(background_bank_ptrs[index].offset + (BankDataPtr(image_bank)));
+      000058 69                     194 	ld	l, c
+      000059 60                     195 	ld	h, b
+      00005A 23                     196 	inc	hl
+      00005B 2A                     197 	ld	a, (hl+)
+      00005C 4F                     198 	ld	c, a
+      00005D 7E                     199 	ld	a, (hl)
+      00005E C6 40                  200 	add	a, #0x40
+      000060 47                     201 	ld	b, a
+                                    202 ;/tmp/_gbsbuild/src/core/DataManager.c:56: POP_BANK;
+      000061 C5                     203 	push	bc
+      000062 CDr00r00               204 	call	_PopBank
+      000065 FAr03r00               205 	ld	a, (#_image_bank)
+      000068 F5                     206 	push	af
+      000069 33                     207 	inc	sp
+      00006A CDr00r00               208 	call	_PushBank
+      00006D 33                     209 	inc	sp
+      00006E C1                     210 	pop	bc
+                                    211 ;/tmp/_gbsbuild/src/core/DataManager.c:60: LoadTiles(*(data_ptr++));
+      00006F 0A                     212 	ld	a, (bc)
+      000070 03                     213 	inc	bc
+      000071 5F                     214 	ld	e, a
+      000072 16 00                  215 	ld	d, #0x00
+      000074 C5                     216 	push	bc
+      000075 D5                     217 	push	de
+      000076 CDr00r00               218 	call	_LoadTiles
+      000079 E8 02                  219 	add	sp, #2
+      00007B C1                     220 	pop	bc
+                                    221 ;/tmp/_gbsbuild/src/core/DataManager.c:62: image_tile_width = *(data_ptr++);
+      00007C 0A                     222 	ld	a, (bc)
+      00007D EAr0Cr00               223 	ld	(#_image_tile_width),a
+      000080 03                     224 	inc	bc
+                                    225 ;/tmp/_gbsbuild/src/core/DataManager.c:63: image_tile_height = *(data_ptr++);
+      000081 0A                     226 	ld	a, (bc)
+      000082 EAr0Dr00               227 	ld	(#_image_tile_height),a
+      000085 03                     228 	inc	bc
+      000086 21r06r00               229 	ld	hl, #_image_ptr
+      000089 79                     230 	ld	a, c
+      00008A 22                     231 	ld	(hl+), a
+      00008B 70                     232 	ld	(hl), b
+                                    233 ;/tmp/_gbsbuild/src/core/DataManager.c:64: image_width = image_tile_width * 8;
+      00008C 21r0Cr00               234 	ld	hl, #_image_tile_width
+      00008F 4E                     235 	ld	c, (hl)
+      000090 AF                     236 	xor	a, a
+      000091 CB 21                  237 	sla	c
+      000093 8F                     238 	adc	a, a
+      000094 CB 21                  239 	sla	c
+      000096 8F                     240 	adc	a, a
+      000097 CB 21                  241 	sla	c
+      000099 8F                     242 	adc	a, a
+      00009A 21r0Er00               243 	ld	hl, #_image_width
+      00009D 71                     244 	ld	(hl), c
+      00009E 23                     245 	inc	hl
+                                    246 ;/tmp/_gbsbuild/src/core/DataManager.c:65: scroll_x_max = image_width - ((UINT16)SCREENWIDTH);
+      00009F 32                     247 	ld	(hl-), a
+      0000A0 7E                     248 	ld	a, (hl)
+      0000A1 C6 60                  249 	add	a, #0x60
+      0000A3 EAr00r00               250 	ld	(#_scroll_x_max),a
+      0000A6 FAr0Fr00               251 	ld	a, (#_image_width + 1)
+      0000A9 CE FF                  252 	adc	a, #0xff
+      0000AB EAr01r00               253 	ld	(#_scroll_x_max + 1),a
+                                    254 ;/tmp/_gbsbuild/src/core/DataManager.c:66: image_height = image_tile_height * 8;
+      0000AE 21r0Dr00               255 	ld	hl, #_image_tile_height
+      0000B1 4E                     256 	ld	c, (hl)
+      0000B2 AF                     257 	xor	a, a
+      0000B3 CB 21                  258 	sla	c
+      0000B5 8F                     259 	adc	a, a
+      0000B6 CB 21                  260 	sla	c
+      0000B8 8F                     261 	adc	a, a
+      0000B9 CB 21                  262 	sla	c
+      0000BB 8F                     263 	adc	a, a
+      0000BC 21r10r00               264 	ld	hl, #_image_height
+      0000BF 71                     265 	ld	(hl), c
+      0000C0 23                     266 	inc	hl
+                                    267 ;/tmp/_gbsbuild/src/core/DataManager.c:67: scroll_y_max = image_height - ((UINT16)SCREENHEIGHT);
+      0000C1 32                     268 	ld	(hl-), a
+      0000C2 7E                     269 	ld	a, (hl)
+      0000C3 C6 70                  270 	add	a, #0x70
+      0000C5 EAr00r00               271 	ld	(#_scroll_y_max),a
+      0000C8 FAr11r00               272 	ld	a, (#_image_height + 1)
+      0000CB CE FF                  273 	adc	a, #0xff
+      0000CD EAr01r00               274 	ld	(#_scroll_y_max + 1),a
+                                    275 ;/tmp/_gbsbuild/src/core/DataManager.c:70: POP_BANK;
+                                    276 ;/tmp/_gbsbuild/src/core/DataManager.c:71: }
+      0000D0 C3r00r00               277 	jp  _PopBank
+                                    278 ;/tmp/_gbsbuild/src/core/DataManager.c:73: void LoadImageAttr(UINT16 index) {
+                                    279 ;	---------------------------------
+                                    280 ; Function LoadImageAttr
+                                    281 ; ---------------------------------
+      0000D3                        282 _LoadImageAttr::
+                                    283 ;/tmp/_gbsbuild/src/core/DataManager.c:74: PUSH_BANK(DATA_PTRS_BANK);
+      0000D3 3E 05                  284 	ld	a, #0x05
+      0000D5 F5                     285 	push	af
+      0000D6 33                     286 	inc	sp
+      0000D7 CDr00r00               287 	call	_PushBank
+      0000DA 33                     288 	inc	sp
+                                    289 ;/tmp/_gbsbuild/src/core/DataManager.c:75: image_attr_bank = background_attr_bank_ptrs[index].bank;
+      0000DB F8 02                  290 	ldhl	sp,#2
+      0000DD 2A                     291 	ld	a, (hl+)
+      0000DE 4F                     292 	ld	c, a
+      0000DF 46                     293 	ld	b, (hl)
+      0000E0 69                     294 	ld	l, c
+      0000E1 60                     295 	ld	h, b
+      0000E2 29                     296 	add	hl, hl
+      0000E3 09                     297 	add	hl, bc
+      0000E4 01r00r00               298 	ld	bc,#_background_attr_bank_ptrs
+      0000E7 09                     299 	add	hl,bc
+      0000E8 4D                     300 	ld	c, l
+      0000E9 44                     301 	ld	b, h
+      0000EA 0A                     302 	ld	a, (bc)
+      0000EB EAr04r00               303 	ld	(#_image_attr_bank),a
+                                    304 ;/tmp/_gbsbuild/src/core/DataManager.c:77: (unsigned char*)(background_attr_bank_ptrs[index].offset + (BankDataPtr(image_attr_bank)));
+      0000EE 69                     305 	ld	l, c
+      0000EF 60                     306 	ld	h, b
+      0000F0 23                     307 	inc	hl
+      0000F1 2A                     308 	ld	a, (hl+)
+      0000F2 47                     309 	ld	b, a
+      0000F3 4E                     310 	ld	c, (hl)
+      0000F4 21r08r00               311 	ld	hl, #_image_attr_ptr
+      0000F7 70                     312 	ld	(hl), b
+      0000F8 79                     313 	ld	a, c
+      0000F9 C6 40                  314 	add	a, #0x40
+      0000FB 23                     315 	inc	hl
+      0000FC 77                     316 	ld	(hl), a
+                                    317 ;/tmp/_gbsbuild/src/core/DataManager.c:78: POP_BANK;
+                                    318 ;/tmp/_gbsbuild/src/core/DataManager.c:79: }
+      0000FD C3r00r00               319 	jp  _PopBank
+                                    320 ;/tmp/_gbsbuild/src/core/DataManager.c:81: void LoadPalette(UINT16 index) {
+                                    321 ;	---------------------------------
+                                    322 ; Function LoadPalette
+                                    323 ; ---------------------------------
+      000100                        324 _LoadPalette::
+                                    325 ;/tmp/_gbsbuild/src/core/DataManager.c:85: PUSH_BANK(DATA_PTRS_BANK);
+      000100 3E 05                  326 	ld	a, #0x05
+      000102 F5                     327 	push	af
+      000103 33                     328 	inc	sp
+      000104 CDr00r00               329 	call	_PushBank
+      000107 33                     330 	inc	sp
+                                    331 ;/tmp/_gbsbuild/src/core/DataManager.c:86: bank = palette_bank_ptrs[index].bank;
+      000108 F8 02                  332 	ldhl	sp,#2
+      00010A 2A                     333 	ld	a, (hl+)
+      00010B 4F                     334 	ld	c, a
+      00010C 46                     335 	ld	b, (hl)
+      00010D 69                     336 	ld	l, c
+      00010E 60                     337 	ld	h, b
+      00010F 29                     338 	add	hl, hl
+      000110 09                     339 	add	hl, bc
+      000111 01r00r00               340 	ld	bc,#_palette_bank_ptrs
+      000114 09                     341 	add	hl,bc
+                                    342 ;/tmp/_gbsbuild/src/core/DataManager.c:87: data_ptr = (UBYTE*)(palette_bank_ptrs[index].offset + (BankDataPtr(bank)));
+      000115 2A                     343 	ld	a, (hl+)
+      000116 47                     344 	ld	b, a
+      000117 2A                     345 	ld	a, (hl+)
+      000118 4E                     346 	ld	c, (hl)
+      000119 5F                     347 	ld	e, a
+      00011A 79                     348 	ld	a, c
+      00011B C6 40                  349 	add	a, #0x40
+      00011D 57                     350 	ld	d, a
+                                    351 ;/tmp/_gbsbuild/src/core/DataManager.c:88: POP_BANK;
+      00011E C5                     352 	push	bc
+      00011F D5                     353 	push	de
+      000120 CDr00r00               354 	call	_PopBank
+      000123 D1                     355 	pop	de
+      000124 C1                     356 	pop	bc
+                                    357 ;/tmp/_gbsbuild/src/core/DataManager.c:90: PUSH_BANK(bank);
+      000125 D5                     358 	push	de
+      000126 C5                     359 	push	bc
+      000127 33                     360 	inc	sp
+      000128 CDr00r00               361 	call	_PushBank
+      00012B 33                     362 	inc	sp
+      00012C D1                     363 	pop	de
+                                    364 ;/tmp/_gbsbuild/src/core/DataManager.c:92: memcpy(BkgPalette, data_ptr, 48);
+      00012D 4B                     365 	ld	c, e
+      00012E 42                     366 	ld	b, d
+                                    367 ;/tmp/_gbsbuild/src/core/DataManager.c:91: if (palette_update_mask == 0x3F) {
+      00012F FAr00r00               368 	ld	a, (#_palette_update_mask)
+      000132 D6 3F                  369 	sub	a, #0x3f
+      000134 20 11                  370 	jr	NZ, 00114$
+                                    371 ;/tmp/_gbsbuild/src/core/DataManager.c:92: memcpy(BkgPalette, data_ptr, 48);
+      000136 21 30 00               372 	ld	hl, #0x0030
+      000139 E5                     373 	push	hl
+      00013A C5                     374 	push	bc
+      00013B 21r00r00               375 	ld	hl, #_BkgPalette
+      00013E E5                     376 	push	hl
+      00013F CDr00r00               377 	call	_memcpy
+      000142 E8 06                  378 	add	sp, #6
+      000144 C3r00r00               379 	jp	_PopBank
+      000147                        380 00114$:
+                                    381 ;/tmp/_gbsbuild/src/core/DataManager.c:94: if (palette_update_mask & 0x1) {
+      000147 FAr00r00               382 	ld	a, (#_palette_update_mask)
+      00014A 0F                     383 	rrca
+      00014B 30 10                  384 	jr	NC, 00102$
+                                    385 ;/tmp/_gbsbuild/src/core/DataManager.c:95: memcpy(BkgPalette, data_ptr, 8);
+      00014D D5                     386 	push	de
+      00014E 21 08 00               387 	ld	hl, #0x0008
+      000151 E5                     388 	push	hl
+      000152 C5                     389 	push	bc
+      000153 21r00r00               390 	ld	hl, #_BkgPalette
+      000156 E5                     391 	push	hl
+      000157 CDr00r00               392 	call	_memcpy
+      00015A E8 06                  393 	add	sp, #6
+      00015C D1                     394 	pop	de
+      00015D                        395 00102$:
+                                    396 ;/tmp/_gbsbuild/src/core/DataManager.c:97: if (palette_update_mask & 0x2) {
+      00015D FAr00r00               397 	ld	a, (#_palette_update_mask)
+      000160 CB 4F                  398 	bit	1, a
+      000162 28 16                  399 	jr	Z, 00104$
+                                    400 ;/tmp/_gbsbuild/src/core/DataManager.c:98: memcpy(BkgPalette + 4, data_ptr + 8, 8);
+      000164 21 08 00               401 	ld	hl, #0x0008
+      000167 19                     402 	add	hl, de
+      000168 4D                     403 	ld	c, l
+      000169 44                     404 	ld	b, h
+      00016A D5                     405 	push	de
+      00016B 21 08 00               406 	ld	hl, #0x0008
+      00016E E5                     407 	push	hl
+      00016F C5                     408 	push	bc
+      000170 21r08r00               409 	ld	hl, #(_BkgPalette + 0x0008)
+      000173 E5                     410 	push	hl
+      000174 CDr00r00               411 	call	_memcpy
+      000177 E8 06                  412 	add	sp, #6
+      000179 D1                     413 	pop	de
+      00017A                        414 00104$:
+                                    415 ;/tmp/_gbsbuild/src/core/DataManager.c:100: if (palette_update_mask & 0x4) {
+      00017A FAr00r00               416 	ld	a, (#_palette_update_mask)
+      00017D CB 57                  417 	bit	2, a
+      00017F 28 16                  418 	jr	Z, 00106$
+                                    419 ;/tmp/_gbsbuild/src/core/DataManager.c:101: memcpy(BkgPalette + 8, data_ptr + 16, 8);
+      000181 21 10 00               420 	ld	hl, #0x0010
+      000184 19                     421 	add	hl, de
+      000185 4D                     422 	ld	c, l
+      000186 44                     423 	ld	b, h
+      000187 D5                     424 	push	de
+      000188 21 08 00               425 	ld	hl, #0x0008
+      00018B E5                     426 	push	hl
+      00018C C5                     427 	push	bc
+      00018D 21r10r00               428 	ld	hl, #(_BkgPalette + 0x0010)
+      000190 E5                     429 	push	hl
+      000191 CDr00r00               430 	call	_memcpy
+      000194 E8 06                  431 	add	sp, #6
+      000196 D1                     432 	pop	de
+      000197                        433 00106$:
+                                    434 ;/tmp/_gbsbuild/src/core/DataManager.c:103: if (palette_update_mask & 0x8) {
+      000197 FAr00r00               435 	ld	a, (#_palette_update_mask)
+      00019A CB 5F                  436 	bit	3, a
+      00019C 28 16                  437 	jr	Z, 00108$
+                                    438 ;/tmp/_gbsbuild/src/core/DataManager.c:104: memcpy(BkgPalette + 12, data_ptr + 24, 8);
+      00019E 21 18 00               439 	ld	hl, #0x0018
+      0001A1 19                     440 	add	hl, de
+      0001A2 4D                     441 	ld	c, l
+      0001A3 44                     442 	ld	b, h
+      0001A4 D5                     443 	push	de
+      0001A5 21 08 00               444 	ld	hl, #0x0008
+      0001A8 E5                     445 	push	hl
+      0001A9 C5                     446 	push	bc
+      0001AA 21r18r00               447 	ld	hl, #(_BkgPalette + 0x0018)
+      0001AD E5                     448 	push	hl
+      0001AE CDr00r00               449 	call	_memcpy
+      0001B1 E8 06                  450 	add	sp, #6
+      0001B3 D1                     451 	pop	de
+      0001B4                        452 00108$:
+                                    453 ;/tmp/_gbsbuild/src/core/DataManager.c:106: if (palette_update_mask & 0x10) {
+      0001B4 FAr00r00               454 	ld	a, (#_palette_update_mask)
+      0001B7 CB 67                  455 	bit	4, a
+      0001B9 28 16                  456 	jr	Z, 00110$
+                                    457 ;/tmp/_gbsbuild/src/core/DataManager.c:107: memcpy(BkgPalette + 16, data_ptr + 32, 8);
+      0001BB 21 20 00               458 	ld	hl, #0x0020
+      0001BE 19                     459 	add	hl, de
+      0001BF 4D                     460 	ld	c, l
+      0001C0 44                     461 	ld	b, h
+      0001C1 D5                     462 	push	de
+      0001C2 21 08 00               463 	ld	hl, #0x0008
+      0001C5 E5                     464 	push	hl
+      0001C6 C5                     465 	push	bc
+      0001C7 21r20r00               466 	ld	hl, #(_BkgPalette + 0x0020)
+      0001CA E5                     467 	push	hl
+      0001CB CDr00r00               468 	call	_memcpy
+      0001CE E8 06                  469 	add	sp, #6
+      0001D0 D1                     470 	pop	de
+      0001D1                        471 00110$:
+                                    472 ;/tmp/_gbsbuild/src/core/DataManager.c:109: if (palette_update_mask & 0x20) {
+      0001D1 FAr00r00               473 	ld	a, (#_palette_update_mask)
+      0001D4 CB 6F                  474 	bit	5, a
+      0001D6 CAr00r00               475 	jp	Z,_PopBank
+                                    476 ;/tmp/_gbsbuild/src/core/DataManager.c:110: memcpy(BkgPalette + 20, data_ptr + 40, 8);
+      0001D9 21 28 00               477 	ld	hl, #0x0028
+      0001DC 19                     478 	add	hl, de
+      0001DD 4D                     479 	ld	c, l
+      0001DE 44                     480 	ld	b, h
+      0001DF 21 08 00               481 	ld	hl, #0x0008
+      0001E2 E5                     482 	push	hl
+      0001E3 C5                     483 	push	bc
+      0001E4 21r28r00               484 	ld	hl, #(_BkgPalette + 0x0028)
+      0001E7 E5                     485 	push	hl
+      0001E8 CDr00r00               486 	call	_memcpy
+      0001EB E8 06                  487 	add	sp, #6
+                                    488 ;/tmp/_gbsbuild/src/core/DataManager.c:112: }  POP_BANK;
+                                    489 ;/tmp/_gbsbuild/src/core/DataManager.c:113: }
+      0001ED C3r00r00               490 	jp  _PopBank
+                                    491 ;/tmp/_gbsbuild/src/core/DataManager.c:115: void LoadUIPalette(UINT16 index) {
+                                    492 ;	---------------------------------
+                                    493 ; Function LoadUIPalette
+                                    494 ; ---------------------------------
+      0001F0                        495 _LoadUIPalette::
+                                    496 ;/tmp/_gbsbuild/src/core/DataManager.c:119: PUSH_BANK(DATA_PTRS_BANK);
+      0001F0 3E 05                  497 	ld	a, #0x05
+      0001F2 F5                     498 	push	af
+      0001F3 33                     499 	inc	sp
+      0001F4 CDr00r00               500 	call	_PushBank
+      0001F7 33                     501 	inc	sp
+                                    502 ;/tmp/_gbsbuild/src/core/DataManager.c:120: bank = palette_bank_ptrs[index].bank;
+      0001F8 F8 02                  503 	ldhl	sp,#2
+      0001FA 2A                     504 	ld	a, (hl+)
+      0001FB 4F                     505 	ld	c, a
+      0001FC 46                     506 	ld	b, (hl)
+      0001FD 69                     507 	ld	l, c
+      0001FE 60                     508 	ld	h, b
+      0001FF 29                     509 	add	hl, hl
+      000200 09                     510 	add	hl, bc
+      000201 01r00r00               511 	ld	bc,#_palette_bank_ptrs
+      000204 09                     512 	add	hl,bc
+                                    513 ;/tmp/_gbsbuild/src/core/DataManager.c:121: data_ptr = (UBYTE*)(palette_bank_ptrs[index].offset + (BankDataPtr(bank)));
+      000205 2A                     514 	ld	a, (hl+)
+      000206 47                     515 	ld	b, a
+      000207 2A                     516 	ld	a, (hl+)
+      000208 4E                     517 	ld	c, (hl)
+      000209 5F                     518 	ld	e, a
+      00020A 79                     519 	ld	a, c
+      00020B C6 40                  520 	add	a, #0x40
+      00020D 57                     521 	ld	d, a
+                                    522 ;/tmp/_gbsbuild/src/core/DataManager.c:122: POP_BANK;
+      00020E C5                     523 	push	bc
+      00020F D5                     524 	push	de
+      000210 CDr00r00               525 	call	_PopBank
+      000213 D1                     526 	pop	de
+      000214 C1                     527 	pop	bc
+                                    528 ;/tmp/_gbsbuild/src/core/DataManager.c:124: PUSH_BANK(bank);
+      000215 D5                     529 	push	de
+      000216 C5                     530 	push	bc
+      000217 33                     531 	inc	sp
+      000218 CDr00r00               532 	call	_PushBank
+      00021B 33                     533 	inc	sp
+      00021C D1                     534 	pop	de
+                                    535 ;/tmp/_gbsbuild/src/core/DataManager.c:125: memcpy(BkgPalette + UI_PALETTE_OFFSET, data_ptr, 8);
+      00021D 21 08 00               536 	ld	hl, #0x0008
+      000220 E5                     537 	push	hl
+      000221 D5                     538 	push	de
+      000222 21r38r00               539 	ld	hl, #(_BkgPalette + 0x0038)
+      000225 E5                     540 	push	hl
+      000226 CDr00r00               541 	call	_memcpy
+      000229 E8 06                  542 	add	sp, #6
+                                    543 ;/tmp/_gbsbuild/src/core/DataManager.c:126: POP_BANK;
+                                    544 ;/tmp/_gbsbuild/src/core/DataManager.c:127: }
+      00022B C3r00r00               545 	jp  _PopBank
+                                    546 ;/tmp/_gbsbuild/src/core/DataManager.c:129: void LoadSpritePalette(UINT16 index) {
+                                    547 ;	---------------------------------
+                                    548 ; Function LoadSpritePalette
+                                    549 ; ---------------------------------
+      00022E                        550 _LoadSpritePalette::
+                                    551 ;/tmp/_gbsbuild/src/core/DataManager.c:133: PUSH_BANK(DATA_PTRS_BANK);
+      00022E 3E 05                  552 	ld	a, #0x05
+      000230 F5                     553 	push	af
+      000231 33                     554 	inc	sp
+      000232 CDr00r00               555 	call	_PushBank
+      000235 33                     556 	inc	sp
+                                    557 ;/tmp/_gbsbuild/src/core/DataManager.c:134: bank = palette_bank_ptrs[index].bank;
+      000236 F8 02                  558 	ldhl	sp,#2
+      000238 2A                     559 	ld	a, (hl+)
+      000239 4F                     560 	ld	c, a
+      00023A 46                     561 	ld	b, (hl)
+      00023B 69                     562 	ld	l, c
+      00023C 60                     563 	ld	h, b
+      00023D 29                     564 	add	hl, hl
+      00023E 09                     565 	add	hl, bc
+      00023F 01r00r00               566 	ld	bc,#_palette_bank_ptrs
+      000242 09                     567 	add	hl,bc
+                                    568 ;/tmp/_gbsbuild/src/core/DataManager.c:135: data_ptr = (UBYTE*)(palette_bank_ptrs[index].offset + (BankDataPtr(bank)));
+      000243 2A                     569 	ld	a, (hl+)
+      000244 47                     570 	ld	b, a
+      000245 2A                     571 	ld	a, (hl+)
+      000246 4E                     572 	ld	c, (hl)
+      000247 5F                     573 	ld	e, a
+      000248 79                     574 	ld	a, c
+      000249 C6 40                  575 	add	a, #0x40
+      00024B 57                     576 	ld	d, a
+                                    577 ;/tmp/_gbsbuild/src/core/DataManager.c:136: POP_BANK;
+      00024C C5                     578 	push	bc
+      00024D D5                     579 	push	de
+      00024E CDr00r00               580 	call	_PopBank
+      000251 D1                     581 	pop	de
+      000252 C1                     582 	pop	bc
+                                    583 ;/tmp/_gbsbuild/src/core/DataManager.c:138: PUSH_BANK(bank);
+      000253 D5                     584 	push	de
+      000254 C5                     585 	push	bc
+      000255 33                     586 	inc	sp
+      000256 CDr00r00               587 	call	_PushBank
+      000259 33                     588 	inc	sp
+      00025A D1                     589 	pop	de
+                                    590 ;/tmp/_gbsbuild/src/core/DataManager.c:139: memcpy(SprPalette, data_ptr, 56);
+      00025B 21 38 00               591 	ld	hl, #0x0038
+      00025E E5                     592 	push	hl
+      00025F D5                     593 	push	de
+      000260 21r00r00               594 	ld	hl, #_SprPalette
+      000263 E5                     595 	push	hl
+      000264 CDr00r00               596 	call	_memcpy
+      000267 E8 06                  597 	add	sp, #6
+                                    598 ;/tmp/_gbsbuild/src/core/DataManager.c:140: POP_BANK;
+                                    599 ;/tmp/_gbsbuild/src/core/DataManager.c:141: }
+      000269 C3r00r00               600 	jp  _PopBank
+                                    601 ;/tmp/_gbsbuild/src/core/DataManager.c:143: void LoadPlayerSpritePalette(UINT16 index) {
+                                    602 ;	---------------------------------
+                                    603 ; Function LoadPlayerSpritePalette
+                                    604 ; ---------------------------------
+      00026C                        605 _LoadPlayerSpritePalette::
+                                    606 ;/tmp/_gbsbuild/src/core/DataManager.c:147: PUSH_BANK(DATA_PTRS_BANK);
+      00026C 3E 05                  607 	ld	a, #0x05
+      00026E F5                     608 	push	af
+      00026F 33                     609 	inc	sp
+      000270 CDr00r00               610 	call	_PushBank
+      000273 33                     611 	inc	sp
+                                    612 ;/tmp/_gbsbuild/src/core/DataManager.c:148: bank = palette_bank_ptrs[index].bank;
+      000274 F8 02                  613 	ldhl	sp,#2
+      000276 2A                     614 	ld	a, (hl+)
+      000277 4F                     615 	ld	c, a
+      000278 46                     616 	ld	b, (hl)
+      000279 69                     617 	ld	l, c
+      00027A 60                     618 	ld	h, b
+      00027B 29                     619 	add	hl, hl
+      00027C 09                     620 	add	hl, bc
+      00027D 01r00r00               621 	ld	bc,#_palette_bank_ptrs
+      000280 09                     622 	add	hl,bc
+                                    623 ;/tmp/_gbsbuild/src/core/DataManager.c:149: data_ptr = (UBYTE*)(palette_bank_ptrs[index].offset + (BankDataPtr(bank)));
+      000281 2A                     624 	ld	a, (hl+)
+      000282 47                     625 	ld	b, a
+      000283 2A                     626 	ld	a, (hl+)
+      000284 4E                     627 	ld	c, (hl)
+      000285 5F                     628 	ld	e, a
+      000286 79                     629 	ld	a, c
+      000287 C6 40                  630 	add	a, #0x40
+      000289 57                     631 	ld	d, a
+                                    632 ;/tmp/_gbsbuild/src/core/DataManager.c:150: POP_BANK;
+      00028A C5                     633 	push	bc
+      00028B D5                     634 	push	de
+      00028C CDr00r00               635 	call	_PopBank
+      00028F D1                     636 	pop	de
+      000290 C1                     637 	pop	bc
+                                    638 ;/tmp/_gbsbuild/src/core/DataManager.c:152: PUSH_BANK(bank);
+      000291 D5                     639 	push	de
+      000292 C5                     640 	push	bc
+      000293 33                     641 	inc	sp
+      000294 CDr00r00               642 	call	_PushBank
+      000297 33                     643 	inc	sp
+      000298 D1                     644 	pop	de
+                                    645 ;/tmp/_gbsbuild/src/core/DataManager.c:153: memcpy(SprPalette + PLAYER_PALETTE_OFFSET, data_ptr, 8);
+      000299 21 08 00               646 	ld	hl, #0x0008
+      00029C E5                     647 	push	hl
+      00029D D5                     648 	push	de
+      00029E 21r38r00               649 	ld	hl, #(_SprPalette + 0x0038)
+      0002A1 E5                     650 	push	hl
+      0002A2 CDr00r00               651 	call	_memcpy
+      0002A5 E8 06                  652 	add	sp, #6
+                                    653 ;/tmp/_gbsbuild/src/core/DataManager.c:154: POP_BANK;
+                                    654 ;/tmp/_gbsbuild/src/core/DataManager.c:155: }
+      0002A7 C3r00r00               655 	jp  _PopBank
+                                    656 ;/tmp/_gbsbuild/src/core/DataManager.c:157: UBYTE LoadSprite(UINT16 index, UBYTE sprite_offset) {
+                                    657 ;	---------------------------------
+                                    658 ; Function LoadSprite
+                                    659 ; ---------------------------------
+      0002AA                        660 _LoadSprite::
+                                    661 ;/tmp/_gbsbuild/src/core/DataManager.c:161: PUSH_BANK(DATA_PTRS_BANK);
+      0002AA 3E 05                  662 	ld	a, #0x05
+      0002AC F5                     663 	push	af
+      0002AD 33                     664 	inc	sp
+      0002AE CDr00r00               665 	call	_PushBank
+      0002B1 33                     666 	inc	sp
+                                    667 ;/tmp/_gbsbuild/src/core/DataManager.c:162: bank = sprite_bank_ptrs[index].bank;
+      0002B2 F8 02                  668 	ldhl	sp,#2
+      0002B4 2A                     669 	ld	a, (hl+)
+      0002B5 4F                     670 	ld	c, a
+      0002B6 46                     671 	ld	b, (hl)
+      0002B7 69                     672 	ld	l, c
+      0002B8 60                     673 	ld	h, b
+      0002B9 29                     674 	add	hl, hl
+      0002BA 09                     675 	add	hl, bc
+      0002BB 01r00r00               676 	ld	bc,#_sprite_bank_ptrs
+      0002BE 09                     677 	add	hl,bc
+                                    678 ;/tmp/_gbsbuild/src/core/DataManager.c:163: data_ptr = (UBYTE*)(sprite_bank_ptrs[index].offset + (BankDataPtr(bank)));
+      0002BF 2A                     679 	ld	a, (hl+)
+      0002C0 47                     680 	ld	b, a
+      0002C1 2A                     681 	ld	a, (hl+)
+      0002C2 4E                     682 	ld	c, (hl)
+      0002C3 5F                     683 	ld	e, a
+      0002C4 79                     684 	ld	a, c
+      0002C5 C6 40                  685 	add	a, #0x40
+      0002C7 57                     686 	ld	d, a
+                                    687 ;/tmp/_gbsbuild/src/core/DataManager.c:164: POP_BANK;
+      0002C8 C5                     688 	push	bc
+      0002C9 D5                     689 	push	de
+      0002CA CDr00r00               690 	call	_PopBank
+      0002CD D1                     691 	pop	de
+      0002CE C1                     692 	pop	bc
+                                    693 ;/tmp/_gbsbuild/src/core/DataManager.c:166: PUSH_BANK(bank);
+      0002CF D5                     694 	push	de
+      0002D0 C5                     695 	push	bc
+      0002D1 33                     696 	inc	sp
+      0002D2 CDr00r00               697 	call	_PushBank
+      0002D5 33                     698 	inc	sp
+      0002D6 D1                     699 	pop	de
+                                    700 ;/tmp/_gbsbuild/src/core/DataManager.c:167: sprite_frames = *(data_ptr++);
+      0002D7 1A                     701 	ld	a, (de)
+      0002D8 4F                     702 	ld	c, a
+      0002D9 13                     703 	inc	de
+                                    704 ;/tmp/_gbsbuild/src/core/DataManager.c:168: size = sprite_frames * 4;
+      0002DA 79                     705 	ld	a, c
+      0002DB 87                     706 	add	a, a
+      0002DC 87                     707 	add	a, a
+      0002DD 47                     708 	ld	b, a
+                                    709 ;/tmp/_gbsbuild/src/core/DataManager.c:170: if (sprite_offset == 0 && sprite_frames > 6) {
+      0002DE F8 04                  710 	ldhl	sp,	#4
+      0002E0 7E                     711 	ld	a, (hl)
+      0002E1 B7                     712 	or	a, a
+      0002E2 20 09                  713 	jr	NZ, 00102$
+      0002E4 3E 06                  714 	ld	a, #0x06
+      0002E6 91                     715 	sub	a, c
+      0002E7 30 04                  716 	jr	NC, 00102$
+                                    717 ;/tmp/_gbsbuild/src/core/DataManager.c:171: load_size = MAX_PLAYER_SPRITE_SIZE;
+      0002E9 3E 18                  718 	ld	a, #0x18
+      0002EB 18 01                  719 	jr	00103$
+      0002ED                        720 00102$:
+                                    721 ;/tmp/_gbsbuild/src/core/DataManager.c:173: load_size = size;
+      0002ED 78                     722 	ld	a, b
+      0002EE                        723 00103$:
+                                    724 ;/tmp/_gbsbuild/src/core/DataManager.c:176: set_sprite_data(sprite_offset, load_size, data_ptr);
+      0002EE D5                     725 	push	de
+      0002EF F5                     726 	push	af
+      0002F0 33                     727 	inc	sp
+      0002F1 F8 07                  728 	ldhl	sp,	#7
+      0002F3 7E                     729 	ld	a, (hl)
+      0002F4 F5                     730 	push	af
+      0002F5 33                     731 	inc	sp
+      0002F6 CDr00r00               732 	call	_set_sprite_data
+      0002F9 E8 04                  733 	add	sp, #4
+                                    734 ;/tmp/_gbsbuild/src/core/DataManager.c:177: POP_BANK;
+      0002FB C5                     735 	push	bc
+      0002FC CDr00r00               736 	call	_PopBank
+      0002FF C1                     737 	pop	bc
+                                    738 ;/tmp/_gbsbuild/src/core/DataManager.c:179: return size;
+      000300 58                     739 	ld	e, b
+                                    740 ;/tmp/_gbsbuild/src/core/DataManager.c:180: }
+      000301 C9                     741 	ret
+                                    742 ;/tmp/_gbsbuild/src/core/DataManager.c:182: void LoadScene(UINT16 index) {
+                                    743 ;	---------------------------------
+                                    744 ; Function LoadScene
+                                    745 ; ---------------------------------
+      000302                        746 _LoadScene::
+      000302 E8 F6                  747 	add	sp, #-10
+                                    748 ;/tmp/_gbsbuild/src/core/DataManager.c:186: PUSH_BANK(DATA_PTRS_BANK);
+      000304 3E 05                  749 	ld	a, #0x05
+      000306 F5                     750 	push	af
+      000307 33                     751 	inc	sp
+      000308 CDr00r00               752 	call	_PushBank
+      00030B 33                     753 	inc	sp
+                                    754 ;/tmp/_gbsbuild/src/core/DataManager.c:187: bank = scene_bank_ptrs[index].bank;
+      00030C F8 0C                  755 	ldhl	sp,#12
+      00030E 2A                     756 	ld	a, (hl+)
+      00030F 4F                     757 	ld	c, a
+      000310 46                     758 	ld	b, (hl)
+      000311 69                     759 	ld	l, c
+      000312 60                     760 	ld	h, b
+      000313 29                     761 	add	hl, hl
+      000314 09                     762 	add	hl, bc
+      000315 4D                     763 	ld	c, l
+      000316 44                     764 	ld	b, h
+      000317 21r00r00               765 	ld	hl, #_scene_bank_ptrs
+      00031A 09                     766 	add	hl, bc
+      00031B 5D                     767 	ld	e, l
+      00031C 54                     768 	ld	d, h
+      00031D 1A                     769 	ld	a, (de)
+      00031E F8 05                  770 	ldhl	sp,	#5
+      000320 77                     771 	ld	(hl), a
+                                    772 ;/tmp/_gbsbuild/src/core/DataManager.c:188: data_ptr = (scene_bank_ptrs[index].offset + (BankDataPtr(bank)));
+      000321 6B                     773 	ld	l, e
+      000322 62                     774 	ld	h, d
+      000323 23                     775 	inc	hl
+      000324 5D                     776 	ld	e, l
+      000325 54                     777 	ld	d, h
+      000326 1A                     778 	ld	a, (de)
+      000327 F8 06                  779 	ldhl	sp,	#6
+      000329 22                     780 	ld	(hl+), a
+      00032A 13                     781 	inc	de
+      00032B 1A                     782 	ld	a, (de)
+      00032C 77                     783 	ld	(hl), a
+                                    784 ;c
+      00032D F8 06                  785 	ldhl	sp,#6
+      00032F 2A                     786 	ld	a, (hl+)
+      000330 5F                     787 	ld	e, a
+      000331 56                     788 	ld	d, (hl)
+      000332 21 00 40               789 	ld	hl, #0x4000
+      000335 19                     790 	add	hl, de
+      000336 E5                     791 	push	hl
+      000337 7D                     792 	ld	a, l
+      000338 F8 0A                  793 	ldhl	sp,	#10
+      00033A 77                     794 	ld	(hl), a
+      00033B E1                     795 	pop	hl
+      00033C 7C                     796 	ld	a, h
+      00033D F8 09                  797 	ldhl	sp,	#9
+      00033F 77                     798 	ld	(hl), a
+                                    799 ;/tmp/_gbsbuild/src/core/DataManager.c:190: collision_bank = collision_bank_ptrs[index].bank;
+      000340 21r00r00               800 	ld	hl, #_collision_bank_ptrs
+      000343 09                     801 	add	hl, bc
+      000344 4D                     802 	ld	c, l
+      000345 44                     803 	ld	b, h
+      000346 0A                     804 	ld	a, (bc)
+      000347 EAr05r00               805 	ld	(#_collision_bank),a
+                                    806 ;/tmp/_gbsbuild/src/core/DataManager.c:192: (unsigned char*)(collision_bank_ptrs[index].offset + (BankDataPtr(collision_bank)));
+      00034A 69                     807 	ld	l, c
+      00034B 60                     808 	ld	h, b
+      00034C 23                     809 	inc	hl
+      00034D 2A                     810 	ld	a, (hl+)
+      00034E 47                     811 	ld	b, a
+      00034F 4E                     812 	ld	c, (hl)
+      000350 21r0Ar00               813 	ld	hl, #_collision_ptr
+      000353 70                     814 	ld	(hl), b
+      000354 79                     815 	ld	a, c
+      000355 C6 40                  816 	add	a, #0x40
+      000357 23                     817 	inc	hl
+      000358 77                     818 	ld	(hl), a
+                                    819 ;/tmp/_gbsbuild/src/core/DataManager.c:193: POP_BANK;
+      000359 CDr00r00               820 	call	_PopBank
+                                    821 ;/tmp/_gbsbuild/src/core/DataManager.c:195: SpritePoolReset();
+      00035C CDr00r00               822 	call	_SpritePoolReset
+                                    823 ;/tmp/_gbsbuild/src/core/DataManager.c:196: ScriptCtxPoolReset();
+      00035F CDr00r00               824 	call	_ScriptCtxPoolReset
+                                    825 ;/tmp/_gbsbuild/src/core/DataManager.c:198: PUSH_BANK(bank);
+      000362 F8 05                  826 	ldhl	sp,	#5
+      000364 7E                     827 	ld	a, (hl)
+      000365 F5                     828 	push	af
+      000366 33                     829 	inc	sp
+      000367 CDr00r00               830 	call	_PushBank
+      00036A 33                     831 	inc	sp
+                                    832 ;/tmp/_gbsbuild/src/core/DataManager.c:199: LoadImage((*(data_ptr++) * 256) + *(data_ptr++));
+      00036B F8 08                  833 	ldhl	sp,#8
+      00036D 2A                     834 	ld	a, (hl+)
+      00036E 5F                     835 	ld	e, a
+      00036F 56                     836 	ld	d, (hl)
+      000370 1A                     837 	ld	a, (de)
+      000371 47                     838 	ld	b, a
+      000372 2B                     839 	dec	hl
+      000373 2A                     840 	ld	a, (hl+)
+      000374 5F                     841 	ld	e, a
+      000375 56                     842 	ld	d, (hl)
+      000376 13                     843 	inc	de
+      000377 0E 00                  844 	ld	c, #0x00
+      000379 1A                     845 	ld	a, (de)
+      00037A 13                     846 	inc	de
+      00037B 6F                     847 	ld	l, a
+      00037C 26 00                  848 	ld	h, #0x00
+      00037E 09                     849 	add	hl, bc
+      00037F D5                     850 	push	de
+      000380 E5                     851 	push	hl
+      000381 CDr3Dr00               852 	call	_LoadImage
+      000384 E8 02                  853 	add	sp, #2
+      000386 F8 0E                  854 	ldhl	sp,	#14
+      000388 2A                     855 	ld	a, (hl+)
+      000389 66                     856 	ld	h, (hl)
+      00038A 6F                     857 	ld	l, a
+      00038B E5                     858 	push	hl
+      00038C CDrD3r00               859 	call	_LoadImageAttr
+      00038F E8 02                  860 	add	sp, #2
+      000391 D1                     861 	pop	de
+                                    862 ;/tmp/_gbsbuild/src/core/DataManager.c:201: LoadPalette((*(data_ptr++) * 256) + *(data_ptr++));
+      000392 1A                     863 	ld	a, (de)
+      000393 4F                     864 	ld	c, a
+      000394 13                     865 	inc	de
+      000395 41                     866 	ld	b, c
+      000396 0E 00                  867 	ld	c, #0x00
+      000398 1A                     868 	ld	a, (de)
+      000399 13                     869 	inc	de
+      00039A 6F                     870 	ld	l, a
+      00039B 26 00                  871 	ld	h, #0x00
+      00039D 09                     872 	add	hl, bc
+      00039E D5                     873 	push	de
+      00039F E5                     874 	push	hl
+      0003A0 CDr00r01               875 	call	_LoadPalette
+      0003A3 E8 02                  876 	add	sp, #2
+      0003A5 D1                     877 	pop	de
+                                    878 ;/tmp/_gbsbuild/src/core/DataManager.c:202: LoadSpritePalette((*(data_ptr++) * 256) + *(data_ptr++));
+      0003A6 1A                     879 	ld	a, (de)
+      0003A7 4F                     880 	ld	c, a
+      0003A8 13                     881 	inc	de
+      0003A9 41                     882 	ld	b, c
+      0003AA 0E 00                  883 	ld	c, #0x00
+      0003AC 1A                     884 	ld	a, (de)
+      0003AD 13                     885 	inc	de
+      0003AE 6F                     886 	ld	l, a
+      0003AF 26 00                  887 	ld	h, #0x00
+      0003B1 09                     888 	add	hl, bc
+      0003B2 D5                     889 	push	de
+      0003B3 E5                     890 	push	hl
+      0003B4 CDr2Er02               891 	call	_LoadSpritePalette
+      0003B7 E8 02                  892 	add	sp, #2
+      0003B9 21 00 00               893 	ld	hl, #0x0000
+      0003BC E5                     894 	push	hl
+      0003BD CDr6Cr02               895 	call	_LoadPlayerSpritePalette
+      0003C0 E8 02                  896 	add	sp, #2
+      0003C2 21 01 00               897 	ld	hl, #0x0001
+      0003C5 E5                     898 	push	hl
+      0003C6 CDrF0r01               899 	call	_LoadUIPalette
+      0003C9 E8 02                  900 	add	sp, #2
+      0003CB CDr00r00               901 	call	_UIReset
+      0003CE CDr00r00               902 	call	_RemoveInputScripts
+      0003D1 CDr00r00               903 	call	_ProjectilesInit
+      0003D4 CDr00r00               904 	call	_InitPlayer
+      0003D7 D1                     905 	pop	de
+                                    906 ;/tmp/_gbsbuild/src/core/DataManager.c:211: scene_type = (*(data_ptr++)) + 1;
+      0003D8 1A                     907 	ld	a, (de)
+      0003D9 13                     908 	inc	de
+      0003DA 3C                     909 	inc	a
+      0003DB EAr14r00               910 	ld	(#_scene_type),a
+                                    911 ;/tmp/_gbsbuild/src/core/DataManager.c:212: sprites_len = (*(data_ptr++)) + 1;
+      0003DE 1A                     912 	ld	a, (de)
+      0003DF 13                     913 	inc	de
+      0003E0 3C                     914 	inc	a
+      0003E1 EAr12r00               915 	ld	(#_sprites_len),a
+                                    916 ;/tmp/_gbsbuild/src/core/DataManager.c:213: actors_len = (*(data_ptr++)) + 1;
+      0003E4 1A                     917 	ld	a, (de)
+      0003E5 13                     918 	inc	de
+      0003E6 3C                     919 	inc	a
+      0003E7 EAr13r00               920 	ld	(#_actors_len),a
+                                    921 ;/tmp/_gbsbuild/src/core/DataManager.c:214: triggers_len = *(data_ptr++);
+      0003EA 1A                     922 	ld	a, (de)
+      0003EB EAr00r00               923 	ld	(#_triggers_len),a
+      0003EE 13                     924 	inc	de
+                                    925 ;/tmp/_gbsbuild/src/core/DataManager.c:216: scene_events_start_ptr.bank = *(data_ptr++);
+      0003EF 01r15r00               926 	ld	bc, #_scene_events_start_ptr+0
+      0003F2 1A                     927 	ld	a, (de)
+      0003F3 13                     928 	inc	de
+      0003F4 02                     929 	ld	(bc), a
+                                    930 ;/tmp/_gbsbuild/src/core/DataManager.c:217: scene_events_start_ptr.offset = *(data_ptr++) + (*(data_ptr++) * 256);
+      0003F5 1A                     931 	ld	a, (de)
+      0003F6 13                     932 	inc	de
+      0003F7 4F                     933 	ld	c, a
+      0003F8 06 00                  934 	ld	b, #0x00
+      0003FA 1A                     935 	ld	a, (de)
+      0003FB F8 09                  936 	ldhl	sp,	#9
+      0003FD 77                     937 	ld	(hl), a
+      0003FE 13                     938 	inc	de
+      0003FF 33                     939 	inc	sp
+      000400 33                     940 	inc	sp
+      000401 D5                     941 	push	de
+      000402 5E                     942 	ld	e, (hl)
+      000403 3E 00                  943 	ld	a, #0x00
+      000405 81                     944 	add	a, c
+      000406 4F                     945 	ld	c, a
+      000407 7B                     946 	ld	a, e
+      000408 88                     947 	adc	a, b
+      000409 47                     948 	ld	b, a
+      00040A 21r16r00               949 	ld	hl, #(_scene_events_start_ptr + 0x0001)
+      00040D 79                     950 	ld	a, c
+      00040E 22                     951 	ld	(hl+), a
+      00040F 70                     952 	ld	(hl), b
+                                    953 ;/tmp/_gbsbuild/src/core/DataManager.c:220: k = 24;
+      000410 F8 08                  954 	ldhl	sp,	#8
+                                    955 ;/tmp/_gbsbuild/src/core/DataManager.c:221: for (i = 1; i != sprites_len; i++) {
+      000412 3E 18                  956 	ld	a, #0x18
+      000414 22                     957 	ld	(hl+), a
+      000415 36 01                  958 	ld	(hl), #0x01
+      000417                        959 00114$:
+      000417 FAr12r00               960 	ld	a, (#_sprites_len)
+      00041A F8 09                  961 	ldhl	sp,	#9
+      00041C 96                     962 	sub	a, (hl)
+      00041D CArC8r04               963 	jp	Z,00107$
+                                    964 ;/tmp/_gbsbuild/src/core/DataManager.c:222: UBYTE sprite_len = LoadSprite((*(data_ptr++) * 256) + *(data_ptr++), k);
+      000420 D1                     965 	pop	de
+      000421 D5                     966 	push	de
+      000422 1A                     967 	ld	a, (de)
+      000423 47                     968 	ld	b, a
+      000424 D1                     969 	pop	de
+      000425 D5                     970 	push	de
+      000426 13                     971 	inc	de
+      000427 0E 00                  972 	ld	c, #0x00
+      000429 1A                     973 	ld	a, (de)
+      00042A F8 07                  974 	ldhl	sp,	#7
+      00042C 77                     975 	ld	(hl), a
+      00042D 13                     976 	inc	de
+      00042E 33                     977 	inc	sp
+      00042F 33                     978 	inc	sp
+      000430 D5                     979 	push	de
+      000431 5E                     980 	ld	e, (hl)
+      000432 16 00                  981 	ld	d, #0x00
+      000434 7B                     982 	ld	a, e
+      000435 81                     983 	add	a, c
+      000436 4F                     984 	ld	c, a
+      000437 7A                     985 	ld	a, d
+      000438 88                     986 	adc	a, b
+      000439 47                     987 	ld	b, a
+      00043A 23                     988 	inc	hl
+      00043B 7E                     989 	ld	a, (hl)
+      00043C F5                     990 	push	af
+      00043D 33                     991 	inc	sp
+      00043E C5                     992 	push	bc
+      00043F CDrAAr02               993 	call	_LoadSprite
+      000442 E8 03                  994 	add	sp, #3
+      000444 F8 02                  995 	ldhl	sp,	#2
+      000446 73                     996 	ld	(hl), e
+                                    997 ;/tmp/_gbsbuild/src/core/DataManager.c:223: sprites_info[i].sprite_offset = DIV_4(k);
+      000447 F8 09                  998 	ldhl	sp,	#9
+      000449 4E                     999 	ld	c, (hl)
+      00044A 06 00                 1000 	ld	b, #0x00
+      00044C 69                    1001 	ld	l, c
+      00044D 60                    1002 	ld	h, b
+      00044E 29                    1003 	add	hl, hl
+      00044F 09                    1004 	add	hl, bc
+      000450 7D                    1005 	ld	a, l
+      000451 C6r00                 1006 	add	a, #<(_sprites_info)
+      000453 4F                    1007 	ld	c, a
+      000454 7C                    1008 	ld	a, h
+      000455 CEs00                 1009 	adc	a, #>(_sprites_info)
+      000457 47                    1010 	ld	b, a
+      000458 F8 08                 1011 	ldhl	sp,	#8
+      00045A 7E                    1012 	ld	a, (hl)
+      00045B 0F                    1013 	rrca
+      00045C 0F                    1014 	rrca
+      00045D E6 3F                 1015 	and	a, #0x3f
+      00045F 02                    1016 	ld	(bc), a
+                                   1017 ;/tmp/_gbsbuild/src/core/DataManager.c:224: sprites_info[i].frames_len = DIV_4(sprite_len);
+      000460 69                    1018 	ld	l, c
+      000461 60                    1019 	ld	h, b
+      000462 23                    1020 	inc	hl
+      000463 E5                    1021 	push	hl
+      000464 7D                    1022 	ld	a, l
+      000465 F8 05                 1023 	ldhl	sp,	#5
+      000467 77                    1024 	ld	(hl), a
+      000468 E1                    1025 	pop	hl
+      000469 7C                    1026 	ld	a, h
+      00046A F8 04                 1027 	ldhl	sp,	#4
+      00046C 32                    1028 	ld	(hl-), a
+      00046D 2B                    1029 	dec	hl
+      00046E 7E                    1030 	ld	a, (hl)
+      00046F 0F                    1031 	rrca
+      000470 0F                    1032 	rrca
+      000471 E6 3F                 1033 	and	a, #0x3f
+      000473 F8 05                 1034 	ldhl	sp,	#5
+      000475 32                    1035 	ld	(hl-), a
+      000476 2B                    1036 	dec	hl
+      000477 2A                    1037 	ld	a, (hl+)
+      000478 5F                    1038 	ld	e, a
+      000479 2A                    1039 	ld	a, (hl+)
+      00047A 57                    1040 	ld	d, a
+      00047B 7E                    1041 	ld	a, (hl)
+      00047C 12                    1042 	ld	(de), a
+                                   1043 ;/tmp/_gbsbuild/src/core/DataManager.c:226: sprites_info[i].sprite_type = SPRITE_ACTOR_ANIMATED;
+      00047D 03                    1044 	inc	bc
+      00047E 03                    1045 	inc	bc
+      00047F 23                    1046 	inc	hl
+      000480 79                    1047 	ld	a, c
+      000481 22                    1048 	ld	(hl+), a
+                                   1049 ;/tmp/_gbsbuild/src/core/DataManager.c:225: if (sprites_info[i].frames_len == 6) {
+      000482 78                    1050 	ld	a, b
+      000483 32                    1051 	ld	(hl-), a
+      000484 2B                    1052 	dec	hl
+      000485 7E                    1053 	ld	a, (hl)
+      000486 D6 06                 1054 	sub	a, #0x06
+      000488 20 10                 1055 	jr	NZ, 00105$
+                                   1056 ;/tmp/_gbsbuild/src/core/DataManager.c:226: sprites_info[i].sprite_type = SPRITE_ACTOR_ANIMATED;
+      00048A F8 06                 1057 	ldhl	sp,	#6
+      00048C 2A                    1058 	ld	a, (hl+)
+      00048D 66                    1059 	ld	h, (hl)
+      00048E 6F                    1060 	ld	l, a
+      00048F 36 02                 1061 	ld	(hl), #0x02
+                                   1062 ;/tmp/_gbsbuild/src/core/DataManager.c:227: sprites_info[i].frames_len = 2;
+      000491 F8 03                 1063 	ldhl	sp,	#3
+      000493 2A                    1064 	ld	a, (hl+)
+      000494 66                    1065 	ld	h, (hl)
+      000495 6F                    1066 	ld	l, a
+      000496 36 02                 1067 	ld	(hl), #0x02
+      000498 18 21                 1068 	jr	00106$
+      00049A                       1069 00105$:
+                                   1070 ;/tmp/_gbsbuild/src/core/DataManager.c:228: } else if (sprites_info[i].frames_len == 3) {
+      00049A F8 03                 1071 	ldhl	sp,#3
+      00049C 2A                    1072 	ld	a, (hl+)
+      00049D 5F                    1073 	ld	e, a
+      00049E 56                    1074 	ld	d, (hl)
+      00049F 1A                    1075 	ld	a, (de)
+      0004A0 D6 03                 1076 	sub	a, #0x03
+      0004A2 20 10                 1077 	jr	NZ, 00102$
+                                   1078 ;/tmp/_gbsbuild/src/core/DataManager.c:229: sprites_info[i].sprite_type = SPRITE_ACTOR;
+      0004A4 23                    1079 	inc	hl
+      0004A5 23                    1080 	inc	hl
+      0004A6 2A                    1081 	ld	a, (hl+)
+      0004A7 66                    1082 	ld	h, (hl)
+      0004A8 6F                    1083 	ld	l, a
+      0004A9 36 01                 1084 	ld	(hl), #0x01
+                                   1085 ;/tmp/_gbsbuild/src/core/DataManager.c:230: sprites_info[i].frames_len = 1;
+      0004AB F8 03                 1086 	ldhl	sp,	#3
+      0004AD 2A                    1087 	ld	a, (hl+)
+      0004AE 66                    1088 	ld	h, (hl)
+      0004AF 6F                    1089 	ld	l, a
+      0004B0 36 01                 1090 	ld	(hl), #0x01
+      0004B2 18 07                 1091 	jr	00106$
+      0004B4                       1092 00102$:
+                                   1093 ;/tmp/_gbsbuild/src/core/DataManager.c:232: sprites_info[i].sprite_type = SPRITE_STATIC;
+      0004B4 F8 06                 1094 	ldhl	sp,	#6
+      0004B6 2A                    1095 	ld	a, (hl+)
+      0004B7 66                    1096 	ld	h, (hl)
+      0004B8 6F                    1097 	ld	l, a
+      0004B9 36 00                 1098 	ld	(hl), #0x00
+      0004BB                       1099 00106$:
+                                   1100 ;/tmp/_gbsbuild/src/core/DataManager.c:234: k += sprite_len;
+      0004BB F8 08                 1101 	ldhl	sp,	#8
+      0004BD 7E                    1102 	ld	a, (hl)
+      0004BE F8 02                 1103 	ldhl	sp,	#2
+      0004C0 86                    1104 	add	a, (hl)
+      0004C1 F8 08                 1105 	ldhl	sp,	#8
+                                   1106 ;/tmp/_gbsbuild/src/core/DataManager.c:221: for (i = 1; i != sprites_len; i++) {
+      0004C3 22                    1107 	ld	(hl+), a
+      0004C4 34                    1108 	inc	(hl)
+      0004C5 C3r17r04              1109 	jp	00114$
+      0004C8                       1110 00107$:
+                                   1111 ;/tmp/_gbsbuild/src/core/DataManager.c:238: for (i = 1; i != actors_len; i++) {
+      0004C8 F8 09                 1112 	ldhl	sp,	#9
+      0004CA 36 01                 1113 	ld	(hl), #0x01
+      0004CC                       1114 00117$:
+      0004CC FAr13r00              1115 	ld	a, (#_actors_len)
+      0004CF F8 09                 1116 	ldhl	sp,	#9
+      0004D1 96                    1117 	sub	a, (hl)
+      0004D2 CAr31r08              1118 	jp	Z,00108$
+                                   1119 ;/tmp/_gbsbuild/src/core/DataManager.c:241: actors[i].sprite = *(data_ptr++);
+      0004D5 F8 09                 1120 	ldhl	sp,	#9
+      0004D7 4E                    1121 	ld	c, (hl)
+      0004D8 06 00                 1122 	ld	b, #0x00
+      0004DA 69                    1123 	ld	l, c
+      0004DB 60                    1124 	ld	h, b
+      0004DC 29                    1125 	add	hl, hl
+      0004DD 29                    1126 	add	hl, hl
+      0004DE 09                    1127 	add	hl, bc
+      0004DF 29                    1128 	add	hl, hl
+      0004E0 09                    1129 	add	hl, bc
+      0004E1 29                    1130 	add	hl, hl
+      0004E2 09                    1131 	add	hl, bc
+      0004E3 29                    1132 	add	hl, hl
+      0004E4 01r00r00              1133 	ld	bc,#_actors
+      0004E7 09                    1134 	add	hl,bc
+      0004E8 E5                    1135 	push	hl
+      0004E9 7D                    1136 	ld	a, l
+      0004EA F8 06                 1137 	ldhl	sp,	#6
+      0004EC 77                    1138 	ld	(hl), a
+      0004ED E1                    1139 	pop	hl
+      0004EE 7C                    1140 	ld	a, h
+      0004EF F8 05                 1141 	ldhl	sp,	#5
+                                   1142 ;c
+      0004F1 32                    1143 	ld	(hl-), a
+      0004F2 2A                    1144 	ld	a, (hl+)
+      0004F3 5F                    1145 	ld	e, a
+      0004F4 56                    1146 	ld	d, (hl)
+      0004F5 21 08 00              1147 	ld	hl, #0x0008
+      0004F8 19                    1148 	add	hl, de
+      0004F9 E5                    1149 	push	hl
+      0004FA 7D                    1150 	ld	a, l
+      0004FB F8 09                 1151 	ldhl	sp,	#9
+      0004FD 77                    1152 	ld	(hl), a
+      0004FE E1                    1153 	pop	hl
+      0004FF 7C                    1154 	ld	a, h
+      000500 F8 08                 1155 	ldhl	sp,	#8
+      000502 77                    1156 	ld	(hl), a
+      000503 D1                    1157 	pop	de
+      000504 D5                    1158 	push	de
+      000505 1A                    1159 	ld	a, (de)
+      000506 C1                    1160 	pop	bc
+      000507 C5                    1161 	push	bc
+      000508 03                    1162 	inc	bc
+      000509 2B                    1163 	dec	hl
+      00050A F5                    1164 	push	af
+      00050B 2A                    1165 	ld	a, (hl+)
+      00050C 66                    1166 	ld	h, (hl)
+      00050D 6F                    1167 	ld	l, a
+      00050E F1                    1168 	pop	af
+      00050F 77                    1169 	ld	(hl), a
+                                   1170 ;/tmp/_gbsbuild/src/core/DataManager.c:242: actors[i].palette_index = *(data_ptr++);
+                                   1171 ;c
+      000510 F8 04                 1172 	ldhl	sp,#4
+      000512 2A                    1173 	ld	a, (hl+)
+      000513 5F                    1174 	ld	e, a
+      000514 56                    1175 	ld	d, (hl)
+      000515 21 0A 00              1176 	ld	hl, #0x000a
+      000518 19                    1177 	add	hl, de
+      000519 5D                    1178 	ld	e, l
+      00051A 54                    1179 	ld	d, h
+      00051B 0A                    1180 	ld	a, (bc)
+      00051C 03                    1181 	inc	bc
+      00051D 12                    1182 	ld	(de), a
+                                   1183 ;/tmp/_gbsbuild/src/core/DataManager.c:243: actors[i].enabled = TRUE;
+                                   1184 ;c
+      00051E F8 04                 1185 	ldhl	sp,#4
+      000520 2A                    1186 	ld	a, (hl+)
+      000521 5F                    1187 	ld	e, a
+      000522 56                    1188 	ld	d, (hl)
+      000523 21 12 00              1189 	ld	hl, #0x0012
+      000526 19                    1190 	add	hl, de
+      000527 36 01                 1191 	ld	(hl), #0x01
+                                   1192 ;/tmp/_gbsbuild/src/core/DataManager.c:244: actors[i].moving = FALSE;
+                                   1193 ;c
+      000529 F8 04                 1194 	ldhl	sp,#4
+      00052B 2A                    1195 	ld	a, (hl+)
+      00052C 5F                    1196 	ld	e, a
+      00052D 56                    1197 	ld	d, (hl)
+      00052E 21 07 00              1198 	ld	hl, #0x0007
+      000531 19                    1199 	add	hl, de
+      000532 5D                    1200 	ld	e, l
+      000533 54                    1201 	ld	d, h
+      000534 AF                    1202 	xor	a, a
+      000535 12                    1203 	ld	(de), a
+                                   1204 ;/tmp/_gbsbuild/src/core/DataManager.c:245: actors[i].sprite_type = *(data_ptr++);
+                                   1205 ;c
+      000536 F8 04                 1206 	ldhl	sp,#4
+      000538 2A                    1207 	ld	a, (hl+)
+      000539 5F                    1208 	ld	e, a
+      00053A 56                    1209 	ld	d, (hl)
+      00053B 21 19 00              1210 	ld	hl, #0x0019
+      00053E 19                    1211 	add	hl, de
+      00053F 5D                    1212 	ld	e, l
+      000540 54                    1213 	ld	d, h
+      000541 0A                    1214 	ld	a, (bc)
+      000542 03                    1215 	inc	bc
+      000543 12                    1216 	ld	(de), a
+                                   1217 ;/tmp/_gbsbuild/src/core/DataManager.c:246: actors[i].frames_len = *(data_ptr++);
+                                   1218 ;c
+      000544 F8 04                 1219 	ldhl	sp,#4
+      000546 2A                    1220 	ld	a, (hl+)
+      000547 5F                    1221 	ld	e, a
+      000548 56                    1222 	ld	d, (hl)
+      000549 21 10 00              1223 	ld	hl, #0x0010
+      00054C 19                    1224 	add	hl, de
+      00054D 5D                    1225 	ld	e, l
+      00054E 54                    1226 	ld	d, h
+      00054F 0A                    1227 	ld	a, (bc)
+      000550 03                    1228 	inc	bc
+      000551 12                    1229 	ld	(de), a
+                                   1230 ;/tmp/_gbsbuild/src/core/DataManager.c:247: actors[i].animate = *(data_ptr++);
+                                   1231 ;c
+      000552 F8 04                 1232 	ldhl	sp,#4
+      000554 2A                    1233 	ld	a, (hl+)
+      000555 5F                    1234 	ld	e, a
+      000556 56                    1235 	ld	d, (hl)
+      000557 21 11 00              1236 	ld	hl, #0x0011
+      00055A 19                    1237 	add	hl, de
+      00055B E5                    1238 	push	hl
+      00055C 7D                    1239 	ld	a, l
+      00055D F8 08                 1240 	ldhl	sp,	#8
+      00055F 77                    1241 	ld	(hl), a
+      000560 E1                    1242 	pop	hl
+      000561 7C                    1243 	ld	a, h
+      000562 F8 07                 1244 	ldhl	sp,	#7
+      000564 77                    1245 	ld	(hl), a
+      000565 0A                    1246 	ld	a, (bc)
+      000566 23                    1247 	inc	hl
+      000567 77                    1248 	ld	(hl), a
+      000568 03                    1249 	inc	bc
+      000569 2B                    1250 	dec	hl
+      00056A 2B                    1251 	dec	hl
+      00056B 2A                    1252 	ld	a, (hl+)
+      00056C 5F                    1253 	ld	e, a
+      00056D 2A                    1254 	ld	a, (hl+)
+      00056E 57                    1255 	ld	d, a
+      00056F 7E                    1256 	ld	a, (hl)
+      000570 12                    1257 	ld	(de), a
+                                   1258 ;/tmp/_gbsbuild/src/core/DataManager.c:248: actors[i].frame = actors[i].animate >> 1;
+                                   1259 ;c
+      000571 F8 04                 1260 	ldhl	sp,#4
+      000573 2A                    1261 	ld	a, (hl+)
+      000574 5F                    1262 	ld	e, a
+      000575 56                    1263 	ld	d, (hl)
+      000576 21 0F 00              1264 	ld	hl, #0x000f
+      000579 19                    1265 	add	hl, de
+      00057A 5D                    1266 	ld	e, l
+      00057B 54                    1267 	ld	d, h
+      00057C F8 08                 1268 	ldhl	sp,	#8
+      00057E 7E                    1269 	ld	a, (hl)
+      00057F CB 3F                 1270 	srl	a
+      000581 12                    1271 	ld	(de), a
+                                   1272 ;/tmp/_gbsbuild/src/core/DataManager.c:249: actors[i].animate = actors[i].animate & 0x1;
+      000582 7E                    1273 	ld	a, (hl)
+      000583 E6 01                 1274 	and	a, #0x01
+      000585 2B                    1275 	dec	hl
+      000586 2B                    1276 	dec	hl
+      000587 F5                    1277 	push	af
+      000588 2A                    1278 	ld	a, (hl+)
+      000589 66                    1279 	ld	h, (hl)
+      00058A 6F                    1280 	ld	l, a
+      00058B F1                    1281 	pop	af
+      00058C 77                    1282 	ld	(hl), a
+                                   1283 ;/tmp/_gbsbuild/src/core/DataManager.c:250: actors[i].pos.x = *(data_ptr++) * 8;
+      00058D 0A                    1284 	ld	a, (bc)
+      00058E 5F                    1285 	ld	e, a
+      00058F 03                    1286 	inc	bc
+      000590 AF                    1287 	xor	a, a
+      000591 CB 23                 1288 	sla	e
+      000593 8F                    1289 	adc	a, a
+      000594 CB 23                 1290 	sla	e
+      000596 8F                    1291 	adc	a, a
+      000597 CB 23                 1292 	sla	e
+      000599 8F                    1293 	adc	a, a
+      00059A F8 02                 1294 	ldhl	sp,	#2
+      00059C 73                    1295 	ld	(hl), e
+      00059D 23                    1296 	inc	hl
+      00059E 22                    1297 	ld	(hl+), a
+      00059F 2A                    1298 	ld	a, (hl+)
+      0005A0 5F                    1299 	ld	e, a
+      0005A1 56                    1300 	ld	d, (hl)
+      0005A2 F8 02                 1301 	ldhl	sp,	#2
+      0005A4 7E                    1302 	ld	a, (hl)
+      0005A5 12                    1303 	ld	(de), a
+      0005A6 13                    1304 	inc	de
+      0005A7 23                    1305 	inc	hl
+      0005A8 7E                    1306 	ld	a, (hl)
+      0005A9 12                    1307 	ld	(de), a
+                                   1308 ;/tmp/_gbsbuild/src/core/DataManager.c:251: actors[i].pos.y = *(data_ptr++) * 8;
+      0005AA 23                    1309 	inc	hl
+      0005AB 2A                    1310 	ld	a, (hl+)
+      0005AC 5F                    1311 	ld	e, a
+      0005AD 56                    1312 	ld	d, (hl)
+      0005AE 13                    1313 	inc	de
+      0005AF 13                    1314 	inc	de
+      0005B0 0A                    1315 	ld	a, (bc)
+      0005B1 23                    1316 	inc	hl
+      0005B2 77                    1317 	ld	(hl), a
+      0005B3 03                    1318 	inc	bc
+      0005B4 23                    1319 	inc	hl
+      0005B5 79                    1320 	ld	a, c
+      0005B6 22                    1321 	ld	(hl+), a
+      0005B7 78                    1322 	ld	a, b
+      0005B8 32                    1323 	ld	(hl-), a
+      0005B9 2B                    1324 	dec	hl
+      0005BA 4E                    1325 	ld	c, (hl)
+      0005BB 06 00                 1326 	ld	b, #0x00
+      0005BD CB 21                 1327 	sla	c
+      0005BF CB 10                 1328 	rl	b
+      0005C1 CB 21                 1329 	sla	c
+      0005C3 CB 10                 1330 	rl	b
+      0005C5 CB 21                 1331 	sla	c
+      0005C7 CB 10                 1332 	rl	b
+      0005C9 79                    1333 	ld	a, c
+      0005CA 12                    1334 	ld	(de), a
+      0005CB 13                    1335 	inc	de
+      0005CC 78                    1336 	ld	a, b
+      0005CD 12                    1337 	ld	(de), a
+                                   1338 ;/tmp/_gbsbuild/src/core/DataManager.c:252: actors[i].start_pos.x = actors[i].pos.x;
+                                   1339 ;c
+      0005CE 2B                    1340 	dec	hl
+      0005CF 2B                    1341 	dec	hl
+      0005D0 2A                    1342 	ld	a, (hl+)
+      0005D1 5F                    1343 	ld	e, a
+      0005D2 56                    1344 	ld	d, (hl)
+      0005D3 21 0B 00              1345 	ld	hl, #0x000b
+      0005D6 19                    1346 	add	hl, de
+      0005D7 5D                    1347 	ld	e, l
+      0005D8 54                    1348 	ld	d, h
+      0005D9 F8 02                 1349 	ldhl	sp,	#2
+      0005DB 7E                    1350 	ld	a, (hl)
+      0005DC 12                    1351 	ld	(de), a
+      0005DD 13                    1352 	inc	de
+      0005DE 23                    1353 	inc	hl
+      0005DF 7E                    1354 	ld	a, (hl)
+      0005E0 12                    1355 	ld	(de), a
+                                   1356 ;/tmp/_gbsbuild/src/core/DataManager.c:253: actors[i].start_pos.y = actors[i].pos.y;
+                                   1357 ;c
+      0005E1 23                    1358 	inc	hl
+      0005E2 2A                    1359 	ld	a, (hl+)
+      0005E3 5F                    1360 	ld	e, a
+      0005E4 56                    1361 	ld	d, (hl)
+      0005E5 21 0D 00              1362 	ld	hl, #0x000d
+      0005E8 19                    1363 	add	hl, de
+      0005E9 5D                    1364 	ld	e, l
+      0005EA 54                    1365 	ld	d, h
+      0005EB 79                    1366 	ld	a, c
+      0005EC 12                    1367 	ld	(de), a
+      0005ED 13                    1368 	inc	de
+      0005EE 78                    1369 	ld	a, b
+      0005EF 12                    1370 	ld	(de), a
+                                   1371 ;/tmp/_gbsbuild/src/core/DataManager.c:255: j = *(data_ptr++);
+      0005F0 F8 07                 1372 	ldhl	sp,#7
+      0005F2 2A                    1373 	ld	a, (hl+)
+      0005F3 5F                    1374 	ld	e, a
+      0005F4 56                    1375 	ld	d, (hl)
+      0005F5 1A                    1376 	ld	a, (de)
+      0005F6 4F                    1377 	ld	c, a
+                                   1378 ;c
+      0005F7 2B                    1379 	dec	hl
+      0005F8 2A                    1380 	ld	a, (hl+)
+      0005F9 5F                    1381 	ld	e, a
+      0005FA 56                    1382 	ld	d, (hl)
+      0005FB 6B                    1383 	ld	l, e
+      0005FC 62                    1384 	ld	h, d
+      0005FD 23                    1385 	inc	hl
+      0005FE 33                    1386 	inc	sp
+      0005FF 33                    1387 	inc	sp
+      000600 E5                    1388 	push	hl
+                                   1389 ;/tmp/_gbsbuild/src/core/DataManager.c:256: actors[i].dir.x = j == 2 ? -1 : j == 4 ? 1 : 0;
+                                   1390 ;c
+      000601 F8 04                 1391 	ldhl	sp,#4
+      000603 2A                    1392 	ld	a, (hl+)
+      000604 5F                    1393 	ld	e, a
+      000605 56                    1394 	ld	d, (hl)
+      000606 21 05 00              1395 	ld	hl, #0x0005
+      000609 19                    1396 	add	hl, de
+      00060A E5                    1397 	push	hl
+      00060B 7D                    1398 	ld	a, l
+      00060C F8 09                 1399 	ldhl	sp,	#9
+      00060E 77                    1400 	ld	(hl), a
+      00060F E1                    1401 	pop	hl
+      000610 7C                    1402 	ld	a, h
+      000611 F8 08                 1403 	ldhl	sp,	#8
+      000613 77                    1404 	ld	(hl), a
+      000614 79                    1405 	ld	a, c
+      000615 D6 02                 1406 	sub	a, #0x02
+      000617 20 05                 1407 	jr	NZ, 00127$
+      000619 11 FF FF              1408 	ld	de, #0xffff
+      00061C 18 0D                 1409 	jr	00128$
+      00061E                       1410 00127$:
+      00061E 79                    1411 	ld	a, c
+      00061F D6 04                 1412 	sub	a, #0x04
+      000621 20 05                 1413 	jr	NZ, 00129$
+      000623 11 01 00              1414 	ld	de, #0x0001
+      000626 18 03                 1415 	jr	00130$
+      000628                       1416 00129$:
+      000628 11 00 00              1417 	ld	de, #0x0000
+      00062B                       1418 00130$:
+      00062B                       1419 00128$:
+      00062B 43                    1420 	ld	b, e
+      00062C F8 07                 1421 	ldhl	sp,	#7
+      00062E 2A                    1422 	ld	a, (hl+)
+      00062F 66                    1423 	ld	h, (hl)
+      000630 6F                    1424 	ld	l, a
+      000631 70                    1425 	ld	(hl), b
+                                   1426 ;/tmp/_gbsbuild/src/core/DataManager.c:257: actors[i].dir.y = j == 8 ? -1 : j == 1 ? 1 : 0;
+                                   1427 ;c
+      000632 F8 04                 1428 	ldhl	sp,#4
+      000634 2A                    1429 	ld	a, (hl+)
+      000635 5F                    1430 	ld	e, a
+      000636 56                    1431 	ld	d, (hl)
+      000637 21 06 00              1432 	ld	hl, #0x0006
+      00063A 19                    1433 	add	hl, de
+      00063B E5                    1434 	push	hl
+      00063C 7D                    1435 	ld	a, l
+      00063D F8 04                 1436 	ldhl	sp,	#4
+      00063F 77                    1437 	ld	(hl), a
+      000640 E1                    1438 	pop	hl
+      000641 7C                    1439 	ld	a, h
+      000642 F8 03                 1440 	ldhl	sp,	#3
+      000644 77                    1441 	ld	(hl), a
+      000645 79                    1442 	ld	a, c
+      000646 D6 08                 1443 	sub	a, #0x08
+      000648 20 05                 1444 	jr	NZ, 00131$
+      00064A 01 FF FF              1445 	ld	bc, #0xffff
+      00064D 18 15                 1446 	jr	00132$
+      00064F                       1447 00131$:
+      00064F 0D                    1448 	dec	c
+      000650 20 09                 1449 	jr	NZ, 00133$
+      000652 F8 07                 1450 	ldhl	sp,	#7
+      000654 36 01                 1451 	ld	(hl), #0x01
+      000656 AF                    1452 	xor	a, a
+      000657 23                    1453 	inc	hl
+      000658 77                    1454 	ld	(hl), a
+      000659 18 05                 1455 	jr	00134$
+      00065B                       1456 00133$:
+      00065B AF                    1457 	xor	a, a
+      00065C F8 07                 1458 	ldhl	sp,	#7
+      00065E 22                    1459 	ld	(hl+), a
+      00065F 77                    1460 	ld	(hl), a
+      000660                       1461 00134$:
+      000660 F8 07                 1462 	ldhl	sp,#7
+      000662 2A                    1463 	ld	a, (hl+)
+      000663 4F                    1464 	ld	c, a
+      000664                       1465 00132$:
+      000664 F8 02                 1466 	ldhl	sp,	#2
+      000666 2A                    1467 	ld	a, (hl+)
+      000667 66                    1468 	ld	h, (hl)
+      000668 6F                    1469 	ld	l, a
+      000669 71                    1470 	ld	(hl), c
+                                   1471 ;/tmp/_gbsbuild/src/core/DataManager.c:259: actors[i].move_speed = *(data_ptr++);
+                                   1472 ;c
+      00066A F8 04                 1473 	ldhl	sp,#4
+      00066C 2A                    1474 	ld	a, (hl+)
+      00066D 5F                    1475 	ld	e, a
+      00066E 56                    1476 	ld	d, (hl)
+      00066F 21 04 00              1477 	ld	hl, #0x0004
+      000672 19                    1478 	add	hl, de
+      000673 4D                    1479 	ld	c, l
+      000674 44                    1480 	ld	b, h
+      000675 D1                    1481 	pop	de
+      000676 D5                    1482 	push	de
+      000677 1A                    1483 	ld	a, (de)
+      000678 D1                    1484 	pop	de
+      000679 D5                    1485 	push	de
+      00067A 13                    1486 	inc	de
+      00067B 02                    1487 	ld	(bc), a
+                                   1488 ;/tmp/_gbsbuild/src/core/DataManager.c:260: actors[i].anim_speed = *(data_ptr++);
+      00067C D5                    1489 	push	de
+                                   1490 ;c
+      00067D F8 06                 1491 	ldhl	sp,#6
+      00067F 2A                    1492 	ld	a, (hl+)
+      000680 5F                    1493 	ld	e, a
+      000681 56                    1494 	ld	d, (hl)
+      000682 21 15 00              1495 	ld	hl, #0x0015
+      000685 19                    1496 	add	hl, de
+      000686 D1                    1497 	pop	de
+      000687 4D                    1498 	ld	c, l
+      000688 44                    1499 	ld	b, h
+      000689 1A                    1500 	ld	a, (de)
+      00068A 13                    1501 	inc	de
+      00068B 02                    1502 	ld	(bc), a
+                                   1503 ;/tmp/_gbsbuild/src/core/DataManager.c:261: actors[i].pinned = *(data_ptr++);
+      00068C D5                    1504 	push	de
+                                   1505 ;c
+      00068D F8 06                 1506 	ldhl	sp,#6
+      00068F 2A                    1507 	ld	a, (hl+)
+      000690 5F                    1508 	ld	e, a
+      000691 56                    1509 	ld	d, (hl)
+      000692 21 16 00              1510 	ld	hl, #0x0016
+      000695 19                    1511 	add	hl, de
+      000696 D1                    1512 	pop	de
+      000697 4D                    1513 	ld	c, l
+      000698 44                    1514 	ld	b, h
+      000699 1A                    1515 	ld	a, (de)
+      00069A F8 06                 1516 	ldhl	sp,	#6
+      00069C 77                    1517 	ld	(hl), a
+      00069D 13                    1518 	inc	de
+      00069E 23                    1519 	inc	hl
+      00069F 7B                    1520 	ld	a, e
+      0006A0 22                    1521 	ld	(hl+), a
+      0006A1 7A                    1522 	ld	a, d
+      0006A2 32                    1523 	ld	(hl-), a
+      0006A3 2B                    1524 	dec	hl
+      0006A4 7E                    1525 	ld	a, (hl)
+      0006A5 02                    1526 	ld	(bc), a
+                                   1527 ;/tmp/_gbsbuild/src/core/DataManager.c:262: actors[i].collision_group = actors[i].pinned >> 1;
+                                   1528 ;c
+      0006A6 2B                    1529 	dec	hl
+      0006A7 2B                    1530 	dec	hl
+      0006A8 2A                    1531 	ld	a, (hl+)
+      0006A9 5F                    1532 	ld	e, a
+      0006AA 56                    1533 	ld	d, (hl)
+      0006AB 21 18 00              1534 	ld	hl, #0x0018
+      0006AE 19                    1535 	add	hl, de
+      0006AF 5D                    1536 	ld	e, l
+      0006B0 54                    1537 	ld	d, h
+      0006B1 F8 06                 1538 	ldhl	sp,	#6
+      0006B3 7E                    1539 	ld	a, (hl)
+      0006B4 CB 3F                 1540 	srl	a
+      0006B6 12                    1541 	ld	(de), a
+                                   1542 ;/tmp/_gbsbuild/src/core/DataManager.c:263: actors[i].pinned = actors[i].pinned & 0x1;
+      0006B7 7E                    1543 	ld	a, (hl)
+      0006B8 E6 01                 1544 	and	a, #0x01
+      0006BA 5F                    1545 	ld	e, a
+      0006BB 02                    1546 	ld	(bc), a
+                                   1547 ;/tmp/_gbsbuild/src/core/DataManager.c:265: actors[i].collisionsEnabled = !actors[i].pinned;
+      0006BC D5                    1548 	push	de
+                                   1549 ;c
+      0006BD 2B                    1550 	dec	hl
+      0006BE 2B                    1551 	dec	hl
+      0006BF 2A                    1552 	ld	a, (hl+)
+      0006C0 5F                    1553 	ld	e, a
+      0006C1 56                    1554 	ld	d, (hl)
+      0006C2 21 17 00              1555 	ld	hl, #0x0017
+      0006C5 19                    1556 	add	hl, de
+      0006C6 D1                    1557 	pop	de
+      0006C7 4D                    1558 	ld	c, l
+      0006C8 44                    1559 	ld	b, h
+      0006C9 7B                    1560 	ld	a, e
+      0006CA D6 01                 1561 	sub	a,#0x01
+      0006CC 3E 00                 1562 	ld	a, #0x00
+      0006CE 17                    1563 	rla
+      0006CF 02                    1564 	ld	(bc), a
+                                   1565 ;/tmp/_gbsbuild/src/core/DataManager.c:267: actors[i].events_ptr.bank = *(data_ptr++);
+                                   1566 ;c
+      0006D0 F8 04                 1567 	ldhl	sp,#4
+      0006D2 2A                    1568 	ld	a, (hl+)
+      0006D3 5F                    1569 	ld	e, a
+      0006D4 56                    1570 	ld	d, (hl)
+      0006D5 21 1E 00              1571 	ld	hl, #0x001e
+      0006D8 19                    1572 	add	hl, de
+      0006D9 4D                    1573 	ld	c, l
+      0006DA 44                    1574 	ld	b, h
+      0006DB F8 07                 1575 	ldhl	sp,#7
+      0006DD 2A                    1576 	ld	a, (hl+)
+      0006DE 5F                    1577 	ld	e, a
+      0006DF 56                    1578 	ld	d, (hl)
+      0006E0 1A                    1579 	ld	a, (de)
+      0006E1 2B                    1580 	dec	hl
+      0006E2 5E                    1581 	ld	e, (hl)
+      0006E3 23                    1582 	inc	hl
+      0006E4 56                    1583 	ld	d, (hl)
+      0006E5 13                    1584 	inc	de
+      0006E6 02                    1585 	ld	(bc), a
+                                   1586 ;/tmp/_gbsbuild/src/core/DataManager.c:268: actors[i].events_ptr.offset = *(data_ptr++) + (*(data_ptr++) * 256);
+      0006E7 D5                    1587 	push	de
+                                   1588 ;c
+      0006E8 F8 06                 1589 	ldhl	sp,#6
+      0006EA 2A                    1590 	ld	a, (hl+)
+      0006EB 5F                    1591 	ld	e, a
+      0006EC 56                    1592 	ld	d, (hl)
+      0006ED 21 1F 00              1593 	ld	hl, #0x001f
+      0006F0 19                    1594 	add	hl, de
+      0006F1 D1                    1595 	pop	de
+      0006F2 33                    1596 	inc	sp
+      0006F3 33                    1597 	inc	sp
+      0006F4 E5                    1598 	push	hl
+      0006F5 1A                    1599 	ld	a, (de)
+      0006F6 4B                    1600 	ld	c, e
+      0006F7 42                    1601 	ld	b, d
+      0006F8 03                    1602 	inc	bc
+      0006F9 F8 02                 1603 	ldhl	sp,	#2
+      0006FB 77                    1604 	ld	(hl), a
+      0006FC AF                    1605 	xor	a, a
+      0006FD 23                    1606 	inc	hl
+      0006FE 77                    1607 	ld	(hl), a
+      0006FF 0A                    1608 	ld	a, (bc)
+      000700 03                    1609 	inc	bc
+                                   1610 ;c
+      000701 57                    1611 	ld	d, a
+      000702 1E 00                 1612 	ld	e, #0x00
+      000704 2B                    1613 	dec	hl
+      000705 2A                    1614 	ld	a, (hl+)
+      000706 66                    1615 	ld	h, (hl)
+      000707 6F                    1616 	ld	l, a
+      000708 19                    1617 	add	hl, de
+      000709 E5                    1618 	push	hl
+      00070A 7D                    1619 	ld	a, l
+      00070B F8 09                 1620 	ldhl	sp,	#9
+      00070D 77                    1621 	ld	(hl), a
+      00070E E1                    1622 	pop	hl
+      00070F 7C                    1623 	ld	a, h
+      000710 F8 08                 1624 	ldhl	sp,	#8
+      000712 77                    1625 	ld	(hl), a
+      000713 D1                    1626 	pop	de
+      000714 D5                    1627 	push	de
+      000715 2B                    1628 	dec	hl
+      000716 7E                    1629 	ld	a, (hl)
+      000717 12                    1630 	ld	(de), a
+      000718 13                    1631 	inc	de
+      000719 23                    1632 	inc	hl
+      00071A 7E                    1633 	ld	a, (hl)
+      00071B 12                    1634 	ld	(de), a
+                                   1635 ;/tmp/_gbsbuild/src/core/DataManager.c:270: actors[i].movement_ptr.bank = *(data_ptr++);
+                                   1636 ;c
+      00071C F8 04                 1637 	ldhl	sp,#4
+      00071E 2A                    1638 	ld	a, (hl+)
+      00071F 5F                    1639 	ld	e, a
+      000720 56                    1640 	ld	d, (hl)
+      000721 21 21 00              1641 	ld	hl, #0x0021
+      000724 19                    1642 	add	hl, de
+      000725 5D                    1643 	ld	e, l
+      000726 54                    1644 	ld	d, h
+      000727 0A                    1645 	ld	a, (bc)
+      000728 03                    1646 	inc	bc
+      000729 12                    1647 	ld	(de), a
+                                   1648 ;/tmp/_gbsbuild/src/core/DataManager.c:271: actors[i].movement_ptr.offset = *(data_ptr++) + (*(data_ptr++) * 256);
+                                   1649 ;c
+      00072A F8 04                 1650 	ldhl	sp,#4
+      00072C 2A                    1651 	ld	a, (hl+)
+      00072D 5F                    1652 	ld	e, a
+      00072E 56                    1653 	ld	d, (hl)
+      00072F 21 22 00              1654 	ld	hl, #0x0022
+      000732 19                    1655 	add	hl, de
+      000733 33                    1656 	inc	sp
+      000734 33                    1657 	inc	sp
+      000735 E5                    1658 	push	hl
+      000736 0A                    1659 	ld	a, (bc)
+      000737 03                    1660 	inc	bc
+      000738 F8 02                 1661 	ldhl	sp,	#2
+      00073A 77                    1662 	ld	(hl), a
+      00073B AF                    1663 	xor	a, a
+      00073C 23                    1664 	inc	hl
+      00073D 77                    1665 	ld	(hl), a
+      00073E 0A                    1666 	ld	a, (bc)
+      00073F 03                    1667 	inc	bc
+                                   1668 ;c
+      000740 57                    1669 	ld	d, a
+      000741 1E 00                 1670 	ld	e, #0x00
+      000743 2B                    1671 	dec	hl
+      000744 2A                    1672 	ld	a, (hl+)
+      000745 66                    1673 	ld	h, (hl)
+      000746 6F                    1674 	ld	l, a
+      000747 19                    1675 	add	hl, de
+      000748 E5                    1676 	push	hl
+      000749 7D                    1677 	ld	a, l
+      00074A F8 09                 1678 	ldhl	sp,	#9
+      00074C 77                    1679 	ld	(hl), a
+      00074D E1                    1680 	pop	hl
+      00074E 7C                    1681 	ld	a, h
+      00074F F8 08                 1682 	ldhl	sp,	#8
+      000751 77                    1683 	ld	(hl), a
+      000752 D1                    1684 	pop	de
+      000753 D5                    1685 	push	de
+      000754 2B                    1686 	dec	hl
+      000755 7E                    1687 	ld	a, (hl)
+      000756 12                    1688 	ld	(de), a
+      000757 13                    1689 	inc	de
+      000758 23                    1690 	inc	hl
+      000759 7E                    1691 	ld	a, (hl)
+      00075A 12                    1692 	ld	(de), a
+                                   1693 ;/tmp/_gbsbuild/src/core/DataManager.c:273: actors[i].hit_1_ptr.bank = *(data_ptr++);
+                                   1694 ;c
+      00075B F8 04                 1695 	ldhl	sp,#4
+      00075D 2A                    1696 	ld	a, (hl+)
+      00075E 5F                    1697 	ld	e, a
+      00075F 56                    1698 	ld	d, (hl)
+      000760 21 24 00              1699 	ld	hl, #0x0024
+      000763 19                    1700 	add	hl, de
+      000764 5D                    1701 	ld	e, l
+      000765 54                    1702 	ld	d, h
+      000766 0A                    1703 	ld	a, (bc)
+      000767 03                    1704 	inc	bc
+      000768 12                    1705 	ld	(de), a
+                                   1706 ;/tmp/_gbsbuild/src/core/DataManager.c:274: actors[i].hit_1_ptr.offset = *(data_ptr++) + (*(data_ptr++) * 256);
+                                   1707 ;c
+      000769 F8 04                 1708 	ldhl	sp,#4
+      00076B 2A                    1709 	ld	a, (hl+)
+      00076C 5F                    1710 	ld	e, a
+      00076D 56                    1711 	ld	d, (hl)
+      00076E 21 25 00              1712 	ld	hl, #0x0025
+      000771 19                    1713 	add	hl, de
+      000772 33                    1714 	inc	sp
+      000773 33                    1715 	inc	sp
+      000774 E5                    1716 	push	hl
+      000775 0A                    1717 	ld	a, (bc)
+      000776 03                    1718 	inc	bc
+      000777 F8 02                 1719 	ldhl	sp,	#2
+      000779 77                    1720 	ld	(hl), a
+      00077A AF                    1721 	xor	a, a
+      00077B 23                    1722 	inc	hl
+      00077C 77                    1723 	ld	(hl), a
+      00077D 0A                    1724 	ld	a, (bc)
+      00077E 03                    1725 	inc	bc
+                                   1726 ;c
+      00077F 57                    1727 	ld	d, a
+      000780 1E 00                 1728 	ld	e, #0x00
+      000782 2B                    1729 	dec	hl
+      000783 2A                    1730 	ld	a, (hl+)
+      000784 66                    1731 	ld	h, (hl)
+      000785 6F                    1732 	ld	l, a
+      000786 19                    1733 	add	hl, de
+      000787 E5                    1734 	push	hl
+      000788 7D                    1735 	ld	a, l
+      000789 F8 09                 1736 	ldhl	sp,	#9
+      00078B 77                    1737 	ld	(hl), a
+      00078C E1                    1738 	pop	hl
+      00078D 7C                    1739 	ld	a, h
+      00078E F8 08                 1740 	ldhl	sp,	#8
+      000790 77                    1741 	ld	(hl), a
+      000791 D1                    1742 	pop	de
+      000792 D5                    1743 	push	de
+      000793 2B                    1744 	dec	hl
+      000794 7E                    1745 	ld	a, (hl)
+      000795 12                    1746 	ld	(de), a
+      000796 13                    1747 	inc	de
+      000797 23                    1748 	inc	hl
+      000798 7E                    1749 	ld	a, (hl)
+      000799 12                    1750 	ld	(de), a
+                                   1751 ;/tmp/_gbsbuild/src/core/DataManager.c:276: actors[i].hit_2_ptr.bank = *(data_ptr++);
+                                   1752 ;c
+      00079A F8 04                 1753 	ldhl	sp,#4
+      00079C 2A                    1754 	ld	a, (hl+)
+      00079D 5F                    1755 	ld	e, a
+      00079E 56                    1756 	ld	d, (hl)
+      00079F 21 27 00              1757 	ld	hl, #0x0027
+      0007A2 19                    1758 	add	hl, de
+      0007A3 5D                    1759 	ld	e, l
+      0007A4 54                    1760 	ld	d, h
+      0007A5 0A                    1761 	ld	a, (bc)
+      0007A6 03                    1762 	inc	bc
+      0007A7 12                    1763 	ld	(de), a
+                                   1764 ;/tmp/_gbsbuild/src/core/DataManager.c:277: actors[i].hit_2_ptr.offset = *(data_ptr++) + (*(data_ptr++) * 256);
+                                   1765 ;c
+      0007A8 F8 04                 1766 	ldhl	sp,#4
+      0007AA 2A                    1767 	ld	a, (hl+)
+      0007AB 5F                    1768 	ld	e, a
+      0007AC 56                    1769 	ld	d, (hl)
+      0007AD 21 28 00              1770 	ld	hl, #0x0028
+      0007B0 19                    1771 	add	hl, de
+      0007B1 33                    1772 	inc	sp
+      0007B2 33                    1773 	inc	sp
+      0007B3 E5                    1774 	push	hl
+      0007B4 0A                    1775 	ld	a, (bc)
+      0007B5 03                    1776 	inc	bc
+      0007B6 F8 02                 1777 	ldhl	sp,	#2
+      0007B8 77                    1778 	ld	(hl), a
+      0007B9 AF                    1779 	xor	a, a
+      0007BA 23                    1780 	inc	hl
+      0007BB 77                    1781 	ld	(hl), a
+      0007BC 0A                    1782 	ld	a, (bc)
+      0007BD 03                    1783 	inc	bc
+                                   1784 ;c
+      0007BE 57                    1785 	ld	d, a
+      0007BF 1E 00                 1786 	ld	e, #0x00
+      0007C1 2B                    1787 	dec	hl
+      0007C2 2A                    1788 	ld	a, (hl+)
+      0007C3 66                    1789 	ld	h, (hl)
+      0007C4 6F                    1790 	ld	l, a
+      0007C5 19                    1791 	add	hl, de
+      0007C6 E5                    1792 	push	hl
+      0007C7 7D                    1793 	ld	a, l
+      0007C8 F8 09                 1794 	ldhl	sp,	#9
+      0007CA 77                    1795 	ld	(hl), a
+      0007CB E1                    1796 	pop	hl
+      0007CC 7C                    1797 	ld	a, h
+      0007CD F8 08                 1798 	ldhl	sp,	#8
+      0007CF 77                    1799 	ld	(hl), a
+      0007D0 D1                    1800 	pop	de
+      0007D1 D5                    1801 	push	de
+      0007D2 2B                    1802 	dec	hl
+      0007D3 7E                    1803 	ld	a, (hl)
+      0007D4 12                    1804 	ld	(de), a
+      0007D5 13                    1805 	inc	de
+      0007D6 23                    1806 	inc	hl
+      0007D7 7E                    1807 	ld	a, (hl)
+      0007D8 12                    1808 	ld	(de), a
+                                   1809 ;/tmp/_gbsbuild/src/core/DataManager.c:279: actors[i].hit_3_ptr.bank = *(data_ptr++);
+                                   1810 ;c
+      0007D9 F8 04                 1811 	ldhl	sp,#4
+      0007DB 2A                    1812 	ld	a, (hl+)
+      0007DC 5F                    1813 	ld	e, a
+      0007DD 56                    1814 	ld	d, (hl)
+      0007DE 21 2A 00              1815 	ld	hl, #0x002a
+      0007E1 19                    1816 	add	hl, de
+      0007E2 5D                    1817 	ld	e, l
+      0007E3 54                    1818 	ld	d, h
+      0007E4 0A                    1819 	ld	a, (bc)
+      0007E5 03                    1820 	inc	bc
+      0007E6 12                    1821 	ld	(de), a
+                                   1822 ;/tmp/_gbsbuild/src/core/DataManager.c:280: actors[i].hit_3_ptr.offset = *(data_ptr++) + (*(data_ptr++) * 256);
+                                   1823 ;c
+      0007E7 F8 04                 1824 	ldhl	sp,#4
+      0007E9 2A                    1825 	ld	a, (hl+)
+      0007EA 5F                    1826 	ld	e, a
+      0007EB 56                    1827 	ld	d, (hl)
+      0007EC 21 2B 00              1828 	ld	hl, #0x002b
+      0007EF 19                    1829 	add	hl, de
+      0007F0 5D                    1830 	ld	e, l
+      0007F1 54                    1831 	ld	d, h
+      0007F2 0A                    1832 	ld	a, (bc)
+      0007F3 03                    1833 	inc	bc
+      0007F4 F8 06                 1834 	ldhl	sp,	#6
+      0007F6 77                    1835 	ld	(hl), a
+      0007F7 AF                    1836 	xor	a, a
+      0007F8 23                    1837 	inc	hl
+      0007F9 77                    1838 	ld	(hl), a
+      0007FA 0A                    1839 	ld	a, (bc)
+      0007FB 23                    1840 	inc	hl
+      0007FC 77                    1841 	ld	(hl), a
+      0007FD 03                    1842 	inc	bc
+      0007FE 33                    1843 	inc	sp
+      0007FF 33                    1844 	inc	sp
+      000800 C5                    1845 	push	bc
+      000801 46                    1846 	ld	b, (hl)
+      000802 0E 00                 1847 	ld	c, #0x00
+      000804 2B                    1848 	dec	hl
+      000805 2B                    1849 	dec	hl
+      000806 2A                    1850 	ld	a, (hl+)
+      000807 66                    1851 	ld	h, (hl)
+      000808 6F                    1852 	ld	l, a
+      000809 09                    1853 	add	hl, bc
+      00080A 4D                    1854 	ld	c, l
+      00080B 44                    1855 	ld	b, h
+      00080C 79                    1856 	ld	a, c
+      00080D 12                    1857 	ld	(de), a
+      00080E 13                    1858 	inc	de
+      00080F 78                    1859 	ld	a, b
+      000810 12                    1860 	ld	(de), a
+                                   1861 ;/tmp/_gbsbuild/src/core/DataManager.c:282: actors[i].movement_ctx = 0;
+                                   1862 ;c
+      000811 F8 04                 1863 	ldhl	sp,#4
+      000813 2A                    1864 	ld	a, (hl+)
+      000814 5F                    1865 	ld	e, a
+      000815 56                    1866 	ld	d, (hl)
+      000816 21 2D 00              1867 	ld	hl, #0x002d
+      000819 19                    1868 	add	hl, de
+      00081A 4D                    1869 	ld	c, l
+      00081B 44                    1870 	ld	b, h
+      00081C AF                    1871 	xor	a, a
+      00081D 02                    1872 	ld	(bc), a
+                                   1873 ;/tmp/_gbsbuild/src/core/DataManager.c:283: actors[i].script_control = FALSE;
+                                   1874 ;c
+      00081E F8 04                 1875 	ldhl	sp,#4
+      000820 2A                    1876 	ld	a, (hl+)
+      000821 5F                    1877 	ld	e, a
+      000822 56                    1878 	ld	d, (hl)
+      000823 21 1B 00              1879 	ld	hl, #0x001b
+      000826 19                    1880 	add	hl, de
+      000827 4D                    1881 	ld	c, l
+      000828 44                    1882 	ld	b, h
+      000829 AF                    1883 	xor	a, a
+      00082A 02                    1884 	ld	(bc), a
+                                   1885 ;/tmp/_gbsbuild/src/core/DataManager.c:238: for (i = 1; i != actors_len; i++) {
+      00082B F8 09                 1886 	ldhl	sp,	#9
+      00082D 34                    1887 	inc	(hl)
+      00082E C3rCCr04              1888 	jp	00117$
+      000831                       1889 00108$:
+                                   1890 ;/tmp/_gbsbuild/src/core/DataManager.c:286: actors_active[0] = 0;
+      000831 21r00r00              1891 	ld	hl, #_actors_active
+      000834 36 00                 1892 	ld	(hl), #0x00
+                                   1893 ;/tmp/_gbsbuild/src/core/DataManager.c:287: actors_active_size = 1;
+      000836 21r00r00              1894 	ld	hl, #_actors_active_size
+      000839 36 01                 1895 	ld	(hl), #0x01
+                                   1896 ;/tmp/_gbsbuild/src/core/DataManager.c:290: for (i = 0; i != triggers_len; i++) {
+      00083B AF                    1897 	xor	a, a
+      00083C F8 09                 1898 	ldhl	sp,	#9
+      00083E 77                    1899 	ld	(hl), a
+      00083F                       1900 00120$:
+                                   1901 ;/tmp/_gbsbuild/src/core/DataManager.c:199: LoadImage((*(data_ptr++) * 256) + *(data_ptr++));
+      00083F C1                    1902 	pop	bc
+      000840 C5                    1903 	push	bc
+      000841 03                    1904 	inc	bc
+                                   1905 ;/tmp/_gbsbuild/src/core/DataManager.c:290: for (i = 0; i != triggers_len; i++) {
+      000842 FAr00r00              1906 	ld	a, (#_triggers_len)
+      000845 F8 09                 1907 	ldhl	sp,	#9
+      000847 96                    1908 	sub	a, (hl)
+      000848 CArDAr08              1909 	jp	Z,00109$
+                                   1910 ;/tmp/_gbsbuild/src/core/DataManager.c:291: triggers[i].x = *(data_ptr++);
+      00084B F8 09                 1911 	ldhl	sp,	#9
+      00084D 5E                    1912 	ld	e, (hl)
+      00084E 16 00                 1913 	ld	d, #0x00
+      000850 6B                    1914 	ld	l, e
+      000851 62                    1915 	ld	h, d
+      000852 29                    1916 	add	hl, hl
+      000853 19                    1917 	add	hl, de
+      000854 29                    1918 	add	hl, hl
+      000855 19                    1919 	add	hl, de
+      000856 E5                    1920 	push	hl
+      000857 7D                    1921 	ld	a, l
+      000858 F8 09                 1922 	ldhl	sp,	#9
+      00085A 77                    1923 	ld	(hl), a
+      00085B E1                    1924 	pop	hl
+      00085C 7C                    1925 	ld	a, h
+      00085D F8 08                 1926 	ldhl	sp,	#8
+                                   1927 ;c
+      00085F 32                    1928 	ld	(hl-), a
+      000860 2A                    1929 	ld	a, (hl+)
+      000861 5F                    1930 	ld	e, a
+      000862 56                    1931 	ld	d, (hl)
+      000863 21r00r00              1932 	ld	hl, #_triggers
+      000866 19                    1933 	add	hl, de
+      000867 E5                    1934 	push	hl
+      000868 7D                    1935 	ld	a, l
+      000869 F8 06                 1936 	ldhl	sp,	#6
+      00086B 77                    1937 	ld	(hl), a
+      00086C E1                    1938 	pop	hl
+      00086D 7C                    1939 	ld	a, h
+      00086E F8 05                 1940 	ldhl	sp,	#5
+      000870 77                    1941 	ld	(hl), a
+      000871 D1                    1942 	pop	de
+      000872 D5                    1943 	push	de
+      000873 1A                    1944 	ld	a, (de)
+      000874 2B                    1945 	dec	hl
+      000875 F5                    1946 	push	af
+      000876 2A                    1947 	ld	a, (hl+)
+      000877 66                    1948 	ld	h, (hl)
+      000878 6F                    1949 	ld	l, a
+      000879 F1                    1950 	pop	af
+      00087A 77                    1951 	ld	(hl), a
+                                   1952 ;/tmp/_gbsbuild/src/core/DataManager.c:292: triggers[i].y = *(data_ptr++);
+      00087B F8 04                 1953 	ldhl	sp,#4
+      00087D 2A                    1954 	ld	a, (hl+)
+      00087E 5F                    1955 	ld	e, a
+      00087F 56                    1956 	ld	d, (hl)
+      000880 13                    1957 	inc	de
+      000881 0A                    1958 	ld	a, (bc)
+      000882 03                    1959 	inc	bc
+      000883 12                    1960 	ld	(de), a
+                                   1961 ;/tmp/_gbsbuild/src/core/DataManager.c:293: triggers[i].w = *(data_ptr++);
+      000884 2B                    1962 	dec	hl
+      000885 2A                    1963 	ld	a, (hl+)
+      000886 5F                    1964 	ld	e, a
+      000887 56                    1965 	ld	d, (hl)
+      000888 13                    1966 	inc	de
+      000889 13                    1967 	inc	de
+      00088A 0A                    1968 	ld	a, (bc)
+      00088B 03                    1969 	inc	bc
+      00088C 12                    1970 	ld	(de), a
+                                   1971 ;/tmp/_gbsbuild/src/core/DataManager.c:294: triggers[i].h = *(data_ptr++);
+      00088D 2B                    1972 	dec	hl
+      00088E 2A                    1973 	ld	a, (hl+)
+      00088F 5F                    1974 	ld	e, a
+      000890 56                    1975 	ld	d, (hl)
+      000891 13                    1976 	inc	de
+      000892 13                    1977 	inc	de
+      000893 13                    1978 	inc	de
+      000894 0A                    1979 	ld	a, (bc)
+      000895 03                    1980 	inc	bc
+      000896 12                    1981 	ld	(de), a
+                                   1982 ;/tmp/_gbsbuild/src/core/DataManager.c:295: data_ptr++;  // Trigger type
+      000897 03                    1983 	inc	bc
+                                   1984 ;/tmp/_gbsbuild/src/core/DataManager.c:296: triggers[i].events_ptr.bank = *(data_ptr++);
+                                   1985 ;c
+      000898 2B                    1986 	dec	hl
+      000899 2A                    1987 	ld	a, (hl+)
+      00089A 5F                    1988 	ld	e, a
+      00089B 56                    1989 	ld	d, (hl)
+      00089C 21 04 00              1990 	ld	hl, #0x0004
+      00089F 19                    1991 	add	hl, de
+      0008A0 5D                    1992 	ld	e, l
+      0008A1 54                    1993 	ld	d, h
+      0008A2 0A                    1994 	ld	a, (bc)
+      0008A3 03                    1995 	inc	bc
+      0008A4 12                    1996 	ld	(de), a
+                                   1997 ;/tmp/_gbsbuild/src/core/DataManager.c:297: triggers[i].events_ptr.offset = *(data_ptr++) + (*(data_ptr++) * 256);
+                                   1998 ;c
+      0008A5 F8 04                 1999 	ldhl	sp,#4
+      0008A7 2A                    2000 	ld	a, (hl+)
+      0008A8 5F                    2001 	ld	e, a
+      0008A9 56                    2002 	ld	d, (hl)
+      0008AA 21 05 00              2003 	ld	hl, #0x0005
+      0008AD 19                    2004 	add	hl, de
+      0008AE E5                    2005 	push	hl
+      0008AF 7D                    2006 	ld	a, l
+      0008B0 F8 08                 2007 	ldhl	sp,	#8
+      0008B2 77                    2008 	ld	(hl), a
+      0008B3 E1                    2009 	pop	hl
+      0008B4 7C                    2010 	ld	a, h
+      0008B5 F8 07                 2011 	ldhl	sp,	#7
+      0008B7 77                    2012 	ld	(hl), a
+      0008B8 0A                    2013 	ld	a, (bc)
+      0008B9 03                    2014 	inc	bc
+      0008BA 5F                    2015 	ld	e, a
+      0008BB 16 00                 2016 	ld	d, #0x00
+      0008BD 0A                    2017 	ld	a, (bc)
+      0008BE 23                    2018 	inc	hl
+      0008BF 77                    2019 	ld	(hl), a
+      0008C0 03                    2020 	inc	bc
+      0008C1 33                    2021 	inc	sp
+      0008C2 33                    2022 	inc	sp
+      0008C3 C5                    2023 	push	bc
+      0008C4 46                    2024 	ld	b, (hl)
+      0008C5 3E 00                 2025 	ld	a, #0x00
+      0008C7 83                    2026 	add	a, e
+      0008C8 4F                    2027 	ld	c, a
+      0008C9 78                    2028 	ld	a, b
+      0008CA 8A                    2029 	adc	a, d
+      0008CB 47                    2030 	ld	b, a
+      0008CC 2B                    2031 	dec	hl
+      0008CD 2B                    2032 	dec	hl
+      0008CE 2A                    2033 	ld	a, (hl+)
+      0008CF 66                    2034 	ld	h, (hl)
+      0008D0 6F                    2035 	ld	l, a
+      0008D1 79                    2036 	ld	a, c
+      0008D2 22                    2037 	ld	(hl+), a
+      0008D3 70                    2038 	ld	(hl), b
+                                   2039 ;/tmp/_gbsbuild/src/core/DataManager.c:290: for (i = 0; i != triggers_len; i++) {
+      0008D4 F8 09                 2040 	ldhl	sp,	#9
+      0008D6 34                    2041 	inc	(hl)
+      0008D7 C3r3Fr08              2042 	jp	00120$
+      0008DA                       2043 00109$:
+                                   2044 ;/tmp/_gbsbuild/src/core/DataManager.c:302: InitScroll();
+      0008DA C5                    2045 	push	bc
+      0008DB CDr00r00              2046 	call	_InitScroll
+      0008DE C1                    2047 	pop	bc
+                                   2048 ;/tmp/_gbsbuild/src/core/DataManager.c:305: last_trigger_tx = 0xFF;
+      0008DF 21r00r00              2049 	ld	hl, #_last_trigger_tx
+      0008E2 36 FF                 2050 	ld	(hl), #0xff
+                                   2051 ;/tmp/_gbsbuild/src/core/DataManager.c:306: last_trigger_ty = 0xFF;
+      0008E4 21r00r00              2052 	ld	hl, #_last_trigger_ty
+      0008E7 36 FF                 2053 	ld	(hl), #0xff
+                                   2054 ;/tmp/_gbsbuild/src/core/DataManager.c:308: player.hit_1_ptr.bank = *(data_ptr++);
+      0008E9 D1                    2055 	pop	de
+      0008EA D5                    2056 	push	de
+      0008EB 1A                    2057 	ld	a, (de)
+      0008EC EAr24r00              2058 	ld	(#(_actors + 0x0024)),a
+                                   2059 ;/tmp/_gbsbuild/src/core/DataManager.c:309: player.hit_1_ptr.offset = *(data_ptr++) + (*(data_ptr++) * 256);
+      0008EF 0A                    2060 	ld	a, (bc)
+      0008F0 03                    2061 	inc	bc
+      0008F1 F8 06                 2062 	ldhl	sp,	#6
+      0008F3 77                    2063 	ld	(hl), a
+      0008F4 AF                    2064 	xor	a, a
+      0008F5 23                    2065 	inc	hl
+      0008F6 77                    2066 	ld	(hl), a
+      0008F7 0A                    2067 	ld	a, (bc)
+      0008F8 03                    2068 	inc	bc
+                                   2069 ;c
+      0008F9 57                    2070 	ld	d, a
+      0008FA 1E 00                 2071 	ld	e, #0x00
+      0008FC 2B                    2072 	dec	hl
+      0008FD 2A                    2073 	ld	a, (hl+)
+      0008FE 66                    2074 	ld	h, (hl)
+      0008FF 6F                    2075 	ld	l, a
+      000900 19                    2076 	add	hl, de
+      000901 E5                    2077 	push	hl
+      000902 7D                    2078 	ld	a, l
+      000903 F8 0A                 2079 	ldhl	sp,	#10
+      000905 77                    2080 	ld	(hl), a
+      000906 E1                    2081 	pop	hl
+      000907 7C                    2082 	ld	a, h
+      000908 F8 09                 2083 	ldhl	sp,	#9
+      00090A 77                    2084 	ld	(hl), a
+      00090B 11r25r00              2085 	ld	de, #(_actors + 0x0025)
+      00090E 2B                    2086 	dec	hl
+      00090F 7E                    2087 	ld	a, (hl)
+      000910 12                    2088 	ld	(de), a
+      000911 13                    2089 	inc	de
+      000912 23                    2090 	inc	hl
+      000913 7E                    2091 	ld	a, (hl)
+      000914 12                    2092 	ld	(de), a
+                                   2093 ;/tmp/_gbsbuild/src/core/DataManager.c:311: player.hit_2_ptr.bank = *(data_ptr++);
+      000915 0A                    2094 	ld	a, (bc)
+      000916 03                    2095 	inc	bc
+      000917 EAr27r00              2096 	ld	(#(_actors + 0x0027)),a
+                                   2097 ;/tmp/_gbsbuild/src/core/DataManager.c:312: player.hit_2_ptr.offset = *(data_ptr++) + (*(data_ptr++) * 256);
+      00091A 0A                    2098 	ld	a, (bc)
+      00091B 03                    2099 	inc	bc
+      00091C F8 06                 2100 	ldhl	sp,	#6
+      00091E 77                    2101 	ld	(hl), a
+      00091F AF                    2102 	xor	a, a
+      000920 23                    2103 	inc	hl
+      000921 77                    2104 	ld	(hl), a
+      000922 0A                    2105 	ld	a, (bc)
+      000923 03                    2106 	inc	bc
+                                   2107 ;c
+      000924 57                    2108 	ld	d, a
+      000925 1E 00                 2109 	ld	e, #0x00
+      000927 2B                    2110 	dec	hl
+      000928 2A                    2111 	ld	a, (hl+)
+      000929 66                    2112 	ld	h, (hl)
+      00092A 6F                    2113 	ld	l, a
+      00092B 19                    2114 	add	hl, de
+      00092C E5                    2115 	push	hl
+      00092D 7D                    2116 	ld	a, l
+      00092E F8 0A                 2117 	ldhl	sp,	#10
+      000930 77                    2118 	ld	(hl), a
+      000931 E1                    2119 	pop	hl
+      000932 7C                    2120 	ld	a, h
+      000933 F8 09                 2121 	ldhl	sp,	#9
+      000935 77                    2122 	ld	(hl), a
+      000936 11r28r00              2123 	ld	de, #(_actors + 0x0028)
+      000939 2B                    2124 	dec	hl
+      00093A 7E                    2125 	ld	a, (hl)
+      00093B 12                    2126 	ld	(de), a
+      00093C 13                    2127 	inc	de
+      00093D 23                    2128 	inc	hl
+      00093E 7E                    2129 	ld	a, (hl)
+      00093F 12                    2130 	ld	(de), a
+                                   2131 ;/tmp/_gbsbuild/src/core/DataManager.c:314: player.hit_3_ptr.bank = *(data_ptr++);
+      000940 0A                    2132 	ld	a, (bc)
+      000941 03                    2133 	inc	bc
+      000942 EAr2Ar00              2134 	ld	(#(_actors + 0x002a)),a
+                                   2135 ;/tmp/_gbsbuild/src/core/DataManager.c:315: player.hit_3_ptr.offset = *(data_ptr++) + (*(data_ptr++) * 256);
+      000945 0A                    2136 	ld	a, (bc)
+      000946 03                    2137 	inc	bc
+      000947 5F                    2138 	ld	e, a
+      000948 16 00                 2139 	ld	d, #0x00
+      00094A 0A                    2140 	ld	a, (bc)
+      00094B 6F                    2141 	ld	l, a
+      00094C 3E 00                 2142 	ld	a, #0x00
+      00094E 83                    2143 	add	a, e
+      00094F 4F                    2144 	ld	c, a
+      000950 7D                    2145 	ld	a, l
+      000951 8A                    2146 	adc	a, d
+      000952 47                    2147 	ld	b, a
+      000953 21r2Br00              2148 	ld	hl, #(_actors + 0x002b)
+      000956 79                    2149 	ld	a, c
+      000957 22                    2150 	ld	(hl+), a
+      000958 70                    2151 	ld	(hl), b
+                                   2152 ;/tmp/_gbsbuild/src/core/DataManager.c:318: for (i = 1; i != actors_len; i++) {
+      000959 06 01                 2153 	ld	b, #0x01
+      00095B                       2154 00123$:
+      00095B FAr13r00              2155 	ld	a, (#_actors_len)
+      00095E 90                    2156 	sub	a, b
+      00095F 28 24                 2157 	jr	Z, 00112$
+                                   2158 ;/tmp/_gbsbuild/src/core/DataManager.c:319: if (actors[i].pinned) {
+      000961 58                    2159 	ld	e, b
+      000962 16 00                 2160 	ld	d, #0x00
+      000964 6B                    2161 	ld	l, e
+      000965 62                    2162 	ld	h, d
+      000966 29                    2163 	add	hl, hl
+      000967 29                    2164 	add	hl, hl
+      000968 19                    2165 	add	hl, de
+      000969 29                    2166 	add	hl, hl
+      00096A 19                    2167 	add	hl, de
+      00096B 29                    2168 	add	hl, hl
+      00096C 19                    2169 	add	hl, de
+      00096D 29                    2170 	add	hl, hl
+      00096E 11r00r00              2171 	ld	de, #_actors
+      000971 19                    2172 	add	hl, de
+      000972 11 16 00              2173 	ld	de, #0x0016
+      000975 19                    2174 	add	hl, de
+      000976 7E                    2175 	ld	a, (hl)
+      000977 B7                    2176 	or	a, a
+      000978 28 08                 2177 	jr	Z, 00124$
+                                   2178 ;/tmp/_gbsbuild/src/core/DataManager.c:320: ActivateActor(i);
+      00097A C5                    2179 	push	bc
+      00097B C5                    2180 	push	bc
+      00097C 33                    2181 	inc	sp
+      00097D CDr00r00              2182 	call	_ActivateActor
+      000980 33                    2183 	inc	sp
+      000981 C1                    2184 	pop	bc
+      000982                       2185 00124$:
+                                   2186 ;/tmp/_gbsbuild/src/core/DataManager.c:318: for (i = 1; i != actors_len; i++) {
+      000982 04                    2187 	inc	b
+      000983 18 D6                 2188 	jr	00123$
+      000985                       2189 00112$:
+                                   2190 ;/tmp/_gbsbuild/src/core/DataManager.c:324: POP_BANK;
+      000985 CDr00r00              2191 	call	_PopBank
+                                   2192 ;/tmp/_gbsbuild/src/core/DataManager.c:325: }
+      000988 E8 0A                 2193 	add	sp, #10
+      00098A C9                    2194 	ret
+                                   2195 	.area _CODE
+                                   2196 	.area _CABS (ABS)

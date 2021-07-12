@@ -1,0 +1,37 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+  0 _SpritePoolNext                                                000017 GR
+    _SpritePoolNext_b                                              ****** GX
+  0 _SpritePoolReset                                               000000 GR
+    _SpritePoolReset_b                                             ****** GX
+  0 _SpritePoolReturn                                              000008 GR
+    _SpritePoolReturn_b                                            ****** GX
+    ___sdcc_bcall_ehl                                              ****** GX
+  1 _hide_sprites                                                  00005F GR
+  1 _sprite_pool                                                   00004B GR
+  1 _sprites_info                                                  000000 GR
+    b_SpritePoolNext_b                                             ****** GX
+    b_SpritePoolReset_b                                            ****** GX
+    b_SpritePoolReturn_b                                           ****** GX
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size     1F   flags    0
+   1 _DATA                                      size     60   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size      A   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CABS                                      size      0   flags    8
+

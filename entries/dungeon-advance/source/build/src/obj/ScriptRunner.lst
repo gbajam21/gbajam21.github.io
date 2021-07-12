@@ -1,0 +1,879 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module ScriptRunner
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_ScriptTimerUpdate_b
+                                     12 	.globl _ScriptTimerUpdate_b
+                                     13 	.globl _memcpy
+                                     14 	.globl _PopBank
+                                     15 	.globl _PushBank
+                                     16 	.globl _StackPop
+                                     17 	.globl _StackPush
+                                     18 	.globl b_Script_StackPop_b
+                                     19 	.globl _Script_StackPop_b
+                                     20 	.globl _ctx_cmd_remaining
+                                     21 	.globl _timer_script_ptr
+                                     22 	.globl _timer_script_time
+                                     23 	.globl _timer_script_duration
+                                     24 	.globl _script_ctx_ptr
+                                     25 	.globl _active_script_ctx_index
+                                     26 	.globl _script_ctxs
+                                     27 	.globl _script_start_stack
+                                     28 	.globl _script_bank_stack
+                                     29 	.globl _script_stack
+                                     30 	.globl _script_stack_ptr
+                                     31 	.globl _script_cmd_args_len
+                                     32 	.globl _script_cmd_args
+                                     33 	.globl _script_main_ctx_actor
+                                     34 	.globl _active_script_ctx
+                                     35 	.globl _script_ctx_pool
+                                     36 	.globl _ScriptRunnerInit
+                                     37 	.globl _ScriptStart
+                                     38 	.globl _ScriptStartBg
+                                     39 	.globl _ScriptRunnerUpdate
+                                     40 	.globl _ScriptTimerUpdate
+                                     41 	.globl _ScriptSaveCtx
+                                     42 	.globl _ScriptRestoreCtx
+                                     43 	.globl _ScriptCtxPoolNext
+                                     44 	.globl _ScriptCtxPoolReturn
+                                     45 	.globl _ScriptCtxPoolReset
+                                     46 ;--------------------------------------------------------
+                                     47 ; special function registers
+                                     48 ;--------------------------------------------------------
+                                     49 ;--------------------------------------------------------
+                                     50 ; ram data
+                                     51 ;--------------------------------------------------------
+                                     52 	.area _DATA
+      000000                         53 _script_ctx_pool::
+      000000                         54 	.ds 12
+      00000C                         55 _active_script_ctx::
+      00000C                         56 	.ds 24
+      000024                         57 _script_main_ctx_actor::
+      000024                         58 	.ds 1
+      000025                         59 _script_cmd_args::
+      000025                         60 	.ds 7
+      00002C                         61 _script_cmd_args_len::
+      00002C                         62 	.ds 1
+      00002D                         63 _script_stack_ptr::
+      00002D                         64 	.ds 1
+      00002E                         65 _script_stack::
+      00002E                         66 	.ds 16
+      00003E                         67 _script_bank_stack::
+      00003E                         68 	.ds 8
+      000046                         69 _script_start_stack::
+      000046                         70 	.ds 16
+      000056                         71 _script_ctxs::
+      000056                         72 	.ds 288
+      000176                         73 _active_script_ctx_index::
+      000176                         74 	.ds 1
+      000177                         75 _script_ctx_ptr::
+      000177                         76 	.ds 2
+      000179                         77 _timer_script_duration::
+      000179                         78 	.ds 1
+      00017A                         79 _timer_script_time::
+      00017A                         80 	.ds 1
+      00017B                         81 _timer_script_ptr::
+      00017B                         82 	.ds 3
+      00017E                         83 _ctx_cmd_remaining::
+      00017E                         84 	.ds 1
+                                     85 ;--------------------------------------------------------
+                                     86 ; absolute external ram data
+                                     87 ;--------------------------------------------------------
+                                     88 	.area _DABS (ABS)
+                                     89 ;--------------------------------------------------------
+                                     90 ; global & static initialisations
+                                     91 ;--------------------------------------------------------
+                                     92 	.area _HOME
+                                     93 	.area _GSINIT
+                                     94 	.area _GSFINAL
+                                     95 	.area _GSINIT
+                                     96 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:14: DECLARE_STACK(script_ctx_pool, MAX_BG_SCRIPT_CONTEXTS);
+      000000 21r00r00                97 	ld	hl, #_script_ctx_pool
+      000003 36 00                   98 	ld	(hl), #0x00
+                                     99 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:19: UBYTE script_stack_ptr = 0;
+      000005 21r2Dr00               100 	ld	hl, #_script_stack_ptr
+      000008 36 00                  101 	ld	(hl), #0x00
+                                    102 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:24: UBYTE active_script_ctx_index = 0;
+      00000A 21r76r01               103 	ld	hl, #_active_script_ctx_index
+      00000D 36 00                  104 	ld	(hl), #0x00
+                                    105 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:26: UBYTE timer_script_duration = 0;
+      00000F 21r79r01               106 	ld	hl, #_timer_script_duration
+      000012 36 00                  107 	ld	(hl), #0x00
+                                    108 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:27: UBYTE timer_script_time = 0;
+      000014 21r7Ar01               109 	ld	hl, #_timer_script_time
+      000017 36 00                  110 	ld	(hl), #0x00
+                                    111 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:28: BankPtr timer_script_ptr = {0, 0};
+      000019 21r7Br01               112 	ld	hl, #_timer_script_ptr
+      00001C 36 00                  113 	ld	(hl), #0x00
+      00001E 21r7Cr01               114 	ld	hl, #(_timer_script_ptr + 0x0001)
+      000021 AF                     115 	xor	a, a
+      000022 22                     116 	ld	(hl+), a
+      000023 77                     117 	ld	(hl), a
+                                    118 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:29: UBYTE ctx_cmd_remaining = 5;
+      000024 21r7Er01               119 	ld	hl, #_ctx_cmd_remaining
+      000027 36 05                  120 	ld	(hl), #0x05
+                                    121 ;--------------------------------------------------------
+                                    122 ; Home
+                                    123 ;--------------------------------------------------------
+                                    124 	.area _HOME
+                                    125 	.area _HOME
+                                    126 ;--------------------------------------------------------
+                                    127 ; code
+                                    128 ;--------------------------------------------------------
+                                    129 	.area _CODE
+                                    130 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:33: void ScriptRunnerInit() {
+                                    131 ;	---------------------------------
+                                    132 ; Function ScriptRunnerInit
+                                    133 ; ---------------------------------
+      000000                        134 _ScriptRunnerInit::
+                                    135 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:34: ScriptCtxPoolReset();
+                                    136 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:35: }
+      000000 C3r4Br03               137 	jp  _ScriptCtxPoolReset
+                                    138 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:37: void ScriptStart(BankPtr* events_ptr) {
+                                    139 ;	---------------------------------
+                                    140 ; Function ScriptStart
+                                    141 ; ---------------------------------
+      000003                        142 _ScriptStart::
+                                    143 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:39: player.moving = FALSE;
+      000003 21r07r00               144 	ld	hl, #(_actors + 0x0007)
+      000006 36 00                  145 	ld	(hl), #0x00
+                                    146 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:41: script_variables[TMP_VAR_1] = 0;
+      000008 21r64r00               147 	ld	hl, #(_script_variables + 0x0064)
+      00000B 36 00                  148 	ld	(hl), #0x00
+                                    149 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:42: script_variables[TMP_VAR_2] = 0;
+      00000D 21r65r00               150 	ld	hl, #(_script_variables + 0x0065)
+      000010 36 00                  151 	ld	(hl), #0x00
+                                    152 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:44: script_ctxs[0].script_ptr_bank = events_ptr->bank;
+      000012 11r64r00               153 	ld	de, #_script_ctxs + 14
+      000015 F8 02                  154 	ldhl	sp,#2
+      000017 2A                     155 	ld	a, (hl+)
+      000018 4F                     156 	ld	c, a
+      000019 46                     157 	ld	b, (hl)
+      00001A 0A                     158 	ld	a, (bc)
+      00001B 12                     159 	ld	(de), a
+                                    160 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:45: script_ctxs[0].script_ptr = (BankDataPtr(script_ctxs[0].script_ptr_bank)) + events_ptr->offset;
+      00001C 69                     161 	ld	l, c
+      00001D 60                     162 	ld	h, b
+      00001E 23                     163 	inc	hl
+      00001F 2A                     164 	ld	a, (hl+)
+      000020 4F                     165 	ld	c, a
+      000021 7E                     166 	ld	a, (hl)
+      000022 C6 40                  167 	add	a, #0x40
+      000024 47                     168 	ld	b, a
+      000025 21r5Er00               169 	ld	hl, #(_script_ctxs + 0x0008)
+      000028 79                     170 	ld	a, c
+      000029 22                     171 	ld	(hl+), a
+      00002A 70                     172 	ld	(hl), b
+                                    173 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:46: script_ctxs[0].script_update_fn = FALSE;
+      00002B 21r5Ar00               174 	ld	hl, #(_script_ctxs + 0x0004)
+      00002E AF                     175 	xor	a, a
+      00002F 22                     176 	ld	(hl+), a
+      000030 77                     177 	ld	(hl), a
+                                    178 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:47: script_ctxs[0].script_start_ptr = script_ctxs[0].script_ptr;
+      000031 21r5Cr00               179 	ld	hl, #(_script_ctxs + 0x0006)
+      000034 79                     180 	ld	a, c
+      000035 22                     181 	ld	(hl+), a
+      000036 70                     182 	ld	(hl), b
+                                    183 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:48: }
+      000037 C9                     184 	ret
+                                    185 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:50: UBYTE ScriptStartBg(BankPtr* events_ptr, UBYTE owner) {
+                                    186 ;	---------------------------------
+                                    187 ; Function ScriptStartBg
+                                    188 ; ---------------------------------
+      000038                        189 _ScriptStartBg::
+      000038 E8 FB                  190 	add	sp, #-5
+                                    191 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:54: new_ctx = ScriptCtxPoolNext();
+      00003A CDr09r03               192 	call	_ScriptCtxPoolNext
+      00003D 4B                     193 	ld	c, e
+      00003E 06 00                  194 	ld	b, #0x00
+                                    195 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:68: ScriptRestoreCtx(new_ctx);
+      000040 F8 00                  196 	ldhl	sp,	#0
+      000042 71                     197 	ld	(hl), c
+                                    198 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:56: if (new_ctx != 0) {
+      000043 78                     199 	ld	a, b
+      000044 B1                     200 	or	a, c
+      000045 CArE5r00               201 	jp	Z, 00102$
+                                    202 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:57: script_variables[TMP_VAR_1] = 0;
+      000048 21r64r00               203 	ld	hl, #(_script_variables + 0x0064)
+      00004B 36 00                  204 	ld	(hl), #0x00
+                                    205 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:58: script_variables[TMP_VAR_2] = 0;
+      00004D 21r65r00               206 	ld	hl, #(_script_variables + 0x0065)
+      000050 36 00                  207 	ld	(hl), #0x00
+                                    208 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:60: script_ctxs[new_ctx].owner = 0;  // @wtf
+      000052 69                     209 	ld	l, c
+      000053 60                     210 	ld	h, b
+      000054 29                     211 	add	hl, hl
+      000055 09                     212 	add	hl, bc
+      000056 29                     213 	add	hl, hl
+      000057 29                     214 	add	hl, hl
+      000058 29                     215 	add	hl, hl
+      000059 01r56r00               216 	ld	bc,#_script_ctxs
+      00005C 09                     217 	add	hl,bc
+      00005D E5                     218 	push	hl
+      00005E 7D                     219 	ld	a, l
+      00005F F8 03                  220 	ldhl	sp,	#3
+      000061 77                     221 	ld	(hl), a
+      000062 E1                     222 	pop	hl
+      000063 7C                     223 	ld	a, h
+      000064 F8 02                  224 	ldhl	sp,	#2
+                                    225 ;c
+      000066 32                     226 	ld	(hl-), a
+      000067 2A                     227 	ld	a, (hl+)
+      000068 5F                     228 	ld	e, a
+      000069 56                     229 	ld	d, (hl)
+      00006A 21 12 00               230 	ld	hl, #0x0012
+      00006D 19                     231 	add	hl, de
+      00006E E5                     232 	push	hl
+      00006F 7D                     233 	ld	a, l
+      000070 F8 05                  234 	ldhl	sp,	#5
+      000072 77                     235 	ld	(hl), a
+      000073 E1                     236 	pop	hl
+      000074 7C                     237 	ld	a, h
+      000075 F8 04                  238 	ldhl	sp,	#4
+      000077 32                     239 	ld	(hl-), a
+      000078 2A                     240 	ld	a, (hl+)
+      000079 66                     241 	ld	h, (hl)
+      00007A 6F                     242 	ld	l, a
+      00007B 36 00                  243 	ld	(hl), #0x00
+                                    244 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:61: script_ctxs[new_ctx].script_ptr_bank = events_ptr->bank;
+                                    245 ;c
+      00007D F8 01                  246 	ldhl	sp,#1
+      00007F 2A                     247 	ld	a, (hl+)
+      000080 5F                     248 	ld	e, a
+      000081 56                     249 	ld	d, (hl)
+      000082 21 0E 00               250 	ld	hl, #0x000e
+      000085 19                     251 	add	hl, de
+      000086 4D                     252 	ld	c, l
+      000087 44                     253 	ld	b, h
+      000088 F8 07                  254 	ldhl	sp,#7
+      00008A 2A                     255 	ld	a, (hl+)
+      00008B 5F                     256 	ld	e, a
+      00008C 56                     257 	ld	d, (hl)
+      00008D 1A                     258 	ld	a, (de)
+      00008E 02                     259 	ld	(bc), a
+                                    260 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:62: script_ctxs[new_ctx].script_ptr =
+      00008F D5                     261 	push	de
+                                    262 ;c
+      000090 F8 03                  263 	ldhl	sp,#3
+      000092 2A                     264 	ld	a, (hl+)
+      000093 5F                     265 	ld	e, a
+      000094 56                     266 	ld	d, (hl)
+      000095 21 08 00               267 	ld	hl, #0x0008
+      000098 19                     268 	add	hl, de
+      000099 D1                     269 	pop	de
+      00009A 4D                     270 	ld	c, l
+      00009B 44                     271 	ld	b, h
+                                    272 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:63: (BankDataPtr(script_ctxs[new_ctx].script_ptr_bank)) + events_ptr->offset;
+      00009C 6B                     273 	ld	l, e
+      00009D 62                     274 	ld	h, d
+      00009E 23                     275 	inc	hl
+      00009F 2A                     276 	ld	a, (hl+)
+      0000A0 6E                     277 	ld	l, (hl)
+      0000A1 5F                     278 	ld	e, a
+      0000A2 7D                     279 	ld	a, l
+      0000A3 C6 40                  280 	add	a, #0x40
+      0000A5 57                     281 	ld	d, a
+      0000A6 7B                     282 	ld	a, e
+      0000A7 02                     283 	ld	(bc), a
+      0000A8 03                     284 	inc	bc
+      0000A9 7A                     285 	ld	a, d
+      0000AA 02                     286 	ld	(bc), a
+                                    287 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:64: script_ctxs[new_ctx].script_update_fn = FALSE;
+      0000AB D5                     288 	push	de
+                                    289 ;c
+      0000AC F8 03                  290 	ldhl	sp,#3
+      0000AE 2A                     291 	ld	a, (hl+)
+      0000AF 5F                     292 	ld	e, a
+      0000B0 56                     293 	ld	d, (hl)
+      0000B1 21 04 00               294 	ld	hl, #0x0004
+      0000B4 19                     295 	add	hl, de
+      0000B5 D1                     296 	pop	de
+      0000B6 4D                     297 	ld	c, l
+      0000B7 44                     298 	ld	b, h
+      0000B8 AF                     299 	xor	a, a
+      0000B9 02                     300 	ld	(bc), a
+      0000BA 03                     301 	inc	bc
+      0000BB 02                     302 	ld	(bc), a
+                                    303 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:65: script_ctxs[new_ctx].script_start_ptr = script_ctxs[new_ctx].script_ptr;
+      0000BC D5                     304 	push	de
+                                    305 ;c
+      0000BD F8 03                  306 	ldhl	sp,#3
+      0000BF 2A                     307 	ld	a, (hl+)
+      0000C0 5F                     308 	ld	e, a
+      0000C1 56                     309 	ld	d, (hl)
+      0000C2 21 06 00               310 	ld	hl, #0x0006
+      0000C5 19                     311 	add	hl, de
+      0000C6 D1                     312 	pop	de
+      0000C7 4D                     313 	ld	c, l
+      0000C8 44                     314 	ld	b, h
+      0000C9 7B                     315 	ld	a, e
+      0000CA 02                     316 	ld	(bc), a
+      0000CB 03                     317 	inc	bc
+      0000CC 7A                     318 	ld	a, d
+      0000CD 02                     319 	ld	(bc), a
+                                    320 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:66: script_ctxs[new_ctx].owner = owner;
+      0000CE F8 03                  321 	ldhl	sp,#3
+      0000D0 2A                     322 	ld	a, (hl+)
+      0000D1 5F                     323 	ld	e, a
+      0000D2 56                     324 	ld	d, (hl)
+      0000D3 F8 09                  325 	ldhl	sp,	#9
+      0000D5 7E                     326 	ld	a, (hl)
+      0000D6 12                     327 	ld	(de), a
+                                    328 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:68: ScriptRestoreCtx(new_ctx);
+      0000D7 F8 00                  329 	ldhl	sp,	#0
+      0000D9 7E                     330 	ld	a, (hl)
+      0000DA F5                     331 	push	af
+      0000DB 33                     332 	inc	sp
+      0000DC CDr96r02               333 	call	_ScriptRestoreCtx
+      0000DF 33                     334 	inc	sp
+                                    335 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:70: return new_ctx;
+      0000E0 F8 00                  336 	ldhl	sp,	#0
+      0000E2 5E                     337 	ld	e, (hl)
+      0000E3 18 03                  338 	jr	00103$
+      0000E5                        339 00102$:
+                                    340 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:73: return new_ctx;
+      0000E5 F8 00                  341 	ldhl	sp,	#0
+      0000E7 5E                     342 	ld	e, (hl)
+      0000E8                        343 00103$:
+                                    344 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:74: }
+      0000E8 E8 05                  345 	add	sp, #5
+      0000EA C9                     346 	ret
+                                    347 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:76: void ScriptRunnerUpdate() {
+                                    348 ;	---------------------------------
+                                    349 ; Function ScriptRunnerUpdate
+                                    350 ; ---------------------------------
+      0000EB                        351 _ScriptRunnerUpdate::
+      0000EB E8 FD                  352 	add	sp, #-3
+                                    353 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:81: active_script_ctx.script_await_next_frame = FALSE;
+      0000ED 21r1Cr00               354 	ld	hl, #(_active_script_ctx + 0x0010)
+      0000F0 36 00                  355 	ld	(hl), #0x00
+                                    356 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:83: if (active_script_ctx.script_update_fn) {
+      0000F2 21r10r00               357 	ld	hl, #(_active_script_ctx + 0x0004)
+      0000F5 2A                     358 	ld	a, (hl+)
+      0000F6 B6                     359 	or	a,(hl)
+      0000F7 28 1F                  360 	jr	Z, 00104$
+                                    361 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:85: PUSH_BANK(SCRIPT_RUNNER_BANK);
+      0000F9 3E 04                  362 	ld	a, #0x04
+      0000FB F5                     363 	push	af
+      0000FC 33                     364 	inc	sp
+      0000FD CDr00r00               365 	call	_PushBank
+      000100 33                     366 	inc	sp
+                                    367 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:87: update_complete = (*(active_script_ctx.script_update_fn))();
+      000101 21r10r00               368 	ld	hl, #(_active_script_ctx + 0x0004)
+      000104 2A                     369 	ld	a, (hl+)
+      000105 4F                     370 	ld	c, a
+      000106 66                     371 	ld	h, (hl)
+      000107 69                     372 	ld	l, c
+      000108 CDr00r00               373 	call	___sdcc_call_hl
+      00010B 7B                     374 	ld	a, e
+                                    375 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:89: if (update_complete) {
+      00010C B7                     376 	or	a, a
+      00010D 28 06                  377 	jr	Z, 00102$
+                                    378 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:90: active_script_ctx.script_update_fn = FALSE;
+      00010F 21r10r00               379 	ld	hl, #(_active_script_ctx + 0x0004)
+      000112 AF                     380 	xor	a, a
+      000113 22                     381 	ld	(hl+), a
+      000114 77                     382 	ld	(hl), a
+      000115                        383 00102$:
+                                    384 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:92: POP_BANK;
+      000115 CDr00r00               385 	call	_PopBank
+      000118                        386 00104$:
+                                    387 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:95: if (!active_script_ctx.script_ptr_bank || active_script_ctx.script_update_fn) {
+      000118 21r1Ar00               388 	ld	hl, #(_active_script_ctx + 0x000e)
+      00011B 46                     389 	ld	b, (hl)
+                                    390 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:97: active_script_ctx.script_ptr = 0;
+                                    391 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:95: if (!active_script_ctx.script_ptr_bank || active_script_ctx.script_update_fn) {
+      00011C 78                     392 	ld	a, b
+      00011D B7                     393 	or	a, a
+      00011E 28 08                  394 	jr	Z, 00105$
+      000120 21r10r00               395 	ld	hl, #(_active_script_ctx + 0x0004)
+      000123 2A                     396 	ld	a, (hl+)
+      000124 4F                     397 	ld	c,a
+      000125 B6                     398 	or	a,(hl)
+      000126 28 0C                  399 	jr	Z, 00106$
+      000128                        400 00105$:
+                                    401 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:96: ScriptSaveCtx();
+      000128 CDr47r02               402 	call	_ScriptSaveCtx
+                                    403 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:97: active_script_ctx.script_ptr = 0;
+      00012B 21r14r00               404 	ld	hl, #(_active_script_ctx + 0x0008)
+      00012E AF                     405 	xor	a, a
+      00012F 22                     406 	ld	(hl+), a
+      000130 77                     407 	ld	(hl), a
+                                    408 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:98: return;
+      000131 C3r3Cr02               409 	jp	00121$
+      000134                        410 00106$:
+                                    411 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:101: PUSH_BANK(active_script_ctx.script_ptr_bank);
+      000134 C5                     412 	push	bc
+      000135 33                     413 	inc	sp
+      000136 CDr00r00               414 	call	_PushBank
+      000139 33                     415 	inc	sp
+                                    416 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:102: script_cmd_index = *active_script_ctx.script_ptr;
+      00013A 11r14r00               417 	ld	de, #(_active_script_ctx + 0x0008)
+      00013D 1A                     418 	ld	a, (de)
+      00013E F8 01                  419 	ldhl	sp,	#1
+      000140 22                     420 	ld	(hl+), a
+      000141 13                     421 	inc	de
+      000142 1A                     422 	ld	a, (de)
+      000143 32                     423 	ld	(hl-), a
+      000144 2A                     424 	ld	a, (hl+)
+      000145 5F                     425 	ld	e, a
+      000146 56                     426 	ld	d, (hl)
+      000147 1A                     427 	ld	a, (de)
+      000148 2B                     428 	dec	hl
+      000149 2B                     429 	dec	hl
+      00014A 77                     430 	ld	(hl), a
+                                    431 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:104: if (!script_cmd_index) {
+      00014B B7                     432 	or	a, a
+      00014C 20 61                  433 	jr	NZ, 00114$
+                                    434 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:105: POP_BANK;
+      00014E CDr00r00               435 	call	_PopBank
+                                    436 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:106: if (script_stack_ptr) {
+      000151 FAr2Dr00               437 	ld	a, (#_script_stack_ptr)
+      000154 B7                     438 	or	a, a
+      000155 28 14                  439 	jr	Z, 00109$
+                                    440 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:108: Script_StackPop_b();
+      000157 1Er00                  441 	ld	e, #b_Script_StackPop_b
+      000159 21r00r00               442 	ld	hl, #_Script_StackPop_b
+      00015C CDr00r00               443 	call	___sdcc_bcall_ehl
+                                    444 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:109: ScriptSaveCtx();
+      00015F CDr47r02               445 	call	_ScriptSaveCtx
+                                    446 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:110: active_script_ctx.script_ptr = 0;
+      000162 21r14r00               447 	ld	hl, #(_active_script_ctx + 0x0008)
+      000165 AF                     448 	xor	a, a
+      000166 22                     449 	ld	(hl+), a
+      000167 77                     450 	ld	(hl), a
+                                    451 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:111: return;
+      000168 C3r3Cr02               452 	jp	00121$
+      00016B                        453 00109$:
+                                    454 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:114: active_script_ctx.script_ptr_bank = 0;
+      00016B 21r1Ar00               455 	ld	hl, #(_active_script_ctx + 0x000e)
+      00016E 36 00                  456 	ld	(hl), #0x00
+                                    457 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:115: active_script_ctx.script_ptr = 0;
+      000170 21r14r00               458 	ld	hl, #(_active_script_ctx + 0x0008)
+      000173 AF                     459 	xor	a, a
+      000174 22                     460 	ld	(hl+), a
+      000175 77                     461 	ld	(hl), a
+                                    462 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:116: active_script_ctx.script_actor = 0;
+      000176 21r1Dr00               463 	ld	hl, #(_active_script_ctx + 0x0011)
+      000179 36 00                  464 	ld	(hl), #0x00
+                                    465 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:117: ScriptSaveCtx();
+      00017B CDr47r02               466 	call	_ScriptSaveCtx
+                                    467 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:118: if (active_script_ctx_index != 0) {
+      00017E 21r76r01               468 	ld	hl, #_active_script_ctx_index
+      000181 7E                     469 	ld	a, (hl)
+      000182 B7                     470 	or	a, a
+      000183 28 22                  471 	jr	Z, 00111$
+                                    472 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:119: ScriptCtxPoolReturn(active_script_ctx_index, script_ctxs[active_script_ctx_index].owner);
+      000185 4E                     473 	ld	c, (hl)
+      000186 06 00                  474 	ld	b, #0x00
+      000188 69                     475 	ld	l, c
+      000189 60                     476 	ld	h, b
+      00018A 29                     477 	add	hl, hl
+      00018B 09                     478 	add	hl, bc
+      00018C 29                     479 	add	hl, hl
+      00018D 29                     480 	add	hl, hl
+      00018E 29                     481 	add	hl, hl
+      00018F 01r56r00               482 	ld	bc,#_script_ctxs
+      000192 09                     483 	add	hl,bc
+      000193 01 12 00               484 	ld	bc, #0x0012
+      000196 09                     485 	add	hl, bc
+      000197 7E                     486 	ld	a, (hl)
+      000198 F5                     487 	push	af
+      000199 33                     488 	inc	sp
+      00019A FAr76r01               489 	ld	a, (#_active_script_ctx_index)
+      00019D F5                     490 	push	af
+      00019E 33                     491 	inc	sp
+      00019F CDr1Ar03               492 	call	_ScriptCtxPoolReturn
+      0001A2 E8 02                  493 	add	sp, #2
+      0001A4 C3r3Cr02               494 	jp	00121$
+      0001A7                        495 00111$:
+                                    496 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:121: script_main_ctx_actor = 0;
+      0001A7 21r24r00               497 	ld	hl, #_script_main_ctx_actor
+      0001AA 36 00                  498 	ld	(hl), #0x00
+                                    499 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:123: return;
+      0001AC C3r3Cr02               500 	jp	00121$
+      0001AF                        501 00114$:
+                                    502 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:127: memcpy(script_cmd_args, active_script_ctx.script_ptr + 1, 7);
+      0001AF F8 01                  503 	ldhl	sp,#1
+      0001B1 2A                     504 	ld	a, (hl+)
+      0001B2 4F                     505 	ld	c, a
+      0001B3 46                     506 	ld	b, (hl)
+      0001B4 03                     507 	inc	bc
+      0001B5 21 07 00               508 	ld	hl, #0x0007
+      0001B8 E5                     509 	push	hl
+      0001B9 C5                     510 	push	bc
+      0001BA 21r25r00               511 	ld	hl, #_script_cmd_args
+      0001BD E5                     512 	push	hl
+      0001BE CDr00r00               513 	call	_memcpy
+      0001C1 E8 06                  514 	add	sp, #6
+                                    515 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:128: POP_BANK;
+      0001C3 CDr00r00               516 	call	_PopBank
+                                    517 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:130: PUSH_BANK(SCRIPT_RUNNER_BANK);
+      0001C6 3E 04                  518 	ld	a, #0x04
+      0001C8 F5                     519 	push	af
+      0001C9 33                     520 	inc	sp
+      0001CA CDr00r00               521 	call	_PushBank
+      0001CD 33                     522 	inc	sp
+                                    523 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:131: initial_script_ptr = active_script_ctx.script_ptr;
+      0001CE 11r14r00               524 	ld	de, #(_active_script_ctx + 0x0008)
+      0001D1 1A                     525 	ld	a, (de)
+      0001D2 F8 01                  526 	ldhl	sp,	#1
+      0001D4 22                     527 	ld	(hl+), a
+      0001D5 13                     528 	inc	de
+      0001D6 1A                     529 	ld	a, (de)
+      0001D7 77                     530 	ld	(hl), a
+                                    531 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:132: script_cmd_args_len = script_cmds[script_cmd_index].args_len;
+      0001D8 01r00r00               532 	ld	bc, #_script_cmds+0
+      0001DB 2B                     533 	dec	hl
+      0001DC 2B                     534 	dec	hl
+      0001DD 5E                     535 	ld	e, (hl)
+      0001DE 16 00                  536 	ld	d, #0x00
+      0001E0 6B                     537 	ld	l, e
+      0001E1 62                     538 	ld	h, d
+      0001E2 29                     539 	add	hl, hl
+      0001E3 19                     540 	add	hl, de
+      0001E4 09                     541 	add	hl, bc
+      0001E5 4D                     542 	ld	c, l
+      0001E6 44                     543 	ld	b, h
+      0001E7 59                     544 	ld	e, c
+      0001E8 50                     545 	ld	d, b
+      0001E9 13                     546 	inc	de
+      0001EA 13                     547 	inc	de
+      0001EB 1A                     548 	ld	a, (de)
+      0001EC EAr2Cr00               549 	ld	(#_script_cmd_args_len),a
+                                    550 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:133: script_cmds[script_cmd_index].fn();
+      0001EF 69                     551 	ld	l, c
+      0001F0 60                     552 	ld	h, b
+      0001F1 2A                     553 	ld	a, (hl+)
+      0001F2 4F                     554 	ld	c, a
+      0001F3 66                     555 	ld	h, (hl)
+      0001F4 69                     556 	ld	l, c
+      0001F5 CDr00r00               557 	call	___sdcc_call_hl
+                                    558 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:134: if (initial_script_ptr == active_script_ctx.script_ptr) {
+      0001F8 21r14r00               559 	ld	hl, #(_active_script_ctx + 0x0008)
+      0001FB 2A                     560 	ld	a, (hl+)
+      0001FC 4F                     561 	ld	c, a
+      0001FD 46                     562 	ld	b, (hl)
+      0001FE F8 01                  563 	ldhl	sp,	#1
+      000200 7E                     564 	ld	a, (hl)
+      000201 91                     565 	sub	a, c
+      000202 20 18                  566 	jr	NZ, 00116$
+      000204 23                     567 	inc	hl
+      000205 7E                     568 	ld	a, (hl)
+      000206 90                     569 	sub	a, b
+      000207 20 13                  570 	jr	NZ, 00116$
+                                    571 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:136: active_script_ctx.script_ptr += 1 + script_cmd_args_len;
+      000209 21r2Cr00               572 	ld	hl, #_script_cmd_args_len
+      00020C 5E                     573 	ld	e, (hl)
+      00020D 16 00                  574 	ld	d, #0x00
+      00020F 13                     575 	inc	de
+      000210 7B                     576 	ld	a, e
+      000211 81                     577 	add	a, c
+      000212 4F                     578 	ld	c, a
+      000213 7A                     579 	ld	a, d
+      000214 88                     580 	adc	a, b
+      000215 47                     581 	ld	b, a
+      000216 21r14r00               582 	ld	hl, #(_active_script_ctx + 0x0008)
+      000219 79                     583 	ld	a, c
+      00021A 22                     584 	ld	(hl+), a
+      00021B 70                     585 	ld	(hl), b
+      00021C                        586 00116$:
+                                    587 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:138: POP_BANK;
+      00021C CDr00r00               588 	call	_PopBank
+                                    589 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:140: if (!active_script_ctx.script_await_next_frame && !active_script_ctx.script_update_fn && ctx_cmd_remaining != 0) {    
+      00021F FAr1Cr00               590 	ld	a, (#(_active_script_ctx + 0x0010) + 0)
+      000222 B7                     591 	or	a, a
+      000223 20 14                  592 	jr	NZ, 00118$
+      000225 21r10r00               593 	ld	hl, #(_active_script_ctx + 0x0004)
+      000228 2A                     594 	ld	a, (hl+)
+      000229 B6                     595 	or	a,(hl)
+      00022A 20 0D                  596 	jr	NZ, 00118$
+      00022C 21r7Er01               597 	ld	hl, #_ctx_cmd_remaining
+      00022F 7E                     598 	ld	a, (hl)
+      000230 B7                     599 	or	a, a
+      000231 28 06                  600 	jr	Z, 00118$
+                                    601 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:141: ctx_cmd_remaining--;
+      000233 35                     602 	dec	(hl)
+                                    603 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:142: ScriptRunnerUpdate();
+      000234 CDrEBr00               604 	call	_ScriptRunnerUpdate
+                                    605 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:143: return;
+      000237 18 03                  606 	jr	00121$
+      000239                        607 00118$:
+                                    608 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:146: ScriptSaveCtx();
+      000239 CDr47r02               609 	call	_ScriptSaveCtx
+      00023C                        610 00121$:
+                                    611 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:147: }
+      00023C E8 03                  612 	add	sp, #3
+      00023E C9                     613 	ret
+                                    614 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:149: void ScriptTimerUpdate() {
+                                    615 ;	---------------------------------
+                                    616 ; Function ScriptTimerUpdate
+                                    617 ; ---------------------------------
+      00023F                        618 _ScriptTimerUpdate::
+                                    619 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:150: ScriptTimerUpdate_b();
+      00023F 1Er00                  620 	ld	e, #b_ScriptTimerUpdate_b
+      000241 21r00r00               621 	ld	hl, #_ScriptTimerUpdate_b
+                                    622 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:151: }
+      000244 C3r00r00               623 	jp  ___sdcc_bcall_ehl
+                                    624 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:153: void ScriptSaveCtx() {
+                                    625 ;	---------------------------------
+                                    626 ; Function ScriptSaveCtx
+                                    627 ; ---------------------------------
+      000247                        628 _ScriptSaveCtx::
+                                    629 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:155: script_ctx_ptr = &script_ctxs[active_script_ctx_index];
+      000247 21r76r01               630 	ld	hl, #_active_script_ctx_index
+      00024A 4E                     631 	ld	c, (hl)
+      00024B 06 00                  632 	ld	b, #0x00
+      00024D 69                     633 	ld	l, c
+      00024E 60                     634 	ld	h, b
+      00024F 29                     635 	add	hl, hl
+      000250 09                     636 	add	hl, bc
+      000251 29                     637 	add	hl, hl
+      000252 29                     638 	add	hl, hl
+      000253 29                     639 	add	hl, hl
+      000254 4D                     640 	ld	c, l
+      000255 44                     641 	ld	b, h
+      000256 21r56r00               642 	ld	hl, #_script_ctxs
+      000259 09                     643 	add	hl, bc
+      00025A 7D                     644 	ld	a, l
+      00025B EAr77r01               645 	ld	(_script_ctx_ptr), a
+      00025E 7C                     646 	ld	a, h
+      00025F EAr78r01               647 	ld	(_script_ctx_ptr + 1), a
+                                    648 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:158: memcpy(script_ctx_ptr, &active_script_ctx, sizeof(ScriptContext)-3);
+      000262 11r0Cr00               649 	ld	de, #_active_script_ctx+0
+      000265 21r78r01               650 	ld	hl, #_script_ctx_ptr + 1
+      000268 2B                     651 	dec	hl
+      000269 2A                     652 	ld	a, (hl+)
+      00026A 4F                     653 	ld	c, a
+      00026B 46                     654 	ld	b, (hl)
+      00026C 21 15 00               655 	ld	hl, #0x0015
+      00026F E5                     656 	push	hl
+      000270 D5                     657 	push	de
+      000271 C5                     658 	push	bc
+      000272 CDr00r00               659 	call	_memcpy
+      000275 E8 06                  660 	add	sp, #6
+                                    661 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:159: (*script_ctx_ptr).tmp_1 = script_variables[TMP_VAR_1];
+      000277 21r77r01               662 	ld	hl, #_script_ctx_ptr
+      00027A 2A                     663 	ld	a, (hl+)
+      00027B 5F                     664 	ld	e, a
+      00027C 46                     665 	ld	b, (hl)
+      00027D 7B                     666 	ld	a, e
+      00027E C6 15                  667 	add	a, #0x15
+      000280 4F                     668 	ld	c, a
+      000281 30 01                  669 	jr	NC, 00103$
+      000283 04                     670 	inc	b
+      000284                        671 00103$:
+      000284 FAr64r00               672 	ld	a, (#(_script_variables + 0x0064) + 0)
+      000287 02                     673 	ld	(bc), a
+                                    674 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:160: (*script_ctx_ptr).tmp_2 = script_variables[TMP_VAR_2];
+      000288 2B                     675 	dec	hl
+      000289 2A                     676 	ld	a, (hl+)
+      00028A 4F                     677 	ld	c, a
+      00028B 46                     678 	ld	b, (hl)
+      00028C 21 16 00               679 	ld	hl, #0x0016
+      00028F 09                     680 	add	hl, bc
+      000290 01r65r00               681 	ld	bc, #_script_variables + 101
+      000293 0A                     682 	ld	a, (bc)
+      000294 77                     683 	ld	(hl), a
+                                    684 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:161: }
+      000295 C9                     685 	ret
+                                    686 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:163: void ScriptRestoreCtx(UBYTE i) {
+                                    687 ;	---------------------------------
+                                    688 ; Function ScriptRestoreCtx
+                                    689 ; ---------------------------------
+      000296                        690 _ScriptRestoreCtx::
+                                    691 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:164: if (!script_ctxs[i].script_ptr_bank || (i != 0 && script_ctxs[0].script_ptr_bank)) {
+      000296 F8 02                  692 	ldhl	sp,	#2
+      000298 4E                     693 	ld	c, (hl)
+      000299 06 00                  694 	ld	b, #0x00
+      00029B 69                     695 	ld	l, c
+      00029C 60                     696 	ld	h, b
+      00029D 29                     697 	add	hl, hl
+      00029E 09                     698 	add	hl, bc
+      00029F 29                     699 	add	hl, hl
+      0002A0 29                     700 	add	hl, hl
+      0002A1 29                     701 	add	hl, hl
+      0002A2 01r56r00               702 	ld	bc,#_script_ctxs
+      0002A5 09                     703 	add	hl,bc
+      0002A6 01 0E 00               704 	ld	bc, #0x000e
+      0002A9 09                     705 	add	hl, bc
+      0002AA 7E                     706 	ld	a, (hl)
+      0002AB B7                     707 	or	a, a
+      0002AC C8                     708 	ret	Z
+      0002AD F8 02                  709 	ldhl	sp,	#2
+      0002AF 7E                     710 	ld	a, (hl)
+      0002B0 B7                     711 	or	a, a
+      0002B1 28 05                  712 	jr	Z, 00102$
+      0002B3 FAr64r00               713 	ld	a, (#(_script_ctxs + 0x000e) + 0)
+      0002B6 B7                     714 	or	a, a
+                                    715 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:165: return;
+      0002B7 C0                     716 	ret	NZ
+      0002B8                        717 00102$:
+                                    718 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:170: if (i == 0) {
+      0002B8 F8 02                  719 	ldhl	sp,	#2
+      0002BA 7E                     720 	ld	a, (hl)
+      0002BB B7                     721 	or	a, a
+      0002BC 20 07                  722 	jr	NZ, 00106$
+                                    723 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:171: ctx_cmd_remaining = 255;
+      0002BE 21r7Er01               724 	ld	hl, #_ctx_cmd_remaining
+      0002C1 36 FF                  725 	ld	(hl), #0xff
+      0002C3 18 05                  726 	jr	00107$
+      0002C5                        727 00106$:
+                                    728 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:173: ctx_cmd_remaining = 2;
+      0002C5 21r7Er01               729 	ld	hl, #_ctx_cmd_remaining
+      0002C8 36 02                  730 	ld	(hl), #0x02
+      0002CA                        731 00107$:
+                                    732 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:176: active_script_ctx_index = i;
+      0002CA F8 02                  733 	ldhl	sp,	#2
+      0002CC 4E                     734 	ld	c, (hl)
+      0002CD 21r76r01               735 	ld	hl, #_active_script_ctx_index
+      0002D0 71                     736 	ld	(hl), c
+                                    737 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:179: memcpy(&active_script_ctx, &script_ctxs[i], sizeof(ScriptContext)-3);
+      0002D1 06 00                  738 	ld	b, #0x00
+      0002D3 69                     739 	ld	l, c
+      0002D4 60                     740 	ld	h, b
+      0002D5 29                     741 	add	hl, hl
+      0002D6 09                     742 	add	hl, bc
+      0002D7 29                     743 	add	hl, hl
+      0002D8 29                     744 	add	hl, hl
+      0002D9 29                     745 	add	hl, hl
+      0002DA 7D                     746 	ld	a, l
+      0002DB C6r56                  747 	add	a, #<(_script_ctxs)
+      0002DD 5F                     748 	ld	e, a
+      0002DE 7C                     749 	ld	a, h
+      0002DF CEs00                  750 	adc	a, #>(_script_ctxs)
+      0002E1 57                     751 	ld	d, a
+      0002E2 4B                     752 	ld	c, e
+      0002E3 42                     753 	ld	b, d
+      0002E4 D5                     754 	push	de
+      0002E5 21 15 00               755 	ld	hl, #0x0015
+      0002E8 E5                     756 	push	hl
+      0002E9 C5                     757 	push	bc
+      0002EA 21r0Cr00               758 	ld	hl, #_active_script_ctx
+      0002ED E5                     759 	push	hl
+      0002EE CDr00r00               760 	call	_memcpy
+      0002F1 E8 06                  761 	add	sp, #6
+      0002F3 D1                     762 	pop	de
+                                    763 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:180: script_variables[TMP_VAR_1] = script_ctxs[i].tmp_1;
+      0002F4 01r64r00               764 	ld	bc, #_script_variables + 100
+      0002F7 21 15 00               765 	ld	hl, #0x0015
+      0002FA 19                     766 	add	hl, de
+      0002FB 7E                     767 	ld	a, (hl)
+      0002FC 02                     768 	ld	(bc), a
+                                    769 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:181: script_variables[TMP_VAR_2] = script_ctxs[i].tmp_2;
+      0002FD 01r65r00               770 	ld	bc, #_script_variables + 101
+      000300 21 16 00               771 	ld	hl, #0x0016
+      000303 19                     772 	add	hl, de
+      000304 7E                     773 	ld	a, (hl)
+      000305 02                     774 	ld	(bc), a
+                                    775 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:183: ScriptRunnerUpdate();
+                                    776 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:184: }
+      000306 C3rEBr00               777 	jp  _ScriptRunnerUpdate
+                                    778 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:186: UINT8 ScriptCtxPoolNext() {
+                                    779 ;	---------------------------------
+                                    780 ; Function ScriptCtxPoolNext
+                                    781 ; ---------------------------------
+      000309                        782 _ScriptCtxPoolNext::
+                                    783 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:188: if (StackSize(script_ctx_pool)) {
+      000309 01r00r00               784 	ld	bc, #_script_ctx_pool+0
+      00030C 0A                     785 	ld	a, (bc)
+      00030D B7                     786 	or	a, a
+      00030E 28 07                  787 	jr	Z, 00102$
+                                    788 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:189: next = StackPop(script_ctx_pool);
+      000310 C5                     789 	push	bc
+      000311 CDr00r00               790 	call	_StackPop
+      000314 E8 02                  791 	add	sp, #2
+                                    792 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:190: return next;
+      000316 C9                     793 	ret
+      000317                        794 00102$:
+                                    795 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:192: return 0;
+      000317 1E 00                  796 	ld	e, #0x00
+                                    797 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:193: }
+      000319 C9                     798 	ret
+                                    799 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:195: void ScriptCtxPoolReturn(UINT8 ctx, UBYTE owner) {
+                                    800 ;	---------------------------------
+                                    801 ; Function ScriptCtxPoolReturn
+                                    802 ; ---------------------------------
+      00031A                        803 _ScriptCtxPoolReturn::
+                                    804 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:199: if (script_ctxs[ctx].owner == owner) {
+      00031A F8 02                  805 	ldhl	sp,	#2
+      00031C 4E                     806 	ld	c, (hl)
+      00031D 06 00                  807 	ld	b, #0x00
+      00031F 69                     808 	ld	l, c
+      000320 60                     809 	ld	h, b
+      000321 29                     810 	add	hl, hl
+      000322 09                     811 	add	hl, bc
+      000323 29                     812 	add	hl, hl
+      000324 29                     813 	add	hl, hl
+      000325 29                     814 	add	hl, hl
+      000326 01r56r00               815 	ld	bc,#_script_ctxs
+      000329 09                     816 	add	hl,bc
+      00032A 4D                     817 	ld	c, l
+      00032B 44                     818 	ld	b, h
+      00032C 21 12 00               819 	ld	hl, #0x0012
+      00032F 09                     820 	add	hl, bc
+      000330 5E                     821 	ld	e, (hl)
+      000331 F8 03                  822 	ldhl	sp,	#3
+      000333 7E                     823 	ld	a, (hl)
+      000334 93                     824 	sub	a, e
+      000335 C0                     825 	ret	NZ
+                                    826 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:200: script_ctxs[ctx].script_ptr_bank = 0;
+      000336 21 0E 00               827 	ld	hl, #0x000e
+      000339 09                     828 	add	hl, bc
+      00033A 36 00                  829 	ld	(hl), #0x00
+                                    830 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:201: StackPush(script_ctx_pool, ctx);
+      00033C F8 02                  831 	ldhl	sp,	#2
+      00033E 7E                     832 	ld	a, (hl)
+      00033F F5                     833 	push	af
+      000340 33                     834 	inc	sp
+      000341 21r00r00               835 	ld	hl, #_script_ctx_pool
+      000344 E5                     836 	push	hl
+      000345 CDr00r00               837 	call	_StackPush
+      000348 E8 03                  838 	add	sp, #3
+                                    839 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:203: }
+      00034A C9                     840 	ret
+                                    841 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:205: void ScriptCtxPoolReset() {
+                                    842 ;	---------------------------------
+                                    843 ; Function ScriptCtxPoolReset
+                                    844 ; ---------------------------------
+      00034B                        845 _ScriptCtxPoolReset::
+                                    846 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:207: for (i = 1; i != MAX_BG_SCRIPT_CONTEXTS + 1; i++) {
+      00034B 0E 01                  847 	ld	c, #0x01
+      00034D                        848 00102$:
+                                    849 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:208: script_ctx_pool[i] = i;
+      00034D 21r00r00               850 	ld	hl, #_script_ctx_pool
+      000350 06 00                  851 	ld	b, #0x00
+      000352 09                     852 	add	hl, bc
+      000353 71                     853 	ld	(hl), c
+                                    854 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:209: script_ctxs[i].script_ptr_bank = 0;
+      000354 06 00                  855 	ld	b, #0x00
+      000356 69                     856 	ld	l, c
+      000357 60                     857 	ld	h, b
+      000358 29                     858 	add	hl, hl
+      000359 09                     859 	add	hl, bc
+      00035A 29                     860 	add	hl, hl
+      00035B 29                     861 	add	hl, hl
+      00035C 29                     862 	add	hl, hl
+      00035D 11r56r00               863 	ld	de, #_script_ctxs
+      000360 19                     864 	add	hl, de
+      000361 11 0E 00               865 	ld	de, #0x000e
+      000364 19                     866 	add	hl, de
+      000365 36 00                  867 	ld	(hl), #0x00
+                                    868 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:207: for (i = 1; i != MAX_BG_SCRIPT_CONTEXTS + 1; i++) {
+      000367 0C                     869 	inc	c
+      000368 79                     870 	ld	a, c
+      000369 D6 0C                  871 	sub	a, #0x0c
+      00036B 20 E0                  872 	jr	NZ, 00102$
+                                    873 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:211: script_ctx_pool[0] = MAX_BG_SCRIPT_CONTEXTS;
+      00036D 21r00r00               874 	ld	hl, #_script_ctx_pool
+      000370 36 0B                  875 	ld	(hl), #0x0b
+                                    876 ;/tmp/_gbsbuild/src/core/ScriptRunner.c:212: }
+      000372 C9                     877 	ret
+                                    878 	.area _CODE
+                                    879 	.area _CABS (ABS)

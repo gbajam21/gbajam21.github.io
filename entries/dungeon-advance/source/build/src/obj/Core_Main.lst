@@ -1,0 +1,969 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Core_Main
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _lcd_update
+                                     12 	.globl _vbl_update
+                                     13 	.globl _gbt_enable_channels
+                                     14 	.globl b_RefreshScroll_b
+                                     15 	.globl _RefreshScroll_b
+                                     16 	.globl _RefreshScroll
+                                     17 	.globl _ScriptRestoreCtx
+                                     18 	.globl _ScriptTimerUpdate
+                                     19 	.globl _ScriptStart
+                                     20 	.globl _ScriptRunnerInit
+                                     21 	.globl b_UpdateProjectiles_b
+                                     22 	.globl _UpdateProjectiles_b
+                                     23 	.globl _MusicUpdate
+                                     24 	.globl _HandleInputScripts
+                                     25 	.globl b_UIOnInteract_b
+                                     26 	.globl _UIOnInteract_b
+                                     27 	.globl b_UIUpdate_b
+                                     28 	.globl _UIUpdate_b
+                                     29 	.globl _UIUpdate
+                                     30 	.globl _UIInit
+                                     31 	.globl _FadeUpdate
+                                     32 	.globl _FadeOut
+                                     33 	.globl _FadeIn
+                                     34 	.globl _FadeInit
+                                     35 	.globl _LoadScene
+                                     36 	.globl _UpdateCamera
+                                     37 	.globl _PopBank
+                                     38 	.globl _PushBank
+                                     39 	.globl _ActorRunCollisionScripts
+                                     40 	.globl _UpdateActors
+                                     41 	.globl _ActorsInit
+                                     42 	.globl _initrand
+                                     43 	.globl _memset
+                                     44 	.globl _display_off
+                                     45 	.globl _wait_vbl_done
+                                     46 	.globl _set_interrupts
+                                     47 	.globl _enable_interrupts
+                                     48 	.globl _joypad
+                                     49 	.globl _add_TIM
+                                     50 	.globl _add_LCD
+                                     51 	.globl _add_VBL
+                                     52 	.globl _cpu_fast
+                                     53 	.globl _set_sprite_palette
+                                     54 	.globl _set_bkg_palette
+                                     55 	.globl _music_mute_frames
+                                     56 	.globl _old_scroll_y
+                                     57 	.globl _old_scroll_x
+                                     58 	.globl _vbl_count
+                                     59 	.globl _state_running
+                                     60 	.globl _current_state
+                                     61 	.globl _delta_time
+                                     62 	.globl _next_state
+                                     63 	.globl _seedRand
+                                     64 	.globl _game_time
+                                     65 	.globl _SetScene
+                                     66 	.globl _core_start
+                                     67 ;--------------------------------------------------------
+                                     68 ; special function registers
+                                     69 ;--------------------------------------------------------
+                                     70 ;--------------------------------------------------------
+                                     71 ; ram data
+                                     72 ;--------------------------------------------------------
+                                     73 	.area _DATA
+      000000                         74 _game_time::
+      000000                         75 	.ds 1
+      000001                         76 _seedRand::
+      000001                         77 	.ds 1
+      000002                         78 _next_state::
+      000002                         79 	.ds 2
+      000004                         80 _delta_time::
+      000004                         81 	.ds 1
+      000005                         82 _current_state::
+      000005                         83 	.ds 2
+      000007                         84 _state_running::
+      000007                         85 	.ds 1
+      000008                         86 _vbl_count::
+      000008                         87 	.ds 1
+      000009                         88 _old_scroll_x::
+      000009                         89 	.ds 2
+      00000B                         90 _old_scroll_y::
+      00000B                         91 	.ds 2
+      00000D                         92 _music_mute_frames::
+      00000D                         93 	.ds 1
+                                     94 ;--------------------------------------------------------
+                                     95 ; absolute external ram data
+                                     96 ;--------------------------------------------------------
+                                     97 	.area _DABS (ABS)
+                                     98 ;--------------------------------------------------------
+                                     99 ; global & static initialisations
+                                    100 ;--------------------------------------------------------
+                                    101 	.area _HOME
+                                    102 	.area _GSINIT
+                                    103 	.area _GSFINAL
+                                    104 	.area _GSINIT
+                                    105 ;/tmp/_gbsbuild/src/core/Core_Main.c:25: UBYTE game_time = 0;
+      000000 21r00r00               106 	ld	hl, #_game_time
+      000003 36 00                  107 	ld	(hl), #0x00
+                                    108 ;/tmp/_gbsbuild/src/core/Core_Main.c:26: UBYTE seedRand = 2;
+      000005 21r01r00               109 	ld	hl, #_seedRand
+      000008 36 02                  110 	ld	(hl), #0x02
+                                    111 ;/tmp/_gbsbuild/src/core/Core_Main.c:30: UINT8 state_running = 0;
+      00000A 21r07r00               112 	ld	hl, #_state_running
+      00000D 36 00                  113 	ld	(hl), #0x00
+                                    114 ;/tmp/_gbsbuild/src/core/Core_Main.c:31: UINT8 vbl_count = 0;
+      00000F 21r08r00               115 	ld	hl, #_vbl_count
+      000012 36 00                  116 	ld	(hl), #0x00
+                                    117 ;/tmp/_gbsbuild/src/core/Core_Main.c:33: UINT8 music_mute_frames = 0;
+      000014 21r0Dr00               118 	ld	hl, #_music_mute_frames
+      000017 36 00                  119 	ld	(hl), #0x00
+                                    120 ;--------------------------------------------------------
+                                    121 ; Home
+                                    122 ;--------------------------------------------------------
+                                    123 	.area _HOME
+                                    124 	.area _HOME
+                                    125 ;--------------------------------------------------------
+                                    126 ; code
+                                    127 ;--------------------------------------------------------
+                                    128 	.area _CODE
+                                    129 ;/tmp/_gbsbuild/src/core/Core_Main.c:37: void SetScene(UINT16 state) {
+                                    130 ;	---------------------------------
+                                    131 ; Function SetScene
+                                    132 ; ---------------------------------
+      000000                        133 _SetScene::
+                                    134 ;/tmp/_gbsbuild/src/core/Core_Main.c:38: state_running = 0;
+      000000 21r07r00               135 	ld	hl, #_state_running
+      000003 36 00                  136 	ld	(hl), #0x00
+                                    137 ;/tmp/_gbsbuild/src/core/Core_Main.c:39: next_state = state;
+      000005 F8 02                  138 	ldhl	sp,	#2
+      000007 2A                     139 	ld	a, (hl+)
+      000008 5E                     140 	ld	e, (hl)
+      000009 21r02r00               141 	ld	hl, #_next_state
+      00000C 22                     142 	ld	(hl+), a
+      00000D 73                     143 	ld	(hl), e
+                                    144 ;/tmp/_gbsbuild/src/core/Core_Main.c:40: }
+      00000E C9                     145 	ret
+                                    146 ;/tmp/_gbsbuild/src/core/Core_Main.c:42: void vbl_update() {
+                                    147 ;	---------------------------------
+                                    148 ; Function vbl_update
+                                    149 ; ---------------------------------
+      00000F                        150 _vbl_update::
+                                    151 ;/tmp/_gbsbuild/src/core/Core_Main.c:43: vbl_count++;
+      00000F 21r08r00               152 	ld	hl, #_vbl_count
+      000012 34                     153 	inc	(hl)
+                                    154 ;/tmp/_gbsbuild/src/core/Core_Main.c:47: SCX_REG = draw_scroll_x;
+      000013 FAr00r00               155 	ld	a, (#_draw_scroll_x)
+      000016 E0r00                  156 	ldh	(_SCX_REG+0),a
+                                    157 ;/tmp/_gbsbuild/src/core/Core_Main.c:48: SCY_REG = draw_scroll_y;
+      000018 FAr00r00               158 	ld	a, (#_draw_scroll_y)
+      00001B E0r00                  159 	ldh	(_SCY_REG+0),a
+                                    160 ;/tmp/_gbsbuild/src/core/Core_Main.c:51: if (palette_dirty) {
+      00001D FAr00r00               161 	ld	a, (#_palette_dirty)
+      000020 B7                     162 	or	a, a
+      000021 28 25                  163 	jr	Z, 00102$
+                                    164 ;/tmp/_gbsbuild/src/core/Core_Main.c:52: set_bkg_palette(0, 8, BkgPaletteBuffer);
+      000023 21r00r00               165 	ld	hl, #_BkgPaletteBuffer
+      000026 E5                     166 	push	hl
+      000027 3E 08                  167 	ld	a, #0x08
+      000029 F5                     168 	push	af
+      00002A 33                     169 	inc	sp
+      00002B AF                     170 	xor	a, a
+      00002C F5                     171 	push	af
+      00002D 33                     172 	inc	sp
+      00002E CDr00r00               173 	call	_set_bkg_palette
+      000031 E8 04                  174 	add	sp, #4
+                                    175 ;/tmp/_gbsbuild/src/core/Core_Main.c:53: set_sprite_palette(0, 8, SprPaletteBuffer);
+      000033 21r00r00               176 	ld	hl, #_SprPaletteBuffer
+      000036 E5                     177 	push	hl
+      000037 3E 08                  178 	ld	a, #0x08
+      000039 F5                     179 	push	af
+      00003A 33                     180 	inc	sp
+      00003B AF                     181 	xor	a, a
+      00003C F5                     182 	push	af
+      00003D 33                     183 	inc	sp
+      00003E CDr00r00               184 	call	_set_sprite_palette
+      000041 E8 04                  185 	add	sp, #4
+                                    186 ;/tmp/_gbsbuild/src/core/Core_Main.c:54: palette_dirty = FALSE;
+      000043 21r00r00               187 	ld	hl, #_palette_dirty
+      000046 36 00                  188 	ld	(hl), #0x00
+      000048                        189 00102$:
+                                    190 ;/tmp/_gbsbuild/src/core/Core_Main.c:58: if (music_mute_frames != 0) {
+      000048 21r0Dr00               191 	ld	hl, #_music_mute_frames
+      00004B 7E                     192 	ld	a, (hl)
+      00004C B7                     193 	or	a, a
+      00004D 28 0C                  194 	jr	Z, 00106$
+                                    195 ;/tmp/_gbsbuild/src/core/Core_Main.c:59: music_mute_frames--;
+                                    196 ;/tmp/_gbsbuild/src/core/Core_Main.c:60: if (music_mute_frames == 0) {
+      00004F 35                     197 	dec	(hl)
+      000050 7E                     198 	ld	a, (hl)
+      000051 20 08                  199 	jr	NZ, 00106$
+                                    200 ;/tmp/_gbsbuild/src/core/Core_Main.c:61: gbt_enable_channels(0xF);
+      000053 3E 0F                  201 	ld	a, #0x0f
+      000055 F5                     202 	push	af
+      000056 33                     203 	inc	sp
+      000057 CDr00r00               204 	call	_gbt_enable_channels
+      00005A 33                     205 	inc	sp
+      00005B                        206 00106$:
+                                    207 ;/tmp/_gbsbuild/src/core/Core_Main.c:65: if (!hide_sprites) {
+      00005B FAr00r00               208 	ld	a, (#_hide_sprites)
+      00005E B7                     209 	or	a, a
+      00005F C0                     210 	ret	NZ
+                                    211 ;/tmp/_gbsbuild/src/core/Core_Main.c:66: SHOW_SPRITES;
+      000060 F0r00                  212 	ldh	a, (_LCDC_REG+0)
+      000062 F6 02                  213 	or	a, #0x02
+      000064 E0r00                  214 	ldh	(_LCDC_REG+0),a
+                                    215 ;/tmp/_gbsbuild/src/core/Core_Main.c:68: }
+      000066 C9                     216 	ret
+                                    217 ;/tmp/_gbsbuild/src/core/Core_Main.c:70: void lcd_update() {
+                                    218 ;	---------------------------------
+                                    219 ; Function lcd_update
+                                    220 ; ---------------------------------
+      000067                        221 _lcd_update::
+                                    222 ;/tmp/_gbsbuild/src/core/Core_Main.c:71: if (LYC_REG == 0x0) {
+      000067 FAr00r00               223 	ld	a, (#_LYC_REG)
+      00006A B7                     224 	or	a, a
+      00006B 20 16                  225 	jr	NZ, 00108$
+                                    226 ;/tmp/_gbsbuild/src/core/Core_Main.c:72: if(WY_REG == 0x0) {
+      00006D FAr00r00               227 	ld	a, (#_WY_REG)
+      000070 B7                     228 	or	a, a
+      000071 20 06                  229 	jr	NZ, 00102$
+                                    230 ;/tmp/_gbsbuild/src/core/Core_Main.c:73: HIDE_SPRITES;
+      000073 F0r00                  231 	ldh	a, (_LCDC_REG+0)
+      000075 E6 FD                  232 	and	a, #0xfd
+      000077 E0r00                  233 	ldh	(_LCDC_REG+0),a
+      000079                        234 00102$:
+                                    235 ;/tmp/_gbsbuild/src/core/Core_Main.c:79: if (WY_REG != MENU_CLOSED_Y) {
+      000079 F0r00                  236 	ldh	a, (_WY_REG+0)
+      00007B D6 90                  237 	sub	a, #0x90
+      00007D C8                     238 	ret	Z
+                                    239 ;/tmp/_gbsbuild/src/core/Core_Main.c:80: LYC_REG = WY_REG;
+      00007E F0r00                  240 	ldh	a, (_WY_REG+0)
+      000080 E0r00                  241 	ldh	(_LYC_REG+0),a
+      000082 C9                     242 	ret
+      000083                        243 00108$:
+                                    244 ;/tmp/_gbsbuild/src/core/Core_Main.c:82: } else if (WX_REG == WIN_LEFT_X) {
+      000083 F0r00                  245 	ldh	a, (_WX_REG+0)
+      000085 D6 07                  246 	sub	a, #0x07
+      000087 C0                     247 	ret	NZ
+                                    248 ;/tmp/_gbsbuild/src/core/Core_Main.c:85: HIDE_SPRITES;
+      000088 F0r00                  249 	ldh	a, (_LCDC_REG+0)
+      00008A E6 FD                  250 	and	a, #0xfd
+      00008C E0r00                  251 	ldh	(_LCDC_REG+0),a
+                                    252 ;/tmp/_gbsbuild/src/core/Core_Main.c:86: LYC_REG = 0x0;
+      00008E 3E 00                  253 	ld	a, #0x00
+      000090 E0r00                  254 	ldh	(_LYC_REG+0),a
+                                    255 ;/tmp/_gbsbuild/src/core/Core_Main.c:88: }
+      000092 C9                     256 	ret
+                                    257 ;/tmp/_gbsbuild/src/core/Core_Main.c:90: int core_start() {
+                                    258 ;	---------------------------------
+                                    259 ; Function core_start
+                                    260 ; ---------------------------------
+      000093                        261 _core_start::
+                                    262 ;/tmp/_gbsbuild/src/core/Core_Main.c:93: if (_cpu == CGB_TYPE) {
+      000093 FAr00r00               263 	ld	a, (#__cpu)
+      000096 D6 11                  264 	sub	a, #0x11
+      000098 20 03                  265 	jr	NZ, 00102$
+                                    266 ;/tmp/_gbsbuild/src/core/Core_Main.c:94: cpu_fast();
+      00009A CDr00r00               267 	call	_cpu_fast
+      00009D                        268 00102$:
+                                    269 ;/tmp/_gbsbuild/src/core/Core_Main.c:98: display_off();
+      00009D CDr00r00               270 	call	_display_off
+                                    271 ;/tmp/_gbsbuild/src/core/Core_Main.c:101: LCDC_REG = 0x67;
+      0000A0 3E 67                  272 	ld	a, #0x67
+      0000A2 E0r00                  273 	ldh	(_LCDC_REG+0),a
+                                    274 ;/tmp/_gbsbuild/src/core/Core_Main.c:104: add_VBL(vbl_update);
+      0000A4 21r0Fr00               275 	ld	hl, #_vbl_update
+      0000A7 E5                     276 	push	hl
+      0000A8 CDr00r00               277 	call	_add_VBL
+      0000AB E8 02                  278 	add	sp, #2
+                                    279 ;/tmp/_gbsbuild/src/core/Core_Main.c:105: add_TIM(MusicUpdate);
+      0000AD 21r00r00               280 	ld	hl, #_MusicUpdate
+      0000B0 E5                     281 	push	hl
+      0000B1 CDr00r00               282 	call	_add_TIM
+      0000B4 E8 02                  283 	add	sp, #2
+                                    284 ;/tmp/_gbsbuild/src/core/Core_Main.c:106: add_LCD(lcd_update);
+      0000B6 21r67r00               285 	ld	hl, #_lcd_update
+      0000B9 E5                     286 	push	hl
+      0000BA CDr00r00               287 	call	_add_LCD
+      0000BD E8 02                  288 	add	sp, #2
+                                    289 ;/tmp/_gbsbuild/src/core/Core_Main.c:109: TMA_REG = _cpu == CGB_TYPE ? 120U : 0xBCU;
+      0000BF FAr00r00               290 	ld	a, (#__cpu)
+      0000C2 D6 11                  291 	sub	a, #0x11
+      0000C4 20 05                  292 	jr	NZ, 00139$
+      0000C6 01 78 00               293 	ld	bc, #0x0078
+      0000C9 18 03                  294 	jr	00140$
+      0000CB                        295 00139$:
+      0000CB 01 BC 00               296 	ld	bc, #0x00bc
+      0000CE                        297 00140$:
+      0000CE 79                     298 	ld	a, c
+      0000CF E0r00                  299 	ldh	(_TMA_REG+0),a
+                                    300 ;/tmp/_gbsbuild/src/core/Core_Main.c:113: TAC_REG = 0x04U;
+      0000D1 3E 04                  301 	ld	a, #0x04
+      0000D3 E0r00                  302 	ldh	(_TAC_REG+0),a
+                                    303 ;/tmp/_gbsbuild/src/core/Core_Main.c:115: LYC_REG = 0x0;  // LCD interupt pos
+      0000D5 3E 00                  304 	ld	a, #0x00
+      0000D7 E0r00                  305 	ldh	(_LYC_REG+0),a
+                                    306 ;/tmp/_gbsbuild/src/core/Core_Main.c:117: set_interrupts(VBL_IFLAG | TIM_IFLAG | LCD_IFLAG);
+      0000D9 3E 07                  307 	ld	a, #0x07
+      0000DB F5                     308 	push	af
+      0000DC 33                     309 	inc	sp
+      0000DD CDr00r00               310 	call	_set_interrupts
+      0000E0 33                     311 	inc	sp
+                                    312 ;/tmp/_gbsbuild/src/core/Core_Main.c:118: enable_interrupts();
+      0000E1 CDr00r00               313 	call	_enable_interrupts
+                                    314 ;/tmp/_gbsbuild/src/core/Core_Main.c:120: STAT_REG = 0x45;
+      0000E4 3E 45                  315 	ld	a, #0x45
+      0000E6 E0r00                  316 	ldh	(_STAT_REG+0),a
+                                    317 ;/tmp/_gbsbuild/src/core/Core_Main.c:123: BGP_REG = OBP0_REG = 0xE4U;
+      0000E8 3E E4                  318 	ld	a, #0xe4
+      0000EA E0r00                  319 	ldh	(_OBP0_REG+0),a
+      0000EC 3E E4                  320 	ld	a, #0xe4
+      0000EE E0r00                  321 	ldh	(_BGP_REG+0),a
+                                    322 ;/tmp/_gbsbuild/src/core/Core_Main.c:124: OBP1_REG = 0xD2U;
+      0000F0 3E D2                  323 	ld	a, #0xd2
+      0000F2 E0r00                  324 	ldh	(_OBP1_REG+0),a
+                                    325 ;/tmp/_gbsbuild/src/core/Core_Main.c:126: SCX_REG = 0;
+      0000F4 3E 00                  326 	ld	a, #0x00
+      0000F6 E0r00                  327 	ldh	(_SCX_REG+0),a
+                                    328 ;/tmp/_gbsbuild/src/core/Core_Main.c:127: SCY_REG = 0;
+      0000F8 3E 00                  329 	ld	a, #0x00
+      0000FA E0r00                  330 	ldh	(_SCY_REG+0),a
+                                    331 ;/tmp/_gbsbuild/src/core/Core_Main.c:130: WX_REG = 7;
+      0000FC 3E 07                  332 	ld	a, #0x07
+      0000FE E0r00                  333 	ldh	(_WX_REG+0),a
+                                    334 ;/tmp/_gbsbuild/src/core/Core_Main.c:131: WY_REG = MAXWNDPOSY + 1U;
+      000100 3E 90                  335 	ld	a, #0x90
+      000102 E0r00                  336 	ldh	(_WY_REG+0),a
+                                    337 ;/tmp/_gbsbuild/src/core/Core_Main.c:134: memset(&script_variables, 0, sizeof(script_variables));
+      000104 21 F4 01               338 	ld	hl, #0x01f4
+      000107 E5                     339 	push	hl
+      000108 21 00 00               340 	ld	hl, #0x0000
+      00010B E5                     341 	push	hl
+      00010C 21r00r00               342 	ld	hl, #_script_variables
+      00010F E5                     343 	push	hl
+      000110 CDr00r00               344 	call	_memset
+      000113 E8 06                  345 	add	sp, #6
+                                    346 ;/tmp/_gbsbuild/src/core/Core_Main.c:136: memset(&input_script_ptrs, 0, sizeof(input_script_ptrs));
+      000115 21 18 00               347 	ld	hl, #0x0018
+      000118 E5                     348 	push	hl
+      000119 6C                     349 	ld	l, h
+      00011A E5                     350 	push	hl
+      00011B 21r00r00               351 	ld	hl, #_input_script_ptrs
+      00011E E5                     352 	push	hl
+      00011F CDr00r00               353 	call	_memset
+      000122 E8 06                  354 	add	sp, #6
+                                    355 ;/tmp/_gbsbuild/src/core/Core_Main.c:138: memset(&scene_stack, 0, sizeof(scene_stack));
+      000124 21 08 00               356 	ld	hl, #0x0008
+      000127 E5                     357 	push	hl
+      000128 6C                     358 	ld	l, h
+      000129 E5                     359 	push	hl
+      00012A 21r00r00               360 	ld	hl, #_scene_stack
+      00012D E5                     361 	push	hl
+      00012E CDr00r00               362 	call	_memset
+      000131 E8 06                  363 	add	sp, #6
+                                    364 ;/tmp/_gbsbuild/src/core/Core_Main.c:139: memset(&script_cmd_args, 0, sizeof(script_cmd_args));
+      000133 21 07 00               365 	ld	hl, #0x0007
+      000136 E5                     366 	push	hl
+      000137 6C                     367 	ld	l, h
+      000138 E5                     368 	push	hl
+      000139 21r00r00               369 	ld	hl, #_script_cmd_args
+      00013C E5                     370 	push	hl
+      00013D CDr00r00               371 	call	_memset
+      000140 E8 06                  372 	add	sp, #6
+                                    373 ;/tmp/_gbsbuild/src/core/Core_Main.c:140: memset(&script_stack, 0, sizeof(script_stack));
+      000142 21 10 00               374 	ld	hl, #0x0010
+      000145 E5                     375 	push	hl
+      000146 6C                     376 	ld	l, h
+      000147 E5                     377 	push	hl
+      000148 21r00r00               378 	ld	hl, #_script_stack
+      00014B E5                     379 	push	hl
+      00014C CDr00r00               380 	call	_memset
+      00014F E8 06                  381 	add	sp, #6
+                                    382 ;/tmp/_gbsbuild/src/core/Core_Main.c:141: memset(&script_bank_stack, 0, sizeof(script_bank_stack));
+      000151 21 08 00               383 	ld	hl, #0x0008
+      000154 E5                     384 	push	hl
+      000155 6C                     385 	ld	l, h
+      000156 E5                     386 	push	hl
+      000157 21r00r00               387 	ld	hl, #_script_bank_stack
+      00015A E5                     388 	push	hl
+      00015B CDr00r00               389 	call	_memset
+      00015E E8 06                  390 	add	sp, #6
+                                    391 ;/tmp/_gbsbuild/src/core/Core_Main.c:142: memset(&script_start_stack, 0, sizeof(script_bank_stack));
+      000160 21 08 00               392 	ld	hl, #0x0008
+      000163 E5                     393 	push	hl
+      000164 6C                     394 	ld	l, h
+      000165 E5                     395 	push	hl
+      000166 21r00r00               396 	ld	hl, #_script_start_stack
+      000169 E5                     397 	push	hl
+      00016A CDr00r00               398 	call	_memset
+      00016D E8 06                  399 	add	sp, #6
+                                    400 ;/tmp/_gbsbuild/src/core/Core_Main.c:144: memset(&actors, 0, sizeof(actors));
+      00016F 21 92 05               401 	ld	hl, #0x0592
+      000172 E5                     402 	push	hl
+      000173 21 00 00               403 	ld	hl, #0x0000
+      000176 E5                     404 	push	hl
+      000177 21r00r00               405 	ld	hl, #_actors
+      00017A E5                     406 	push	hl
+      00017B CDr00r00               407 	call	_memset
+      00017E E8 06                  408 	add	sp, #6
+                                    409 ;/tmp/_gbsbuild/src/core/Core_Main.c:145: memset(&active_script_ctx, 0, sizeof(active_script_ctx));
+      000180 21 18 00               410 	ld	hl, #0x0018
+      000183 E5                     411 	push	hl
+      000184 6C                     412 	ld	l, h
+      000185 E5                     413 	push	hl
+      000186 21r00r00               414 	ld	hl, #_active_script_ctx
+      000189 E5                     415 	push	hl
+      00018A CDr00r00               416 	call	_memset
+      00018D E8 06                  417 	add	sp, #6
+                                    418 ;/tmp/_gbsbuild/src/core/Core_Main.c:146: memset(&script_ctxs, 0, sizeof(script_ctxs));
+      00018F 21 20 01               419 	ld	hl, #0x0120
+      000192 E5                     420 	push	hl
+      000193 21 00 00               421 	ld	hl, #0x0000
+      000196 E5                     422 	push	hl
+      000197 21r00r00               423 	ld	hl, #_script_ctxs
+      00019A E5                     424 	push	hl
+      00019B CDr00r00               425 	call	_memset
+      00019E E8 06                  426 	add	sp, #6
+                                    427 ;/tmp/_gbsbuild/src/core/Core_Main.c:148: memset(&SprPalette, 0, sizeof(SprPalette));
+      0001A0 21 40 00               428 	ld	hl, #0x0040
+      0001A3 E5                     429 	push	hl
+      0001A4 6C                     430 	ld	l, h
+      0001A5 E5                     431 	push	hl
+      0001A6 21r00r00               432 	ld	hl, #_SprPalette
+      0001A9 E5                     433 	push	hl
+      0001AA CDr00r00               434 	call	_memset
+      0001AD E8 06                  435 	add	sp, #6
+                                    436 ;/tmp/_gbsbuild/src/core/Core_Main.c:149: memset(&BkgPalette, 0, sizeof(BkgPalette));
+      0001AF 21 40 00               437 	ld	hl, #0x0040
+      0001B2 E5                     438 	push	hl
+      0001B3 6C                     439 	ld	l, h
+      0001B4 E5                     440 	push	hl
+      0001B5 21r00r00               441 	ld	hl, #_BkgPalette
+      0001B8 E5                     442 	push	hl
+      0001B9 CDr00r00               443 	call	_memset
+      0001BC E8 06                  444 	add	sp, #6
+                                    445 ;/tmp/_gbsbuild/src/core/Core_Main.c:150: memset(&SprPaletteBuffer, 0, sizeof(SprPaletteBuffer));
+      0001BE 21 40 00               446 	ld	hl, #0x0040
+      0001C1 E5                     447 	push	hl
+      0001C2 6C                     448 	ld	l, h
+      0001C3 E5                     449 	push	hl
+      0001C4 21r00r00               450 	ld	hl, #_SprPaletteBuffer
+      0001C7 E5                     451 	push	hl
+      0001C8 CDr00r00               452 	call	_memset
+      0001CB E8 06                  453 	add	sp, #6
+                                    454 ;/tmp/_gbsbuild/src/core/Core_Main.c:151: memset(&BkgPaletteBuffer, 0, sizeof(BkgPaletteBuffer));
+      0001CD 21 40 00               455 	ld	hl, #0x0040
+      0001D0 E5                     456 	push	hl
+      0001D1 6C                     457 	ld	l, h
+      0001D2 E5                     458 	push	hl
+      0001D3 21r00r00               459 	ld	hl, #_BkgPaletteBuffer
+      0001D6 E5                     460 	push	hl
+      0001D7 CDr00r00               461 	call	_memset
+      0001DA E8 06                  462 	add	sp, #6
+                                    463 ;/tmp/_gbsbuild/src/core/Core_Main.c:154: player.sprite = 0;
+      0001DC 21r08r00               464 	ld	hl, #(_actors + 0x0008)
+      0001DF 36 00                  465 	ld	(hl), #0x00
+                                    466 ;/tmp/_gbsbuild/src/core/Core_Main.c:155: player.moving = TRUE;
+      0001E1 21r07r00               467 	ld	hl, #(_actors + 0x0007)
+      0001E4 36 01                  468 	ld	(hl), #0x01
+                                    469 ;/tmp/_gbsbuild/src/core/Core_Main.c:156: player.frame = 0;
+      0001E6 21r0Fr00               470 	ld	hl, #(_actors + 0x000f)
+      0001E9 36 00                  471 	ld	(hl), #0x00
+                                    472 ;/tmp/_gbsbuild/src/core/Core_Main.c:157: player.frames_len = 2;
+      0001EB 21r10r00               473 	ld	hl, #(_actors + 0x0010)
+      0001EE 36 02                  474 	ld	(hl), #0x02
+                                    475 ;/tmp/_gbsbuild/src/core/Core_Main.c:158: map_next_pos.x = start_scene_x;
+      0001F0 11r00r00               476 	ld	de, #_map_next_pos
+      0001F3 21r00r00               477 	ld	hl, #_start_scene_x
+      0001F6 7E                     478 	ld	a, (hl)
+      0001F7 12                     479 	ld	(de), a
+      0001F8 13                     480 	inc	de
+      0001F9 23                     481 	inc	hl
+      0001FA 7E                     482 	ld	a, (hl)
+      0001FB 12                     483 	ld	(de), a
+                                    484 ;/tmp/_gbsbuild/src/core/Core_Main.c:159: map_next_pos.y = start_scene_y;
+      0001FC 11r02r00               485 	ld	de, #(_map_next_pos + 0x0002)
+      0001FF 21r00r00               486 	ld	hl, #_start_scene_y
+      000202 7E                     487 	ld	a, (hl)
+      000203 12                     488 	ld	(de), a
+      000204 13                     489 	inc	de
+      000205 23                     490 	inc	hl
+      000206 7E                     491 	ld	a, (hl)
+      000207 12                     492 	ld	(de), a
+                                    493 ;/tmp/_gbsbuild/src/core/Core_Main.c:160: map_next_dir.x = player.dir.x = start_scene_dir_x;
+      000208 11r05r00               494 	ld	de, #(_actors + 0x0005)
+      00020B 21r00r00               495 	ld	hl, #_start_scene_dir_x
+      00020E 7E                     496 	ld	a, (hl)
+      00020F 12                     497 	ld	(de), a
+      000210 11r00r00               498 	ld	de, #_map_next_dir
+      000213 7E                     499 	ld	a, (hl)
+      000214 12                     500 	ld	(de), a
+                                    501 ;/tmp/_gbsbuild/src/core/Core_Main.c:161: map_next_dir.y = player.dir.y = start_scene_dir_y;
+      000215 11r06r00               502 	ld	de, #(_actors + 0x0006)
+      000218 21r00r00               503 	ld	hl, #_start_scene_dir_y
+      00021B 7E                     504 	ld	a, (hl)
+      00021C 12                     505 	ld	(de), a
+      00021D 11r01r00               506 	ld	de, #(_map_next_dir + 0x0001)
+      000220 7E                     507 	ld	a, (hl)
+      000221 12                     508 	ld	(de), a
+                                    509 ;/tmp/_gbsbuild/src/core/Core_Main.c:162: map_next_sprite = start_player_sprite;
+      000222 21r00r00               510 	ld	hl, #_start_player_sprite
+      000225 2A                     511 	ld	a, (hl+)
+      000226 5E                     512 	ld	e, (hl)
+      000227 21r00r00               513 	ld	hl, #_map_next_sprite
+      00022A 22                     514 	ld	(hl+), a
+      00022B 73                     515 	ld	(hl), e
+                                    516 ;/tmp/_gbsbuild/src/core/Core_Main.c:163: player.enabled = TRUE;
+      00022C 21r12r00               517 	ld	hl, #(_actors + 0x0012)
+      00022F 36 01                  518 	ld	(hl), #0x01
+                                    519 ;/tmp/_gbsbuild/src/core/Core_Main.c:164: player.move_speed = start_player_move_speed;
+      000231 11r04r00               520 	ld	de, #(_actors + 0x0004)
+      000234 FAr00r00               521 	ld	a, (#_start_player_move_speed)
+      000237 12                     522 	ld	(de), a
+                                    523 ;/tmp/_gbsbuild/src/core/Core_Main.c:165: player.anim_speed = start_player_anim_speed;
+      000238 11r15r00               524 	ld	de, #(_actors + 0x0015)
+      00023B FAr00r00               525 	ld	a, (#_start_player_anim_speed)
+      00023E 12                     526 	ld	(de), a
+                                    527 ;/tmp/_gbsbuild/src/core/Core_Main.c:167: state_running = 0;
+      00023F 21r07r00               528 	ld	hl, #_state_running
+      000242 36 00                  529 	ld	(hl), #0x00
+                                    530 ;/tmp/_gbsbuild/src/core/Core_Main.c:168: next_state = start_scene_index;
+      000244 21r00r00               531 	ld	hl, #_start_scene_index
+      000247 2A                     532 	ld	a, (hl+)
+      000248 5E                     533 	ld	e, (hl)
+      000249 21r02r00               534 	ld	hl, #_next_state
+      00024C 22                     535 	ld	(hl+), a
+      00024D 73                     536 	ld	(hl), e
+                                    537 ;/tmp/_gbsbuild/src/core/Core_Main.c:169: game_time = 0;
+      00024E 21r00r00               538 	ld	hl, #_game_time
+      000251 36 00                  539 	ld	(hl), #0x00
+                                    540 ;/tmp/_gbsbuild/src/core/Core_Main.c:170: scene_type = 0;
+      000253 21r00r00               541 	ld	hl, #_scene_type
+      000256 36 00                  542 	ld	(hl), #0x00
+                                    543 ;/tmp/_gbsbuild/src/core/Core_Main.c:172: UIInit();
+      000258 CDr00r00               544 	call	_UIInit
+                                    545 ;/tmp/_gbsbuild/src/core/Core_Main.c:173: FadeInit();
+      00025B CDr00r00               546 	call	_FadeInit
+                                    547 ;/tmp/_gbsbuild/src/core/Core_Main.c:174: ScriptRunnerInit();
+      00025E CDr00r00               548 	call	_ScriptRunnerInit
+                                    549 ;/tmp/_gbsbuild/src/core/Core_Main.c:175: ActorsInit();
+      000261 CDr00r00               550 	call	_ActorsInit
+                                    551 ;/tmp/_gbsbuild/src/core/Core_Main.c:178: while (state_running) {
+      000264                        552 00121$:
+      000264 FAr07r00               553 	ld	a, (#_state_running)
+      000267 B7                     554 	or	a, a
+      000268 CArDEr03               555 	jp	Z, 00123$
+                                    556 ;/tmp/_gbsbuild/src/core/Core_Main.c:182: if (!vbl_count) {
+      00026B FAr08r00               557 	ld	a, (#_vbl_count)
+      00026E B7                     558 	or	a, a
+      00026F 20 03                  559 	jr	NZ, 00104$
+                                    560 ;/tmp/_gbsbuild/src/core/Core_Main.c:183: wait_vbl_done();
+      000271 CDr00r00               561 	call	_wait_vbl_done
+      000274                        562 00104$:
+                                    563 ;/tmp/_gbsbuild/src/core/Core_Main.c:186: delta_time = vbl_count == 1u ? 0u : 1u;
+      000274 FAr08r00               564 	ld	a, (#_vbl_count)
+      000277 3D                     565 	dec	a
+      000278 20 05                  566 	jr	NZ, 00141$
+      00027A 01 00 00               567 	ld	bc, #0x0000
+      00027D 18 03                  568 	jr	00142$
+      00027F                        569 00141$:
+      00027F 01 01 00               570 	ld	bc, #0x0001
+      000282                        571 00142$:
+      000282 21r04r00               572 	ld	hl, #_delta_time
+      000285 71                     573 	ld	(hl), c
+                                    574 ;/tmp/_gbsbuild/src/core/Core_Main.c:187: vbl_count = 0;
+      000286 21r08r00               575 	ld	hl, #_vbl_count
+      000289 36 00                  576 	ld	(hl), #0x00
+                                    577 ;/tmp/_gbsbuild/src/core/Core_Main.c:189: last_joy = joy;
+      00028B FAr00r00               578 	ld	a, (#_joy)
+      00028E EAr00r00               579 	ld	(#_last_joy),a
+                                    580 ;/tmp/_gbsbuild/src/core/Core_Main.c:190: joy = joypad();
+      000291 CDr00r00               581 	call	_joypad
+      000294 21r00r00               582 	ld	hl, #_joy
+      000297 73                     583 	ld	(hl), e
+                                    584 ;/tmp/_gbsbuild/src/core/Core_Main.c:191: if ((joy & INPUT_DPAD) != (last_joy & INPUT_DPAD)) {
+      000298 7E                     585 	ld	a, (hl)
+      000299 E6 0F                  586 	and	a, #0x0f
+      00029B 4F                     587 	ld	c, a
+      00029C 06 00                  588 	ld	b, #0x00
+      00029E 21r00r00               589 	ld	hl, #_last_joy
+      0002A1 7E                     590 	ld	a, (hl)
+      0002A2 E6 0F                  591 	and	a, #0x0f
+      0002A4 5F                     592 	ld	e, a
+      0002A5 16 00                  593 	ld	d, #0x00
+      0002A7 7B                     594 	ld	a, e
+      0002A8 91                     595 	sub	a, c
+      0002A9 20 04                  596 	jr	NZ, 00244$
+      0002AB 7A                     597 	ld	a, d
+      0002AC 90                     598 	sub	a, b
+      0002AD 28 09                  599 	jr	Z, 00106$
+      0002AF                        600 00244$:
+                                    601 ;/tmp/_gbsbuild/src/core/Core_Main.c:192: recent_joy = joy & ~last_joy;
+      0002AF 7E                     602 	ld	a, (hl)
+      0002B0 2F                     603 	cpl
+      0002B1 21r00r00               604 	ld	hl, #_joy
+      0002B4 A6                     605 	and	a, (hl)
+      0002B5 EAr00r00               606 	ld	(#_recent_joy),a
+      0002B8                        607 00106$:
+                                    608 ;/tmp/_gbsbuild/src/core/Core_Main.c:195: if (seedRand) {
+      0002B8 21r01r00               609 	ld	hl, #_seedRand
+      0002BB 7E                     610 	ld	a, (hl)
+      0002BC B7                     611 	or	a, a
+      0002BD 28 44                  612 	jr	Z, 00115$
+                                    613 ;/tmp/_gbsbuild/src/core/Core_Main.c:196: if(seedRand == 2){
+      0002BF 7E                     614 	ld	a, (hl)
+      0002C0 D6 02                  615 	sub	a, #0x02
+      0002C2 20 20                  616 	jr	NZ, 00112$
+                                    617 ;/tmp/_gbsbuild/src/core/Core_Main.c:198: if (joy) {
+      0002C4 FAr00r00               618 	ld	a, (#_joy)
+      0002C7 B7                     619 	or	a, a
+      0002C8 28 39                  620 	jr	Z, 00115$
+                                    621 ;/tmp/_gbsbuild/src/core/Core_Main.c:199: seedRand--;
+      0002CA 21r01r00               622 	ld	hl, #_seedRand
+      0002CD 35                     623 	dec	(hl)
+                                    624 ;/tmp/_gbsbuild/src/core/Core_Main.c:200: initrand((DIV_REG*256)+game_time);
+      0002CE F0r00                  625 	ldh	a, (_DIV_REG+0)
+      0002D0 47                     626 	ld	b, a
+      0002D1 0E 00                  627 	ld	c, #0x00
+      0002D3 21r00r00               628 	ld	hl, #_game_time
+      0002D6 5E                     629 	ld	e, (hl)
+      0002D7 16 00                  630 	ld	d, #0x00
+      0002D9 6B                     631 	ld	l, e
+      0002DA 62                     632 	ld	h, d
+      0002DB 09                     633 	add	hl, bc
+      0002DC E5                     634 	push	hl
+      0002DD CDr00r00               635 	call	_initrand
+      0002E0 E8 02                  636 	add	sp, #2
+      0002E2 18 1F                  637 	jr	00115$
+      0002E4                        638 00112$:
+                                    639 ;/tmp/_gbsbuild/src/core/Core_Main.c:204: if (!joy) {
+      0002E4 FAr00r00               640 	ld	a, (#_joy)
+      0002E7 B7                     641 	or	a, a
+      0002E8 20 19                  642 	jr	NZ, 00115$
+                                    643 ;/tmp/_gbsbuild/src/core/Core_Main.c:205: seedRand = FALSE;
+      0002EA 21r01r00               644 	ld	hl, #_seedRand
+      0002ED 36 00                  645 	ld	(hl), #0x00
+                                    646 ;/tmp/_gbsbuild/src/core/Core_Main.c:206: initrand((DIV_REG*256)+game_time);
+      0002EF F0r00                  647 	ldh	a, (_DIV_REG+0)
+      0002F1 47                     648 	ld	b, a
+      0002F2 0E 00                  649 	ld	c, #0x00
+      0002F4 21r00r00               650 	ld	hl, #_game_time
+      0002F7 5E                     651 	ld	e, (hl)
+      0002F8 16 00                  652 	ld	d, #0x00
+      0002FA 6B                     653 	ld	l, e
+      0002FB 62                     654 	ld	h, d
+      0002FC 09                     655 	add	hl, bc
+      0002FD E5                     656 	push	hl
+      0002FE CDr00r00               657 	call	_initrand
+      000301 E8 02                  658 	add	sp, #2
+      000303                        659 00115$:
+                                    660 ;/tmp/_gbsbuild/src/core/Core_Main.c:211: PUSH_BANK(1);
+      000303 3E 01                  661 	ld	a, #0x01
+      000305 F5                     662 	push	af
+      000306 33                     663 	inc	sp
+      000307 CDr00r00               664 	call	_PushBank
+      00030A 33                     665 	inc	sp
+                                    666 ;/tmp/_gbsbuild/src/core/Core_Main.c:213: UpdateCamera();
+      00030B CDr00r00               667 	call	_UpdateCamera
+                                    668 ;/tmp/_gbsbuild/src/core/Core_Main.c:214: RefreshScroll_b();
+      00030E 1Er00                  669 	ld	e, #b_RefreshScroll_b
+      000310 21r00r00               670 	ld	hl, #_RefreshScroll_b
+      000313 CDr00r00               671 	call	___sdcc_bcall_ehl
+                                    672 ;/tmp/_gbsbuild/src/core/Core_Main.c:215: UpdateActors();
+      000316 CDr00r00               673 	call	_UpdateActors
+                                    674 ;/tmp/_gbsbuild/src/core/Core_Main.c:216: UpdateProjectiles_b();
+      000319 1Er00                  675 	ld	e, #b_UpdateProjectiles_b
+      00031B 21r00r00               676 	ld	hl, #_UpdateProjectiles_b
+      00031E CDr00r00               677 	call	___sdcc_bcall_ehl
+                                    678 ;/tmp/_gbsbuild/src/core/Core_Main.c:217: UIOnInteract_b();
+      000321 1Er00                  679 	ld	e, #b_UIOnInteract_b
+      000323 21r00r00               680 	ld	hl, #_UIOnInteract_b
+      000326 CDr00r00               681 	call	___sdcc_bcall_ehl
+                                    682 ;/tmp/_gbsbuild/src/core/Core_Main.c:218: UIUpdate_b();
+      000329 1Er00                  683 	ld	e, #b_UIUpdate_b
+      00032B 21r00r00               684 	ld	hl, #_UIUpdate_b
+      00032E CDr00r00               685 	call	___sdcc_bcall_ehl
+                                    686 ;/tmp/_gbsbuild/src/core/Core_Main.c:220: if (!script_ctxs[0].script_ptr_bank && !ui_block) {
+      000331 FAr0Er00               687 	ld	a, (#(_script_ctxs + 0x000e) + 0)
+      000334 B7                     688 	or	a, a
+      000335 20 32                  689 	jr	NZ, 00117$
+      000337 FAr00r00               690 	ld	a, (#_ui_block)
+      00033A B7                     691 	or	a, a
+      00033B 20 2C                  692 	jr	NZ, 00117$
+                                    693 ;/tmp/_gbsbuild/src/core/Core_Main.c:221: PUSH_BANK(stateBanks[scene_type]);
+      00033D 01r00r00               694 	ld	bc, #_stateBanks+0
+      000340 79                     695 	ld	a, c
+      000341 21r00r00               696 	ld	hl, #_scene_type
+      000344 86                     697 	add	a, (hl)
+      000345 4F                     698 	ld	c, a
+      000346 30 01                  699 	jr	NC, 00247$
+      000348 04                     700 	inc	b
+      000349                        701 00247$:
+      000349 0A                     702 	ld	a, (bc)
+      00034A F5                     703 	push	af
+      00034B 33                     704 	inc	sp
+      00034C CDr00r00               705 	call	_PushBank
+      00034F 33                     706 	inc	sp
+                                    707 ;/tmp/_gbsbuild/src/core/Core_Main.c:222: updateFuncs[scene_type]();
+      000350 01r00r00               708 	ld	bc, #_updateFuncs+0
+      000353 21r00r00               709 	ld	hl, #_scene_type
+      000356 5E                     710 	ld	e, (hl)
+      000357 AF                     711 	xor	a, a
+      000358 6B                     712 	ld	l, e
+      000359 67                     713 	ld	h, a
+      00035A 29                     714 	add	hl, hl
+      00035B 09                     715 	add	hl, bc
+      00035C 2A                     716 	ld	a, (hl+)
+      00035D 4F                     717 	ld	c, a
+      00035E 66                     718 	ld	h, (hl)
+      00035F 69                     719 	ld	l, c
+      000360 CDr00r00               720 	call	___sdcc_call_hl
+                                    721 ;/tmp/_gbsbuild/src/core/Core_Main.c:223: POP_BANK;
+      000363 CDr00r00               722 	call	_PopBank
+                                    723 ;/tmp/_gbsbuild/src/core/Core_Main.c:224: HandleInputScripts();
+      000366 CDr00r00               724 	call	_HandleInputScripts
+      000369                        725 00117$:
+                                    726 ;/tmp/_gbsbuild/src/core/Core_Main.c:227: ScriptTimerUpdate();
+      000369 CDr00r00               727 	call	_ScriptTimerUpdate
+                                    728 ;/tmp/_gbsbuild/src/core/Core_Main.c:229: ScriptRestoreCtx(0);
+      00036C AF                     729 	xor	a, a
+      00036D F5                     730 	push	af
+      00036E 33                     731 	inc	sp
+      00036F CDr00r00               732 	call	_ScriptRestoreCtx
+      000372 33                     733 	inc	sp
+                                    734 ;/tmp/_gbsbuild/src/core/Core_Main.c:231: if (!ui_block) {
+      000373 FAr00r00               735 	ld	a, (#_ui_block)
+      000376 B7                     736 	or	a, a
+      000377 20 5B                  737 	jr	NZ, 00120$
+                                    738 ;/tmp/_gbsbuild/src/core/Core_Main.c:233: ScriptRestoreCtx(1);
+      000379 3E 01                  739 	ld	a, #0x01
+      00037B F5                     740 	push	af
+      00037C 33                     741 	inc	sp
+      00037D CDr00r00               742 	call	_ScriptRestoreCtx
+      000380 33                     743 	inc	sp
+                                    744 ;/tmp/_gbsbuild/src/core/Core_Main.c:234: ScriptRestoreCtx(2);
+      000381 3E 02                  745 	ld	a, #0x02
+      000383 F5                     746 	push	af
+      000384 33                     747 	inc	sp
+      000385 CDr00r00               748 	call	_ScriptRestoreCtx
+      000388 33                     749 	inc	sp
+                                    750 ;/tmp/_gbsbuild/src/core/Core_Main.c:235: ScriptRestoreCtx(3);
+      000389 3E 03                  751 	ld	a, #0x03
+      00038B F5                     752 	push	af
+      00038C 33                     753 	inc	sp
+      00038D CDr00r00               754 	call	_ScriptRestoreCtx
+      000390 33                     755 	inc	sp
+                                    756 ;/tmp/_gbsbuild/src/core/Core_Main.c:236: ScriptRestoreCtx(4);
+      000391 3E 04                  757 	ld	a, #0x04
+      000393 F5                     758 	push	af
+      000394 33                     759 	inc	sp
+      000395 CDr00r00               760 	call	_ScriptRestoreCtx
+      000398 33                     761 	inc	sp
+                                    762 ;/tmp/_gbsbuild/src/core/Core_Main.c:237: ScriptRestoreCtx(5);
+      000399 3E 05                  763 	ld	a, #0x05
+      00039B F5                     764 	push	af
+      00039C 33                     765 	inc	sp
+      00039D CDr00r00               766 	call	_ScriptRestoreCtx
+      0003A0 33                     767 	inc	sp
+                                    768 ;/tmp/_gbsbuild/src/core/Core_Main.c:238: ScriptRestoreCtx(6);
+      0003A1 3E 06                  769 	ld	a, #0x06
+      0003A3 F5                     770 	push	af
+      0003A4 33                     771 	inc	sp
+      0003A5 CDr00r00               772 	call	_ScriptRestoreCtx
+      0003A8 33                     773 	inc	sp
+                                    774 ;/tmp/_gbsbuild/src/core/Core_Main.c:239: ScriptRestoreCtx(7);
+      0003A9 3E 07                  775 	ld	a, #0x07
+      0003AB F5                     776 	push	af
+      0003AC 33                     777 	inc	sp
+      0003AD CDr00r00               778 	call	_ScriptRestoreCtx
+      0003B0 33                     779 	inc	sp
+                                    780 ;/tmp/_gbsbuild/src/core/Core_Main.c:240: ScriptRestoreCtx(8);
+      0003B1 3E 08                  781 	ld	a, #0x08
+      0003B3 F5                     782 	push	af
+      0003B4 33                     783 	inc	sp
+      0003B5 CDr00r00               784 	call	_ScriptRestoreCtx
+      0003B8 33                     785 	inc	sp
+                                    786 ;/tmp/_gbsbuild/src/core/Core_Main.c:241: ScriptRestoreCtx(9);
+      0003B9 3E 09                  787 	ld	a, #0x09
+      0003BB F5                     788 	push	af
+      0003BC 33                     789 	inc	sp
+      0003BD CDr00r00               790 	call	_ScriptRestoreCtx
+      0003C0 33                     791 	inc	sp
+                                    792 ;/tmp/_gbsbuild/src/core/Core_Main.c:242: ScriptRestoreCtx(10);
+      0003C1 3E 0A                  793 	ld	a, #0x0a
+      0003C3 F5                     794 	push	af
+      0003C4 33                     795 	inc	sp
+      0003C5 CDr00r00               796 	call	_ScriptRestoreCtx
+      0003C8 33                     797 	inc	sp
+                                    798 ;/tmp/_gbsbuild/src/core/Core_Main.c:243: ScriptRestoreCtx(11);
+      0003C9 3E 0B                  799 	ld	a, #0x0b
+      0003CB F5                     800 	push	af
+      0003CC 33                     801 	inc	sp
+      0003CD CDr00r00               802 	call	_ScriptRestoreCtx
+      0003D0 33                     803 	inc	sp
+                                    804 ;/tmp/_gbsbuild/src/core/Core_Main.c:246: ActorRunCollisionScripts();
+      0003D1 CDr00r00               805 	call	_ActorRunCollisionScripts
+      0003D4                        806 00120$:
+                                    807 ;/tmp/_gbsbuild/src/core/Core_Main.c:249: game_time++;
+      0003D4 21r00r00               808 	ld	hl, #_game_time
+      0003D7 34                     809 	inc	(hl)
+                                    810 ;/tmp/_gbsbuild/src/core/Core_Main.c:251: POP_BANK;
+      0003D8 CDr00r00               811 	call	_PopBank
+      0003DB C3r64r02               812 	jp	00121$
+      0003DE                        813 00123$:
+                                    814 ;/tmp/_gbsbuild/src/core/Core_Main.c:260: FadeOut();
+      0003DE CDr00r00               815 	call	_FadeOut
+                                    816 ;/tmp/_gbsbuild/src/core/Core_Main.c:261: while (fade_running) {
+      0003E1                        817 00124$:
+      0003E1 FAr00r00               818 	ld	a, (#_fade_running)
+      0003E4 B7                     819 	or	a, a
+      0003E5 28 08                  820 	jr	Z, 00126$
+                                    821 ;/tmp/_gbsbuild/src/core/Core_Main.c:262: wait_vbl_done();
+      0003E7 CDr00r00               822 	call	_wait_vbl_done
+                                    823 ;/tmp/_gbsbuild/src/core/Core_Main.c:263: FadeUpdate();
+      0003EA CDr00r00               824 	call	_FadeUpdate
+      0003ED 18 F2                  825 	jr	00124$
+      0003EF                        826 00126$:
+                                    827 ;/tmp/_gbsbuild/src/core/Core_Main.c:265: if (!fade_style)
+      0003EF FAr00r00               828 	ld	a, (#_fade_style)
+      0003F2 B7                     829 	or	a, a
+      0003F3 20 03                  830 	jr	NZ, 00128$
+                                    831 ;/tmp/_gbsbuild/src/core/Core_Main.c:267: DISPLAY_OFF
+      0003F5 CDr00r00               832 	call	_display_off
+      0003F8                        833 00128$:
+                                    834 ;/tmp/_gbsbuild/src/core/Core_Main.c:270: state_running = 1;
+      0003F8 21r07r00               835 	ld	hl, #_state_running
+      0003FB 36 01                  836 	ld	(hl), #0x01
+                                    837 ;/tmp/_gbsbuild/src/core/Core_Main.c:271: current_state = next_state;
+      0003FD 21r02r00               838 	ld	hl, #_next_state
+      000400 2A                     839 	ld	a, (hl+)
+      000401 5E                     840 	ld	e, (hl)
+      000402 21r05r00               841 	ld	hl, #_current_state
+      000405 22                     842 	ld	(hl+), a
+      000406 73                     843 	ld	(hl), e
+                                    844 ;/tmp/_gbsbuild/src/core/Core_Main.c:275: scroll_target = &camera_pos;
+      000407 21r00r00               845 	ld	hl, #_scroll_target
+      00040A 36r00                  846 	ld	(hl), #<(_camera_pos)
+      00040C 23                     847 	inc	hl
+      00040D 36s00                  848 	ld	(hl), #>(_camera_pos)
+                                    849 ;/tmp/_gbsbuild/src/core/Core_Main.c:276: camera_settings = CAMERA_LOCK_FLAG;
+      00040F 21r00r00               850 	ld	hl, #_camera_settings
+      000412 36 10                  851 	ld	(hl), #0x10
+                                    852 ;/tmp/_gbsbuild/src/core/Core_Main.c:279: timer_script_duration = 0;
+      000414 21r00r00               853 	ld	hl, #_timer_script_duration
+      000417 36 00                  854 	ld	(hl), #0x00
+                                    855 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1072: OAM_item_t * itm = &shadow_OAM[nb];
+      000419 01r00r00               856 	ld	bc, #_shadow_OAM
+                                    857 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1073: itm->y=y, itm->x=x;
+      00041C AF                     858 	xor	a, a
+      00041D 02                     859 	ld	(bc), a
+      00041E 03                     860 	inc	bc
+      00041F AF                     861 	xor	a, a
+      000420 02                     862 	ld	(bc), a
+                                    863 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1072: OAM_item_t * itm = &shadow_OAM[nb];
+      000421 01r04r00               864 	ld	bc, #(_shadow_OAM + 0x0004)
+                                    865 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1073: itm->y=y, itm->x=x;
+      000424 AF                     866 	xor	a, a
+      000425 02                     867 	ld	(bc), a
+      000426 03                     868 	inc	bc
+      000427 AF                     869 	xor	a, a
+      000428 02                     870 	ld	(bc), a
+                                    871 ;/tmp/_gbsbuild/src/core/Core_Main.c:288: script_stack_ptr = 0;
+      000429 21r00r00               872 	ld	hl, #_script_stack_ptr
+      00042C 36 00                  873 	ld	(hl), #0x00
+                                    874 ;/tmp/_gbsbuild/src/core/Core_Main.c:291: palette_update_mask = 0x3F;
+      00042E 21r00r00               875 	ld	hl, #_palette_update_mask
+      000431 36 3F                  876 	ld	(hl), #0x3f
+                                    877 ;/tmp/_gbsbuild/src/core/Core_Main.c:294: UIInit();
+      000433 CDr00r00               878 	call	_UIInit
+                                    879 ;/tmp/_gbsbuild/src/core/Core_Main.c:295: LoadScene(current_state);
+      000436 21r05r00               880 	ld	hl, #_current_state
+      000439 2A                     881 	ld	a, (hl+)
+      00043A 66                     882 	ld	h, (hl)
+      00043B 6F                     883 	ld	l, a
+      00043C E5                     884 	push	hl
+      00043D CDr00r00               885 	call	_LoadScene
+      000440 E8 02                  886 	add	sp, #2
+                                    887 ;/tmp/_gbsbuild/src/core/Core_Main.c:298: PUSH_BANK(stateBanks[scene_type]);
+      000442 3Er00                  888 	ld	a, #<(_stateBanks)
+      000444 21r00r00               889 	ld	hl, #_scene_type
+      000447 86                     890 	add	a, (hl)
+      000448 4F                     891 	ld	c, a
+      000449 3Es00                  892 	ld	a, #>(_stateBanks)
+      00044B CE 00                  893 	adc	a, #0x00
+      00044D 47                     894 	ld	b, a
+      00044E 0A                     895 	ld	a, (bc)
+      00044F F5                     896 	push	af
+      000450 33                     897 	inc	sp
+      000451 CDr00r00               898 	call	_PushBank
+      000454 33                     899 	inc	sp
+                                    900 ;/tmp/_gbsbuild/src/core/Core_Main.c:299: startFuncs[scene_type]();
+      000455 21r00r00               901 	ld	hl, #_scene_type
+      000458 4E                     902 	ld	c, (hl)
+      000459 AF                     903 	xor	a, a
+      00045A 69                     904 	ld	l, c
+      00045B 67                     905 	ld	h, a
+      00045C 29                     906 	add	hl, hl
+      00045D 11r00r00               907 	ld	de, #_startFuncs
+      000460 19                     908 	add	hl, de
+      000461 2A                     909 	ld	a, (hl+)
+      000462 66                     910 	ld	h, (hl)
+      000463 6F                     911 	ld	l, a
+      000464 CDr00r00               912 	call	___sdcc_call_hl
+                                    913 ;/tmp/_gbsbuild/src/core/Core_Main.c:300: POP_BANK;
+      000467 CDr00r00               914 	call	_PopBank
+                                    915 ;/tmp/_gbsbuild/src/core/Core_Main.c:302: game_time = 0;
+      00046A 21r00r00               916 	ld	hl, #_game_time
+      00046D 36 00                  917 	ld	(hl), #0x00
+                                    918 ;/tmp/_gbsbuild/src/core/Core_Main.c:303: old_scroll_x = scroll_x;
+      00046F 21r00r00               919 	ld	hl, #_scroll_x
+      000472 2A                     920 	ld	a, (hl+)
+      000473 5E                     921 	ld	e, (hl)
+      000474 21r09r00               922 	ld	hl, #_old_scroll_x
+      000477 22                     923 	ld	(hl+), a
+      000478 73                     924 	ld	(hl), e
+                                    925 ;/tmp/_gbsbuild/src/core/Core_Main.c:304: old_scroll_y = scroll_y;
+      000479 21r00r00               926 	ld	hl, #_scroll_y
+      00047C 2A                     927 	ld	a, (hl+)
+      00047D 5E                     928 	ld	e, (hl)
+      00047E 21r0Br00               929 	ld	hl, #_old_scroll_y
+      000481 22                     930 	ld	(hl+), a
+      000482 73                     931 	ld	(hl), e
+                                    932 ;/tmp/_gbsbuild/src/core/Core_Main.c:307: DISPLAY_ON;
+      000483 F0r00                  933 	ldh	a, (_LCDC_REG+0)
+      000485 F6 80                  934 	or	a, #0x80
+      000487 E0r00                  935 	ldh	(_LCDC_REG+0),a
+                                    936 ;/tmp/_gbsbuild/src/core/Core_Main.c:308: FadeIn();
+      000489 CDr00r00               937 	call	_FadeIn
+                                    938 ;/tmp/_gbsbuild/src/core/Core_Main.c:311: ScriptStart(&scene_events_start_ptr);
+      00048C 21r00r00               939 	ld	hl, #_scene_events_start_ptr
+      00048F E5                     940 	push	hl
+      000490 CDr00r00               941 	call	_ScriptStart
+      000493 E8 02                  942 	add	sp, #2
+                                    943 ;/tmp/_gbsbuild/src/core/Core_Main.c:312: ScriptRestoreCtx(0);
+      000495 AF                     944 	xor	a, a
+      000496 F5                     945 	push	af
+      000497 33                     946 	inc	sp
+      000498 CDr00r00               947 	call	_ScriptRestoreCtx
+      00049B 33                     948 	inc	sp
+                                    949 ;/tmp/_gbsbuild/src/core/Core_Main.c:314: UpdateCamera();
+      00049C CDr00r00               950 	call	_UpdateCamera
+                                    951 ;/tmp/_gbsbuild/src/core/Core_Main.c:315: RefreshScroll();
+      00049F CDr00r00               952 	call	_RefreshScroll
+                                    953 ;/tmp/_gbsbuild/src/core/Core_Main.c:316: UpdateActors();
+      0004A2 CDr00r00               954 	call	_UpdateActors
+                                    955 ;/tmp/_gbsbuild/src/core/Core_Main.c:317: UIUpdate();
+      0004A5 CDr00r00               956 	call	_UIUpdate
+                                    957 ;/tmp/_gbsbuild/src/core/Core_Main.c:320: while (fade_running) {
+      0004A8                        958 00129$:
+      0004A8 FAr00r00               959 	ld	a, (#_fade_running)
+      0004AB B7                     960 	or	a, a
+      0004AC CAr64r02               961 	jp	Z, 00121$
+                                    962 ;/tmp/_gbsbuild/src/core/Core_Main.c:321: wait_vbl_done();
+      0004AF CDr00r00               963 	call	_wait_vbl_done
+                                    964 ;/tmp/_gbsbuild/src/core/Core_Main.c:322: FadeUpdate();
+      0004B2 CDr00r00               965 	call	_FadeUpdate
+                                    966 ;/tmp/_gbsbuild/src/core/Core_Main.c:325: }
+      0004B5 18 F1                  967 	jr	00129$
+                                    968 	.area _CODE
+                                    969 	.area _CABS (ABS)

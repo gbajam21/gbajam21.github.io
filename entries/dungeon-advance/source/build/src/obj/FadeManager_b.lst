@@ -1,0 +1,819 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module FadeManager_b
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_ApplyPaletteChange_b
+                                     12 	.globl _ApplyPaletteChange_b
+                                     13 	.globl b_FadeUpdate_b
+                                     14 	.globl _FadeUpdate_b
+                                     15 	.globl b_FadeOut_b
+                                     16 	.globl _FadeOut_b
+                                     17 	.globl b_FadeIn_b
+                                     18 	.globl _FadeIn_b
+                                     19 	.globl _ApplyPaletteChangeDMG
+                                     20 	.globl _ApplyPaletteChangeColor
+                                     21 	.globl _UpdateColorBlack
+                                     22 	.globl _DespRight
+                                     23 	.globl _memcpy
+                                     24 ;--------------------------------------------------------
+                                     25 ; special function registers
+                                     26 ;--------------------------------------------------------
+                                     27 ;--------------------------------------------------------
+                                     28 ; ram data
+                                     29 ;--------------------------------------------------------
+                                     30 	.area _DATA
+      000000                         31 _fade_frame:
+      000000                         32 	.ds 1
+      000001                         33 _fade_direction:
+      000001                         34 	.ds 1
+                                     35 ;--------------------------------------------------------
+                                     36 ; absolute external ram data
+                                     37 ;--------------------------------------------------------
+                                     38 	.area _DABS (ABS)
+                                     39 ;--------------------------------------------------------
+                                     40 ; global & static initialisations
+                                     41 ;--------------------------------------------------------
+                                     42 	.area _HOME
+                                     43 	.area _GSINIT
+                                     44 	.area _GSFINAL
+                                     45 	.area _GSINIT
+                                     46 ;--------------------------------------------------------
+                                     47 ; Home
+                                     48 ;--------------------------------------------------------
+                                     49 	.area _HOME
+                                     50 	.area _HOME
+                                     51 ;--------------------------------------------------------
+                                     52 ; code
+                                     53 ;--------------------------------------------------------
+                                     54 	.area _CODE_1
+                                     55 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:20: UWORD UpdateColorBlack(UINT8 i, UWORD col) {
+                                     56 ;	---------------------------------
+                                     57 ; Function UpdateColorBlack
+                                     58 ; ---------------------------------
+      000000                         59 _UpdateColorBlack::
+      000000 E8 FE                   60 	add	sp, #-2
+                                     61 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:21: return RGB2(DespRight(PAL_RED(col), 5 - i),  DespRight(PAL_GREEN(col), 5 - i),
+      000002 F8 04                   62 	ldhl	sp,	#4
+      000004 4E                      63 	ld	c, (hl)
+      000005 06 00                   64 	ld	b, #0x00
+      000007 11 05 00                65 	ld	de, #0x0005
+      00000A 7B                      66 	ld	a, e
+      00000B 91                      67 	sub	a, c
+      00000C 5F                      68 	ld	e, a
+      00000D 7A                      69 	ld	a, d
+      00000E 98                      70 	sbc	a, b
+      00000F F8 01                   71 	ldhl	sp,	#1
+      000011 32                      72 	ld	(hl-), a
+      000012 73                      73 	ld	(hl), e
+      000013 F8 05                   74 	ldhl	sp,	#5
+      000015 7E                      75 	ld	a, (hl)
+      000016 E6 1F                   76 	and	a, #0x1f
+      000018 4F                      77 	ld	c, a
+      000019 06 00                   78 	ld	b, #0x00
+      00001B E1                      79 	pop	hl
+      00001C E5                      80 	push	hl
+      00001D E5                      81 	push	hl
+      00001E C5                      82 	push	bc
+      00001F CDr00r00                83 	call	_DespRight
+      000022 E8 04                   84 	add	sp, #4
+      000024 4B                      85 	ld	c, e
+      000025 42                      86 	ld	b, d
+      000026 F8 05                   87 	ldhl	sp,#5
+      000028 2A                      88 	ld	a, (hl+)
+      000029 5F                      89 	ld	e, a
+      00002A 56                      90 	ld	d, (hl)
+      00002B CB 3A                   91 	srl	d
+      00002D CB 1B                   92 	rr	e
+      00002F CB 3A                   93 	srl	d
+      000031 CB 1B                   94 	rr	e
+      000033 CB 3A                   95 	srl	d
+      000035 CB 1B                   96 	rr	e
+      000037 CB 3A                   97 	srl	d
+      000039 CB 1B                   98 	rr	e
+      00003B CB 3A                   99 	srl	d
+      00003D CB 1B                  100 	rr	e
+      00003F 7B                     101 	ld	a, e
+      000040 E6 1F                  102 	and	a, #0x1f
+      000042 5F                     103 	ld	e, a
+      000043 16 00                  104 	ld	d, #0x00
+      000045 C5                     105 	push	bc
+      000046 F8 02                  106 	ldhl	sp,	#2
+      000048 2A                     107 	ld	a, (hl+)
+      000049 66                     108 	ld	h, (hl)
+      00004A 6F                     109 	ld	l, a
+      00004B E5                     110 	push	hl
+      00004C D5                     111 	push	de
+      00004D CDr00r00               112 	call	_DespRight
+      000050 E8 04                  113 	add	sp, #4
+      000052 C1                     114 	pop	bc
+      000053 6B                     115 	ld	l, e
+      000054 62                     116 	ld	h, d
+      000055 29                     117 	add	hl, hl
+      000056 29                     118 	add	hl, hl
+      000057 29                     119 	add	hl, hl
+      000058 29                     120 	add	hl, hl
+      000059 29                     121 	add	hl, hl
+      00005A 7D                     122 	ld	a, l
+      00005B B1                     123 	or	a, c
+      00005C 4F                     124 	ld	c, a
+      00005D 7C                     125 	ld	a, h
+      00005E B0                     126 	or	a, b
+      00005F 47                     127 	ld	b, a
+      000060 F8 06                  128 	ldhl	sp,	#6
+      000062 7E                     129 	ld	a, (hl)
+      000063 0F                     130 	rrca
+      000064 0F                     131 	rrca
+      000065 E6 3F                  132 	and	a, #0x3f
+      000067 E6 1F                  133 	and	a, #0x1f
+      000069 5F                     134 	ld	e, a
+      00006A 16 00                  135 	ld	d, #0x00
+      00006C C5                     136 	push	bc
+      00006D F8 02                  137 	ldhl	sp,	#2
+      00006F 2A                     138 	ld	a, (hl+)
+      000070 66                     139 	ld	h, (hl)
+      000071 6F                     140 	ld	l, a
+      000072 E5                     141 	push	hl
+      000073 D5                     142 	push	de
+      000074 CDr00r00               143 	call	_DespRight
+      000077 E8 04                  144 	add	sp, #4
+      000079 C1                     145 	pop	bc
+      00007A 63                     146 	ld	h, e
+      00007B 2E 00                  147 	ld	l, #0x00
+      00007D 29                     148 	add	hl, hl
+      00007E 29                     149 	add	hl, hl
+      00007F 7D                     150 	ld	a, l
+      000080 B1                     151 	or	a, c
+      000081 5F                     152 	ld	e, a
+      000082 7C                     153 	ld	a, h
+      000083 B0                     154 	or	a, b
+      000084 57                     155 	ld	d, a
+                                    156 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:23: }
+      000085 E8 02                  157 	add	sp, #2
+      000087 C9                     158 	ret
+      000088                        159 _obj_fade_vals:
+      000088 00                     160 	.db #0x00	; 0
+      000089 00                     161 	.db #0x00	; 0
+      00008A 40                     162 	.db #0x40	; 64
+      00008B 80                     163 	.db #0x80	; 128
+      00008C 90                     164 	.db #0x90	; 144
+      00008D D0                     165 	.db #0xd0	; 208
+      00008E D0                     166 	.db #0xd0	; 208
+      00008F                        167 _bgp_fade_vals:
+      00008F 00                     168 	.db #0x00	; 0
+      000090 00                     169 	.db #0x00	; 0
+      000091 40                     170 	.db #0x40	; 64
+      000092 90                     171 	.db #0x90	; 144
+      000093 A4                     172 	.db #0xa4	; 164
+      000094 E4                     173 	.db #0xe4	; 228
+      000095 E4                     174 	.db #0xe4	; 228
+      000096                        175 _obj_fade_black_vals:
+      000096 FF                     176 	.db #0xff	; 255
+      000097 FF                     177 	.db #0xff	; 255
+      000098 F8                     178 	.db #0xf8	; 248
+      000099 E4                     179 	.db #0xe4	; 228
+      00009A D4                     180 	.db #0xd4	; 212
+      00009B D0                     181 	.db #0xd0	; 208
+      00009C D0                     182 	.db #0xd0	; 208
+      00009D                        183 _bgp_fade_black_vals:
+      00009D FF                     184 	.db #0xff	; 255
+      00009E FF                     185 	.db #0xff	; 255
+      00009F FE                     186 	.db #0xfe	; 254
+      0000A0 E9                     187 	.db #0xe9	; 233
+      0000A1 E5                     188 	.db #0xe5	; 229
+      0000A2 E4                     189 	.db #0xe4	; 228
+      0000A3 E4                     190 	.db #0xe4	; 228
+                                    191 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:25: void ApplyPaletteChangeColor(UBYTE index) {
+                                    192 ;	---------------------------------
+                                    193 ; Function ApplyPaletteChangeColor
+                                    194 ; ---------------------------------
+      0000A4                        195 _ApplyPaletteChangeColor::
+      0000A4 E8 F7                  196 	add	sp, #-9
+                                    197 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:28: UWORD* col = BkgPalette;
+                                    198 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:30: if (index == 5) {
+      0000A6 F8 0B                  199 	ldhl	sp,	#11
+      0000A8 7E                     200 	ld	a, (hl)
+      0000A9 D6 05                  201 	sub	a, #0x05
+      0000AB 20 2A                  202 	jr	NZ, 00102$
+                                    203 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:31: memcpy(BkgPaletteBuffer, BkgPalette, 64);
+      0000AD 21 40 00               204 	ld	hl, #0x0040
+      0000B0 E5                     205 	push	hl
+      0000B1 21r00r00               206 	ld	hl, #_BkgPalette
+      0000B4 E5                     207 	push	hl
+      0000B5 21r00r00               208 	ld	hl, #_BkgPaletteBuffer
+      0000B8 E5                     209 	push	hl
+      0000B9 CDr00r00               210 	call	_memcpy
+      0000BC E8 06                  211 	add	sp, #6
+                                    212 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:32: memcpy(SprPaletteBuffer, SprPalette, 64);
+      0000BE 21 40 00               213 	ld	hl, #0x0040
+      0000C1 E5                     214 	push	hl
+      0000C2 21r00r00               215 	ld	hl, #_SprPalette
+      0000C5 E5                     216 	push	hl
+      0000C6 21r00r00               217 	ld	hl, #_SprPaletteBuffer
+      0000C9 E5                     218 	push	hl
+      0000CA CDr00r00               219 	call	_memcpy
+      0000CD E8 06                  220 	add	sp, #6
+                                    221 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:33: palette_dirty = TRUE;
+      0000CF 21r00r00               222 	ld	hl, #_palette_dirty
+      0000D2 36 01                  223 	ld	(hl), #0x01
+                                    224 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:34: return;
+      0000D4 C3r98r02               225 	jp	00118$
+      0000D7                        226 00102$:
+                                    227 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:37: if (fade_style) {
+      0000D7 FAr00r00               228 	ld	a, (#_fade_style)
+      0000DA B7                     229 	or	a, a
+      0000DB CArA1r01               230 	jp	Z, 00108$
+                                    231 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:38: for (c = 0; c != 32; ++c, ++col) {
+      0000DE AF                     232 	xor	a, a
+      0000DF F8 08                  233 	ldhl	sp,	#8
+      0000E1 77                     234 	ld	(hl), a
+      0000E2 01r00r00               235 	ld	bc, #_BkgPalette
+      0000E5                        236 00110$:
+                                    237 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:39: BkgPaletteBuffer[c] = UpdateColorBlack(index, *col);
+      0000E5 F8 08                  238 	ldhl	sp,	#8
+      0000E7 5E                     239 	ld	e, (hl)
+      0000E8 16 00                  240 	ld	d, #0x00
+      0000EA CB 23                  241 	sla	e
+      0000EC CB 12                  242 	rl	d
+      0000EE 2B                     243 	dec	hl
+      0000EF 2B                     244 	dec	hl
+      0000F0 7B                     245 	ld	a, e
+      0000F1 22                     246 	ld	(hl+), a
+                                    247 ;c
+      0000F2 7A                     248 	ld	a, d
+      0000F3 32                     249 	ld	(hl-), a
+      0000F4 2A                     250 	ld	a, (hl+)
+      0000F5 5F                     251 	ld	e, a
+      0000F6 56                     252 	ld	d, (hl)
+      0000F7 21r00r00               253 	ld	hl, #_BkgPaletteBuffer
+      0000FA 19                     254 	add	hl, de
+      0000FB E5                     255 	push	hl
+      0000FC 7D                     256 	ld	a, l
+      0000FD F8 06                  257 	ldhl	sp,	#6
+      0000FF 77                     258 	ld	(hl), a
+      000100 E1                     259 	pop	hl
+      000101 7C                     260 	ld	a, h
+      000102 F8 05                  261 	ldhl	sp,	#5
+      000104 77                     262 	ld	(hl), a
+      000105 69                     263 	ld	l, c
+      000106 60                     264 	ld	h, b
+      000107 2A                     265 	ld	a, (hl+)
+      000108 66                     266 	ld	h, (hl)
+      000109 6F                     267 	ld	l, a
+      00010A C5                     268 	push	bc
+      00010B E5                     269 	push	hl
+      00010C F8 0F                  270 	ldhl	sp,	#15
+      00010E 7E                     271 	ld	a, (hl)
+      00010F F5                     272 	push	af
+      000110 33                     273 	inc	sp
+      000111 CDr00r00               274 	call	_UpdateColorBlack
+      000114 E8 03                  275 	add	sp, #3
+      000116 E5                     276 	push	hl
+      000117 F8 0A                  277 	ldhl	sp,	#10
+      000119 73                     278 	ld	(hl), e
+      00011A F8 0B                  279 	ldhl	sp,	#11
+      00011C 72                     280 	ld	(hl), d
+      00011D E1                     281 	pop	hl
+      00011E C1                     282 	pop	bc
+      00011F F8 04                  283 	ldhl	sp,#4
+      000121 2A                     284 	ld	a, (hl+)
+      000122 5F                     285 	ld	e, a
+      000123 2A                     286 	ld	a, (hl+)
+      000124 57                     287 	ld	d, a
+      000125 7E                     288 	ld	a, (hl)
+      000126 12                     289 	ld	(de), a
+      000127 13                     290 	inc	de
+      000128 23                     291 	inc	hl
+      000129 7E                     292 	ld	a, (hl)
+      00012A 12                     293 	ld	(de), a
+                                    294 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:38: for (c = 0; c != 32; ++c, ++col) {
+      00012B 23                     295 	inc	hl
+      00012C 34                     296 	inc	(hl)
+      00012D 03                     297 	inc	bc
+      00012E 03                     298 	inc	bc
+      00012F 7E                     299 	ld	a, (hl)
+      000130 D6 20                  300 	sub	a, #0x20
+      000132 20 B1                  301 	jr	NZ, 00110$
+                                    302 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:41: col = SprPalette;
+      000134 F8 06                  303 	ldhl	sp,	#6
+      000136 36r00                  304 	ld	(hl), #<(_SprPalette)
+      000138 23                     305 	inc	hl
+      000139 36s00                  306 	ld	(hl), #>(_SprPalette)
+                                    307 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:42: for (c = 0; c != 32; c++, ++col) {
+      00013B AF                     308 	xor	a, a
+      00013C 23                     309 	inc	hl
+      00013D 77                     310 	ld	(hl), a
+      00013E                        311 00112$:
+                                    312 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:43: SprPaletteBuffer[c] = UpdateColorBlack(index, *col);
+      00013E F8 08                  313 	ldhl	sp,	#8
+      000140 7E                     314 	ld	a, (hl)
+      000141 F8 04                  315 	ldhl	sp,	#4
+      000143 77                     316 	ld	(hl), a
+      000144 AF                     317 	xor	a, a
+      000145 23                     318 	inc	hl
+      000146 32                     319 	ld	(hl-), a
+      000147 3A                     320 	ld	a, (hl-)
+      000148 2B                     321 	dec	hl
+      000149 77                     322 	ld	(hl), a
+      00014A F8 05                  323 	ldhl	sp,	#5
+      00014C 3A                     324 	ld	a, (hl-)
+      00014D 2B                     325 	dec	hl
+      00014E 32                     326 	ld	(hl-), a
+      00014F CB 26                  327 	sla	(hl)
+      000151 23                     328 	inc	hl
+      000152 CB 16                  329 	rl	(hl)
+                                    330 ;c
+      000154 2B                     331 	dec	hl
+      000155 2A                     332 	ld	a, (hl+)
+      000156 5F                     333 	ld	e, a
+      000157 56                     334 	ld	d, (hl)
+      000158 21r00r00               335 	ld	hl, #_SprPaletteBuffer
+      00015B 19                     336 	add	hl, de
+      00015C E5                     337 	push	hl
+      00015D 7D                     338 	ld	a, l
+      00015E F8 06                  339 	ldhl	sp,	#6
+      000160 77                     340 	ld	(hl), a
+      000161 E1                     341 	pop	hl
+      000162 7C                     342 	ld	a, h
+      000163 F8 05                  343 	ldhl	sp,	#5
+      000165 22                     344 	ld	(hl+), a
+      000166 2A                     345 	ld	a, (hl+)
+      000167 5F                     346 	ld	e, a
+      000168 56                     347 	ld	d, (hl)
+      000169 1A                     348 	ld	a, (de)
+      00016A 4F                     349 	ld	c, a
+      00016B 13                     350 	inc	de
+      00016C 1A                     351 	ld	a, (de)
+      00016D 47                     352 	ld	b, a
+      00016E C5                     353 	push	bc
+      00016F F8 0D                  354 	ldhl	sp,	#13
+      000171 7E                     355 	ld	a, (hl)
+      000172 F5                     356 	push	af
+      000173 33                     357 	inc	sp
+      000174 CDr00r00               358 	call	_UpdateColorBlack
+      000177 E8 03                  359 	add	sp, #3
+      000179 4B                     360 	ld	c, e
+      00017A 42                     361 	ld	b, d
+      00017B F8 04                  362 	ldhl	sp,	#4
+      00017D 2A                     363 	ld	a, (hl+)
+      00017E 66                     364 	ld	h, (hl)
+      00017F 6F                     365 	ld	l, a
+      000180 79                     366 	ld	a, c
+      000181 22                     367 	ld	(hl+), a
+      000182 70                     368 	ld	(hl), b
+                                    369 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:42: for (c = 0; c != 32; c++, ++col) {
+      000183 F8 08                  370 	ldhl	sp,	#8
+      000185 34                     371 	inc	(hl)
+                                    372 ;c
+      000186 2B                     373 	dec	hl
+      000187 2B                     374 	dec	hl
+      000188 2A                     375 	ld	a, (hl+)
+      000189 5F                     376 	ld	e, a
+      00018A 56                     377 	ld	d, (hl)
+      00018B 21 02 00               378 	ld	hl, #0x0002
+      00018E 19                     379 	add	hl, de
+      00018F E5                     380 	push	hl
+      000190 7D                     381 	ld	a, l
+      000191 F8 08                  382 	ldhl	sp,	#8
+      000193 77                     383 	ld	(hl), a
+      000194 E1                     384 	pop	hl
+      000195 7C                     385 	ld	a, h
+      000196 F8 07                  386 	ldhl	sp,	#7
+      000198 22                     387 	ld	(hl+), a
+      000199 7E                     388 	ld	a, (hl)
+      00019A D6 20                  389 	sub	a, #0x20
+      00019C CAr93r02               390 	jp	Z,00109$
+      00019F 18 9D                  391 	jr	00112$
+      0001A1                        392 00108$:
+                                    393 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:46: paletteWhite = RGB2(DespRight(0x1F, index), DespRight(0x1F, index), 
+      0001A1 F8 0B                  394 	ldhl	sp,	#11
+      0001A3 4E                     395 	ld	c, (hl)
+      0001A4 06 00                  396 	ld	b, #0x00
+      0001A6 C5                     397 	push	bc
+      0001A7 C5                     398 	push	bc
+      0001A8 21 1F 00               399 	ld	hl, #0x001f
+      0001AB E5                     400 	push	hl
+      0001AC CDr00r00               401 	call	_DespRight
+      0001AF E8 04                  402 	add	sp, #4
+      0001B1 C1                     403 	pop	bc
+      0001B2 F8 07                  404 	ldhl	sp,	#7
+      0001B4 7B                     405 	ld	a, e
+      0001B5 22                     406 	ld	(hl+), a
+      0001B6 72                     407 	ld	(hl), d
+      0001B7 C5                     408 	push	bc
+      0001B8 C5                     409 	push	bc
+      0001B9 21 1F 00               410 	ld	hl, #0x001f
+      0001BC E5                     411 	push	hl
+      0001BD CDr00r00               412 	call	_DespRight
+      0001C0 E8 04                  413 	add	sp, #4
+      0001C2 C1                     414 	pop	bc
+      0001C3 6B                     415 	ld	l, e
+      0001C4 62                     416 	ld	h, d
+      0001C5 29                     417 	add	hl, hl
+      0001C6 29                     418 	add	hl, hl
+      0001C7 29                     419 	add	hl, hl
+      0001C8 29                     420 	add	hl, hl
+      0001C9 29                     421 	add	hl, hl
+      0001CA 7D                     422 	ld	a, l
+      0001CB 54                     423 	ld	d, h
+      0001CC F8 07                  424 	ldhl	sp,	#7
+      0001CE B6                     425 	or	a, (hl)
+      0001CF 5F                     426 	ld	e, a
+      0001D0 7A                     427 	ld	a, d
+      0001D1 23                     428 	inc	hl
+      0001D2 B6                     429 	or	a, (hl)
+      0001D3 57                     430 	ld	d, a
+      0001D4 D5                     431 	push	de
+      0001D5 C5                     432 	push	bc
+      0001D6 21 1F 00               433 	ld	hl, #0x001f
+      0001D9 E5                     434 	push	hl
+      0001DA CDr00r00               435 	call	_DespRight
+      0001DD E8 04                  436 	add	sp, #4
+      0001DF 4B                     437 	ld	c, e
+      0001E0 D1                     438 	pop	de
+      0001E1 61                     439 	ld	h, c
+      0001E2 2E 00                  440 	ld	l, #0x00
+      0001E4 29                     441 	add	hl, hl
+      0001E5 29                     442 	add	hl, hl
+      0001E6 7D                     443 	ld	a, l
+      0001E7 B3                     444 	or	a, e
+      0001E8 4F                     445 	ld	c, a
+      0001E9 7C                     446 	ld	a, h
+      0001EA B2                     447 	or	a, d
+      0001EB 47                     448 	ld	b, a
+      0001EC 33                     449 	inc	sp
+      0001ED 33                     450 	inc	sp
+      0001EE C5                     451 	push	bc
+                                    452 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:48: for (c = 0; c != 32; ++c, ++col) {
+      0001EF AF                     453 	xor	a, a
+      0001F0 F8 08                  454 	ldhl	sp,	#8
+      0001F2 77                     455 	ld	(hl), a
+      0001F3 01r00r00               456 	ld	bc, #_BkgPalette
+      0001F6                        457 00114$:
+                                    458 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:49: BkgPaletteBuffer[c] = (UWORD)*col | paletteWhite;
+      0001F6 F8 08                  459 	ldhl	sp,	#8
+      0001F8 5E                     460 	ld	e, (hl)
+      0001F9 16 00                  461 	ld	d, #0x00
+      0001FB CB 23                  462 	sla	e
+      0001FD CB 12                  463 	rl	d
+      0001FF 2B                     464 	dec	hl
+      000200 2B                     465 	dec	hl
+      000201 7B                     466 	ld	a, e
+      000202 22                     467 	ld	(hl+), a
+                                    468 ;c
+      000203 7A                     469 	ld	a, d
+      000204 32                     470 	ld	(hl-), a
+      000205 2A                     471 	ld	a, (hl+)
+      000206 5F                     472 	ld	e, a
+      000207 56                     473 	ld	d, (hl)
+      000208 21r00r00               474 	ld	hl, #_BkgPaletteBuffer
+      00020B 19                     475 	add	hl, de
+      00020C E5                     476 	push	hl
+      00020D 7D                     477 	ld	a, l
+      00020E F8 04                  478 	ldhl	sp,	#4
+      000210 77                     479 	ld	(hl), a
+      000211 E1                     480 	pop	hl
+      000212 7C                     481 	ld	a, h
+      000213 F8 03                  482 	ldhl	sp,	#3
+      000215 77                     483 	ld	(hl), a
+      000216 59                     484 	ld	e, c
+      000217 50                     485 	ld	d, b
+      000218 1A                     486 	ld	a, (de)
+      000219 23                     487 	inc	hl
+      00021A 22                     488 	ld	(hl+), a
+      00021B 13                     489 	inc	de
+      00021C 1A                     490 	ld	a, (de)
+      00021D 32                     491 	ld	(hl-), a
+      00021E 7E                     492 	ld	a, (hl)
+      00021F F8 00                  493 	ldhl	sp,	#0
+      000221 B6                     494 	or	a, (hl)
+      000222 F8 06                  495 	ldhl	sp,	#6
+      000224 32                     496 	ld	(hl-), a
+      000225 7E                     497 	ld	a, (hl)
+      000226 F8 01                  498 	ldhl	sp,	#1
+      000228 B6                     499 	or	a, (hl)
+      000229 F8 07                  500 	ldhl	sp,	#7
+      00022B 77                     501 	ld	(hl), a
+      00022C F8 02                  502 	ldhl	sp,#2
+      00022E 2A                     503 	ld	a, (hl+)
+      00022F 5F                     504 	ld	e, a
+      000230 56                     505 	ld	d, (hl)
+      000231 F8 06                  506 	ldhl	sp,	#6
+      000233 7E                     507 	ld	a, (hl)
+      000234 12                     508 	ld	(de), a
+      000235 13                     509 	inc	de
+      000236 23                     510 	inc	hl
+      000237 7E                     511 	ld	a, (hl)
+      000238 12                     512 	ld	(de), a
+                                    513 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:48: for (c = 0; c != 32; ++c, ++col) {
+      000239 23                     514 	inc	hl
+      00023A 34                     515 	inc	(hl)
+      00023B 03                     516 	inc	bc
+      00023C 03                     517 	inc	bc
+      00023D 7E                     518 	ld	a, (hl)
+      00023E D6 20                  519 	sub	a, #0x20
+      000240 20 B4                  520 	jr	NZ, 00114$
+                                    521 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:51: col = SprPalette;
+      000242 F8 06                  522 	ldhl	sp,	#6
+      000244 36r00                  523 	ld	(hl), #<(_SprPalette)
+      000246 23                     524 	inc	hl
+      000247 36s00                  525 	ld	(hl), #>(_SprPalette)
+                                    526 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:52: for (c = 0; c != 32; ++c, ++col) {
+      000249 AF                     527 	xor	a, a
+      00024A 23                     528 	inc	hl
+      00024B 77                     529 	ld	(hl), a
+      00024C                        530 00116$:
+                                    531 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:53: SprPaletteBuffer[c] = (UWORD)*col | paletteWhite;
+      00024C F8 08                  532 	ldhl	sp,	#8
+      00024E 4E                     533 	ld	c, (hl)
+      00024F AF                     534 	xor	a, a
+      000250 69                     535 	ld	l, c
+      000251 67                     536 	ld	h, a
+      000252 29                     537 	add	hl, hl
+      000253 7D                     538 	ld	a, l
+      000254 C6r00                  539 	add	a, #<(_SprPaletteBuffer)
+      000256 4F                     540 	ld	c, a
+      000257 7C                     541 	ld	a, h
+      000258 CEs00                  542 	adc	a, #>(_SprPaletteBuffer)
+      00025A 47                     543 	ld	b, a
+      00025B F8 06                  544 	ldhl	sp,#6
+      00025D 2A                     545 	ld	a, (hl+)
+      00025E 5F                     546 	ld	e, a
+      00025F 56                     547 	ld	d, (hl)
+      000260 1A                     548 	ld	a, (de)
+      000261 F8 04                  549 	ldhl	sp,	#4
+      000263 22                     550 	ld	(hl+), a
+      000264 13                     551 	inc	de
+      000265 1A                     552 	ld	a, (de)
+      000266 32                     553 	ld	(hl-), a
+      000267 7E                     554 	ld	a, (hl)
+      000268 F8 00                  555 	ldhl	sp,	#0
+      00026A B6                     556 	or	a, (hl)
+      00026B 5F                     557 	ld	e, a
+      00026C F8 05                  558 	ldhl	sp,	#5
+      00026E 7E                     559 	ld	a, (hl)
+      00026F F8 01                  560 	ldhl	sp,	#1
+      000271 B6                     561 	or	a, (hl)
+      000272 57                     562 	ld	d, a
+      000273 7B                     563 	ld	a, e
+      000274 02                     564 	ld	(bc), a
+      000275 03                     565 	inc	bc
+      000276 7A                     566 	ld	a, d
+      000277 02                     567 	ld	(bc), a
+                                    568 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:52: for (c = 0; c != 32; ++c, ++col) {
+      000278 F8 08                  569 	ldhl	sp,	#8
+      00027A 34                     570 	inc	(hl)
+                                    571 ;c
+      00027B 2B                     572 	dec	hl
+      00027C 2B                     573 	dec	hl
+      00027D 2A                     574 	ld	a, (hl+)
+      00027E 5F                     575 	ld	e, a
+      00027F 56                     576 	ld	d, (hl)
+      000280 21 02 00               577 	ld	hl, #0x0002
+      000283 19                     578 	add	hl, de
+      000284 E5                     579 	push	hl
+      000285 7D                     580 	ld	a, l
+      000286 F8 08                  581 	ldhl	sp,	#8
+      000288 77                     582 	ld	(hl), a
+      000289 E1                     583 	pop	hl
+      00028A 7C                     584 	ld	a, h
+      00028B F8 07                  585 	ldhl	sp,	#7
+      00028D 22                     586 	ld	(hl+), a
+      00028E 7E                     587 	ld	a, (hl)
+      00028F D6 20                  588 	sub	a, #0x20
+      000291 20 B9                  589 	jr	NZ, 00116$
+      000293                        590 00109$:
+                                    591 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:57: palette_dirty = TRUE;
+      000293 21r00r00               592 	ld	hl, #_palette_dirty
+      000296 36 01                  593 	ld	(hl), #0x01
+      000298                        594 00118$:
+                                    595 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:58: }
+      000298 E8 09                  596 	add	sp, #9
+      00029A C9                     597 	ret
+                                    598 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:61: void ApplyPaletteChangeDMG(UBYTE index) {
+                                    599 ;	---------------------------------
+                                    600 ; Function ApplyPaletteChangeDMG
+                                    601 ; ---------------------------------
+      00029B                        602 _ApplyPaletteChangeDMG::
+                                    603 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:62: if (!fade_style) {
+      00029B FAr00r00               604 	ld	a, (#_fade_style)
+      00029E B7                     605 	or	a, a
+      00029F 20 1D                  606 	jr	NZ, 00102$
+                                    607 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:63: OBP0_REG = obj_fade_vals[index];
+      0002A1 01r88r00               608 	ld	bc, #_obj_fade_vals+0
+      0002A4 F8 02                  609 	ldhl	sp,	#2
+      0002A6 6E                     610 	ld	l, (hl)
+      0002A7 26 00                  611 	ld	h, #0x00
+      0002A9 09                     612 	add	hl, bc
+      0002AA 4D                     613 	ld	c, l
+      0002AB 44                     614 	ld	b, h
+      0002AC 0A                     615 	ld	a, (bc)
+      0002AD E0r00                  616 	ldh	(_OBP0_REG+0),a
+                                    617 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:64: BGP_REG = bgp_fade_vals[index];
+                                    618 ;c
+      0002AF 11r8Fr00               619 	ld	de, #_bgp_fade_vals
+      0002B2 F8 02                  620 	ldhl	sp,	#2
+      0002B4 6E                     621 	ld	l, (hl)
+      0002B5 26 00                  622 	ld	h, #0x00
+      0002B7 19                     623 	add	hl, de
+      0002B8 4D                     624 	ld	c, l
+      0002B9 44                     625 	ld	b, h
+      0002BA 0A                     626 	ld	a, (bc)
+      0002BB E0r00                  627 	ldh	(_BGP_REG+0),a
+      0002BD C9                     628 	ret
+      0002BE                        629 00102$:
+                                    630 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:67: OBP0_REG = obj_fade_black_vals[index];
+      0002BE 01r96r00               631 	ld	bc, #_obj_fade_black_vals+0
+      0002C1 F8 02                  632 	ldhl	sp,	#2
+      0002C3 6E                     633 	ld	l, (hl)
+      0002C4 26 00                  634 	ld	h, #0x00
+      0002C6 09                     635 	add	hl, bc
+      0002C7 4D                     636 	ld	c, l
+      0002C8 44                     637 	ld	b, h
+      0002C9 0A                     638 	ld	a, (bc)
+      0002CA E0r00                  639 	ldh	(_OBP0_REG+0),a
+                                    640 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:68: BGP_REG = bgp_fade_black_vals[index];
+      0002CC 01r9Dr00               641 	ld	bc, #_bgp_fade_black_vals+0
+      0002CF F8 02                  642 	ldhl	sp,	#2
+      0002D1 6E                     643 	ld	l, (hl)
+      0002D2 26 00                  644 	ld	h, #0x00
+      0002D4 09                     645 	add	hl, bc
+      0002D5 4D                     646 	ld	c, l
+      0002D6 44                     647 	ld	b, h
+      0002D7 0A                     648 	ld	a, (bc)
+      0002D8 E0r00                  649 	ldh	(_BGP_REG+0),a
+                                    650 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:70: }
+      0002DA C9                     651 	ret
+                                    652 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:72: void FadeIn_b() __banked {
+                                    653 ;	---------------------------------
+                                    654 ; Function FadeIn_b
+                                    655 ; ---------------------------------
+                           000001   656 	b_FadeIn_b	= 1
+      0002DB                        657 _FadeIn_b::
+                                    658 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:73: fade_frame = 0;
+      0002DB 21r00r00               659 	ld	hl, #_fade_frame
+      0002DE 36 00                  660 	ld	(hl), #0x00
+                                    661 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:74: fade_direction = FADE_IN;
+      0002E0 21r01r00               662 	ld	hl, #_fade_direction
+      0002E3 36 00                  663 	ld	(hl), #0x00
+                                    664 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:75: fade_running = TRUE;
+      0002E5 21r00r00               665 	ld	hl, #_fade_running
+      0002E8 36 01                  666 	ld	(hl), #0x01
+                                    667 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:76: fade_timer = 0;
+      0002EA 21r00r00               668 	ld	hl, #_fade_timer
+      0002ED 36 00                  669 	ld	(hl), #0x00
+                                    670 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:78: if (_cpu == CGB_TYPE) {
+      0002EF FAr00r00               671 	ld	a, (#__cpu)
+      0002F2 D6 11                  672 	sub	a, #0x11
+      0002F4 20 08                  673 	jr	NZ, 00102$
+                                    674 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:79: ApplyPaletteChangeColor(fade_timer);
+      0002F6 AF                     675 	xor	a, a
+      0002F7 F5                     676 	push	af
+      0002F8 33                     677 	inc	sp
+      0002F9 CDrA4r00               678 	call	_ApplyPaletteChangeColor
+      0002FC 33                     679 	inc	sp
+      0002FD C9                     680 	ret
+      0002FE                        681 00102$:
+                                    682 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:82: ApplyPaletteChangeDMG(fade_timer);
+      0002FE AF                     683 	xor	a, a
+      0002FF F5                     684 	push	af
+      000300 33                     685 	inc	sp
+      000301 CDr9Br02               686 	call	_ApplyPaletteChangeDMG
+      000304 33                     687 	inc	sp
+                                    688 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:83: }
+      000305 C9                     689 	ret
+                                    690 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:85: void FadeOut_b() __banked {
+                                    691 ;	---------------------------------
+                                    692 ; Function FadeOut_b
+                                    693 ; ---------------------------------
+                           000001   694 	b_FadeOut_b	= 1
+      000306                        695 _FadeOut_b::
+                                    696 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:86: fade_frame = 0;
+      000306 21r00r00               697 	ld	hl, #_fade_frame
+      000309 36 00                  698 	ld	(hl), #0x00
+                                    699 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:87: fade_direction = FADE_OUT;
+      00030B 21r01r00               700 	ld	hl, #_fade_direction
+      00030E 36 01                  701 	ld	(hl), #0x01
+                                    702 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:88: fade_running = TRUE;
+      000310 21r00r00               703 	ld	hl, #_fade_running
+      000313 36 01                  704 	ld	(hl), #0x01
+                                    705 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:89: fade_timer = 5;
+      000315 21r00r00               706 	ld	hl, #_fade_timer
+      000318 36 05                  707 	ld	(hl), #0x05
+                                    708 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:91: if (_cpu == CGB_TYPE) {
+      00031A FAr00r00               709 	ld	a, (#__cpu)
+      00031D D6 11                  710 	sub	a, #0x11
+      00031F 20 09                  711 	jr	NZ, 00102$
+                                    712 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:92: ApplyPaletteChangeColor(fade_timer);
+      000321 3E 05                  713 	ld	a, #0x05
+      000323 F5                     714 	push	af
+      000324 33                     715 	inc	sp
+      000325 CDrA4r00               716 	call	_ApplyPaletteChangeColor
+      000328 33                     717 	inc	sp
+      000329 C9                     718 	ret
+      00032A                        719 00102$:
+                                    720 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:95: ApplyPaletteChangeDMG(fade_timer);
+      00032A 3E 05                  721 	ld	a, #0x05
+      00032C F5                     722 	push	af
+      00032D 33                     723 	inc	sp
+      00032E CDr9Br02               724 	call	_ApplyPaletteChangeDMG
+      000331 33                     725 	inc	sp
+                                    726 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:96: }
+      000332 C9                     727 	ret
+                                    728 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:98: void FadeUpdate_b()  __banked {
+                                    729 ;	---------------------------------
+                                    730 ; Function FadeUpdate_b
+                                    731 ; ---------------------------------
+                           000001   732 	b_FadeUpdate_b	= 1
+      000333                        733 _FadeUpdate_b::
+                                    734 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:99: if (fade_running) {
+      000333 FAr00r00               735 	ld	a, (#_fade_running)
+      000336 B7                     736 	or	a, a
+      000337 C8                     737 	ret	Z
+                                    738 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:100: if ((fade_frame & fade_frames_per_step) == 0) {
+      000338 FAr00r00               739 	ld	a, (#_fade_frame)
+      00033B 21r00r00               740 	ld	hl, #_fade_frames_per_step
+      00033E A6                     741 	and	a,(hl)
+      00033F 20 3C                  742 	jr	NZ, 00112$
+                                    743 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:101: if (fade_direction == FADE_IN) {
+      000341 FAr01r00               744 	ld	a, (#_fade_direction)
+      000344 B7                     745 	or	a, a
+      000345 20 10                  746 	jr	NZ, 00106$
+                                    747 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:102: fade_timer++;
+      000347 21r00r00               748 	ld	hl, #_fade_timer
+      00034A 34                     749 	inc	(hl)
+                                    750 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:103: if (fade_timer == 5) {
+      00034B 7E                     751 	ld	a, (hl)
+      00034C D6 05                  752 	sub	a, #0x05
+      00034E 20 12                  753 	jr	NZ, 00107$
+                                    754 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:104: fade_running = FALSE;
+      000350 21r00r00               755 	ld	hl, #_fade_running
+      000353 36 00                  756 	ld	(hl), #0x00
+      000355 18 0B                  757 	jr	00107$
+      000357                        758 00106$:
+                                    759 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:107: fade_timer--;
+      000357 21r00r00               760 	ld	hl, #_fade_timer
+                                    761 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:108: if (fade_timer == 0) {
+      00035A 35                     762 	dec	(hl)
+      00035B 20 05                  763 	jr	NZ, 00107$
+                                    764 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:109: fade_running = FALSE;
+      00035D 21r00r00               765 	ld	hl, #_fade_running
+      000360 36 00                  766 	ld	(hl), #0x00
+      000362                        767 00107$:
+                                    768 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:113: if (_cpu == CGB_TYPE) {
+      000362 FAr00r00               769 	ld	a, (#__cpu)
+      000365 D6 11                  770 	sub	a, #0x11
+      000367 20 0B                  771 	jr	NZ, 00109$
+                                    772 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:114: ApplyPaletteChangeColor(fade_timer);
+      000369 FAr00r00               773 	ld	a, (#_fade_timer)
+      00036C F5                     774 	push	af
+      00036D 33                     775 	inc	sp
+      00036E CDrA4r00               776 	call	_ApplyPaletteChangeColor
+      000371 33                     777 	inc	sp
+      000372 18 09                  778 	jr	00112$
+      000374                        779 00109$:
+                                    780 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:117: ApplyPaletteChangeDMG(fade_timer);
+      000374 FAr00r00               781 	ld	a, (#_fade_timer)
+      000377 F5                     782 	push	af
+      000378 33                     783 	inc	sp
+      000379 CDr9Br02               784 	call	_ApplyPaletteChangeDMG
+      00037C 33                     785 	inc	sp
+      00037D                        786 00112$:
+                                    787 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:119: fade_frame++;
+      00037D 21r00r00               788 	ld	hl, #_fade_frame
+      000380 34                     789 	inc	(hl)
+                                    790 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:121: }
+      000381 C9                     791 	ret
+                                    792 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:123: void ApplyPaletteChange_b() __banked {
+                                    793 ;	---------------------------------
+                                    794 ; Function ApplyPaletteChange_b
+                                    795 ; ---------------------------------
+                           000001   796 	b_ApplyPaletteChange_b	= 1
+      000382                        797 _ApplyPaletteChange_b::
+                                    798 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:125: if (_cpu == CGB_TYPE) {
+      000382 FAr00r00               799 	ld	a, (#__cpu)
+      000385 D6 11                  800 	sub	a, #0x11
+      000387 20 0A                  801 	jr	NZ, 00102$
+                                    802 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:126: ApplyPaletteChangeColor(fade_timer);
+      000389 FAr00r00               803 	ld	a, (#_fade_timer)
+      00038C F5                     804 	push	af
+      00038D 33                     805 	inc	sp
+      00038E CDrA4r00               806 	call	_ApplyPaletteChangeColor
+      000391 33                     807 	inc	sp
+      000392 C9                     808 	ret
+      000393                        809 00102$:
+                                    810 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:129: ApplyPaletteChangeDMG(fade_timer);
+      000393 FAr00r00               811 	ld	a, (#_fade_timer)
+      000396 F5                     812 	push	af
+      000397 33                     813 	inc	sp
+      000398 CDr9Br02               814 	call	_ApplyPaletteChangeDMG
+      00039B 33                     815 	inc	sp
+                                    816 ;/tmp/_gbsbuild/src/core/FadeManager_b.c:130: }
+      00039C C9                     817 	ret
+                                    818 	.area _CODE_1
+                                    819 	.area _CABS (ABS)

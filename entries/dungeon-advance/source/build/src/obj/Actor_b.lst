@@ -1,0 +1,2657 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Actor_b
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_ActorRunCollisionScripts_b
+                                     12 	.globl _ActorRunCollisionScripts_b
+                                     13 	.globl b_InitPlayer_b
+                                     14 	.globl _InitPlayer_b
+                                     15 	.globl b_ActorOverlapsPlayer_b
+                                     16 	.globl _ActorOverlapsPlayer_b
+                                     17 	.globl b_ActorAt3x3Tile_b
+                                     18 	.globl _ActorAt3x3Tile_b
+                                     19 	.globl b_ActorAt2x3Tile_b
+                                     20 	.globl _ActorAt2x3Tile_b
+                                     21 	.globl b_ActorAt3x1Tile_b
+                                     22 	.globl _ActorAt3x1Tile_b
+                                     23 	.globl b_ActorAt1x3Tile_b
+                                     24 	.globl _ActorAt1x3Tile_b
+                                     25 	.globl b_ActorAt1x2Tile_b
+                                     26 	.globl _ActorAt1x2Tile_b
+                                     27 	.globl b_ActorAtTile_b
+                                     28 	.globl _ActorAtTile_b
+                                     29 	.globl b_CheckCollisionInDirection_b
+                                     30 	.globl _CheckCollisionInDirection_b
+                                     31 	.globl b_ActorInFrontOfActor_b
+                                     32 	.globl _ActorInFrontOfActor_b
+                                     33 	.globl b_ActorInFrontOfPlayer_b
+                                     34 	.globl _ActorInFrontOfPlayer_b
+                                     35 	.globl b_DeactivateActor_b
+                                     36 	.globl _DeactivateActor_b
+                                     37 	.globl b_ActivateActor_b
+                                     38 	.globl _ActivateActor_b
+                                     39 	.globl _LoadSprite
+                                     40 	.globl _TileAt2x2
+                                     41 	.globl _ScriptCtxPoolReturn
+                                     42 	.globl _ScriptStartBg
+                                     43 	.globl _ActorAt1x2Tile
+                                     44 	.globl _ActorAt3x3Tile
+                                     45 	.globl _ActorAt3x1Tile
+                                     46 	.globl _ActorAt1x3Tile
+                                     47 	.globl _SpritePoolNext
+                                     48 	.globl _SpritePoolReturn
+                                     49 	.globl _actors_active_delete_count
+                                     50 	.globl _actors_active_delete
+                                     51 ;--------------------------------------------------------
+                                     52 ; special function registers
+                                     53 ;--------------------------------------------------------
+                                     54 ;--------------------------------------------------------
+                                     55 ; ram data
+                                     56 ;--------------------------------------------------------
+                                     57 	.area _DATA
+      000000                         58 _actors_active_delete::
+      000000                         59 	.ds 11
+      00000B                         60 _actors_active_delete_count::
+      00000B                         61 	.ds 1
+                                     62 ;--------------------------------------------------------
+                                     63 ; absolute external ram data
+                                     64 ;--------------------------------------------------------
+                                     65 	.area _DABS (ABS)
+                                     66 ;--------------------------------------------------------
+                                     67 ; global & static initialisations
+                                     68 ;--------------------------------------------------------
+                                     69 	.area _HOME
+                                     70 	.area _GSINIT
+                                     71 	.area _GSFINAL
+                                     72 	.area _GSINIT
+                                     73 ;/tmp/_gbsbuild/src/core/Actor_b.c:18: UBYTE actors_active_delete_count = 0;
+      000000 21r0Br00                74 	ld	hl, #_actors_active_delete_count
+      000003 36 00                   75 	ld	(hl), #0x00
+                                     76 ;--------------------------------------------------------
+                                     77 ; Home
+                                     78 ;--------------------------------------------------------
+                                     79 	.area _HOME
+                                     80 	.area _HOME
+                                     81 ;--------------------------------------------------------
+                                     82 ; code
+                                     83 ;--------------------------------------------------------
+                                     84 	.area _CODE_1
+                                     85 ;/tmp/_gbsbuild/src/core/Actor_b.c:20: void ActivateActor_b(UBYTE i) __banked {
+                                     86 ;	---------------------------------
+                                     87 ; Function ActivateActor_b
+                                     88 ; ---------------------------------
+                           000001    89 	b_ActivateActor_b	= 1
+      000000                         90 _ActivateActor_b::
+      000000 E8 FC                   91 	add	sp, #-4
+                                     92 ;/tmp/_gbsbuild/src/core/Actor_b.c:23: if (actors_active_size == MAX_ACTIVE_ACTORS) {
+      000002 FAr00r00                93 	ld	a, (#_actors_active_size)
+      000005 D6 0B                   94 	sub	a, #0x0b
+      000007 CArBEr00                95 	jp	Z,00115$
+                                     96 ;/tmp/_gbsbuild/src/core/Actor_b.c:24: return;
+      00000A 18 00                   97 	jr	00102$
+      00000C                         98 00102$:
+                                     99 ;/tmp/_gbsbuild/src/core/Actor_b.c:28: if (!actors[i].enabled) {
+      00000C F8 0A                  100 	ldhl	sp,	#10
+      00000E 4E                     101 	ld	c, (hl)
+      00000F 06 00                  102 	ld	b, #0x00
+      000011 69                     103 	ld	l, c
+      000012 60                     104 	ld	h, b
+      000013 29                     105 	add	hl, hl
+      000014 29                     106 	add	hl, hl
+      000015 09                     107 	add	hl, bc
+      000016 29                     108 	add	hl, hl
+      000017 09                     109 	add	hl, bc
+      000018 29                     110 	add	hl, hl
+      000019 09                     111 	add	hl, bc
+      00001A 29                     112 	add	hl, hl
+      00001B 01r00r00               113 	ld	bc,#_actors
+      00001E 09                     114 	add	hl,bc
+      00001F 4D                     115 	ld	c, l
+      000020 44                     116 	ld	b, h
+      000021 21 12 00               117 	ld	hl, #0x0012
+      000024 09                     118 	add	hl, bc
+      000025 33                     119 	inc	sp
+      000026 33                     120 	inc	sp
+      000027 5D                     121 	ld	e, l
+      000028 54                     122 	ld	d, h
+      000029 D5                     123 	push	de
+      00002A 1A                     124 	ld	a, (de)
+      00002B B7                     125 	or	a, a
+                                    126 ;/tmp/_gbsbuild/src/core/Actor_b.c:29: return;
+                                    127 ;/tmp/_gbsbuild/src/core/Actor_b.c:33: for (j = 0; j != actors_active_size; j++) {
+      00002C CArBEr00               128 	jp	Z,00115$
+      00002F 1E 00                  129 	ld	e, #0x00
+      000031                        130 00113$:
+      000031 FAr00r00               131 	ld	a, (#_actors_active_size)
+      000034 93                     132 	sub	a, e
+      000035 28 12                  133 	jr	Z, 00107$
+                                    134 ;/tmp/_gbsbuild/src/core/Actor_b.c:34: if (actors_active[j] == i) {
+      000037 21r00r00               135 	ld	hl, #_actors_active
+      00003A 16 00                  136 	ld	d, #0x00
+      00003C 19                     137 	add	hl, de
+      00003D 56                     138 	ld	d, (hl)
+      00003E F8 0A                  139 	ldhl	sp,	#10
+      000040 7E                     140 	ld	a, (hl)
+      000041 92                     141 	sub	a, d
+      000042 28 7A                  142 	jr	Z, 00115$
+                                    143 ;/tmp/_gbsbuild/src/core/Actor_b.c:35: return;
+      000044 18 00                  144 	jr	00114$
+      000046                        145 00114$:
+                                    146 ;/tmp/_gbsbuild/src/core/Actor_b.c:33: for (j = 0; j != actors_active_size; j++) {
+      000046 1C                     147 	inc	e
+      000047 18 E8                  148 	jr	00113$
+      000049                        149 00107$:
+                                    150 ;/tmp/_gbsbuild/src/core/Actor_b.c:39: actors_active[actors_active_size++] = i;
+      000049 21r00r00               151 	ld	hl, #_actors_active_size
+      00004C 5E                     152 	ld	e, (hl)
+      00004D 34                     153 	inc	(hl)
+      00004E 7B                     154 	ld	a, e
+      00004F C6r00                  155 	add	a, #<(_actors_active)
+      000051 5F                     156 	ld	e, a
+      000052 3E 00                  157 	ld	a, #0x00
+      000054 CEs00                  158 	adc	a, #>(_actors_active)
+      000056 57                     159 	ld	d, a
+      000057 F8 0A                  160 	ldhl	sp,	#10
+      000059 7E                     161 	ld	a, (hl)
+      00005A 12                     162 	ld	(de), a
+                                    163 ;/tmp/_gbsbuild/src/core/Actor_b.c:40: actors[i].sprite_index = SpritePoolNext();
+      00005B 21 09 00               164 	ld	hl, #0x0009
+      00005E 09                     165 	add	hl, bc
+      00005F 5D                     166 	ld	e, l
+      000060 54                     167 	ld	d, h
+      000061 C5                     168 	push	bc
+      000062 D5                     169 	push	de
+      000063 CDr00r00               170 	call	_SpritePoolNext
+      000066 7B                     171 	ld	a, e
+      000067 D1                     172 	pop	de
+      000068 C1                     173 	pop	bc
+      000069 12                     174 	ld	(de), a
+                                    175 ;/tmp/_gbsbuild/src/core/Actor_b.c:41: actors[i].frame_offset = 0;
+      00006A 21 13 00               176 	ld	hl, #0x0013
+      00006D 09                     177 	add	hl, bc
+      00006E 36 00                  178 	ld	(hl), #0x00
+                                    179 ;/tmp/_gbsbuild/src/core/Actor_b.c:42: actors[i].rerender = TRUE;
+      000070 21 14 00               180 	ld	hl, #0x0014
+      000073 09                     181 	add	hl, bc
+      000074 36 01                  182 	ld	(hl), #0x01
+                                    183 ;/tmp/_gbsbuild/src/core/Actor_b.c:43: actors[i].moving = FALSE;
+      000076 21 07 00               184 	ld	hl, #0x0007
+      000079 09                     185 	add	hl, bc
+      00007A 36 00                  186 	ld	(hl), #0x00
+                                    187 ;/tmp/_gbsbuild/src/core/Actor_b.c:44: actors[i].script_control = FALSE;
+      00007C 21 1B 00               188 	ld	hl, #0x001b
+      00007F 09                     189 	add	hl, bc
+      000080 36 00                  190 	ld	(hl), #0x00
+                                    191 ;/tmp/_gbsbuild/src/core/Actor_b.c:46: if (actors[i].movement_ptr.bank && actors[i].enabled) {
+      000082 21 21 00               192 	ld	hl, #0x0021
+      000085 09                     193 	add	hl, bc
+      000086 E5                     194 	push	hl
+      000087 7D                     195 	ld	a, l
+      000088 F8 04                  196 	ldhl	sp,	#4
+      00008A 77                     197 	ld	(hl), a
+      00008B E1                     198 	pop	hl
+      00008C 7C                     199 	ld	a, h
+      00008D F8 03                  200 	ldhl	sp,	#3
+      00008F 32                     201 	ld	(hl-), a
+      000090 2A                     202 	ld	a, (hl+)
+      000091 5F                     203 	ld	e, a
+      000092 56                     204 	ld	d, (hl)
+      000093 1A                     205 	ld	a, (de)
+      000094 6F                     206 	ld	l, a
+                                    207 ;/tmp/_gbsbuild/src/core/Actor_b.c:47: actors[i].movement_ctx = ScriptStartBg(&actors[i].movement_ptr, i);
+      000095 79                     208 	ld	a, c
+      000096 C6 2D                  209 	add	a, #0x2d
+      000098 4F                     210 	ld	c, a
+      000099 30 01                  211 	jr	NC, 00157$
+      00009B 04                     212 	inc	b
+      00009C                        213 00157$:
+                                    214 ;/tmp/_gbsbuild/src/core/Actor_b.c:46: if (actors[i].movement_ptr.bank && actors[i].enabled) {
+      00009C 7D                     215 	ld	a, l
+      00009D B7                     216 	or	a, a
+      00009E 28 1C                  217 	jr	Z, 00109$
+      0000A0 D1                     218 	pop	de
+      0000A1 D5                     219 	push	de
+      0000A2 1A                     220 	ld	a, (de)
+      0000A3 B7                     221 	or	a, a
+      0000A4 28 16                  222 	jr	Z, 00109$
+                                    223 ;/tmp/_gbsbuild/src/core/Actor_b.c:47: actors[i].movement_ctx = ScriptStartBg(&actors[i].movement_ptr, i);
+      0000A6 F8 02                  224 	ldhl	sp,#2
+      0000A8 2A                     225 	ld	a, (hl+)
+      0000A9 5F                     226 	ld	e, a
+      0000AA 56                     227 	ld	d, (hl)
+      0000AB C5                     228 	push	bc
+      0000AC F8 0C                  229 	ldhl	sp,	#12
+      0000AE 7E                     230 	ld	a, (hl)
+      0000AF F5                     231 	push	af
+      0000B0 33                     232 	inc	sp
+      0000B1 D5                     233 	push	de
+      0000B2 CDr00r00               234 	call	_ScriptStartBg
+      0000B5 E8 03                  235 	add	sp, #3
+      0000B7 7B                     236 	ld	a, e
+      0000B8 C1                     237 	pop	bc
+      0000B9 02                     238 	ld	(bc), a
+      0000BA 18 02                  239 	jr	00115$
+      0000BC                        240 00109$:
+                                    241 ;/tmp/_gbsbuild/src/core/Actor_b.c:49: actors[i].movement_ctx = 0;
+      0000BC AF                     242 	xor	a, a
+      0000BD 02                     243 	ld	(bc), a
+      0000BE                        244 00115$:
+                                    245 ;/tmp/_gbsbuild/src/core/Actor_b.c:51: }
+      0000BE E8 04                  246 	add	sp, #4
+      0000C0 C9                     247 	ret
+                                    248 ;/tmp/_gbsbuild/src/core/Actor_b.c:53: void DeactivateActor_b(UBYTE i) __banked {
+                                    249 ;	---------------------------------
+                                    250 ; Function DeactivateActor_b
+                                    251 ; ---------------------------------
+                           000001   252 	b_DeactivateActor_b	= 1
+      0000C1                        253 _DeactivateActor_b::
+      0000C1 3B                     254 	dec	sp
+                                    255 ;/tmp/_gbsbuild/src/core/Actor_b.c:56: a = 0;  // Required to fix GBDK bug
+      0000C2 AF                     256 	xor	a, a
+      0000C3 F8 00                  257 	ldhl	sp,	#0
+      0000C5 77                     258 	ld	(hl), a
+                                    259 ;/tmp/_gbsbuild/src/core/Actor_b.c:58: for (j = 0; j != actors_active_size; j++) {
+      0000C6 0E 00                  260 	ld	c, #0x00
+      0000C8 1E 00                  261 	ld	e, #0x00
+      0000CA                        262 00109$:
+      0000CA FAr00r00               263 	ld	a, (#_actors_active_size)
+      0000CD 93                     264 	sub	a, e
+      0000CE 28 16                  265 	jr	Z, 00103$
+                                    266 ;/tmp/_gbsbuild/src/core/Actor_b.c:59: if (actors_active[j] == i) {
+      0000D0 21r00r00               267 	ld	hl, #_actors_active
+      0000D3 16 00                  268 	ld	d, #0x00
+      0000D5 19                     269 	add	hl, de
+      0000D6 46                     270 	ld	b, (hl)
+      0000D7 F8 07                  271 	ldhl	sp,	#7
+      0000D9 7E                     272 	ld	a, (hl)
+      0000DA 90                     273 	sub	a, b
+      0000DB 20 05                  274 	jr	NZ, 00110$
+                                    275 ;/tmp/_gbsbuild/src/core/Actor_b.c:60: a = j;
+      0000DD F8 00                  276 	ldhl	sp,	#0
+      0000DF 71                     277 	ld	(hl), c
+                                    278 ;/tmp/_gbsbuild/src/core/Actor_b.c:61: break;
+      0000E0 18 04                  279 	jr	00103$
+      0000E2                        280 00110$:
+                                    281 ;/tmp/_gbsbuild/src/core/Actor_b.c:58: for (j = 0; j != actors_active_size; j++) {
+      0000E2 1C                     282 	inc	e
+      0000E3 4B                     283 	ld	c, e
+      0000E4 18 E4                  284 	jr	00109$
+      0000E6                        285 00103$:
+                                    286 ;/tmp/_gbsbuild/src/core/Actor_b.c:65: if (a) {
+      0000E6 F8 00                  287 	ldhl	sp,	#0
+      0000E8 7E                     288 	ld	a, (hl)
+      0000E9 B7                     289 	or	a, a
+      0000EA 28 56                  290 	jr	Z, 00111$
+                                    291 ;/tmp/_gbsbuild/src/core/Actor_b.c:66: SpritePoolReturn(actors[i].sprite_index);
+      0000EC F8 07                  292 	ldhl	sp,	#7
+      0000EE 4E                     293 	ld	c, (hl)
+      0000EF 06 00                  294 	ld	b, #0x00
+      0000F1 69                     295 	ld	l, c
+      0000F2 60                     296 	ld	h, b
+      0000F3 29                     297 	add	hl, hl
+      0000F4 29                     298 	add	hl, hl
+      0000F5 09                     299 	add	hl, bc
+      0000F6 29                     300 	add	hl, hl
+      0000F7 09                     301 	add	hl, bc
+      0000F8 29                     302 	add	hl, hl
+      0000F9 09                     303 	add	hl, bc
+      0000FA 29                     304 	add	hl, hl
+      0000FB 01r00r00               305 	ld	bc,#_actors
+      0000FE 09                     306 	add	hl,bc
+      0000FF 4D                     307 	ld	c, l
+      000100 44                     308 	ld	b, h
+      000101 21 09 00               309 	ld	hl, #0x0009
+      000104 09                     310 	add	hl, bc
+      000105 5D                     311 	ld	e, l
+      000106 54                     312 	ld	d, h
+      000107 1A                     313 	ld	a, (de)
+      000108 C5                     314 	push	bc
+      000109 D5                     315 	push	de
+      00010A F5                     316 	push	af
+      00010B 33                     317 	inc	sp
+      00010C CDr00r00               318 	call	_SpritePoolReturn
+      00010F 33                     319 	inc	sp
+      000110 D1                     320 	pop	de
+      000111 C1                     321 	pop	bc
+                                    322 ;/tmp/_gbsbuild/src/core/Actor_b.c:67: actors[i].sprite_index = 0;
+      000112 AF                     323 	xor	a, a
+      000113 12                     324 	ld	(de), a
+                                    325 ;/tmp/_gbsbuild/src/core/Actor_b.c:68: if (actors[i].movement_ctx) {
+      000114 21 2D 00               326 	ld	hl, #0x002d
+      000117 09                     327 	add	hl, bc
+      000118 7E                     328 	ld	a, (hl)
+      000119 B7                     329 	or	a, a
+      00011A 28 0C                  330 	jr	Z, 00105$
+                                    331 ;/tmp/_gbsbuild/src/core/Actor_b.c:69: ScriptCtxPoolReturn(actors[i].movement_ctx, i);
+      00011C F8 07                  332 	ldhl	sp,	#7
+      00011E 66                     333 	ld	h, (hl)
+      00011F E5                     334 	push	hl
+      000120 33                     335 	inc	sp
+      000121 F5                     336 	push	af
+      000122 33                     337 	inc	sp
+      000123 CDr00r00               338 	call	_ScriptCtxPoolReturn
+      000126 E8 02                  339 	add	sp, #2
+      000128                        340 00105$:
+                                    341 ;/tmp/_gbsbuild/src/core/Actor_b.c:71: actors_active[a] = actors_active[--actors_active_size];
+                                    342 ;c
+      000128 F8 00                  343 	ldhl	sp,	#0
+      00012A 5E                     344 	ld	e, (hl)
+      00012B 16 00                  345 	ld	d, #0x00
+      00012D 21r00r00               346 	ld	hl, #_actors_active
+      000130 19                     347 	add	hl, de
+      000131 4D                     348 	ld	c, l
+      000132 44                     349 	ld	b, h
+      000133 21r00r00               350 	ld	hl, #_actors_active_size
+      000136 35                     351 	dec	(hl)
+      000137 3Er00                  352 	ld	a, #<(_actors_active)
+      000139 86                     353 	add	a, (hl)
+      00013A 5F                     354 	ld	e, a
+      00013B 3Es00                  355 	ld	a, #>(_actors_active)
+      00013D CE 00                  356 	adc	a, #0x00
+      00013F 57                     357 	ld	d, a
+      000140 1A                     358 	ld	a, (de)
+      000141 02                     359 	ld	(bc), a
+      000142                        360 00111$:
+                                    361 ;/tmp/_gbsbuild/src/core/Actor_b.c:73: }
+      000142 33                     362 	inc	sp
+      000143 C9                     363 	ret
+                                    364 ;/tmp/_gbsbuild/src/core/Actor_b.c:75: UBYTE ActorInFrontOfPlayer_b(UBYTE grid_size, UBYTE inc_noclip) __banked {
+                                    365 ;	---------------------------------
+                                    366 ; Function ActorInFrontOfPlayer_b
+                                    367 ; ---------------------------------
+                           000001   368 	b_ActorInFrontOfPlayer_b	= 1
+      000144                        369 _ActorInFrontOfPlayer_b::
+      000144 E8 FA                  370 	add	sp, #-6
+                                    371 ;/tmp/_gbsbuild/src/core/Actor_b.c:77: UBYTE hit_actor = 0;
+      000146 AF                     372 	xor	a, a
+      000147 F8 00                  373 	ldhl	sp,	#0
+      000149 77                     374 	ld	(hl), a
+                                    375 ;/tmp/_gbsbuild/src/core/Actor_b.c:79: tile_x = player.pos.x >> 3;
+      00014A 21r00r00               376 	ld	hl, #_actors
+      00014D 2A                     377 	ld	a, (hl+)
+      00014E 4F                     378 	ld	c, a
+      00014F 46                     379 	ld	b, (hl)
+      000150 CB 28                  380 	sra	b
+      000152 CB 19                  381 	rr	c
+      000154 CB 28                  382 	sra	b
+      000156 CB 19                  383 	rr	c
+      000158 CB 28                  384 	sra	b
+      00015A CB 19                  385 	rr	c
+      00015C F8 01                  386 	ldhl	sp,	#1
+      00015E 71                     387 	ld	(hl), c
+                                    388 ;/tmp/_gbsbuild/src/core/Actor_b.c:80: tile_y = player.pos.y >> 3;
+      00015F 21r02r00               389 	ld	hl, #_actors + 2
+      000162 2A                     390 	ld	a, (hl+)
+      000163 4F                     391 	ld	c, a
+      000164 46                     392 	ld	b, (hl)
+      000165 CB 28                  393 	sra	b
+      000167 CB 19                  394 	rr	c
+      000169 CB 28                  395 	sra	b
+      00016B CB 19                  396 	rr	c
+      00016D CB 28                  397 	sra	b
+      00016F CB 19                  398 	rr	c
+      000171 F8 02                  399 	ldhl	sp,	#2
+      000173 71                     400 	ld	(hl), c
+                                    401 ;/tmp/_gbsbuild/src/core/Actor_b.c:84: hit_actor = ActorAt3x3Tile(tile_x - 1, tile_y - 3, inc_noclip);
+      000174 2A                     402 	ld	a, (hl+)
+      000175 32                     403 	ld	(hl-), a
+      000176 2B                     404 	dec	hl
+      000177 7E                     405 	ld	a, (hl)
+      000178 F8 04                  406 	ldhl	sp,	#4
+                                    407 ;/tmp/_gbsbuild/src/core/Actor_b.c:89: hit_actor = ActorAt3x3Tile(tile_x - 3, tile_y - 1, inc_noclip);
+      00017A 32                     408 	ld	(hl-), a
+      00017B 7E                     409 	ld	a, (hl)
+      00017C C6 FF                  410 	add	a, #0xff
+      00017E 23                     411 	inc	hl
+      00017F 23                     412 	inc	hl
+      000180 77                     413 	ld	(hl), a
+                                    414 ;/tmp/_gbsbuild/src/core/Actor_b.c:82: if (grid_size == 16) {
+      000181 F8 0C                  415 	ldhl	sp,	#12
+      000183 7E                     416 	ld	a, (hl)
+      000184 D6 10                  417 	sub	a, #0x10
+      000186 C2r10r02               418 	jp	NZ,00124$
+                                    419 ;/tmp/_gbsbuild/src/core/Actor_b.c:83: if (player.dir.y == -1) {
+      000189 FAr06r00               420 	ld	a, (#(_actors + 0x0006) + 0)
+                                    421 ;/tmp/_gbsbuild/src/core/Actor_b.c:84: hit_actor = ActorAt3x3Tile(tile_x - 1, tile_y - 3, inc_noclip);
+      00018C F8 04                  422 	ldhl	sp,	#4
+      00018E 4E                     423 	ld	c, (hl)
+      00018F 0D                     424 	dec	c
+                                    425 ;/tmp/_gbsbuild/src/core/Actor_b.c:83: if (player.dir.y == -1) {
+      000190 FE FF                  426 	cp	a, #0xff
+      000192 20 16                  427 	jr	NZ, 00110$
+                                    428 ;/tmp/_gbsbuild/src/core/Actor_b.c:84: hit_actor = ActorAt3x3Tile(tile_x - 1, tile_y - 3, inc_noclip);
+      000194 2B                     429 	dec	hl
+      000195 7E                     430 	ld	a, (hl)
+      000196 C6 FD                  431 	add	a, #0xfd
+      000198 F8 0D                  432 	ldhl	sp,	#13
+      00019A 66                     433 	ld	h, (hl)
+      00019B E5                     434 	push	hl
+      00019C 33                     435 	inc	sp
+      00019D 47                     436 	ld	b, a
+      00019E C5                     437 	push	bc
+      00019F CDr00r00               438 	call	_ActorAt3x3Tile
+      0001A2 E8 03                  439 	add	sp, #3
+      0001A4 F8 00                  440 	ldhl	sp,	#0
+      0001A6 73                     441 	ld	(hl), e
+      0001A7 C3rA4r02               442 	jp	00125$
+      0001AA                        443 00110$:
+                                    444 ;/tmp/_gbsbuild/src/core/Actor_b.c:85: } else if (player.dir.y == 1) {
+      0001AA 3D                     445 	dec	a
+      0001AB 20 16                  446 	jr	NZ, 00107$
+                                    447 ;/tmp/_gbsbuild/src/core/Actor_b.c:86: hit_actor = ActorAt3x3Tile(tile_x - 1, tile_y + 1, inc_noclip);
+      0001AD F8 03                  448 	ldhl	sp,	#3
+      0001AF 7E                     449 	ld	a, (hl)
+      0001B0 3C                     450 	inc	a
+      0001B1 F8 0D                  451 	ldhl	sp,	#13
+      0001B3 66                     452 	ld	h, (hl)
+      0001B4 E5                     453 	push	hl
+      0001B5 33                     454 	inc	sp
+      0001B6 47                     455 	ld	b, a
+      0001B7 C5                     456 	push	bc
+      0001B8 CDr00r00               457 	call	_ActorAt3x3Tile
+      0001BB E8 03                  458 	add	sp, #3
+      0001BD F8 00                  459 	ldhl	sp,	#0
+      0001BF 73                     460 	ld	(hl), e
+      0001C0 C3rA4r02               461 	jp	00125$
+      0001C3                        462 00107$:
+                                    463 ;/tmp/_gbsbuild/src/core/Actor_b.c:88: if (player.dir.x == -1) {
+      0001C3 FAr05r00               464 	ld	a, (#(_actors + 0x0005) + 0)
+      0001C6 F8 03                  465 	ldhl	sp,	#3
+      0001C8 77                     466 	ld	(hl), a
+      0001C9 F8 03                  467 	ldhl	sp,	#3
+      0001CB 7E                     468 	ld	a, (hl)
+      0001CC 3C                     469 	inc	a
+      0001CD 20 1F                  470 	jr	NZ, 00104$
+                                    471 ;/tmp/_gbsbuild/src/core/Actor_b.c:89: hit_actor = ActorAt3x3Tile(tile_x - 3, tile_y - 1, inc_noclip);
+      0001CF F8 04                  472 	ldhl	sp,	#4
+      0001D1 7E                     473 	ld	a, (hl)
+      0001D2 C6 FD                  474 	add	a, #0xfd
+      0001D4 77                     475 	ld	(hl), a
+      0001D5 F8 0D                  476 	ldhl	sp,	#13
+      0001D7 7E                     477 	ld	a, (hl)
+      0001D8 F5                     478 	push	af
+      0001D9 33                     479 	inc	sp
+      0001DA F8 06                  480 	ldhl	sp,	#6
+      0001DC 7E                     481 	ld	a, (hl)
+      0001DD F5                     482 	push	af
+      0001DE 33                     483 	inc	sp
+      0001DF 2B                     484 	dec	hl
+      0001E0 7E                     485 	ld	a, (hl)
+      0001E1 F5                     486 	push	af
+      0001E2 33                     487 	inc	sp
+      0001E3 CDr00r00               488 	call	_ActorAt3x3Tile
+      0001E6 E8 03                  489 	add	sp, #3
+      0001E8 F8 00                  490 	ldhl	sp,	#0
+      0001EA 73                     491 	ld	(hl), e
+      0001EB C3rA4r02               492 	jp	00125$
+      0001EE                        493 00104$:
+                                    494 ;/tmp/_gbsbuild/src/core/Actor_b.c:90: } else if (player.dir.x == 1) {
+      0001EE F8 03                  495 	ldhl	sp,	#3
+      0001F0 7E                     496 	ld	a, (hl)
+      0001F1 3D                     497 	dec	a
+      0001F2 C2rA4r02               498 	jp	NZ,00125$
+                                    499 ;/tmp/_gbsbuild/src/core/Actor_b.c:91: hit_actor = ActorAt3x3Tile(tile_x + 1, tile_y - 1, inc_noclip);
+      0001F5 F8 04                  500 	ldhl	sp,	#4
+      0001F7 7E                     501 	ld	a, (hl)
+      0001F8 3C                     502 	inc	a
+      0001F9 F8 0D                  503 	ldhl	sp,	#13
+      0001FB 66                     504 	ld	h, (hl)
+      0001FC E5                     505 	push	hl
+      0001FD 33                     506 	inc	sp
+      0001FE F8 06                  507 	ldhl	sp,	#6
+      000200 66                     508 	ld	h, (hl)
+      000201 E5                     509 	push	hl
+      000202 33                     510 	inc	sp
+      000203 F5                     511 	push	af
+      000204 33                     512 	inc	sp
+      000205 CDr00r00               513 	call	_ActorAt3x3Tile
+      000208 E8 03                  514 	add	sp, #3
+      00020A F8 00                  515 	ldhl	sp,	#0
+      00020C 73                     516 	ld	(hl), e
+      00020D C3rA4r02               517 	jp	00125$
+      000210                        518 00124$:
+                                    519 ;/tmp/_gbsbuild/src/core/Actor_b.c:95: if (player.dir.y == -1) {
+      000210 FAr06r00               520 	ld	a, (#(_actors + 0x0006) + 0)
+      000213 FE FF                  521 	cp	a, #0xff
+      000215 20 19                  522 	jr	NZ, 00121$
+                                    523 ;/tmp/_gbsbuild/src/core/Actor_b.c:96: hit_actor = ActorAt3x1Tile(tile_x, tile_y - 1, inc_noclip);
+      000217 F8 0D                  524 	ldhl	sp,	#13
+      000219 7E                     525 	ld	a, (hl)
+      00021A F5                     526 	push	af
+      00021B 33                     527 	inc	sp
+      00021C F8 06                  528 	ldhl	sp,	#6
+      00021E 7E                     529 	ld	a, (hl)
+      00021F F5                     530 	push	af
+      000220 33                     531 	inc	sp
+      000221 F8 03                  532 	ldhl	sp,	#3
+      000223 7E                     533 	ld	a, (hl)
+      000224 F5                     534 	push	af
+      000225 33                     535 	inc	sp
+      000226 CDr00r00               536 	call	_ActorAt3x1Tile
+      000229 E8 03                  537 	add	sp, #3
+      00022B F8 00                  538 	ldhl	sp,	#0
+      00022D 73                     539 	ld	(hl), e
+      00022E 18 74                  540 	jr	00125$
+      000230                        541 00121$:
+                                    542 ;/tmp/_gbsbuild/src/core/Actor_b.c:97: } else if (player.dir.y == 1) {
+      000230 3D                     543 	dec	a
+      000231 20 1B                  544 	jr	NZ, 00118$
+                                    545 ;/tmp/_gbsbuild/src/core/Actor_b.c:98: hit_actor = ActorAt3x1Tile(tile_x, tile_y + 2, inc_noclip);
+      000233 F8 03                  546 	ldhl	sp,	#3
+      000235 7E                     547 	ld	a, (hl)
+      000236 3C                     548 	inc	a
+      000237 3C                     549 	inc	a
+      000238 F8 0D                  550 	ldhl	sp,	#13
+      00023A 66                     551 	ld	h, (hl)
+      00023B E5                     552 	push	hl
+      00023C 33                     553 	inc	sp
+      00023D F5                     554 	push	af
+      00023E 33                     555 	inc	sp
+      00023F F8 03                  556 	ldhl	sp,	#3
+      000241 7E                     557 	ld	a, (hl)
+      000242 F5                     558 	push	af
+      000243 33                     559 	inc	sp
+      000244 CDr00r00               560 	call	_ActorAt3x1Tile
+      000247 E8 03                  561 	add	sp, #3
+      000249 F8 00                  562 	ldhl	sp,	#0
+      00024B 73                     563 	ld	(hl), e
+      00024C 18 56                  564 	jr	00125$
+      00024E                        565 00118$:
+                                    566 ;/tmp/_gbsbuild/src/core/Actor_b.c:100: if (player.dir.x == -1) {
+      00024E FAr05r00               567 	ld	a, (#(_actors + 0x0005) + 0)
+      000251 F8 05                  568 	ldhl	sp,	#5
+      000253 77                     569 	ld	(hl), a
+      000254 F8 05                  570 	ldhl	sp,	#5
+      000256 7E                     571 	ld	a, (hl)
+      000257 3C                     572 	inc	a
+      000258 20 23                  573 	jr	NZ, 00115$
+                                    574 ;/tmp/_gbsbuild/src/core/Actor_b.c:101: hit_actor = ActorAt1x2Tile(tile_x - 2, tile_y, inc_noclip);
+      00025A F8 04                  575 	ldhl	sp,	#4
+      00025C 7E                     576 	ld	a, (hl)
+      00025D 3D                     577 	dec	a
+      00025E 3D                     578 	dec	a
+      00025F F8 0D                  579 	ldhl	sp,	#13
+      000261 66                     580 	ld	h, (hl)
+      000262 E5                     581 	push	hl
+      000263 33                     582 	inc	sp
+      000264 F8 03                  583 	ldhl	sp,	#3
+      000266 66                     584 	ld	h, (hl)
+      000267 E5                     585 	push	hl
+      000268 33                     586 	inc	sp
+      000269 F5                     587 	push	af
+      00026A 33                     588 	inc	sp
+      00026B CDr00r00               589 	call	_ActorAt1x2Tile
+      00026E E8 03                  590 	add	sp, #3
+      000270 E5                     591 	push	hl
+      000271 F8 07                  592 	ldhl	sp,	#7
+      000273 73                     593 	ld	(hl), e
+      000274 E1                     594 	pop	hl
+      000275 F8 05                  595 	ldhl	sp,	#5
+      000277 7E                     596 	ld	a, (hl)
+      000278 F8 00                  597 	ldhl	sp,	#0
+      00027A 77                     598 	ld	(hl), a
+      00027B 18 27                  599 	jr	00125$
+      00027D                        600 00115$:
+                                    601 ;/tmp/_gbsbuild/src/core/Actor_b.c:102: } else if (player.dir.x == 1) {
+      00027D F8 05                  602 	ldhl	sp,	#5
+      00027F 7E                     603 	ld	a, (hl)
+      000280 3D                     604 	dec	a
+      000281 20 21                  605 	jr	NZ, 00125$
+                                    606 ;/tmp/_gbsbuild/src/core/Actor_b.c:103: hit_actor = ActorAt1x2Tile(tile_x + 2, tile_y, inc_noclip);
+      000283 F8 04                  607 	ldhl	sp,	#4
+      000285 7E                     608 	ld	a, (hl)
+      000286 3C                     609 	inc	a
+      000287 3C                     610 	inc	a
+      000288 F8 0D                  611 	ldhl	sp,	#13
+      00028A 66                     612 	ld	h, (hl)
+      00028B E5                     613 	push	hl
+      00028C 33                     614 	inc	sp
+      00028D F8 03                  615 	ldhl	sp,	#3
+      00028F 66                     616 	ld	h, (hl)
+      000290 E5                     617 	push	hl
+      000291 33                     618 	inc	sp
+      000292 F5                     619 	push	af
+      000293 33                     620 	inc	sp
+      000294 CDr00r00               621 	call	_ActorAt1x2Tile
+      000297 E8 03                  622 	add	sp, #3
+      000299 E5                     623 	push	hl
+      00029A F8 07                  624 	ldhl	sp,	#7
+      00029C 73                     625 	ld	(hl), e
+      00029D E1                     626 	pop	hl
+      00029E F8 05                  627 	ldhl	sp,	#5
+      0002A0 7E                     628 	ld	a, (hl)
+      0002A1 F8 00                  629 	ldhl	sp,	#0
+      0002A3 77                     630 	ld	(hl), a
+      0002A4                        631 00125$:
+                                    632 ;/tmp/_gbsbuild/src/core/Actor_b.c:107: if (hit_actor == 0) {
+      0002A4 F8 00                  633 	ldhl	sp,	#0
+      0002A6 7E                     634 	ld	a, (hl)
+      0002A7 B7                     635 	or	a, a
+      0002A8 20 02                  636 	jr	NZ, 00127$
+                                    637 ;/tmp/_gbsbuild/src/core/Actor_b.c:108: hit_actor = NO_ACTOR_COLLISON;
+      0002AA 36 FF                  638 	ld	(hl), #0xff
+      0002AC                        639 00127$:
+                                    640 ;/tmp/_gbsbuild/src/core/Actor_b.c:111: return hit_actor;
+      0002AC F8 00                  641 	ldhl	sp,	#0
+      0002AE 5E                     642 	ld	e, (hl)
+                                    643 ;/tmp/_gbsbuild/src/core/Actor_b.c:112: }
+      0002AF E8 06                  644 	add	sp, #6
+      0002B1 C9                     645 	ret
+                                    646 ;/tmp/_gbsbuild/src/core/Actor_b.c:115: UBYTE ActorInFrontOfActor_b(UBYTE i) __banked {
+                                    647 ;	---------------------------------
+                                    648 ; Function ActorInFrontOfActor_b
+                                    649 ; ---------------------------------
+                           000001   650 	b_ActorInFrontOfActor_b	= 1
+      0002B2                        651 _ActorInFrontOfActor_b::
+      0002B2 E8 F9                  652 	add	sp, #-7
+                                    653 ;/tmp/_gbsbuild/src/core/Actor_b.c:117: UBYTE hit_actor = 0;
+      0002B4 AF                     654 	xor	a, a
+      0002B5 F8 00                  655 	ldhl	sp,	#0
+      0002B7 77                     656 	ld	(hl), a
+                                    657 ;/tmp/_gbsbuild/src/core/Actor_b.c:119: tile_x = actors[i].pos.x >> 3;
+      0002B8 F8 0D                  658 	ldhl	sp,	#13
+      0002BA 4E                     659 	ld	c, (hl)
+      0002BB 06 00                  660 	ld	b, #0x00
+      0002BD 69                     661 	ld	l, c
+      0002BE 60                     662 	ld	h, b
+      0002BF 29                     663 	add	hl, hl
+      0002C0 29                     664 	add	hl, hl
+      0002C1 09                     665 	add	hl, bc
+      0002C2 29                     666 	add	hl, hl
+      0002C3 09                     667 	add	hl, bc
+      0002C4 29                     668 	add	hl, hl
+      0002C5 09                     669 	add	hl, bc
+      0002C6 29                     670 	add	hl, hl
+      0002C7 01r00r00               671 	ld	bc,#_actors
+      0002CA 09                     672 	add	hl,bc
+      0002CB 4D                     673 	ld	c,l
+      0002CC 44                     674 	ld	b,h
+      0002CD 2A                     675 	ld	a, (hl+)
+      0002CE 66                     676 	ld	h, (hl)
+      0002CF 5F                     677 	ld	e, a
+      0002D0 54                     678 	ld	d, h
+      0002D1 CB 2A                  679 	sra	d
+      0002D3 CB 1B                  680 	rr	e
+      0002D5 CB 2A                  681 	sra	d
+      0002D7 CB 1B                  682 	rr	e
+      0002D9 CB 2A                  683 	sra	d
+      0002DB CB 1B                  684 	rr	e
+      0002DD F8 01                  685 	ldhl	sp,	#1
+      0002DF 73                     686 	ld	(hl), e
+                                    687 ;/tmp/_gbsbuild/src/core/Actor_b.c:120: tile_y = actors[i].pos.y >> 3;
+      0002E0 69                     688 	ld	l, c
+      0002E1 60                     689 	ld	h, b
+      0002E2 23                     690 	inc	hl
+      0002E3 23                     691 	inc	hl
+      0002E4 2A                     692 	ld	a, (hl+)
+      0002E5 66                     693 	ld	h, (hl)
+      0002E6 5F                     694 	ld	e, a
+      0002E7 54                     695 	ld	d, h
+      0002E8 CB 2A                  696 	sra	d
+      0002EA CB 1B                  697 	rr	e
+      0002EC CB 2A                  698 	sra	d
+      0002EE CB 1B                  699 	rr	e
+      0002F0 CB 2A                  700 	sra	d
+      0002F2 CB 1B                  701 	rr	e
+      0002F4 F8 02                  702 	ldhl	sp,	#2
+      0002F6 73                     703 	ld	(hl), e
+                                    704 ;/tmp/_gbsbuild/src/core/Actor_b.c:122: if (actors[i].dir.y == -1) {
+      0002F7 21 05 00               705 	ld	hl, #0x0005
+      0002FA 09                     706 	add	hl, bc
+      0002FB E5                     707 	push	hl
+      0002FC 7D                     708 	ld	a, l
+      0002FD F8 05                  709 	ldhl	sp,	#5
+      0002FF 77                     710 	ld	(hl), a
+      000300 E1                     711 	pop	hl
+      000301 7C                     712 	ld	a, h
+      000302 F8 04                  713 	ldhl	sp,	#4
+      000304 77                     714 	ld	(hl), a
+      000305 21 06 00               715 	ld	hl, #0x0006
+      000308 09                     716 	add	hl, bc
+      000309 7E                     717 	ld	a, (hl)
+      00030A F8 05                  718 	ldhl	sp,	#5
+      00030C 77                     719 	ld	(hl), a
+                                    720 ;/tmp/_gbsbuild/src/core/Actor_b.c:123: hit_actor = ActorAt3x1Tile(tile_x, tile_y - 1, TRUE);
+      00030D F8 02                  721 	ldhl	sp,	#2
+      00030F 7E                     722 	ld	a, (hl)
+      000310 F8 06                  723 	ldhl	sp,	#6
+                                    724 ;/tmp/_gbsbuild/src/core/Actor_b.c:122: if (actors[i].dir.y == -1) {
+      000312 32                     725 	ld	(hl-), a
+      000313 7E                     726 	ld	a, (hl)
+      000314 3C                     727 	inc	a
+      000315 20 1A                  728 	jr	NZ, 00110$
+                                    729 ;/tmp/_gbsbuild/src/core/Actor_b.c:123: hit_actor = ActorAt3x1Tile(tile_x, tile_y - 1, TRUE);
+      000317 F8 06                  730 	ldhl	sp,	#6
+      000319 7E                     731 	ld	a, (hl)
+      00031A 3D                     732 	dec	a
+      00031B 26 01                  733 	ld	h, #0x01
+      00031D E5                     734 	push	hl
+      00031E 33                     735 	inc	sp
+      00031F F5                     736 	push	af
+      000320 33                     737 	inc	sp
+      000321 F8 03                  738 	ldhl	sp,	#3
+      000323 7E                     739 	ld	a, (hl)
+      000324 F5                     740 	push	af
+      000325 33                     741 	inc	sp
+      000326 CDr00r00               742 	call	_ActorAt3x1Tile
+      000329 E8 03                  743 	add	sp, #3
+      00032B F8 00                  744 	ldhl	sp,	#0
+      00032D 73                     745 	ld	(hl), e
+      00032E C3rB1r03               746 	jp	00111$
+      000331                        747 00110$:
+                                    748 ;/tmp/_gbsbuild/src/core/Actor_b.c:124: } else if (actors[i].dir.y == 1) {
+      000331 F8 05                  749 	ldhl	sp,	#5
+      000333 7E                     750 	ld	a, (hl)
+      000334 3D                     751 	dec	a
+      000335 20 1A                  752 	jr	NZ, 00107$
+                                    753 ;/tmp/_gbsbuild/src/core/Actor_b.c:125: hit_actor = ActorAt3x1Tile(tile_x, tile_y + 2, TRUE);
+      000337 F8 06                  754 	ldhl	sp,	#6
+      000339 7E                     755 	ld	a, (hl)
+      00033A 3C                     756 	inc	a
+      00033B 3C                     757 	inc	a
+      00033C 26 01                  758 	ld	h, #0x01
+      00033E E5                     759 	push	hl
+      00033F 33                     760 	inc	sp
+      000340 F5                     761 	push	af
+      000341 33                     762 	inc	sp
+      000342 F8 03                  763 	ldhl	sp,	#3
+      000344 7E                     764 	ld	a, (hl)
+      000345 F5                     765 	push	af
+      000346 33                     766 	inc	sp
+      000347 CDr00r00               767 	call	_ActorAt3x1Tile
+      00034A E8 03                  768 	add	sp, #3
+      00034C F8 00                  769 	ldhl	sp,	#0
+      00034E 73                     770 	ld	(hl), e
+      00034F 18 60                  771 	jr	00111$
+      000351                        772 00107$:
+                                    773 ;/tmp/_gbsbuild/src/core/Actor_b.c:127: if (actors[i].dir.x == -1) {
+      000351 F8 03                  774 	ldhl	sp,#3
+      000353 2A                     775 	ld	a, (hl+)
+      000354 5F                     776 	ld	e, a
+      000355 56                     777 	ld	d, (hl)
+      000356 1A                     778 	ld	a, (de)
+      000357 23                     779 	inc	hl
+      000358 23                     780 	inc	hl
+      000359 77                     781 	ld	(hl), a
+                                    782 ;/tmp/_gbsbuild/src/core/Actor_b.c:128: hit_actor = ActorAt1x2Tile(tile_x - 2, tile_y, TRUE);
+      00035A F8 01                  783 	ldhl	sp,	#1
+      00035C 7E                     784 	ld	a, (hl)
+      00035D F8 05                  785 	ldhl	sp,	#5
+                                    786 ;/tmp/_gbsbuild/src/core/Actor_b.c:127: if (actors[i].dir.x == -1) {
+      00035F 22                     787 	ld	(hl+), a
+      000360 7E                     788 	ld	a, (hl)
+      000361 3C                     789 	inc	a
+      000362 20 22                  790 	jr	NZ, 00104$
+                                    791 ;/tmp/_gbsbuild/src/core/Actor_b.c:128: hit_actor = ActorAt1x2Tile(tile_x - 2, tile_y, TRUE);
+      000364 F8 05                  792 	ldhl	sp,	#5
+      000366 7E                     793 	ld	a, (hl)
+      000367 3D                     794 	dec	a
+      000368 3D                     795 	dec	a
+      000369 26 01                  796 	ld	h, #0x01
+      00036B E5                     797 	push	hl
+      00036C 33                     798 	inc	sp
+      00036D F8 03                  799 	ldhl	sp,	#3
+      00036F 66                     800 	ld	h, (hl)
+      000370 E5                     801 	push	hl
+      000371 33                     802 	inc	sp
+      000372 F5                     803 	push	af
+      000373 33                     804 	inc	sp
+      000374 CDr00r00               805 	call	_ActorAt1x2Tile
+      000377 E8 03                  806 	add	sp, #3
+      000379 E5                     807 	push	hl
+      00037A F8 08                  808 	ldhl	sp,	#8
+      00037C 73                     809 	ld	(hl), e
+      00037D E1                     810 	pop	hl
+      00037E F8 06                  811 	ldhl	sp,	#6
+      000380 7E                     812 	ld	a, (hl)
+      000381 F8 00                  813 	ldhl	sp,	#0
+      000383 77                     814 	ld	(hl), a
+      000384 18 2B                  815 	jr	00111$
+      000386                        816 00104$:
+                                    817 ;/tmp/_gbsbuild/src/core/Actor_b.c:129: } else if (actors[i].dir.x == 1) {
+      000386 F8 06                  818 	ldhl	sp,	#6
+      000388 7E                     819 	ld	a, (hl)
+      000389 3D                     820 	dec	a
+      00038A 20 25                  821 	jr	NZ, 00111$
+                                    822 ;/tmp/_gbsbuild/src/core/Actor_b.c:130: hit_actor = ActorAt1x2Tile(tile_x + 2, tile_y, TRUE);
+      00038C F8 05                  823 	ldhl	sp,	#5
+      00038E 7E                     824 	ld	a, (hl)
+      00038F C6 02                  825 	add	a, #0x02
+      000391 23                     826 	inc	hl
+      000392 77                     827 	ld	(hl), a
+      000393 3E 01                  828 	ld	a, #0x01
+      000395 F5                     829 	push	af
+      000396 33                     830 	inc	sp
+      000397 F8 03                  831 	ldhl	sp,	#3
+      000399 7E                     832 	ld	a, (hl)
+      00039A F5                     833 	push	af
+      00039B 33                     834 	inc	sp
+      00039C F8 08                  835 	ldhl	sp,	#8
+      00039E 7E                     836 	ld	a, (hl)
+      00039F F5                     837 	push	af
+      0003A0 33                     838 	inc	sp
+      0003A1 CDr00r00               839 	call	_ActorAt1x2Tile
+      0003A4 E8 03                  840 	add	sp, #3
+      0003A6 E5                     841 	push	hl
+      0003A7 F8 08                  842 	ldhl	sp,	#8
+      0003A9 73                     843 	ld	(hl), e
+      0003AA E1                     844 	pop	hl
+      0003AB F8 06                  845 	ldhl	sp,	#6
+      0003AD 7E                     846 	ld	a, (hl)
+      0003AE F8 00                  847 	ldhl	sp,	#0
+      0003B0 77                     848 	ld	(hl), a
+      0003B1                        849 00111$:
+                                    850 ;/tmp/_gbsbuild/src/core/Actor_b.c:134: if (hit_actor == i) {
+      0003B1 F8 0D                  851 	ldhl	sp,	#13
+      0003B3 7E                     852 	ld	a, (hl)
+      0003B4 F8 00                  853 	ldhl	sp,	#0
+      0003B6 96                     854 	sub	a, (hl)
+      0003B7 20 04                  855 	jr	NZ, 00113$
+                                    856 ;/tmp/_gbsbuild/src/core/Actor_b.c:135: return NO_ACTOR_COLLISON;
+      0003B9 1E FF                  857 	ld	e, #0xff
+      0003BB 18 03                  858 	jr	00114$
+      0003BD                        859 00113$:
+                                    860 ;/tmp/_gbsbuild/src/core/Actor_b.c:138: return hit_actor;
+      0003BD F8 00                  861 	ldhl	sp,	#0
+      0003BF 5E                     862 	ld	e, (hl)
+      0003C0                        863 00114$:
+                                    864 ;/tmp/_gbsbuild/src/core/Actor_b.c:139: }
+      0003C0 E8 07                  865 	add	sp, #7
+      0003C2 C9                     866 	ret
+                                    867 ;/tmp/_gbsbuild/src/core/Actor_b.c:141: UBYTE CheckCollisionInDirection_b(UBYTE start_x, UBYTE start_y, UBYTE end_tile, COL_CHECK_DIR check_dir) __banked {
+                                    868 ;	---------------------------------
+                                    869 ; Function CheckCollisionInDirection_b
+                                    870 ; ---------------------------------
+                           000001   871 	b_CheckCollisionInDirection_b	= 1
+      0003C3                        872 _CheckCollisionInDirection_b::
+                                    873 ;/tmp/_gbsbuild/src/core/Actor_b.c:145: if (TileAt2x2(start_x - 1, start_y - 1) ||                                // Tile left
+      0003C3 F8 07                  874 	ldhl	sp,	#7
+                                    875 ;/tmp/_gbsbuild/src/core/Actor_b.c:144: while (start_x != end_tile) {
+      0003C5 3A                     876 	ld	a, (hl-)
+      0003C6 47                     877 	ld	b, a
+      0003C7 4E                     878 	ld	c, (hl)
+                                    879 ;/tmp/_gbsbuild/src/core/Actor_b.c:145: if (TileAt2x2(start_x - 1, start_y - 1) ||                                // Tile left
+      0003C8 05                     880 	dec	b
+                                    881 ;/tmp/_gbsbuild/src/core/Actor_b.c:142: switch (check_dir) {
+      0003C9 F8 09                  882 	ldhl	sp,	#9
+      0003CB 7E                     883 	ld	a, (hl)
+      0003CC 3D                     884 	dec	a
+      0003CD 28 1D                  885 	jr	Z, 00139$
+      0003CF F8 09                  886 	ldhl	sp,	#9
+      0003D1 7E                     887 	ld	a, (hl)
+      0003D2 D6 02                  888 	sub	a, #0x02
+      0003D4 28 4F                  889 	jr	Z, 00142$
+                                    890 ;/tmp/_gbsbuild/src/core/Actor_b.c:164: while (start_y != end_tile) {
+      0003D6 F8 07                  891 	ldhl	sp,	#7
+                                    892 ;/tmp/_gbsbuild/src/core/Actor_b.c:142: switch (check_dir) {
+      0003D8 2A                     893 	ld	a, (hl+)
+      0003D9 4F                     894 	ld	c, a
+      0003DA 23                     895 	inc	hl
+      0003DB 7E                     896 	ld	a, (hl)
+      0003DC D6 03                  897 	sub	a, #0x03
+      0003DE CAr60r04               898 	jp	Z,00145$
+      0003E1 F8 09                  899 	ldhl	sp,	#9
+      0003E3 7E                     900 	ld	a, (hl)
+      0003E4 D6 04                  901 	sub	a, #0x04
+      0003E6 CAr9Dr04               902 	jp	Z,00149$
+      0003E9 C3rF2r04               903 	jp	00130$
+                                    904 ;/tmp/_gbsbuild/src/core/Actor_b.c:144: while (start_x != end_tile) {
+      0003EC                        905 00139$:
+      0003EC                        906 00105$:
+      0003EC F8 08                  907 	ldhl	sp,	#8
+      0003EE 7E                     908 	ld	a, (hl)
+      0003EF 91                     909 	sub	a, c
+      0003F0 28 2F                  910 	jr	Z, 00107$
+                                    911 ;/tmp/_gbsbuild/src/core/Actor_b.c:145: if (TileAt2x2(start_x - 1, start_y - 1) ||                                // Tile left
+      0003F2 51                     912 	ld	d, c
+      0003F3 7A                     913 	ld	a, d
+      0003F4 3D                     914 	dec	a
+      0003F5 C5                     915 	push	bc
+      0003F6 D5                     916 	push	de
+      0003F7 C5                     917 	push	bc
+      0003F8 33                     918 	inc	sp
+      0003F9 F5                     919 	push	af
+      0003FA 33                     920 	inc	sp
+      0003FB CDr00r00               921 	call	_TileAt2x2
+      0003FE E8 02                  922 	add	sp, #2
+      000400 7B                     923 	ld	a, e
+      000401 D1                     924 	pop	de
+      000402 C1                     925 	pop	bc
+      000403 B7                     926 	or	a, a
+      000404 20 11                  927 	jr	NZ, 00102$
+                                    928 ;/tmp/_gbsbuild/src/core/Actor_b.c:146: ActorAt1x3Tile(start_x - 2, start_y - 1, FALSE) != NO_ACTOR_COLLISON  // Actor left
+      000406 15                     929 	dec	d
+      000407 15                     930 	dec	d
+      000408 C5                     931 	push	bc
+      000409 AF                     932 	xor	a, a
+      00040A F5                     933 	push	af
+      00040B 33                     934 	inc	sp
+      00040C 4A                     935 	ld	c, d
+      00040D C5                     936 	push	bc
+      00040E CDr00r00               937 	call	_ActorAt1x3Tile
+      000411 E8 03                  938 	add	sp, #3
+      000413 C1                     939 	pop	bc
+      000414 1C                     940 	inc	e
+      000415 28 04                  941 	jr	Z, 00103$
+      000417                        942 00102$:
+                                    943 ;/tmp/_gbsbuild/src/core/Actor_b.c:148: return start_x;
+      000417 F8 06                  944 	ldhl	sp,	#6
+      000419 5E                     945 	ld	e, (hl)
+      00041A C9                     946 	ret
+      00041B                        947 00103$:
+                                    948 ;/tmp/_gbsbuild/src/core/Actor_b.c:150: start_x--;
+      00041B 0D                     949 	dec	c
+      00041C F8 06                  950 	ldhl	sp,	#6
+      00041E 71                     951 	ld	(hl), c
+      00041F 18 CB                  952 	jr	00105$
+      000421                        953 00107$:
+                                    954 ;/tmp/_gbsbuild/src/core/Actor_b.c:152: return end_tile;
+      000421 F8 08                  955 	ldhl	sp,	#8
+      000423 5E                     956 	ld	e, (hl)
+      000424 C9                     957 	ret
+                                    958 ;/tmp/_gbsbuild/src/core/Actor_b.c:154: while (start_x != end_tile) {
+      000425                        959 00142$:
+      000425                        960 00112$:
+      000425 F8 08                  961 	ldhl	sp,	#8
+      000427 7E                     962 	ld	a, (hl)
+      000428 91                     963 	sub	a, c
+      000429 28 31                  964 	jr	Z, 00114$
+                                    965 ;/tmp/_gbsbuild/src/core/Actor_b.c:155: if (TileAt2x2(start_x + 1, start_y - 1) ||                                // Tile right
+      00042B 59                     966 	ld	e, c
+      00042C 7B                     967 	ld	a, e
+      00042D 3C                     968 	inc	a
+      00042E C5                     969 	push	bc
+      00042F D5                     970 	push	de
+      000430 C5                     971 	push	bc
+      000431 33                     972 	inc	sp
+      000432 F5                     973 	push	af
+      000433 33                     974 	inc	sp
+      000434 CDr00r00               975 	call	_TileAt2x2
+      000437 E8 02                  976 	add	sp, #2
+      000439 7B                     977 	ld	a, e
+      00043A D1                     978 	pop	de
+      00043B C1                     979 	pop	bc
+      00043C B7                     980 	or	a, a
+      00043D 20 13                  981 	jr	NZ, 00109$
+                                    982 ;/tmp/_gbsbuild/src/core/Actor_b.c:156: ActorAt1x3Tile(start_x + 2, start_y - 1, FALSE) != NO_ACTOR_COLLISON  // Actor right
+      00043F 7B                     983 	ld	a, e
+      000440 3C                     984 	inc	a
+      000441 3C                     985 	inc	a
+      000442 C5                     986 	push	bc
+      000443 26 00                  987 	ld	h, #0x00
+      000445 68                     988 	ld	l, b
+      000446 E5                     989 	push	hl
+      000447 F5                     990 	push	af
+      000448 33                     991 	inc	sp
+      000449 CDr00r00               992 	call	_ActorAt1x3Tile
+      00044C E8 03                  993 	add	sp, #3
+      00044E C1                     994 	pop	bc
+      00044F 1C                     995 	inc	e
+      000450 28 04                  996 	jr	Z, 00110$
+      000452                        997 00109$:
+                                    998 ;/tmp/_gbsbuild/src/core/Actor_b.c:158: return start_x;
+      000452 F8 06                  999 	ldhl	sp,	#6
+      000454 5E                    1000 	ld	e, (hl)
+      000455 C9                    1001 	ret
+      000456                       1002 00110$:
+                                   1003 ;/tmp/_gbsbuild/src/core/Actor_b.c:160: start_x++;
+      000456 0C                    1004 	inc	c
+      000457 F8 06                 1005 	ldhl	sp,	#6
+      000459 71                    1006 	ld	(hl), c
+      00045A 18 C9                 1007 	jr	00112$
+      00045C                       1008 00114$:
+                                   1009 ;/tmp/_gbsbuild/src/core/Actor_b.c:162: return end_tile;
+      00045C F8 08                 1010 	ldhl	sp,	#8
+      00045E 5E                    1011 	ld	e, (hl)
+      00045F C9                    1012 	ret
+                                   1013 ;/tmp/_gbsbuild/src/core/Actor_b.c:164: while (start_y != end_tile) {
+      000460                       1014 00145$:
+      000460                       1015 00119$:
+      000460 F8 08                 1016 	ldhl	sp,	#8
+      000462 7E                    1017 	ld	a, (hl)
+      000463 91                    1018 	sub	a, c
+      000464 28 33                 1019 	jr	Z, 00121$
+                                   1020 ;/tmp/_gbsbuild/src/core/Actor_b.c:165: if (TileAt2x2(start_x, start_y - 2) ||                                      // Tile up
+      000466 41                    1021 	ld	b, c
+      000467 05                    1022 	dec	b
+      000468 05                    1023 	dec	b
+      000469 C5                    1024 	push	bc
+      00046A C5                    1025 	push	bc
+      00046B 33                    1026 	inc	sp
+      00046C F8 09                 1027 	ldhl	sp,	#9
+      00046E 7E                    1028 	ld	a, (hl)
+      00046F F5                    1029 	push	af
+      000470 33                    1030 	inc	sp
+      000471 CDr00r00              1031 	call	_TileAt2x2
+      000474 E8 02                 1032 	add	sp, #2
+      000476 7B                    1033 	ld	a, e
+      000477 C1                    1034 	pop	bc
+      000478 B7                    1035 	or	a, a
+      000479 20 14                 1036 	jr	NZ, 00116$
+                                   1037 ;/tmp/_gbsbuild/src/core/Actor_b.c:166: (ActorAt3x1Tile(start_x, start_y - 2, FALSE) != NO_ACTOR_COLLISON)  // Actor up
+      00047B C5                    1038 	push	bc
+      00047C AF                    1039 	xor	a, a
+      00047D F5                    1040 	push	af
+      00047E 33                    1041 	inc	sp
+      00047F C5                    1042 	push	bc
+      000480 33                    1043 	inc	sp
+      000481 F8 0A                 1044 	ldhl	sp,	#10
+      000483 7E                    1045 	ld	a, (hl)
+      000484 F5                    1046 	push	af
+      000485 33                    1047 	inc	sp
+      000486 CDr00r00              1048 	call	_ActorAt3x1Tile
+      000489 E8 03                 1049 	add	sp, #3
+      00048B C1                    1050 	pop	bc
+      00048C 1C                    1051 	inc	e
+      00048D 28 04                 1052 	jr	Z, 00117$
+      00048F                       1053 00116$:
+                                   1054 ;/tmp/_gbsbuild/src/core/Actor_b.c:168: return start_y;
+      00048F F8 07                 1055 	ldhl	sp,	#7
+      000491 5E                    1056 	ld	e, (hl)
+      000492 C9                    1057 	ret
+      000493                       1058 00117$:
+                                   1059 ;/tmp/_gbsbuild/src/core/Actor_b.c:170: start_y--;
+      000493 0D                    1060 	dec	c
+      000494 F8 07                 1061 	ldhl	sp,	#7
+      000496 71                    1062 	ld	(hl), c
+      000497 18 C7                 1063 	jr	00119$
+      000499                       1064 00121$:
+                                   1065 ;/tmp/_gbsbuild/src/core/Actor_b.c:172: return end_tile;
+      000499 F8 08                 1066 	ldhl	sp,	#8
+      00049B 5E                    1067 	ld	e, (hl)
+      00049C C9                    1068 	ret
+                                   1069 ;/tmp/_gbsbuild/src/core/Actor_b.c:174: while (start_y != end_tile) {
+      00049D                       1070 00149$:
+      00049D                       1071 00127$:
+      00049D F8 08                 1072 	ldhl	sp,	#8
+      00049F 7E                    1073 	ld	a, (hl)
+      0004A0 91                    1074 	sub	a, c
+      0004A1 28 4B                 1075 	jr	Z, 00129$
+                                   1076 ;/tmp/_gbsbuild/src/core/Actor_b.c:175: if (TileAt2x2(start_x, start_y) ||  // Tile down
+      0004A3 C5                    1077 	push	bc
+      0004A4 79                    1078 	ld	a, c
+      0004A5 F5                    1079 	push	af
+      0004A6 33                    1080 	inc	sp
+      0004A7 F8 09                 1081 	ldhl	sp,	#9
+      0004A9 7E                    1082 	ld	a, (hl)
+      0004AA F5                    1083 	push	af
+      0004AB 33                    1084 	inc	sp
+      0004AC CDr00r00              1085 	call	_TileAt2x2
+      0004AF E8 02                 1086 	add	sp, #2
+      0004B1 7B                    1087 	ld	a, e
+      0004B2 C1                    1088 	pop	bc
+      0004B3 B7                    1089 	or	a, a
+      0004B4 20 2E                 1090 	jr	NZ, 00123$
+                                   1091 ;/tmp/_gbsbuild/src/core/Actor_b.c:176: ActorAt3x1Tile(start_x, start_y + 1, FALSE) !=
+      0004B6 41                    1092 	ld	b, c
+      0004B7 78                    1093 	ld	a, b
+      0004B8 3C                    1094 	inc	a
+      0004B9 C5                    1095 	push	bc
+      0004BA 26 00                 1096 	ld	h, #0x00
+      0004BC E5                    1097 	push	hl
+      0004BD 33                    1098 	inc	sp
+      0004BE F5                    1099 	push	af
+      0004BF 33                    1100 	inc	sp
+      0004C0 F8 0A                 1101 	ldhl	sp,	#10
+      0004C2 7E                    1102 	ld	a, (hl)
+      0004C3 F5                    1103 	push	af
+      0004C4 33                    1104 	inc	sp
+      0004C5 CDr00r00              1105 	call	_ActorAt3x1Tile
+      0004C8 E8 03                 1106 	add	sp, #3
+      0004CA C1                    1107 	pop	bc
+      0004CB 1C                    1108 	inc	e
+      0004CC 20 16                 1109 	jr	NZ, 00123$
+                                   1110 ;/tmp/_gbsbuild/src/core/Actor_b.c:178: ActorAt3x1Tile(start_x, start_y + 2, FALSE) !=
+      0004CE 04                    1111 	inc	b
+      0004CF 04                    1112 	inc	b
+      0004D0 C5                    1113 	push	bc
+      0004D1 AF                    1114 	xor	a, a
+      0004D2 F5                    1115 	push	af
+      0004D3 33                    1116 	inc	sp
+      0004D4 C5                    1117 	push	bc
+      0004D5 33                    1118 	inc	sp
+      0004D6 F8 0A                 1119 	ldhl	sp,	#10
+      0004D8 7E                    1120 	ld	a, (hl)
+      0004D9 F5                    1121 	push	af
+      0004DA 33                    1122 	inc	sp
+      0004DB CDr00r00              1123 	call	_ActorAt3x1Tile
+      0004DE E8 03                 1124 	add	sp, #3
+      0004E0 C1                    1125 	pop	bc
+      0004E1 1C                    1126 	inc	e
+      0004E2 28 04                 1127 	jr	Z, 00124$
+      0004E4                       1128 00123$:
+                                   1129 ;/tmp/_gbsbuild/src/core/Actor_b.c:181: return start_y;
+      0004E4 F8 07                 1130 	ldhl	sp,	#7
+      0004E6 5E                    1131 	ld	e, (hl)
+      0004E7 C9                    1132 	ret
+      0004E8                       1133 00124$:
+                                   1134 ;/tmp/_gbsbuild/src/core/Actor_b.c:183: start_y++;
+      0004E8 0C                    1135 	inc	c
+      0004E9 F8 07                 1136 	ldhl	sp,	#7
+      0004EB 71                    1137 	ld	(hl), c
+      0004EC 18 AF                 1138 	jr	00127$
+      0004EE                       1139 00129$:
+                                   1140 ;/tmp/_gbsbuild/src/core/Actor_b.c:185: return end_tile;
+      0004EE F8 08                 1141 	ldhl	sp,	#8
+      0004F0 5E                    1142 	ld	e, (hl)
+      0004F1 C9                    1143 	ret
+                                   1144 ;/tmp/_gbsbuild/src/core/Actor_b.c:186: }
+      0004F2                       1145 00130$:
+                                   1146 ;/tmp/_gbsbuild/src/core/Actor_b.c:187: return end_tile;
+      0004F2 F8 08                 1147 	ldhl	sp,	#8
+      0004F4 5E                    1148 	ld	e, (hl)
+                                   1149 ;/tmp/_gbsbuild/src/core/Actor_b.c:188: }
+      0004F5 C9                    1150 	ret
+                                   1151 ;/tmp/_gbsbuild/src/core/Actor_b.c:190: UBYTE ActorAtTile_b(UBYTE tx, UBYTE ty, UBYTE inc_noclip) __banked {
+                                   1152 ;	---------------------------------
+                                   1153 ; Function ActorAtTile_b
+                                   1154 ; ---------------------------------
+                           000001  1155 	b_ActorAtTile_b	= 1
+      0004F6                       1156 _ActorAtTile_b::
+      0004F6 E8 FC                 1157 	add	sp, #-4
+                                   1158 ;/tmp/_gbsbuild/src/core/Actor_b.c:193: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      0004F8 FAr00r00              1159 	ld	a, (#_actors_active_size)
+      0004FB C6 FF                 1160 	add	a, #0xff
+      0004FD F8 03                 1161 	ldhl	sp,	#3
+      0004FF 77                    1162 	ld	(hl), a
+      000500                       1163 00114$:
+      000500 F8 03                 1164 	ldhl	sp,	#3
+      000502 7E                    1165 	ld	a, (hl)
+      000503 3C                    1166 	inc	a
+      000504 CArBEr05              1167 	jp	Z,00112$
+                                   1168 ;/tmp/_gbsbuild/src/core/Actor_b.c:194: UBYTE a = actors_active[i];
+                                   1169 ;c
+      000507 11r00r00              1170 	ld	de, #_actors_active
+      00050A F8 03                 1171 	ldhl	sp,	#3
+      00050C 6E                    1172 	ld	l, (hl)
+      00050D 26 00                 1173 	ld	h, #0x00
+      00050F 19                    1174 	add	hl, de
+      000510 4D                    1175 	ld	c, l
+      000511 44                    1176 	ld	b, h
+      000512 0A                    1177 	ld	a, (bc)
+      000513 F8 00                 1178 	ldhl	sp,	#0
+      000515 77                    1179 	ld	(hl), a
+                                   1180 ;/tmp/_gbsbuild/src/core/Actor_b.c:197: if (!actors[a].enabled || (!inc_noclip && !actors[a].collisionsEnabled)) {
+      000516 4E                    1181 	ld	c, (hl)
+      000517 06 00                 1182 	ld	b, #0x00
+      000519 69                    1183 	ld	l, c
+      00051A 60                    1184 	ld	h, b
+      00051B 29                    1185 	add	hl, hl
+      00051C 29                    1186 	add	hl, hl
+      00051D 09                    1187 	add	hl, bc
+      00051E 29                    1188 	add	hl, hl
+      00051F 09                    1189 	add	hl, bc
+      000520 29                    1190 	add	hl, hl
+      000521 09                    1191 	add	hl, bc
+      000522 29                    1192 	add	hl, hl
+      000523 7D                    1193 	ld	a, l
+      000524 C6r00                 1194 	add	a, #<(_actors)
+      000526 4F                    1195 	ld	c, a
+      000527 7C                    1196 	ld	a, h
+      000528 CEs00                 1197 	adc	a, #>(_actors)
+      00052A 47                    1198 	ld	b, a
+      00052B 21 12 00              1199 	ld	hl, #0x0012
+      00052E 09                    1200 	add	hl, bc
+      00052F 7E                    1201 	ld	a, (hl)
+      000530 B7                    1202 	or	a, a
+      000531 CArB8r05              1203 	jp	Z, 00111$
+      000534 F8 0C                 1204 	ldhl	sp,	#12
+      000536 7E                    1205 	ld	a, (hl)
+      000537 B7                    1206 	or	a, a
+      000538 20 08                 1207 	jr	NZ, 00102$
+      00053A 21 17 00              1208 	ld	hl, #0x0017
+      00053D 09                    1209 	add	hl, bc
+      00053E 7E                    1210 	ld	a, (hl)
+      00053F B7                    1211 	or	a, a
+      000540 28 76                 1212 	jr	Z, 00111$
+                                   1213 ;/tmp/_gbsbuild/src/core/Actor_b.c:198: continue;
+      000542                       1214 00102$:
+                                   1215 ;/tmp/_gbsbuild/src/core/Actor_b.c:201: a_tx = DIV_8(actors[a].pos.x);
+      000542 69                    1216 	ld	l, c
+      000543 60                    1217 	ld	h, b
+      000544 2A                    1218 	ld	a, (hl+)
+      000545 66                    1219 	ld	h, (hl)
+      000546 5F                    1220 	ld	e, a
+      000547 54                    1221 	ld	d, h
+      000548 CB 2A                 1222 	sra	d
+      00054A CB 1B                 1223 	rr	e
+      00054C CB 2A                 1224 	sra	d
+      00054E CB 1B                 1225 	rr	e
+      000550 CB 2A                 1226 	sra	d
+      000552 CB 1B                 1227 	rr	e
+      000554 F8 02                 1228 	ldhl	sp,	#2
+      000556 73                    1229 	ld	(hl), e
+                                   1230 ;/tmp/_gbsbuild/src/core/Actor_b.c:202: a_ty = DIV_8(actors[a].pos.y);
+      000557 03                    1231 	inc	bc
+      000558 03                    1232 	inc	bc
+      000559 60                    1233 	ld	h, b
+      00055A 69                    1234 	ld	l, c
+      00055B 2A                    1235 	ld	a, (hl+)
+      00055C 4F                    1236 	ld	c, a
+      00055D 46                    1237 	ld	b, (hl)
+      00055E CB 28                 1238 	sra	b
+      000560 CB 19                 1239 	rr	c
+      000562 CB 28                 1240 	sra	b
+      000564 CB 19                 1241 	rr	c
+      000566 CB 28                 1242 	sra	b
+      000568 CB 19                 1243 	rr	c
+                                   1244 ;/tmp/_gbsbuild/src/core/Actor_b.c:204: if ((ty == a_ty || ty == a_ty + 1) && (tx == a_tx || tx == a_tx + 1 || tx == a_tx - 1)) {
+      00056A F8 0B                 1245 	ldhl	sp,	#11
+      00056C 7E                    1246 	ld	a, (hl)
+      00056D 91                    1247 	sub	a, c
+      00056E 28 10                 1248 	jr	Z, 00110$
+      000570 06 00                 1249 	ld	b, #0x00
+      000572 03                    1250 	inc	bc
+      000573 F8 0B                 1251 	ldhl	sp,	#11
+      000575 5E                    1252 	ld	e, (hl)
+      000576 16 00                 1253 	ld	d, #0x00
+      000578 7B                    1254 	ld	a, e
+      000579 91                    1255 	sub	a, c
+      00057A 20 3C                 1256 	jr	NZ, 00111$
+      00057C 7A                    1257 	ld	a, d
+      00057D 90                    1258 	sub	a, b
+      00057E 20 38                 1259 	jr	NZ, 00111$
+      000580                       1260 00110$:
+      000580 F8 0A                 1261 	ldhl	sp,	#10
+      000582 7E                    1262 	ld	a, (hl)
+      000583 F8 02                 1263 	ldhl	sp,	#2
+      000585 96                    1264 	sub	a, (hl)
+      000586 28 2B                 1265 	jr	Z, 00105$
+      000588 F8 02                 1266 	ldhl	sp,	#2
+      00058A 4E                    1267 	ld	c, (hl)
+      00058B 06 00                 1268 	ld	b, #0x00
+      00058D 69                    1269 	ld	l, c
+      00058E 60                    1270 	ld	h, b
+      00058F 23                    1271 	inc	hl
+      000590 E5                    1272 	push	hl
+      000591 7D                    1273 	ld	a, l
+      000592 F8 03                 1274 	ldhl	sp,	#3
+      000594 77                    1275 	ld	(hl), a
+      000595 E1                    1276 	pop	hl
+      000596 7C                    1277 	ld	a, h
+      000597 F8 02                 1278 	ldhl	sp,	#2
+      000599 77                    1279 	ld	(hl), a
+      00059A F8 0A                 1280 	ldhl	sp,	#10
+      00059C 5E                    1281 	ld	e, (hl)
+      00059D 16 00                 1282 	ld	d, #0x00
+      00059F F8 01                 1283 	ldhl	sp,	#1
+      0005A1 7E                    1284 	ld	a, (hl)
+      0005A2 93                    1285 	sub	a, e
+      0005A3 20 05                 1286 	jr	NZ, 00157$
+      0005A5 23                    1287 	inc	hl
+      0005A6 7E                    1288 	ld	a, (hl)
+      0005A7 92                    1289 	sub	a, d
+      0005A8 28 09                 1290 	jr	Z, 00105$
+      0005AA                       1291 00157$:
+      0005AA 0B                    1292 	dec	bc
+      0005AB 79                    1293 	ld	a, c
+      0005AC 93                    1294 	sub	a, e
+      0005AD 20 09                 1295 	jr	NZ, 00111$
+      0005AF 78                    1296 	ld	a, b
+      0005B0 92                    1297 	sub	a, d
+      0005B1 20 05                 1298 	jr	NZ, 00111$
+      0005B3                       1299 00105$:
+                                   1300 ;/tmp/_gbsbuild/src/core/Actor_b.c:205: return a;
+      0005B3 F8 00                 1301 	ldhl	sp,	#0
+      0005B5 5E                    1302 	ld	e, (hl)
+      0005B6 18 08                 1303 	jr	00115$
+      0005B8                       1304 00111$:
+                                   1305 ;/tmp/_gbsbuild/src/core/Actor_b.c:193: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      0005B8 F8 03                 1306 	ldhl	sp,	#3
+      0005BA 35                    1307 	dec	(hl)
+      0005BB C3r00r05              1308 	jp	00114$
+      0005BE                       1309 00112$:
+                                   1310 ;/tmp/_gbsbuild/src/core/Actor_b.c:208: return NO_ACTOR_COLLISON;
+      0005BE 1E FF                 1311 	ld	e, #0xff
+      0005C0                       1312 00115$:
+                                   1313 ;/tmp/_gbsbuild/src/core/Actor_b.c:209: }
+      0005C0 E8 04                 1314 	add	sp, #4
+      0005C2 C9                    1315 	ret
+                                   1316 ;/tmp/_gbsbuild/src/core/Actor_b.c:211: UBYTE ActorAt1x2Tile_b(UBYTE tx, UBYTE ty, UBYTE inc_noclip) __banked {
+                                   1317 ;	---------------------------------
+                                   1318 ; Function ActorAt1x2Tile_b
+                                   1319 ; ---------------------------------
+                           000001  1320 	b_ActorAt1x2Tile_b	= 1
+      0005C3                       1321 _ActorAt1x2Tile_b::
+      0005C3 E8 FD                 1322 	add	sp, #-3
+                                   1323 ;/tmp/_gbsbuild/src/core/Actor_b.c:214: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      0005C5 FAr00r00              1324 	ld	a, (#_actors_active_size)
+      0005C8 C6 FF                 1325 	add	a, #0xff
+      0005CA F8 02                 1326 	ldhl	sp,	#2
+      0005CC 77                    1327 	ld	(hl), a
+      0005CD                       1328 00112$:
+      0005CD F8 02                 1329 	ldhl	sp,	#2
+      0005CF 7E                    1330 	ld	a, (hl)
+      0005D0 3C                    1331 	inc	a
+      0005D1 CAr5Fr06              1332 	jp	Z,00110$
+                                   1333 ;/tmp/_gbsbuild/src/core/Actor_b.c:215: UBYTE a = actors_active[i];
+                                   1334 ;c
+      0005D4 11r00r00              1335 	ld	de, #_actors_active
+      0005D7 F8 02                 1336 	ldhl	sp,	#2
+      0005D9 6E                    1337 	ld	l, (hl)
+      0005DA 26 00                 1338 	ld	h, #0x00
+      0005DC 19                    1339 	add	hl, de
+      0005DD 4D                    1340 	ld	c, l
+      0005DE 44                    1341 	ld	b, h
+      0005DF 0A                    1342 	ld	a, (bc)
+      0005E0 F8 00                 1343 	ldhl	sp,	#0
+      0005E2 77                    1344 	ld	(hl), a
+                                   1345 ;/tmp/_gbsbuild/src/core/Actor_b.c:218: if (!actors[a].enabled || (!inc_noclip && !actors[a].collisionsEnabled)) {
+      0005E3 4E                    1346 	ld	c, (hl)
+      0005E4 06 00                 1347 	ld	b, #0x00
+      0005E6 69                    1348 	ld	l, c
+      0005E7 60                    1349 	ld	h, b
+      0005E8 29                    1350 	add	hl, hl
+      0005E9 29                    1351 	add	hl, hl
+      0005EA 09                    1352 	add	hl, bc
+      0005EB 29                    1353 	add	hl, hl
+      0005EC 09                    1354 	add	hl, bc
+      0005ED 29                    1355 	add	hl, hl
+      0005EE 09                    1356 	add	hl, bc
+      0005EF 29                    1357 	add	hl, hl
+      0005F0 7D                    1358 	ld	a, l
+      0005F1 C6r00                 1359 	add	a, #<(_actors)
+      0005F3 4F                    1360 	ld	c, a
+      0005F4 7C                    1361 	ld	a, h
+      0005F5 CEs00                 1362 	adc	a, #>(_actors)
+      0005F7 47                    1363 	ld	b, a
+      0005F8 21 12 00              1364 	ld	hl, #0x0012
+      0005FB 09                    1365 	add	hl, bc
+      0005FC 7E                    1366 	ld	a, (hl)
+      0005FD B7                    1367 	or	a, a
+      0005FE 28 59                 1368 	jr	Z, 00109$
+      000600 F8 0B                 1369 	ldhl	sp,	#11
+      000602 7E                    1370 	ld	a, (hl)
+      000603 B7                    1371 	or	a, a
+      000604 20 08                 1372 	jr	NZ, 00102$
+      000606 21 17 00              1373 	ld	hl, #0x0017
+      000609 09                    1374 	add	hl, bc
+      00060A 7E                    1375 	ld	a, (hl)
+      00060B B7                    1376 	or	a, a
+      00060C 28 4B                 1377 	jr	Z, 00109$
+                                   1378 ;/tmp/_gbsbuild/src/core/Actor_b.c:219: continue;
+      00060E                       1379 00102$:
+                                   1380 ;/tmp/_gbsbuild/src/core/Actor_b.c:222: a_tx = DIV_8(actors[a].pos.x);
+      00060E 69                    1381 	ld	l, c
+      00060F 60                    1382 	ld	h, b
+      000610 2A                    1383 	ld	a, (hl+)
+      000611 66                    1384 	ld	h, (hl)
+      000612 5F                    1385 	ld	e, a
+      000613 54                    1386 	ld	d, h
+      000614 CB 2A                 1387 	sra	d
+      000616 CB 1B                 1388 	rr	e
+      000618 CB 2A                 1389 	sra	d
+      00061A CB 1B                 1390 	rr	e
+      00061C CB 2A                 1391 	sra	d
+      00061E CB 1B                 1392 	rr	e
+      000620 F8 01                 1393 	ldhl	sp,	#1
+      000622 73                    1394 	ld	(hl), e
+                                   1395 ;/tmp/_gbsbuild/src/core/Actor_b.c:223: a_ty = DIV_8(actors[a].pos.y);
+      000623 03                    1396 	inc	bc
+      000624 03                    1397 	inc	bc
+      000625 60                    1398 	ld	h, b
+      000626 69                    1399 	ld	l, c
+      000627 2A                    1400 	ld	a, (hl+)
+      000628 4F                    1401 	ld	c, a
+      000629 46                    1402 	ld	b, (hl)
+      00062A CB 28                 1403 	sra	b
+      00062C CB 19                 1404 	rr	c
+      00062E CB 28                 1405 	sra	b
+      000630 CB 19                 1406 	rr	c
+      000632 CB 28                 1407 	sra	b
+      000634 CB 19                 1408 	rr	c
+                                   1409 ;/tmp/_gbsbuild/src/core/Actor_b.c:225: if ((ty == a_ty || ty == a_ty - 1) && (tx == a_tx)) {
+      000636 F8 0A                 1410 	ldhl	sp,	#10
+      000638 7E                    1411 	ld	a, (hl)
+      000639 91                    1412 	sub	a, c
+      00063A 28 10                 1413 	jr	Z, 00108$
+      00063C 06 00                 1414 	ld	b, #0x00
+      00063E 0B                    1415 	dec	bc
+      00063F F8 0A                 1416 	ldhl	sp,	#10
+      000641 5E                    1417 	ld	e, (hl)
+      000642 16 00                 1418 	ld	d, #0x00
+      000644 7B                    1419 	ld	a, e
+      000645 91                    1420 	sub	a, c
+      000646 20 11                 1421 	jr	NZ, 00109$
+      000648 7A                    1422 	ld	a, d
+      000649 90                    1423 	sub	a, b
+      00064A 20 0D                 1424 	jr	NZ, 00109$
+      00064C                       1425 00108$:
+      00064C F8 09                 1426 	ldhl	sp,	#9
+      00064E 7E                    1427 	ld	a, (hl)
+      00064F F8 01                 1428 	ldhl	sp,	#1
+      000651 96                    1429 	sub	a, (hl)
+      000652 20 05                 1430 	jr	NZ, 00109$
+                                   1431 ;/tmp/_gbsbuild/src/core/Actor_b.c:226: return a;
+      000654 F8 00                 1432 	ldhl	sp,	#0
+      000656 5E                    1433 	ld	e, (hl)
+      000657 18 08                 1434 	jr	00113$
+      000659                       1435 00109$:
+                                   1436 ;/tmp/_gbsbuild/src/core/Actor_b.c:214: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      000659 F8 02                 1437 	ldhl	sp,	#2
+      00065B 35                    1438 	dec	(hl)
+      00065C C3rCDr05              1439 	jp	00112$
+      00065F                       1440 00110$:
+                                   1441 ;/tmp/_gbsbuild/src/core/Actor_b.c:229: return NO_ACTOR_COLLISON;
+      00065F 1E FF                 1442 	ld	e, #0xff
+      000661                       1443 00113$:
+                                   1444 ;/tmp/_gbsbuild/src/core/Actor_b.c:230: }
+      000661 E8 03                 1445 	add	sp, #3
+      000663 C9                    1446 	ret
+                                   1447 ;/tmp/_gbsbuild/src/core/Actor_b.c:232: UBYTE ActorAt1x3Tile_b(UBYTE tx, UBYTE ty, UBYTE inc_noclip) __banked {
+                                   1448 ;	---------------------------------
+                                   1449 ; Function ActorAt1x3Tile_b
+                                   1450 ; ---------------------------------
+                           000001  1451 	b_ActorAt1x3Tile_b	= 1
+      000664                       1452 _ActorAt1x3Tile_b::
+      000664 E8 FB                 1453 	add	sp, #-5
+                                   1454 ;/tmp/_gbsbuild/src/core/Actor_b.c:235: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      000666 FAr00r00              1455 	ld	a, (#_actors_active_size)
+      000669 C6 FF                 1456 	add	a, #0xff
+      00066B F8 04                 1457 	ldhl	sp,	#4
+      00066D 77                    1458 	ld	(hl), a
+      00066E                       1459 00113$:
+      00066E F8 04                 1460 	ldhl	sp,	#4
+      000670 7E                    1461 	ld	a, (hl)
+      000671 3C                    1462 	inc	a
+      000672 CAr18r07              1463 	jp	Z,00111$
+                                   1464 ;/tmp/_gbsbuild/src/core/Actor_b.c:236: UBYTE a = actors_active[i];
+                                   1465 ;c
+      000675 11r00r00              1466 	ld	de, #_actors_active
+      000678 F8 04                 1467 	ldhl	sp,	#4
+      00067A 6E                    1468 	ld	l, (hl)
+      00067B 26 00                 1469 	ld	h, #0x00
+      00067D 19                    1470 	add	hl, de
+      00067E 4D                    1471 	ld	c, l
+      00067F 44                    1472 	ld	b, h
+      000680 0A                    1473 	ld	a, (bc)
+      000681 F8 00                 1474 	ldhl	sp,	#0
+      000683 77                    1475 	ld	(hl), a
+                                   1476 ;/tmp/_gbsbuild/src/core/Actor_b.c:239: if (!actors[a].enabled || (!inc_noclip && !actors[a].collisionsEnabled)) {
+      000684 4E                    1477 	ld	c, (hl)
+      000685 06 00                 1478 	ld	b, #0x00
+      000687 69                    1479 	ld	l, c
+      000688 60                    1480 	ld	h, b
+      000689 29                    1481 	add	hl, hl
+      00068A 29                    1482 	add	hl, hl
+      00068B 09                    1483 	add	hl, bc
+      00068C 29                    1484 	add	hl, hl
+      00068D 09                    1485 	add	hl, bc
+      00068E 29                    1486 	add	hl, hl
+      00068F 09                    1487 	add	hl, bc
+      000690 29                    1488 	add	hl, hl
+      000691 7D                    1489 	ld	a, l
+      000692 C6r00                 1490 	add	a, #<(_actors)
+      000694 4F                    1491 	ld	c, a
+      000695 7C                    1492 	ld	a, h
+      000696 CEs00                 1493 	adc	a, #>(_actors)
+      000698 47                    1494 	ld	b, a
+      000699 21 12 00              1495 	ld	hl, #0x0012
+      00069C 09                    1496 	add	hl, bc
+      00069D 7E                    1497 	ld	a, (hl)
+      00069E B7                    1498 	or	a, a
+      00069F 28 71                 1499 	jr	Z, 00110$
+      0006A1 F8 0D                 1500 	ldhl	sp,	#13
+      0006A3 7E                    1501 	ld	a, (hl)
+      0006A4 B7                    1502 	or	a, a
+      0006A5 20 08                 1503 	jr	NZ, 00102$
+      0006A7 21 17 00              1504 	ld	hl, #0x0017
+      0006AA 09                    1505 	add	hl, bc
+      0006AB 7E                    1506 	ld	a, (hl)
+      0006AC B7                    1507 	or	a, a
+      0006AD 28 63                 1508 	jr	Z, 00110$
+                                   1509 ;/tmp/_gbsbuild/src/core/Actor_b.c:240: continue;
+      0006AF                       1510 00102$:
+                                   1511 ;/tmp/_gbsbuild/src/core/Actor_b.c:243: a_tx = DIV_8(actors[a].pos.x);
+      0006AF 69                    1512 	ld	l, c
+      0006B0 60                    1513 	ld	h, b
+      0006B1 2A                    1514 	ld	a, (hl+)
+      0006B2 66                    1515 	ld	h, (hl)
+      0006B3 5F                    1516 	ld	e, a
+      0006B4 54                    1517 	ld	d, h
+      0006B5 CB 2A                 1518 	sra	d
+      0006B7 CB 1B                 1519 	rr	e
+      0006B9 CB 2A                 1520 	sra	d
+      0006BB CB 1B                 1521 	rr	e
+      0006BD CB 2A                 1522 	sra	d
+      0006BF CB 1B                 1523 	rr	e
+      0006C1 F8 01                 1524 	ldhl	sp,	#1
+      0006C3 73                    1525 	ld	(hl), e
+                                   1526 ;/tmp/_gbsbuild/src/core/Actor_b.c:244: a_ty = DIV_8(actors[a].pos.y);
+      0006C4 03                    1527 	inc	bc
+      0006C5 03                    1528 	inc	bc
+      0006C6 60                    1529 	ld	h, b
+      0006C7 69                    1530 	ld	l, c
+      0006C8 2A                    1531 	ld	a, (hl+)
+      0006C9 4F                    1532 	ld	c, a
+      0006CA 46                    1533 	ld	b, (hl)
+      0006CB CB 28                 1534 	sra	b
+      0006CD CB 19                 1535 	rr	c
+      0006CF CB 28                 1536 	sra	b
+      0006D1 CB 19                 1537 	rr	c
+      0006D3 CB 28                 1538 	sra	b
+      0006D5 CB 19                 1539 	rr	c
+                                   1540 ;/tmp/_gbsbuild/src/core/Actor_b.c:246: if ((ty == a_ty || ty == a_ty - 1 || ty == a_ty - 2) && (tx == a_tx)) {
+      0006D7 F8 0C                 1541 	ldhl	sp,	#12
+      0006D9 7E                    1542 	ld	a, (hl)
+      0006DA 91                    1543 	sub	a, c
+      0006DB 28 28                 1544 	jr	Z, 00109$
+      0006DD 06 00                 1545 	ld	b, #0x00
+      0006DF 11 01 00              1546 	ld	de, #0x0001
+      0006E2 79                    1547 	ld	a, c
+      0006E3 93                    1548 	sub	a, e
+      0006E4 5F                    1549 	ld	e, a
+      0006E5 78                    1550 	ld	a, b
+      0006E6 9A                    1551 	sbc	a, d
+      0006E7 F8 03                 1552 	ldhl	sp,	#3
+      0006E9 32                    1553 	ld	(hl-), a
+      0006EA 73                    1554 	ld	(hl), e
+      0006EB F8 0C                 1555 	ldhl	sp,	#12
+      0006ED 5E                    1556 	ld	e, (hl)
+      0006EE 16 00                 1557 	ld	d, #0x00
+      0006F0 F8 02                 1558 	ldhl	sp,	#2
+      0006F2 7E                    1559 	ld	a, (hl)
+      0006F3 93                    1560 	sub	a, e
+      0006F4 20 05                 1561 	jr	NZ, 00153$
+      0006F6 23                    1562 	inc	hl
+      0006F7 7E                    1563 	ld	a, (hl)
+      0006F8 92                    1564 	sub	a, d
+      0006F9 28 0A                 1565 	jr	Z, 00109$
+      0006FB                       1566 00153$:
+      0006FB 0B                    1567 	dec	bc
+      0006FC 0B                    1568 	dec	bc
+      0006FD 79                    1569 	ld	a, c
+      0006FE 93                    1570 	sub	a, e
+      0006FF 20 11                 1571 	jr	NZ, 00110$
+      000701 78                    1572 	ld	a, b
+      000702 92                    1573 	sub	a, d
+      000703 20 0D                 1574 	jr	NZ, 00110$
+      000705                       1575 00109$:
+      000705 F8 0B                 1576 	ldhl	sp,	#11
+      000707 7E                    1577 	ld	a, (hl)
+      000708 F8 01                 1578 	ldhl	sp,	#1
+      00070A 96                    1579 	sub	a, (hl)
+      00070B 20 05                 1580 	jr	NZ, 00110$
+                                   1581 ;/tmp/_gbsbuild/src/core/Actor_b.c:247: return a;
+      00070D F8 00                 1582 	ldhl	sp,	#0
+      00070F 5E                    1583 	ld	e, (hl)
+      000710 18 08                 1584 	jr	00114$
+      000712                       1585 00110$:
+                                   1586 ;/tmp/_gbsbuild/src/core/Actor_b.c:235: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      000712 F8 04                 1587 	ldhl	sp,	#4
+      000714 35                    1588 	dec	(hl)
+      000715 C3r6Er06              1589 	jp	00113$
+      000718                       1590 00111$:
+                                   1591 ;/tmp/_gbsbuild/src/core/Actor_b.c:250: return NO_ACTOR_COLLISON;
+      000718 1E FF                 1592 	ld	e, #0xff
+      00071A                       1593 00114$:
+                                   1594 ;/tmp/_gbsbuild/src/core/Actor_b.c:251: }
+      00071A E8 05                 1595 	add	sp, #5
+      00071C C9                    1596 	ret
+                                   1597 ;/tmp/_gbsbuild/src/core/Actor_b.c:253: UBYTE ActorAt3x1Tile_b(UBYTE tx, UBYTE ty, UBYTE inc_noclip) __banked {
+                                   1598 ;	---------------------------------
+                                   1599 ; Function ActorAt3x1Tile_b
+                                   1600 ; ---------------------------------
+                           000001  1601 	b_ActorAt3x1Tile_b	= 1
+      00071D                       1602 _ActorAt3x1Tile_b::
+      00071D E8 FC                 1603 	add	sp, #-4
+                                   1604 ;/tmp/_gbsbuild/src/core/Actor_b.c:256: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      00071F FAr00r00              1605 	ld	a, (#_actors_active_size)
+      000722 C6 FF                 1606 	add	a, #0xff
+      000724 F8 03                 1607 	ldhl	sp,	#3
+      000726 77                    1608 	ld	(hl), a
+      000727                       1609 00113$:
+      000727 F8 03                 1610 	ldhl	sp,	#3
+      000729 7E                    1611 	ld	a, (hl)
+      00072A 3C                    1612 	inc	a
+      00072B CArCFr07              1613 	jp	Z,00111$
+                                   1614 ;/tmp/_gbsbuild/src/core/Actor_b.c:257: UBYTE a = actors_active[i];
+                                   1615 ;c
+      00072E 11r00r00              1616 	ld	de, #_actors_active
+      000731 F8 03                 1617 	ldhl	sp,	#3
+      000733 6E                    1618 	ld	l, (hl)
+      000734 26 00                 1619 	ld	h, #0x00
+      000736 19                    1620 	add	hl, de
+      000737 4D                    1621 	ld	c, l
+      000738 44                    1622 	ld	b, h
+      000739 0A                    1623 	ld	a, (bc)
+      00073A F8 00                 1624 	ldhl	sp,	#0
+      00073C 77                    1625 	ld	(hl), a
+                                   1626 ;/tmp/_gbsbuild/src/core/Actor_b.c:260: if (!actors[a].enabled || (!inc_noclip && !actors[a].collisionsEnabled)) {
+      00073D 4E                    1627 	ld	c, (hl)
+      00073E 06 00                 1628 	ld	b, #0x00
+      000740 69                    1629 	ld	l, c
+      000741 60                    1630 	ld	h, b
+      000742 29                    1631 	add	hl, hl
+      000743 29                    1632 	add	hl, hl
+      000744 09                    1633 	add	hl, bc
+      000745 29                    1634 	add	hl, hl
+      000746 09                    1635 	add	hl, bc
+      000747 29                    1636 	add	hl, hl
+      000748 09                    1637 	add	hl, bc
+      000749 29                    1638 	add	hl, hl
+      00074A 7D                    1639 	ld	a, l
+      00074B C6r00                 1640 	add	a, #<(_actors)
+      00074D 4F                    1641 	ld	c, a
+      00074E 7C                    1642 	ld	a, h
+      00074F CEs00                 1643 	adc	a, #>(_actors)
+      000751 47                    1644 	ld	b, a
+      000752 21 12 00              1645 	ld	hl, #0x0012
+      000755 09                    1646 	add	hl, bc
+      000756 7E                    1647 	ld	a, (hl)
+      000757 B7                    1648 	or	a, a
+      000758 28 6F                 1649 	jr	Z, 00110$
+      00075A F8 0C                 1650 	ldhl	sp,	#12
+      00075C 7E                    1651 	ld	a, (hl)
+      00075D B7                    1652 	or	a, a
+      00075E 20 08                 1653 	jr	NZ, 00102$
+      000760 21 17 00              1654 	ld	hl, #0x0017
+      000763 09                    1655 	add	hl, bc
+      000764 7E                    1656 	ld	a, (hl)
+      000765 B7                    1657 	or	a, a
+      000766 28 61                 1658 	jr	Z, 00110$
+                                   1659 ;/tmp/_gbsbuild/src/core/Actor_b.c:261: continue;
+      000768                       1660 00102$:
+                                   1661 ;/tmp/_gbsbuild/src/core/Actor_b.c:265: a_tx = DIV_8(actors[a].pos.x);
+      000768 69                    1662 	ld	l, c
+      000769 60                    1663 	ld	h, b
+      00076A 2A                    1664 	ld	a, (hl+)
+      00076B 66                    1665 	ld	h, (hl)
+      00076C 5F                    1666 	ld	e, a
+      00076D 54                    1667 	ld	d, h
+      00076E CB 2A                 1668 	sra	d
+      000770 CB 1B                 1669 	rr	e
+      000772 CB 2A                 1670 	sra	d
+      000774 CB 1B                 1671 	rr	e
+      000776 CB 2A                 1672 	sra	d
+      000778 CB 1B                 1673 	rr	e
+      00077A F8 02                 1674 	ldhl	sp,	#2
+      00077C 73                    1675 	ld	(hl), e
+                                   1676 ;/tmp/_gbsbuild/src/core/Actor_b.c:266: a_ty = DIV_8(actors[a].pos.y);
+      00077D 69                    1677 	ld	l, c
+      00077E 60                    1678 	ld	h, b
+      00077F 23                    1679 	inc	hl
+      000780 23                    1680 	inc	hl
+      000781 2A                    1681 	ld	a, (hl+)
+      000782 4F                    1682 	ld	c, a
+      000783 46                    1683 	ld	b, (hl)
+      000784 CB 28                 1684 	sra	b
+      000786 CB 19                 1685 	rr	c
+      000788 CB 28                 1686 	sra	b
+      00078A CB 19                 1687 	rr	c
+      00078C CB 28                 1688 	sra	b
+      00078E CB 19                 1689 	rr	c
+                                   1690 ;/tmp/_gbsbuild/src/core/Actor_b.c:269: if ((ty == a_ty) && (tx == a_tx || tx == a_tx - 1 || tx == a_tx + 1)) {
+      000790 F8 0B                 1691 	ldhl	sp,	#11
+      000792 7E                    1692 	ld	a, (hl)
+      000793 91                    1693 	sub	a, c
+      000794 20 33                 1694 	jr	NZ, 00110$
+      000796 F8 0A                 1695 	ldhl	sp,	#10
+      000798 7E                    1696 	ld	a, (hl)
+      000799 F8 02                 1697 	ldhl	sp,	#2
+      00079B 96                    1698 	sub	a, (hl)
+      00079C 28 26                 1699 	jr	Z, 00105$
+      00079E F8 02                 1700 	ldhl	sp,	#2
+      0007A0 3A                    1701 	ld	a, (hl-)
+      0007A1 77                    1702 	ld	(hl), a
+      0007A2 AF                    1703 	xor	a, a
+      0007A3 23                    1704 	inc	hl
+      0007A4 32                    1705 	ld	(hl-), a
+      0007A5 2A                    1706 	ld	a, (hl+)
+      0007A6 4F                    1707 	ld	c, a
+      0007A7 46                    1708 	ld	b, (hl)
+      0007A8 0B                    1709 	dec	bc
+      0007A9 F8 0A                 1710 	ldhl	sp,	#10
+      0007AB 5E                    1711 	ld	e, (hl)
+      0007AC 16 00                 1712 	ld	d, #0x00
+      0007AE 79                    1713 	ld	a, c
+      0007AF 93                    1714 	sub	a, e
+      0007B0 20 04                 1715 	jr	NZ, 00155$
+      0007B2 78                    1716 	ld	a, b
+      0007B3 92                    1717 	sub	a, d
+      0007B4 28 0E                 1718 	jr	Z, 00105$
+      0007B6                       1719 00155$:
+      0007B6 F8 01                 1720 	ldhl	sp,	#1
+      0007B8 2A                    1721 	ld	a, (hl+)
+      0007B9 66                    1722 	ld	h, (hl)
+      0007BA 6F                    1723 	ld	l, a
+      0007BB 23                    1724 	inc	hl
+      0007BC 7D                    1725 	ld	a, l
+      0007BD 93                    1726 	sub	a, e
+      0007BE 20 09                 1727 	jr	NZ, 00110$
+      0007C0 7C                    1728 	ld	a, h
+      0007C1 92                    1729 	sub	a, d
+      0007C2 20 05                 1730 	jr	NZ, 00110$
+      0007C4                       1731 00105$:
+                                   1732 ;/tmp/_gbsbuild/src/core/Actor_b.c:270: return a;
+      0007C4 F8 00                 1733 	ldhl	sp,	#0
+      0007C6 5E                    1734 	ld	e, (hl)
+      0007C7 18 08                 1735 	jr	00114$
+      0007C9                       1736 00110$:
+                                   1737 ;/tmp/_gbsbuild/src/core/Actor_b.c:256: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      0007C9 F8 03                 1738 	ldhl	sp,	#3
+      0007CB 35                    1739 	dec	(hl)
+      0007CC C3r27r07              1740 	jp	00113$
+      0007CF                       1741 00111$:
+                                   1742 ;/tmp/_gbsbuild/src/core/Actor_b.c:274: return NO_ACTOR_COLLISON;
+      0007CF 1E FF                 1743 	ld	e, #0xff
+      0007D1                       1744 00114$:
+                                   1745 ;/tmp/_gbsbuild/src/core/Actor_b.c:275: }
+      0007D1 E8 04                 1746 	add	sp, #4
+      0007D3 C9                    1747 	ret
+                                   1748 ;/tmp/_gbsbuild/src/core/Actor_b.c:277: UBYTE ActorAt2x3Tile_b(UBYTE tx, UBYTE ty, UBYTE inc_noclip) __banked {
+                                   1749 ;	---------------------------------
+                                   1750 ; Function ActorAt2x3Tile_b
+                                   1751 ; ---------------------------------
+                           000001  1752 	b_ActorAt2x3Tile_b	= 1
+      0007D4                       1753 _ActorAt2x3Tile_b::
+      0007D4 E8 FB                 1754 	add	sp, #-5
+                                   1755 ;/tmp/_gbsbuild/src/core/Actor_b.c:280: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      0007D6 FAr00r00              1756 	ld	a, (#_actors_active_size)
+      0007D9 C6 FF                 1757 	add	a, #0xff
+      0007DB F8 04                 1758 	ldhl	sp,	#4
+      0007DD 77                    1759 	ld	(hl), a
+      0007DE                       1760 00114$:
+      0007DE F8 04                 1761 	ldhl	sp,	#4
+      0007E0 7E                    1762 	ld	a, (hl)
+      0007E1 3C                    1763 	inc	a
+      0007E2 CAr9Cr08              1764 	jp	Z,00112$
+                                   1765 ;/tmp/_gbsbuild/src/core/Actor_b.c:281: UBYTE a = actors_active[i];
+                                   1766 ;c
+      0007E5 11r00r00              1767 	ld	de, #_actors_active
+      0007E8 F8 04                 1768 	ldhl	sp,	#4
+      0007EA 6E                    1769 	ld	l, (hl)
+      0007EB 26 00                 1770 	ld	h, #0x00
+      0007ED 19                    1771 	add	hl, de
+      0007EE 4D                    1772 	ld	c, l
+      0007EF 44                    1773 	ld	b, h
+      0007F0 0A                    1774 	ld	a, (bc)
+      0007F1 F8 00                 1775 	ldhl	sp,	#0
+      0007F3 77                    1776 	ld	(hl), a
+                                   1777 ;/tmp/_gbsbuild/src/core/Actor_b.c:284: if (!actors[a].enabled || (!inc_noclip && !actors[a].collisionsEnabled)) {
+      0007F4 4E                    1778 	ld	c, (hl)
+      0007F5 06 00                 1779 	ld	b, #0x00
+      0007F7 69                    1780 	ld	l, c
+      0007F8 60                    1781 	ld	h, b
+      0007F9 29                    1782 	add	hl, hl
+      0007FA 29                    1783 	add	hl, hl
+      0007FB 09                    1784 	add	hl, bc
+      0007FC 29                    1785 	add	hl, hl
+      0007FD 09                    1786 	add	hl, bc
+      0007FE 29                    1787 	add	hl, hl
+      0007FF 09                    1788 	add	hl, bc
+      000800 29                    1789 	add	hl, hl
+      000801 7D                    1790 	ld	a, l
+      000802 C6r00                 1791 	add	a, #<(_actors)
+      000804 4F                    1792 	ld	c, a
+      000805 7C                    1793 	ld	a, h
+      000806 CEs00                 1794 	adc	a, #>(_actors)
+      000808 47                    1795 	ld	b, a
+      000809 21 12 00              1796 	ld	hl, #0x0012
+      00080C 09                    1797 	add	hl, bc
+      00080D 7E                    1798 	ld	a, (hl)
+      00080E B7                    1799 	or	a, a
+      00080F CAr96r08              1800 	jp	Z, 00111$
+      000812 F8 0D                 1801 	ldhl	sp,	#13
+      000814 7E                    1802 	ld	a, (hl)
+      000815 B7                    1803 	or	a, a
+      000816 20 08                 1804 	jr	NZ, 00102$
+      000818 21 17 00              1805 	ld	hl, #0x0017
+      00081B 09                    1806 	add	hl, bc
+      00081C 7E                    1807 	ld	a, (hl)
+      00081D B7                    1808 	or	a, a
+      00081E 28 76                 1809 	jr	Z, 00111$
+                                   1810 ;/tmp/_gbsbuild/src/core/Actor_b.c:285: continue;
+      000820                       1811 00102$:
+                                   1812 ;/tmp/_gbsbuild/src/core/Actor_b.c:288: a_tx = DIV_8(actors[a].pos.x);
+      000820 69                    1813 	ld	l, c
+      000821 60                    1814 	ld	h, b
+      000822 2A                    1815 	ld	a, (hl+)
+      000823 66                    1816 	ld	h, (hl)
+      000824 5F                    1817 	ld	e, a
+      000825 54                    1818 	ld	d, h
+      000826 CB 2A                 1819 	sra	d
+      000828 CB 1B                 1820 	rr	e
+      00082A CB 2A                 1821 	sra	d
+      00082C CB 1B                 1822 	rr	e
+      00082E CB 2A                 1823 	sra	d
+      000830 CB 1B                 1824 	rr	e
+      000832 F8 01                 1825 	ldhl	sp,	#1
+      000834 73                    1826 	ld	(hl), e
+                                   1827 ;/tmp/_gbsbuild/src/core/Actor_b.c:289: a_ty = DIV_8(actors[a].pos.y);
+      000835 03                    1828 	inc	bc
+      000836 03                    1829 	inc	bc
+      000837 60                    1830 	ld	h, b
+      000838 69                    1831 	ld	l, c
+      000839 2A                    1832 	ld	a, (hl+)
+      00083A 4F                    1833 	ld	c, a
+      00083B 46                    1834 	ld	b, (hl)
+      00083C CB 28                 1835 	sra	b
+      00083E CB 19                 1836 	rr	c
+      000840 CB 28                 1837 	sra	b
+      000842 CB 19                 1838 	rr	c
+      000844 CB 28                 1839 	sra	b
+      000846 CB 19                 1840 	rr	c
+                                   1841 ;/tmp/_gbsbuild/src/core/Actor_b.c:291: if ((ty == a_ty || ty == a_ty - 1 || ty == a_ty - 2) && (tx == a_tx || tx == a_tx - 1)) {
+      000848 F8 0C                 1842 	ldhl	sp,	#12
+      00084A 7E                    1843 	ld	a, (hl)
+      00084B 91                    1844 	sub	a, c
+      00084C 28 28                 1845 	jr	Z, 00110$
+      00084E 06 00                 1846 	ld	b, #0x00
+      000850 11 01 00              1847 	ld	de, #0x0001
+      000853 79                    1848 	ld	a, c
+      000854 93                    1849 	sub	a, e
+      000855 5F                    1850 	ld	e, a
+      000856 78                    1851 	ld	a, b
+      000857 9A                    1852 	sbc	a, d
+      000858 F8 03                 1853 	ldhl	sp,	#3
+      00085A 32                    1854 	ld	(hl-), a
+      00085B 73                    1855 	ld	(hl), e
+      00085C F8 0C                 1856 	ldhl	sp,	#12
+      00085E 5E                    1857 	ld	e, (hl)
+      00085F 16 00                 1858 	ld	d, #0x00
+      000861 F8 02                 1859 	ldhl	sp,	#2
+      000863 7E                    1860 	ld	a, (hl)
+      000864 93                    1861 	sub	a, e
+      000865 20 05                 1862 	jr	NZ, 00154$
+      000867 23                    1863 	inc	hl
+      000868 7E                    1864 	ld	a, (hl)
+      000869 92                    1865 	sub	a, d
+      00086A 28 0A                 1866 	jr	Z, 00110$
+      00086C                       1867 00154$:
+      00086C 0B                    1868 	dec	bc
+      00086D 0B                    1869 	dec	bc
+      00086E 79                    1870 	ld	a, c
+      00086F 93                    1871 	sub	a, e
+      000870 20 24                 1872 	jr	NZ, 00111$
+      000872 78                    1873 	ld	a, b
+      000873 92                    1874 	sub	a, d
+      000874 20 20                 1875 	jr	NZ, 00111$
+      000876                       1876 00110$:
+      000876 F8 0B                 1877 	ldhl	sp,	#11
+      000878 7E                    1878 	ld	a, (hl)
+      000879 F8 01                 1879 	ldhl	sp,	#1
+      00087B 96                    1880 	sub	a, (hl)
+      00087C 28 13                 1881 	jr	Z, 00105$
+      00087E F8 01                 1882 	ldhl	sp,	#1
+      000880 4E                    1883 	ld	c, (hl)
+      000881 06 00                 1884 	ld	b, #0x00
+      000883 0B                    1885 	dec	bc
+      000884 F8 0B                 1886 	ldhl	sp,	#11
+      000886 5E                    1887 	ld	e, (hl)
+      000887 16 00                 1888 	ld	d, #0x00
+      000889 7B                    1889 	ld	a, e
+      00088A 91                    1890 	sub	a, c
+      00088B 20 09                 1891 	jr	NZ, 00111$
+      00088D 7A                    1892 	ld	a, d
+      00088E 90                    1893 	sub	a, b
+      00088F 20 05                 1894 	jr	NZ, 00111$
+      000891                       1895 00105$:
+                                   1896 ;/tmp/_gbsbuild/src/core/Actor_b.c:292: return a;
+      000891 F8 00                 1897 	ldhl	sp,	#0
+      000893 5E                    1898 	ld	e, (hl)
+      000894 18 08                 1899 	jr	00115$
+      000896                       1900 00111$:
+                                   1901 ;/tmp/_gbsbuild/src/core/Actor_b.c:280: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      000896 F8 04                 1902 	ldhl	sp,	#4
+      000898 35                    1903 	dec	(hl)
+      000899 C3rDEr07              1904 	jp	00114$
+      00089C                       1905 00112$:
+                                   1906 ;/tmp/_gbsbuild/src/core/Actor_b.c:296: return NO_ACTOR_COLLISON;
+      00089C 1E FF                 1907 	ld	e, #0xff
+      00089E                       1908 00115$:
+                                   1909 ;/tmp/_gbsbuild/src/core/Actor_b.c:297: }
+      00089E E8 05                 1910 	add	sp, #5
+      0008A0 C9                    1911 	ret
+                                   1912 ;/tmp/_gbsbuild/src/core/Actor_b.c:299: UBYTE ActorAt3x3Tile_b(UBYTE tx, UBYTE ty, UBYTE inc_noclip) __banked {
+                                   1913 ;	---------------------------------
+                                   1914 ; Function ActorAt3x3Tile_b
+                                   1915 ; ---------------------------------
+                           000001  1916 	b_ActorAt3x3Tile_b	= 1
+      0008A1                       1917 _ActorAt3x3Tile_b::
+      0008A1 E8 FB                 1918 	add	sp, #-5
+                                   1919 ;/tmp/_gbsbuild/src/core/Actor_b.c:302: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      0008A3 FAr00r00              1920 	ld	a, (#_actors_active_size)
+      0008A6 C6 FF                 1921 	add	a, #0xff
+      0008A8 F8 04                 1922 	ldhl	sp,	#4
+      0008AA 77                    1923 	ld	(hl), a
+      0008AB                       1924 00115$:
+      0008AB F8 04                 1925 	ldhl	sp,	#4
+      0008AD 7E                    1926 	ld	a, (hl)
+      0008AE 3C                    1927 	inc	a
+      0008AF CAr82r09              1928 	jp	Z,00113$
+                                   1929 ;/tmp/_gbsbuild/src/core/Actor_b.c:303: UBYTE a = actors_active[i];
+                                   1930 ;c
+      0008B2 11r00r00              1931 	ld	de, #_actors_active
+      0008B5 F8 04                 1932 	ldhl	sp,	#4
+      0008B7 6E                    1933 	ld	l, (hl)
+      0008B8 26 00                 1934 	ld	h, #0x00
+      0008BA 19                    1935 	add	hl, de
+      0008BB 4D                    1936 	ld	c, l
+      0008BC 44                    1937 	ld	b, h
+      0008BD 0A                    1938 	ld	a, (bc)
+      0008BE F8 00                 1939 	ldhl	sp,	#0
+      0008C0 77                    1940 	ld	(hl), a
+                                   1941 ;/tmp/_gbsbuild/src/core/Actor_b.c:306: if (!actors[a].enabled || (!inc_noclip && !actors[a].collisionsEnabled)) {
+      0008C1 4E                    1942 	ld	c, (hl)
+      0008C2 06 00                 1943 	ld	b, #0x00
+      0008C4 69                    1944 	ld	l, c
+      0008C5 60                    1945 	ld	h, b
+      0008C6 29                    1946 	add	hl, hl
+      0008C7 29                    1947 	add	hl, hl
+      0008C8 09                    1948 	add	hl, bc
+      0008C9 29                    1949 	add	hl, hl
+      0008CA 09                    1950 	add	hl, bc
+      0008CB 29                    1951 	add	hl, hl
+      0008CC 09                    1952 	add	hl, bc
+      0008CD 29                    1953 	add	hl, hl
+      0008CE 7D                    1954 	ld	a, l
+      0008CF C6r00                 1955 	add	a, #<(_actors)
+      0008D1 4F                    1956 	ld	c, a
+      0008D2 7C                    1957 	ld	a, h
+      0008D3 CEs00                 1958 	adc	a, #>(_actors)
+      0008D5 47                    1959 	ld	b, a
+      0008D6 21 12 00              1960 	ld	hl, #0x0012
+      0008D9 09                    1961 	add	hl, bc
+      0008DA 7E                    1962 	ld	a, (hl)
+      0008DB B7                    1963 	or	a, a
+      0008DC CAr7Cr09              1964 	jp	Z, 00112$
+      0008DF F8 0D                 1965 	ldhl	sp,	#13
+      0008E1 7E                    1966 	ld	a, (hl)
+      0008E2 B7                    1967 	or	a, a
+      0008E3 20 09                 1968 	jr	NZ, 00102$
+      0008E5 21 17 00              1969 	ld	hl, #0x0017
+      0008E8 09                    1970 	add	hl, bc
+      0008E9 7E                    1971 	ld	a, (hl)
+      0008EA B7                    1972 	or	a, a
+      0008EB CAr7Cr09              1973 	jp	Z, 00112$
+                                   1974 ;/tmp/_gbsbuild/src/core/Actor_b.c:307: continue;
+      0008EE                       1975 00102$:
+                                   1976 ;/tmp/_gbsbuild/src/core/Actor_b.c:310: a_tx = DIV_8(actors[a].pos.x);
+      0008EE 69                    1977 	ld	l, c
+      0008EF 60                    1978 	ld	h, b
+      0008F0 2A                    1979 	ld	a, (hl+)
+      0008F1 66                    1980 	ld	h, (hl)
+      0008F2 5F                    1981 	ld	e, a
+      0008F3 54                    1982 	ld	d, h
+      0008F4 CB 2A                 1983 	sra	d
+      0008F6 CB 1B                 1984 	rr	e
+      0008F8 CB 2A                 1985 	sra	d
+      0008FA CB 1B                 1986 	rr	e
+      0008FC CB 2A                 1987 	sra	d
+      0008FE CB 1B                 1988 	rr	e
+      000900 F8 01                 1989 	ldhl	sp,	#1
+      000902 73                    1990 	ld	(hl), e
+                                   1991 ;/tmp/_gbsbuild/src/core/Actor_b.c:311: a_ty = DIV_8(actors[a].pos.y);
+      000903 03                    1992 	inc	bc
+      000904 03                    1993 	inc	bc
+      000905 60                    1994 	ld	h, b
+      000906 69                    1995 	ld	l, c
+      000907 2A                    1996 	ld	a, (hl+)
+      000908 4F                    1997 	ld	c, a
+      000909 46                    1998 	ld	b, (hl)
+      00090A CB 28                 1999 	sra	b
+      00090C CB 19                 2000 	rr	c
+      00090E CB 28                 2001 	sra	b
+      000910 CB 19                 2002 	rr	c
+      000912 CB 28                 2003 	sra	b
+      000914 CB 19                 2004 	rr	c
+                                   2005 ;/tmp/_gbsbuild/src/core/Actor_b.c:313: if ((ty == a_ty || ty == a_ty - 1 || ty == a_ty - 2) && (tx == a_tx || tx == a_tx - 1 || tx == a_tx - 2)) {
+      000916 F8 0C                 2006 	ldhl	sp,	#12
+      000918 7E                    2007 	ld	a, (hl)
+      000919 91                    2008 	sub	a, c
+      00091A 28 28                 2009 	jr	Z, 00111$
+      00091C 06 00                 2010 	ld	b, #0x00
+      00091E 11 01 00              2011 	ld	de, #0x0001
+      000921 79                    2012 	ld	a, c
+      000922 93                    2013 	sub	a, e
+      000923 5F                    2014 	ld	e, a
+      000924 78                    2015 	ld	a, b
+      000925 9A                    2016 	sbc	a, d
+      000926 F8 03                 2017 	ldhl	sp,	#3
+      000928 32                    2018 	ld	(hl-), a
+      000929 73                    2019 	ld	(hl), e
+      00092A F8 0C                 2020 	ldhl	sp,	#12
+      00092C 5E                    2021 	ld	e, (hl)
+      00092D 16 00                 2022 	ld	d, #0x00
+      00092F F8 02                 2023 	ldhl	sp,	#2
+      000931 7E                    2024 	ld	a, (hl)
+      000932 93                    2025 	sub	a, e
+      000933 20 05                 2026 	jr	NZ, 00160$
+      000935 23                    2027 	inc	hl
+      000936 7E                    2028 	ld	a, (hl)
+      000937 92                    2029 	sub	a, d
+      000938 28 0A                 2030 	jr	Z, 00111$
+      00093A                       2031 00160$:
+      00093A 0B                    2032 	dec	bc
+      00093B 0B                    2033 	dec	bc
+      00093C 79                    2034 	ld	a, c
+      00093D 93                    2035 	sub	a, e
+      00093E 20 3C                 2036 	jr	NZ, 00112$
+      000940 78                    2037 	ld	a, b
+      000941 92                    2038 	sub	a, d
+      000942 20 38                 2039 	jr	NZ, 00112$
+      000944                       2040 00111$:
+      000944 F8 0B                 2041 	ldhl	sp,	#11
+      000946 7E                    2042 	ld	a, (hl)
+      000947 F8 01                 2043 	ldhl	sp,	#1
+      000949 96                    2044 	sub	a, (hl)
+      00094A 28 2B                 2045 	jr	Z, 00105$
+      00094C F8 01                 2046 	ldhl	sp,	#1
+      00094E 4E                    2047 	ld	c, (hl)
+      00094F 06 00                 2048 	ld	b, #0x00
+      000951 11 01 00              2049 	ld	de, #0x0001
+      000954 79                    2050 	ld	a, c
+      000955 93                    2051 	sub	a, e
+      000956 5F                    2052 	ld	e, a
+      000957 78                    2053 	ld	a, b
+      000958 9A                    2054 	sbc	a, d
+      000959 23                    2055 	inc	hl
+      00095A 23                    2056 	inc	hl
+      00095B 32                    2057 	ld	(hl-), a
+      00095C 73                    2058 	ld	(hl), e
+      00095D F8 0B                 2059 	ldhl	sp,	#11
+      00095F 5E                    2060 	ld	e, (hl)
+      000960 16 00                 2061 	ld	d, #0x00
+      000962 F8 02                 2062 	ldhl	sp,	#2
+      000964 7E                    2063 	ld	a, (hl)
+      000965 93                    2064 	sub	a, e
+      000966 20 05                 2065 	jr	NZ, 00164$
+      000968 23                    2066 	inc	hl
+      000969 7E                    2067 	ld	a, (hl)
+      00096A 92                    2068 	sub	a, d
+      00096B 28 0A                 2069 	jr	Z, 00105$
+      00096D                       2070 00164$:
+      00096D 0B                    2071 	dec	bc
+      00096E 0B                    2072 	dec	bc
+      00096F 79                    2073 	ld	a, c
+      000970 93                    2074 	sub	a, e
+      000971 20 09                 2075 	jr	NZ, 00112$
+      000973 78                    2076 	ld	a, b
+      000974 92                    2077 	sub	a, d
+      000975 20 05                 2078 	jr	NZ, 00112$
+      000977                       2079 00105$:
+                                   2080 ;/tmp/_gbsbuild/src/core/Actor_b.c:314: return a;
+      000977 F8 00                 2081 	ldhl	sp,	#0
+      000979 5E                    2082 	ld	e, (hl)
+      00097A 18 08                 2083 	jr	00116$
+      00097C                       2084 00112$:
+                                   2085 ;/tmp/_gbsbuild/src/core/Actor_b.c:302: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      00097C F8 04                 2086 	ldhl	sp,	#4
+      00097E 35                    2087 	dec	(hl)
+      00097F C3rABr08              2088 	jp	00115$
+      000982                       2089 00113$:
+                                   2090 ;/tmp/_gbsbuild/src/core/Actor_b.c:318: return NO_ACTOR_COLLISON;
+      000982 1E FF                 2091 	ld	e, #0xff
+      000984                       2092 00116$:
+                                   2093 ;/tmp/_gbsbuild/src/core/Actor_b.c:319: }
+      000984 E8 05                 2094 	add	sp, #5
+      000986 C9                    2095 	ret
+                                   2096 ;/tmp/_gbsbuild/src/core/Actor_b.c:321: UBYTE ActorOverlapsPlayer_b(UBYTE inc_noclip) __banked {
+                                   2097 ;	---------------------------------
+                                   2098 ; Function ActorOverlapsPlayer_b
+                                   2099 ; ---------------------------------
+                           000001  2100 	b_ActorOverlapsPlayer_b	= 1
+      000987                       2101 _ActorOverlapsPlayer_b::
+      000987 E8 FA                 2102 	add	sp, #-6
+                                   2103 ;/tmp/_gbsbuild/src/core/Actor_b.c:324: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      000989 FAr00r00              2104 	ld	a, (#_actors_active_size)
+      00098C C6 FF                 2105 	add	a, #0xff
+      00098E F8 05                 2106 	ldhl	sp,	#5
+      000990 77                    2107 	ld	(hl), a
+      000991                       2108 00113$:
+      000991 F8 05                 2109 	ldhl	sp,	#5
+      000993 7E                    2110 	ld	a, (hl)
+      000994 3C                    2111 	inc	a
+      000995 CAr9Dr0A              2112 	jp	Z,00111$
+                                   2113 ;/tmp/_gbsbuild/src/core/Actor_b.c:325: UBYTE a = actors_active[i];
+                                   2114 ;c
+      000998 11r00r00              2115 	ld	de, #_actors_active
+      00099B F8 05                 2116 	ldhl	sp,	#5
+      00099D 6E                    2117 	ld	l, (hl)
+      00099E 26 00                 2118 	ld	h, #0x00
+      0009A0 19                    2119 	add	hl, de
+      0009A1 4D                    2120 	ld	c, l
+      0009A2 44                    2121 	ld	b, h
+      0009A3 0A                    2122 	ld	a, (bc)
+      0009A4 F8 00                 2123 	ldhl	sp,	#0
+      0009A6 77                    2124 	ld	(hl), a
+                                   2125 ;/tmp/_gbsbuild/src/core/Actor_b.c:327: if (!actors[a].enabled || (!inc_noclip && !actors[a].collisionsEnabled)) {
+      0009A7 4E                    2126 	ld	c, (hl)
+      0009A8 06 00                 2127 	ld	b, #0x00
+      0009AA 69                    2128 	ld	l, c
+      0009AB 60                    2129 	ld	h, b
+      0009AC 29                    2130 	add	hl, hl
+      0009AD 29                    2131 	add	hl, hl
+      0009AE 09                    2132 	add	hl, bc
+      0009AF 29                    2133 	add	hl, hl
+      0009B0 09                    2134 	add	hl, bc
+      0009B1 29                    2135 	add	hl, hl
+      0009B2 09                    2136 	add	hl, bc
+      0009B3 29                    2137 	add	hl, hl
+      0009B4 01r00r00              2138 	ld	bc,#_actors
+      0009B7 09                    2139 	add	hl,bc
+      0009B8 E5                    2140 	push	hl
+      0009B9 7D                    2141 	ld	a, l
+      0009BA F8 03                 2142 	ldhl	sp,	#3
+      0009BC 77                    2143 	ld	(hl), a
+      0009BD E1                    2144 	pop	hl
+      0009BE 7C                    2145 	ld	a, h
+      0009BF F8 02                 2146 	ldhl	sp,	#2
+                                   2147 ;c
+      0009C1 32                    2148 	ld	(hl-), a
+      0009C2 2A                    2149 	ld	a, (hl+)
+      0009C3 5F                    2150 	ld	e, a
+      0009C4 56                    2151 	ld	d, (hl)
+      0009C5 21 12 00              2152 	ld	hl, #0x0012
+      0009C8 19                    2153 	add	hl, de
+      0009C9 4D                    2154 	ld	c, l
+      0009CA 44                    2155 	ld	b, h
+      0009CB 0A                    2156 	ld	a, (bc)
+      0009CC B7                    2157 	or	a, a
+      0009CD CAr97r0A              2158 	jp	Z, 00110$
+      0009D0 F8 0C                 2159 	ldhl	sp,	#12
+      0009D2 7E                    2160 	ld	a, (hl)
+      0009D3 B7                    2161 	or	a, a
+      0009D4 20 10                 2162 	jr	NZ, 00102$
+                                   2163 ;c
+      0009D6 F8 01                 2164 	ldhl	sp,#1
+      0009D8 2A                    2165 	ld	a, (hl+)
+      0009D9 5F                    2166 	ld	e, a
+      0009DA 56                    2167 	ld	d, (hl)
+      0009DB 21 17 00              2168 	ld	hl, #0x0017
+      0009DE 19                    2169 	add	hl, de
+      0009DF 4D                    2170 	ld	c, l
+      0009E0 44                    2171 	ld	b, h
+      0009E1 0A                    2172 	ld	a, (bc)
+      0009E2 B7                    2173 	or	a, a
+      0009E3 CAr97r0A              2174 	jp	Z, 00110$
+                                   2175 ;/tmp/_gbsbuild/src/core/Actor_b.c:328: continue;
+      0009E6                       2176 00102$:
+                                   2177 ;/tmp/_gbsbuild/src/core/Actor_b.c:331: if ((player.pos.x + 15 >= actors[a].pos.x) && (player.pos.x <= actors[a].pos.x + 15) &&
+      0009E6 11r00r00              2178 	ld	de, #_actors
+      0009E9 1A                    2179 	ld	a, (de)
+      0009EA F8 03                 2180 	ldhl	sp,	#3
+      0009EC 22                    2181 	ld	(hl+), a
+      0009ED 13                    2182 	inc	de
+      0009EE 1A                    2183 	ld	a, (de)
+                                   2184 ;c
+      0009EF 32                    2185 	ld	(hl-), a
+      0009F0 2A                    2186 	ld	a, (hl+)
+      0009F1 5F                    2187 	ld	e, a
+      0009F2 56                    2188 	ld	d, (hl)
+      0009F3 21 0F 00              2189 	ld	hl, #0x000f
+      0009F6 19                    2190 	add	hl, de
+      0009F7 4D                    2191 	ld	c, l
+      0009F8 44                    2192 	ld	b, h
+      0009F9 F8 01                 2193 	ldhl	sp,#1
+      0009FB 2A                    2194 	ld	a, (hl+)
+      0009FC 5F                    2195 	ld	e, a
+      0009FD 56                    2196 	ld	d, (hl)
+      0009FE 1A                    2197 	ld	a, (de)
+      0009FF 6F                    2198 	ld	l, a
+      000A00 13                    2199 	inc	de
+      000A01 1A                    2200 	ld	a, (de)
+      000A02 67                    2201 	ld	h, a
+      000A03 5C                    2202 	ld	e, h
+      000A04 50                    2203 	ld	d, b
+      000A05 79                    2204 	ld	a, c
+      000A06 95                    2205 	sub	a, l
+      000A07 78                    2206 	ld	a, b
+      000A08 9C                    2207 	sbc	a, h
+      000A09 CB 7B                 2208 	bit	7, e
+      000A0B 28 07                 2209 	jr	Z, 00157$
+      000A0D CB 7A                 2210 	bit	7, d
+      000A0F 20 08                 2211 	jr	NZ, 00158$
+      000A11 BF                    2212 	cp	a, a
+      000A12 18 05                 2213 	jr	00158$
+      000A14                       2214 00157$:
+      000A14 CB 7A                 2215 	bit	7, d
+      000A16 28 01                 2216 	jr	Z, 00158$
+      000A18 37                    2217 	scf
+      000A19                       2218 00158$:
+      000A19 38 7C                 2219 	jr	C, 00110$
+      000A1B 01 0F 00              2220 	ld	bc, #0x000f
+      000A1E 09                    2221 	add	hl,bc
+      000A1F 4D                    2222 	ld	c, l
+      000A20 44                    2223 	ld	b, h
+      000A21 F8 03                 2224 	ldhl	sp,	#3
+      000A23 79                    2225 	ld	a, c
+      000A24 96                    2226 	sub	a, (hl)
+      000A25 23                    2227 	inc	hl
+      000A26 78                    2228 	ld	a, b
+      000A27 9E                    2229 	sbc	a, (hl)
+      000A28 78                    2230 	ld	a, b
+      000A29 57                    2231 	ld	d, a
+      000A2A CB 7E                 2232 	bit	7, (hl)
+      000A2C 28 07                 2233 	jr	Z, 00159$
+      000A2E CB 7A                 2234 	bit	7, d
+      000A30 20 08                 2235 	jr	NZ, 00160$
+      000A32 BF                    2236 	cp	a, a
+      000A33 18 05                 2237 	jr	00160$
+      000A35                       2238 00159$:
+      000A35 CB 7A                 2239 	bit	7, d
+      000A37 28 01                 2240 	jr	Z, 00160$
+      000A39 37                    2241 	scf
+      000A3A                       2242 00160$:
+      000A3A 38 5B                 2243 	jr	C, 00110$
+                                   2244 ;/tmp/_gbsbuild/src/core/Actor_b.c:332: (player.pos.y + 7 >= actors[a].pos.y) && (player.pos.y <= actors[a].pos.y + 7)) {
+      000A3C 11r02r00              2245 	ld	de, #(_actors + 0x0002)
+      000A3F 1A                    2246 	ld	a, (de)
+      000A40 F8 03                 2247 	ldhl	sp,	#3
+      000A42 22                    2248 	ld	(hl+), a
+      000A43 13                    2249 	inc	de
+      000A44 1A                    2250 	ld	a, (de)
+                                   2251 ;c
+      000A45 32                    2252 	ld	(hl-), a
+      000A46 2A                    2253 	ld	a, (hl+)
+      000A47 5F                    2254 	ld	e, a
+      000A48 56                    2255 	ld	d, (hl)
+      000A49 21 07 00              2256 	ld	hl, #0x0007
+      000A4C 19                    2257 	add	hl, de
+      000A4D 4D                    2258 	ld	c, l
+      000A4E 44                    2259 	ld	b, h
+      000A4F F8 01                 2260 	ldhl	sp,	#1
+      000A51 2A                    2261 	ld	a, (hl+)
+      000A52 66                    2262 	ld	h, (hl)
+      000A53 6F                    2263 	ld	l, a
+      000A54 23                    2264 	inc	hl
+      000A55 23                    2265 	inc	hl
+      000A56 2A                    2266 	ld	a, (hl+)
+      000A57 66                    2267 	ld	h, (hl)
+      000A58 6F                    2268 	ld	l, a
+      000A59 5C                    2269 	ld	e, h
+      000A5A 50                    2270 	ld	d, b
+      000A5B 79                    2271 	ld	a, c
+      000A5C 95                    2272 	sub	a, l
+      000A5D 78                    2273 	ld	a, b
+      000A5E 9C                    2274 	sbc	a, h
+      000A5F CB 7B                 2275 	bit	7, e
+      000A61 28 07                 2276 	jr	Z, 00161$
+      000A63 CB 7A                 2277 	bit	7, d
+      000A65 20 08                 2278 	jr	NZ, 00162$
+      000A67 BF                    2279 	cp	a, a
+      000A68 18 05                 2280 	jr	00162$
+      000A6A                       2281 00161$:
+      000A6A CB 7A                 2282 	bit	7, d
+      000A6C 28 01                 2283 	jr	Z, 00162$
+      000A6E 37                    2284 	scf
+      000A6F                       2285 00162$:
+      000A6F 38 26                 2286 	jr	C, 00110$
+      000A71 01 07 00              2287 	ld	bc, #0x0007
+      000A74 09                    2288 	add	hl,bc
+      000A75 4D                    2289 	ld	c, l
+      000A76 44                    2290 	ld	b, h
+      000A77 F8 03                 2291 	ldhl	sp,	#3
+      000A79 79                    2292 	ld	a, c
+      000A7A 96                    2293 	sub	a, (hl)
+      000A7B 23                    2294 	inc	hl
+      000A7C 78                    2295 	ld	a, b
+      000A7D 9E                    2296 	sbc	a, (hl)
+      000A7E 78                    2297 	ld	a, b
+      000A7F 57                    2298 	ld	d, a
+      000A80 CB 7E                 2299 	bit	7, (hl)
+      000A82 28 07                 2300 	jr	Z, 00163$
+      000A84 CB 7A                 2301 	bit	7, d
+      000A86 20 08                 2302 	jr	NZ, 00164$
+      000A88 BF                    2303 	cp	a, a
+      000A89 18 05                 2304 	jr	00164$
+      000A8B                       2305 00163$:
+      000A8B CB 7A                 2306 	bit	7, d
+      000A8D 28 01                 2307 	jr	Z, 00164$
+      000A8F 37                    2308 	scf
+      000A90                       2309 00164$:
+      000A90 38 05                 2310 	jr	C, 00110$
+                                   2311 ;/tmp/_gbsbuild/src/core/Actor_b.c:333: return a;
+      000A92 F8 00                 2312 	ldhl	sp,	#0
+      000A94 5E                    2313 	ld	e, (hl)
+      000A95 18 08                 2314 	jr	00114$
+      000A97                       2315 00110$:
+                                   2316 ;/tmp/_gbsbuild/src/core/Actor_b.c:324: for (i = actors_active_size - 1; i != 0xFF; i--) {
+      000A97 F8 05                 2317 	ldhl	sp,	#5
+      000A99 35                    2318 	dec	(hl)
+      000A9A C3r91r09              2319 	jp	00113$
+      000A9D                       2320 00111$:
+                                   2321 ;/tmp/_gbsbuild/src/core/Actor_b.c:337: return NO_ACTOR_COLLISON;
+      000A9D 1E FF                 2322 	ld	e, #0xff
+      000A9F                       2323 00114$:
+                                   2324 ;/tmp/_gbsbuild/src/core/Actor_b.c:338: }
+      000A9F E8 06                 2325 	add	sp, #6
+      000AA1 C9                    2326 	ret
+                                   2327 ;/tmp/_gbsbuild/src/core/Actor_b.c:340: void InitPlayer_b() __banked {
+                                   2328 ;	---------------------------------
+                                   2329 ; Function InitPlayer_b
+                                   2330 ; ---------------------------------
+                           000001  2331 	b_InitPlayer_b	= 1
+      000AA2                       2332 _InitPlayer_b::
+      000AA2 E8 FD                 2333 	add	sp, #-3
+                                   2334 ;/tmp/_gbsbuild/src/core/Actor_b.c:343: sprite_frames = DIV_4(LoadSprite(map_next_sprite, 0));
+      000AA4 AF                    2335 	xor	a, a
+      000AA5 F5                    2336 	push	af
+      000AA6 33                    2337 	inc	sp
+      000AA7 21r00r00              2338 	ld	hl, #_map_next_sprite
+      000AAA 2A                    2339 	ld	a, (hl+)
+      000AAB 66                    2340 	ld	h, (hl)
+      000AAC 6F                    2341 	ld	l, a
+      000AAD E5                    2342 	push	hl
+      000AAE CDr00r00              2343 	call	_LoadSprite
+      000AB1 E8 03                 2344 	add	sp, #3
+      000AB3 7B                    2345 	ld	a, e
+      000AB4 0F                    2346 	rrca
+      000AB5 0F                    2347 	rrca
+      000AB6 E6 3F                 2348 	and	a, #0x3f
+      000AB8 F8 00                 2349 	ldhl	sp,	#0
+      000ABA 77                    2350 	ld	(hl), a
+                                   2351 ;/tmp/_gbsbuild/src/core/Actor_b.c:344: player.enabled = TRUE;
+      000ABB 21r12r00              2352 	ld	hl, #(_actors + 0x0012)
+      000ABE 36 01                 2353 	ld	(hl), #0x01
+                                   2354 ;/tmp/_gbsbuild/src/core/Actor_b.c:345: player.moving = FALSE;
+      000AC0 21r07r00              2355 	ld	hl, #(_actors + 0x0007)
+      000AC3 36 00                 2356 	ld	(hl), #0x00
+                                   2357 ;/tmp/_gbsbuild/src/core/Actor_b.c:346: player.palette_index = PLAYER_PALETTE;
+      000AC5 21r0Ar00              2358 	ld	hl, #(_actors + 0x000a)
+      000AC8 36 07                 2359 	ld	(hl), #0x07
+                                   2360 ;/tmp/_gbsbuild/src/core/Actor_b.c:347: player.collisionsEnabled = TRUE;
+      000ACA 21r17r00              2361 	ld	hl, #(_actors + 0x0017)
+      000ACD 36 01                 2362 	ld	(hl), #0x01
+                                   2363 ;/tmp/_gbsbuild/src/core/Actor_b.c:348: player.collision_group = 1;
+      000ACF 21r18r00              2364 	ld	hl, #(_actors + 0x0018)
+      000AD2 36 01                 2365 	ld	(hl), #0x01
+                                   2366 ;/tmp/_gbsbuild/src/core/Actor_b.c:349: player.pos.x = map_next_pos.x;
+      000AD4 21r00r00              2367 	ld	hl, #_map_next_pos
+      000AD7 2A                    2368 	ld	a, (hl+)
+      000AD8 4F                    2369 	ld	c, a
+      000AD9 46                    2370 	ld	b, (hl)
+      000ADA 21r00r00              2371 	ld	hl, #_actors
+      000ADD 79                    2372 	ld	a, c
+      000ADE 22                    2373 	ld	(hl+), a
+      000ADF 70                    2374 	ld	(hl), b
+                                   2375 ;/tmp/_gbsbuild/src/core/Actor_b.c:350: player.pos.y = map_next_pos.y;
+      000AE0 11r02r00              2376 	ld	de, #(_map_next_pos + 0x0002)
+      000AE3 1A                    2377 	ld	a, (de)
+      000AE4 F8 01                 2378 	ldhl	sp,	#1
+      000AE6 22                    2379 	ld	(hl+), a
+      000AE7 13                    2380 	inc	de
+      000AE8 1A                    2381 	ld	a, (de)
+      000AE9 77                    2382 	ld	(hl), a
+      000AEA 11r02r00              2383 	ld	de, #(_actors + 0x0002)
+      000AED 2B                    2384 	dec	hl
+      000AEE 7E                    2385 	ld	a, (hl)
+      000AEF 12                    2386 	ld	(de), a
+      000AF0 13                    2387 	inc	de
+      000AF1 23                    2388 	inc	hl
+      000AF2 7E                    2389 	ld	a, (hl)
+      000AF3 12                    2390 	ld	(de), a
+                                   2391 ;/tmp/_gbsbuild/src/core/Actor_b.c:351: player.start_pos.x = player.pos.x;
+      000AF4 21r0Br00              2392 	ld	hl, #(_actors + 0x000b)
+      000AF7 79                    2393 	ld	a, c
+      000AF8 22                    2394 	ld	(hl+), a
+      000AF9 70                    2395 	ld	(hl), b
+                                   2396 ;/tmp/_gbsbuild/src/core/Actor_b.c:352: player.start_pos.y = player.pos.y;
+      000AFA 11r0Dr00              2397 	ld	de, #(_actors + 0x000d)
+      000AFD F8 01                 2398 	ldhl	sp,	#1
+      000AFF 7E                    2399 	ld	a, (hl)
+      000B00 12                    2400 	ld	(de), a
+      000B01 13                    2401 	inc	de
+      000B02 23                    2402 	inc	hl
+      000B03 7E                    2403 	ld	a, (hl)
+      000B04 12                    2404 	ld	(de), a
+                                   2405 ;/tmp/_gbsbuild/src/core/Actor_b.c:353: player.dir.x = map_next_dir.x;
+      000B05 01r05r00              2406 	ld	bc, #_actors + 5
+      000B08 FAr00r00              2407 	ld	a, (#_map_next_dir + 0)
+      000B0B 02                    2408 	ld	(bc), a
+                                   2409 ;/tmp/_gbsbuild/src/core/Actor_b.c:354: player.dir.y = map_next_dir.y;
+      000B0C 01r06r00              2410 	ld	bc, #_actors + 6
+      000B0F FAr01r00              2411 	ld	a, (#(_map_next_dir + 0x0001) + 0)
+      000B12 02                    2412 	ld	(bc), a
+                                   2413 ;/tmp/_gbsbuild/src/core/Actor_b.c:357: player.sprite_type = SPRITE_STATIC;
+      000B13 01r19r00              2414 	ld	bc, #_actors + 25
+                                   2415 ;/tmp/_gbsbuild/src/core/Actor_b.c:358: player.frames_len = 6;
+      000B16 11r10r00              2416 	ld	de, #_actors + 16
+                                   2417 ;/tmp/_gbsbuild/src/core/Actor_b.c:355: if (sprite_frames > 6) {
+      000B19 3E 06                 2418 	ld	a, #0x06
+      000B1B 2B                    2419 	dec	hl
+      000B1C 2B                    2420 	dec	hl
+      000B1D 96                    2421 	sub	a, (hl)
+      000B1E 30 07                 2422 	jr	NC, 00108$
+                                   2423 ;/tmp/_gbsbuild/src/core/Actor_b.c:357: player.sprite_type = SPRITE_STATIC;
+      000B20 AF                    2424 	xor	a, a
+      000B21 02                    2425 	ld	(bc), a
+                                   2426 ;/tmp/_gbsbuild/src/core/Actor_b.c:358: player.frames_len = 6;
+      000B22 3E 06                 2427 	ld	a, #0x06
+      000B24 12                    2428 	ld	(de), a
+      000B25 18 20                 2429 	jr	00109$
+      000B27                       2430 00108$:
+                                   2431 ;/tmp/_gbsbuild/src/core/Actor_b.c:359: } else if (sprite_frames == 6) {
+      000B27 F8 00                 2432 	ldhl	sp,	#0
+      000B29 7E                    2433 	ld	a, (hl)
+      000B2A D6 06                 2434 	sub	a, #0x06
+      000B2C 20 06                 2435 	jr	NZ, 00105$
+                                   2436 ;/tmp/_gbsbuild/src/core/Actor_b.c:360: player.sprite_type = SPRITE_ACTOR_ANIMATED;
+                                   2437 ;/tmp/_gbsbuild/src/core/Actor_b.c:361: player.frames_len = 2;
+      000B2E 3E 02                 2438 	ld	a,#0x02
+      000B30 02                    2439 	ld	(bc),a
+      000B31 12                    2440 	ld	(de), a
+      000B32 18 13                 2441 	jr	00109$
+      000B34                       2442 00105$:
+                                   2443 ;/tmp/_gbsbuild/src/core/Actor_b.c:362: } else if (sprite_frames == 3) {
+      000B34 F8 00                 2444 	ldhl	sp,	#0
+      000B36 7E                    2445 	ld	a, (hl)
+      000B37 D6 03                 2446 	sub	a, #0x03
+      000B39 20 06                 2447 	jr	NZ, 00102$
+                                   2448 ;/tmp/_gbsbuild/src/core/Actor_b.c:363: player.sprite_type = SPRITE_ACTOR;
+                                   2449 ;/tmp/_gbsbuild/src/core/Actor_b.c:364: player.frames_len = 1;    
+      000B3B 3E 01                 2450 	ld	a,#0x01
+      000B3D 02                    2451 	ld	(bc),a
+      000B3E 12                    2452 	ld	(de), a
+      000B3F 18 06                 2453 	jr	00109$
+      000B41                       2454 00102$:
+                                   2455 ;/tmp/_gbsbuild/src/core/Actor_b.c:366: player.sprite_type = SPRITE_STATIC;
+      000B41 AF                    2456 	xor	a, a
+      000B42 02                    2457 	ld	(bc), a
+                                   2458 ;/tmp/_gbsbuild/src/core/Actor_b.c:367: player.frames_len = sprite_frames;    
+      000B43 F8 00                 2459 	ldhl	sp,	#0
+      000B45 7E                    2460 	ld	a, (hl)
+      000B46 12                    2461 	ld	(de), a
+      000B47                       2462 00109$:
+                                   2463 ;/tmp/_gbsbuild/src/core/Actor_b.c:369: player.sprite_index = SpritePoolNext();
+      000B47 CDr00r00              2464 	call	_SpritePoolNext
+      000B4A 7B                    2465 	ld	a, e
+      000B4B EAr09r00              2466 	ld	(#(_actors + 0x0009)),a
+                                   2467 ;/tmp/_gbsbuild/src/core/Actor_b.c:370: player.rerender = TRUE;
+      000B4E 21r14r00              2468 	ld	hl, #(_actors + 0x0014)
+      000B51 36 01                 2469 	ld	(hl), #0x01
+                                   2470 ;/tmp/_gbsbuild/src/core/Actor_b.c:371: player.moving = FALSE;
+      000B53 21r07r00              2471 	ld	hl, #(_actors + 0x0007)
+      000B56 36 00                 2472 	ld	(hl), #0x00
+                                   2473 ;/tmp/_gbsbuild/src/core/Actor_b.c:372: player.animate = FALSE;
+      000B58 21r11r00              2474 	ld	hl, #(_actors + 0x0011)
+      000B5B 36 00                 2475 	ld	(hl), #0x00
+                                   2476 ;/tmp/_gbsbuild/src/core/Actor_b.c:373: player.hit_actor = NO_ACTOR_COLLISON;
+      000B5D 21r1Ar00              2477 	ld	hl, #(_actors + 0x001a)
+      000B60 36 FF                 2478 	ld	(hl), #0xff
+                                   2479 ;/tmp/_gbsbuild/src/core/Actor_b.c:374: player.script_control = FALSE;
+      000B62 21r1Br00              2480 	ld	hl, #(_actors + 0x001b)
+      000B65 36 00                 2481 	ld	(hl), #0x00
+                                   2482 ;/tmp/_gbsbuild/src/core/Actor_b.c:375: }
+      000B67 E8 03                 2483 	add	sp, #3
+      000B69 C9                    2484 	ret
+                                   2485 ;/tmp/_gbsbuild/src/core/Actor_b.c:377: void ActorRunCollisionScripts_b() __banked {
+                                   2486 ;	---------------------------------
+                                   2487 ; Function ActorRunCollisionScripts_b
+                                   2488 ; ---------------------------------
+                           000001  2489 	b_ActorRunCollisionScripts_b	= 1
+      000B6A                       2490 _ActorRunCollisionScripts_b::
+      000B6A E8 FE                 2491 	add	sp, #-2
+                                   2492 ;/tmp/_gbsbuild/src/core/Actor_b.c:380: if (player_iframes == 0 && player.hit_actor != NO_ACTOR_COLLISON) {
+      000B6C FAr00r00              2493 	ld	a, (#_player_iframes)
+      000B6F B7                    2494 	or	a, a
+      000B70 C2r32r0C              2495 	jp	NZ, 00126$
+      000B73 FAr1Ar00              2496 	ld	a, (#(_actors + 0x001a) + 0)
+      000B76 FE FF                 2497 	cp	a, #0xff
+      000B78 CAr32r0C              2498 	jp	Z,00126$
+                                   2499 ;/tmp/_gbsbuild/src/core/Actor_b.c:381: actor = &actors[player.hit_actor];
+      000B7B 4F                    2500 	ld	c, a
+      000B7C 06 00                 2501 	ld	b, #0x00
+      000B7E 69                    2502 	ld	l, c
+      000B7F 60                    2503 	ld	h, b
+      000B80 29                    2504 	add	hl, hl
+      000B81 29                    2505 	add	hl, hl
+      000B82 09                    2506 	add	hl, bc
+      000B83 29                    2507 	add	hl, hl
+      000B84 09                    2508 	add	hl, bc
+      000B85 29                    2509 	add	hl, hl
+      000B86 09                    2510 	add	hl, bc
+      000B87 29                    2511 	add	hl, hl
+      000B88 11r00r00              2512 	ld	de, #_actors
+      000B8B 19                    2513 	add	hl, de
+      000B8C 5D                    2514 	ld	e, l
+      000B8D 54                    2515 	ld	d, h
+                                   2516 ;/tmp/_gbsbuild/src/core/Actor_b.c:383: if (actor->collision_group) {
+      000B8E 21 18 00              2517 	ld	hl, #0x0018
+      000B91 19                    2518 	add	hl, de
+      000B92 4E                    2519 	ld	c, (hl)
+      000B93 79                    2520 	ld	a, c
+      000B94 B7                    2521 	or	a, a
+      000B95 CAr3Ar0C              2522 	jp	Z, 00129$
+                                   2523 ;/tmp/_gbsbuild/src/core/Actor_b.c:388: if (actor->events_ptr.bank) {
+                                   2524 ;c
+      000B98 21 1E 00              2525 	ld	hl, #0x001e
+      000B9B 19                    2526 	add	hl, de
+      000B9C 33                    2527 	inc	sp
+      000B9D 33                    2528 	inc	sp
+      000B9E E5                    2529 	push	hl
+                                   2530 ;/tmp/_gbsbuild/src/core/Actor_b.c:384: if (actor->collision_group == 2) {
+      000B9F 79                    2531 	ld	a, c
+      000BA0 D6 02                 2532 	sub	a, #0x02
+      000BA2 20 28                 2533 	jr	NZ, 00119$
+                                   2534 ;/tmp/_gbsbuild/src/core/Actor_b.c:385: if (player.hit_1_ptr.bank) {
+      000BA4 01r24r00              2535 	ld	bc, #_actors + 36
+      000BA7 0A                    2536 	ld	a, (bc)
+      000BA8 B7                    2537 	or	a, a
+      000BA9 28 09                 2538 	jr	Z, 00102$
+                                   2539 ;/tmp/_gbsbuild/src/core/Actor_b.c:386: ScriptStartBg(&player.hit_1_ptr, 0);
+      000BAB AF                    2540 	xor	a, a
+      000BAC F5                    2541 	push	af
+      000BAD 33                    2542 	inc	sp
+      000BAE C5                    2543 	push	bc
+      000BAF CDr00r00              2544 	call	_ScriptStartBg
+      000BB2 E8 03                 2545 	add	sp, #3
+      000BB4                       2546 00102$:
+                                   2547 ;/tmp/_gbsbuild/src/core/Actor_b.c:388: if (actor->events_ptr.bank) {
+      000BB4 D1                    2548 	pop	de
+      000BB5 D5                    2549 	push	de
+      000BB6 1A                    2550 	ld	a, (de)
+      000BB7 B7                    2551 	or	a, a
+      000BB8 28 6C                 2552 	jr	Z, 00120$
+                                   2553 ;/tmp/_gbsbuild/src/core/Actor_b.c:389: ScriptStartBg(&actor->events_ptr, player.hit_actor);
+      000BBA FAr1Ar00              2554 	ld	a, (#(_actors + 0x001a) + 0)
+      000BBD F5                    2555 	push	af
+      000BBE 33                    2556 	inc	sp
+      000BBF F8 01                 2557 	ldhl	sp,	#1
+      000BC1 2A                    2558 	ld	a, (hl+)
+      000BC2 66                    2559 	ld	h, (hl)
+      000BC3 6F                    2560 	ld	l, a
+      000BC4 E5                    2561 	push	hl
+      000BC5 CDr00r00              2562 	call	_ScriptStartBg
+      000BC8 E8 03                 2563 	add	sp, #3
+      000BCA 18 5A                 2564 	jr	00120$
+      000BCC                       2565 00119$:
+                                   2566 ;/tmp/_gbsbuild/src/core/Actor_b.c:391: } else if (actor->collision_group == 4) {
+      000BCC 79                    2567 	ld	a, c
+      000BCD D6 04                 2568 	sub	a, #0x04
+      000BCF 20 28                 2569 	jr	NZ, 00116$
+                                   2570 ;/tmp/_gbsbuild/src/core/Actor_b.c:392: if (player.hit_2_ptr.bank) {
+      000BD1 01r27r00              2571 	ld	bc, #_actors + 39
+      000BD4 0A                    2572 	ld	a, (bc)
+      000BD5 B7                    2573 	or	a, a
+      000BD6 28 09                 2574 	jr	Z, 00106$
+                                   2575 ;/tmp/_gbsbuild/src/core/Actor_b.c:393: ScriptStartBg(&player.hit_2_ptr, 0);
+      000BD8 AF                    2576 	xor	a, a
+      000BD9 F5                    2577 	push	af
+      000BDA 33                    2578 	inc	sp
+      000BDB C5                    2579 	push	bc
+      000BDC CDr00r00              2580 	call	_ScriptStartBg
+      000BDF E8 03                 2581 	add	sp, #3
+      000BE1                       2582 00106$:
+                                   2583 ;/tmp/_gbsbuild/src/core/Actor_b.c:395: if (actor->events_ptr.bank) {
+      000BE1 D1                    2584 	pop	de
+      000BE2 D5                    2585 	push	de
+      000BE3 1A                    2586 	ld	a, (de)
+      000BE4 B7                    2587 	or	a, a
+      000BE5 28 3F                 2588 	jr	Z, 00120$
+                                   2589 ;/tmp/_gbsbuild/src/core/Actor_b.c:396: ScriptStartBg(&actor->events_ptr, player.hit_actor);
+      000BE7 FAr1Ar00              2590 	ld	a, (#(_actors + 0x001a) + 0)
+      000BEA F5                    2591 	push	af
+      000BEB 33                    2592 	inc	sp
+      000BEC F8 01                 2593 	ldhl	sp,	#1
+      000BEE 2A                    2594 	ld	a, (hl+)
+      000BEF 66                    2595 	ld	h, (hl)
+      000BF0 6F                    2596 	ld	l, a
+      000BF1 E5                    2597 	push	hl
+      000BF2 CDr00r00              2598 	call	_ScriptStartBg
+      000BF5 E8 03                 2599 	add	sp, #3
+      000BF7 18 2D                 2600 	jr	00120$
+      000BF9                       2601 00116$:
+                                   2602 ;/tmp/_gbsbuild/src/core/Actor_b.c:398: } else if (actor->collision_group == 8) {
+      000BF9 79                    2603 	ld	a, c
+      000BFA D6 08                 2604 	sub	a, #0x08
+      000BFC 20 28                 2605 	jr	NZ, 00120$
+                                   2606 ;/tmp/_gbsbuild/src/core/Actor_b.c:399: if (player.hit_3_ptr.bank) {
+      000BFE FAr2Ar00              2607 	ld	a, (#(_actors + 0x002a) + 0)
+      000C01 B7                    2608 	or	a, a
+      000C02 28 0C                 2609 	jr	Z, 00110$
+                                   2610 ;/tmp/_gbsbuild/src/core/Actor_b.c:400: ScriptStartBg(&player.hit_3_ptr, 0);
+      000C04 AF                    2611 	xor	a, a
+      000C05 F5                    2612 	push	af
+      000C06 33                    2613 	inc	sp
+      000C07 21r2Ar00              2614 	ld	hl, #(_actors + 0x002a)
+      000C0A E5                    2615 	push	hl
+      000C0B CDr00r00              2616 	call	_ScriptStartBg
+      000C0E E8 03                 2617 	add	sp, #3
+      000C10                       2618 00110$:
+                                   2619 ;/tmp/_gbsbuild/src/core/Actor_b.c:402: if (actor->events_ptr.bank) {
+      000C10 D1                    2620 	pop	de
+      000C11 D5                    2621 	push	de
+      000C12 1A                    2622 	ld	a, (de)
+      000C13 B7                    2623 	or	a, a
+      000C14 28 10                 2624 	jr	Z, 00120$
+                                   2625 ;/tmp/_gbsbuild/src/core/Actor_b.c:403: ScriptStartBg(&actor->events_ptr, player.hit_actor);
+      000C16 FAr1Ar00              2626 	ld	a, (#(_actors + 0x001a) + 0)
+      000C19 F5                    2627 	push	af
+      000C1A 33                    2628 	inc	sp
+      000C1B F8 01                 2629 	ldhl	sp,	#1
+      000C1D 2A                    2630 	ld	a, (hl+)
+      000C1E 66                    2631 	ld	h, (hl)
+      000C1F 6F                    2632 	ld	l, a
+      000C20 E5                    2633 	push	hl
+      000C21 CDr00r00              2634 	call	_ScriptStartBg
+      000C24 E8 03                 2635 	add	sp, #3
+      000C26                       2636 00120$:
+                                   2637 ;/tmp/_gbsbuild/src/core/Actor_b.c:406: player_iframes = 10;
+      000C26 21r00r00              2638 	ld	hl, #_player_iframes
+      000C29 36 0A                 2639 	ld	(hl), #0x0a
+                                   2640 ;/tmp/_gbsbuild/src/core/Actor_b.c:407: player.hit_actor = NO_ACTOR_COLLISON;
+      000C2B 21r1Ar00              2641 	ld	hl, #(_actors + 0x001a)
+      000C2E 36 FF                 2642 	ld	(hl), #0xff
+      000C30 18 08                 2643 	jr	00129$
+      000C32                       2644 00126$:
+                                   2645 ;/tmp/_gbsbuild/src/core/Actor_b.c:409: } else if (player_iframes != 0) {
+      000C32 21r00r00              2646 	ld	hl, #_player_iframes
+      000C35 7E                    2647 	ld	a, (hl)
+      000C36 B7                    2648 	or	a, a
+      000C37 28 01                 2649 	jr	Z, 00129$
+                                   2650 ;/tmp/_gbsbuild/src/core/Actor_b.c:410: player_iframes--;
+      000C39 35                    2651 	dec	(hl)
+      000C3A                       2652 00129$:
+                                   2653 ;/tmp/_gbsbuild/src/core/Actor_b.c:412: }
+      000C3A E8 02                 2654 	add	sp, #2
+      000C3C C9                    2655 	ret
+                                   2656 	.area _CODE_1
+                                   2657 	.area _CABS (ABS)

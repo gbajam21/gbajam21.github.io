@@ -1,0 +1,172 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Trigger_b
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_TriggerAtTile_b
+                                     12 	.globl _TriggerAtTile_b
+                                     13 ;--------------------------------------------------------
+                                     14 ; special function registers
+                                     15 ;--------------------------------------------------------
+                                     16 ;--------------------------------------------------------
+                                     17 ; ram data
+                                     18 ;--------------------------------------------------------
+                                     19 	.area _DATA
+                                     20 ;--------------------------------------------------------
+                                     21 ; absolute external ram data
+                                     22 ;--------------------------------------------------------
+                                     23 	.area _DABS (ABS)
+                                     24 ;--------------------------------------------------------
+                                     25 ; global & static initialisations
+                                     26 ;--------------------------------------------------------
+                                     27 	.area _HOME
+                                     28 	.area _GSINIT
+                                     29 	.area _GSFINAL
+                                     30 	.area _GSINIT
+                                     31 ;--------------------------------------------------------
+                                     32 ; Home
+                                     33 ;--------------------------------------------------------
+                                     34 	.area _HOME
+                                     35 	.area _HOME
+                                     36 ;--------------------------------------------------------
+                                     37 ; code
+                                     38 ;--------------------------------------------------------
+                                     39 	.area _CODE_1
+                                     40 ;/tmp/_gbsbuild/src/core/Trigger_b.c:5: UBYTE TriggerAtTile_b(UBYTE tx_a, UBYTE ty_a) __banked {
+                                     41 ;	---------------------------------
+                                     42 ; Function TriggerAtTile_b
+                                     43 ; ---------------------------------
+                           000001    44 	b_TriggerAtTile_b	= 1
+      000000                         45 _TriggerAtTile_b::
+      000000 E8 F8                   46 	add	sp, #-8
+                                     47 ;/tmp/_gbsbuild/src/core/Trigger_b.c:8: for (i = 0; i != triggers_len; i++) {
+      000002 AF                      48 	xor	a, a
+      000003 F8 00                   49 	ldhl	sp,	#0
+      000005 77                      50 	ld	(hl), a
+      000006 0E 00                   51 	ld	c, #0x00
+      000008                         52 00108$:
+      000008 FAr00r00                53 	ld	a, (#_triggers_len)
+      00000B 91                      54 	sub	a, c
+      00000C CAr91r00                55 	jp	Z,00106$
+                                     56 ;/tmp/_gbsbuild/src/core/Trigger_b.c:9: tx_b = triggers[i].x;
+      00000F 06 00                   57 	ld	b, #0x00
+      000011 69                      58 	ld	l, c
+      000012 60                      59 	ld	h, b
+      000013 29                      60 	add	hl, hl
+      000014 09                      61 	add	hl, bc
+      000015 29                      62 	add	hl, hl
+      000016 09                      63 	add	hl, bc
+      000017 7D                      64 	ld	a, l
+      000018 C6r00                   65 	add	a, #<(_triggers)
+      00001A 5F                      66 	ld	e, a
+      00001B 7C                      67 	ld	a, h
+      00001C CEs00                   68 	adc	a, #>(_triggers)
+      00001E 57                      69 	ld	d, a
+      00001F 1A                      70 	ld	a, (de)
+      000020 47                      71 	ld	b, a
+                                     72 ;/tmp/_gbsbuild/src/core/Trigger_b.c:10: ty_b = triggers[i].y;
+      000021 6B                      73 	ld	l, e
+      000022 62                      74 	ld	h, d
+      000023 23                      75 	inc	hl
+      000024 7E                      76 	ld	a, (hl)
+      000025 F8 01                   77 	ldhl	sp,	#1
+      000027 77                      78 	ld	(hl), a
+                                     79 ;/tmp/_gbsbuild/src/core/Trigger_b.c:11: tx_c = tx_b + triggers[i].w - 1;
+      000028 6B                      80 	ld	l, e
+      000029 62                      81 	ld	h, d
+      00002A 23                      82 	inc	hl
+      00002B 23                      83 	inc	hl
+      00002C 7E                      84 	ld	a, (hl)
+      00002D 80                      85 	add	a, b
+      00002E C6 FF                   86 	add	a, #0xff
+      000030 F8 02                   87 	ldhl	sp,	#2
+      000032 77                      88 	ld	(hl), a
+                                     89 ;/tmp/_gbsbuild/src/core/Trigger_b.c:12: ty_c = ty_b + triggers[i].h - 1;
+      000033 13                      90 	inc	de
+      000034 13                      91 	inc	de
+      000035 13                      92 	inc	de
+      000036 1A                      93 	ld	a, (de)
+      000037 2B                      94 	dec	hl
+      000038 86                      95 	add	a, (hl)
+      000039 C6 FF                   96 	add	a, #0xff
+      00003B 23                      97 	inc	hl
+      00003C 23                      98 	inc	hl
+      00003D 77                      99 	ld	(hl), a
+                                    100 ;/tmp/_gbsbuild/src/core/Trigger_b.c:14: if ((tx_a + 1) >= tx_b && tx_a <= tx_c && ty_a >= ty_b && ty_a <= ty_c) {
+      00003E F8 0E                  101 	ldhl	sp,	#14
+      000040 5E                     102 	ld	e, (hl)
+      000041 16 00                  103 	ld	d, #0x00
+      000043 13                     104 	inc	de
+      000044 F8 04                  105 	ldhl	sp,	#4
+      000046 7B                     106 	ld	a, e
+      000047 22                     107 	ld	(hl+), a
+      000048 7A                     108 	ld	a, d
+      000049 22                     109 	ld	(hl+), a
+      00004A 70                     110 	ld	(hl), b
+      00004B AF                     111 	xor	a, a
+      00004C 23                     112 	inc	hl
+      00004D 77                     113 	ld	(hl), a
+      00004E F8 04                  114 	ldhl	sp,	#4
+      000050 5D                     115 	ld	e, l
+      000051 54                     116 	ld	d, h
+      000052 F8 06                  117 	ldhl	sp,	#6
+      000054 1A                     118 	ld	a, (de)
+      000055 96                     119 	sub	a, (hl)
+      000056 23                     120 	inc	hl
+      000057 13                     121 	inc	de
+      000058 1A                     122 	ld	a, (de)
+      000059 9E                     123 	sbc	a, (hl)
+      00005A 1A                     124 	ld	a, (de)
+      00005B 57                     125 	ld	d, a
+      00005C CB 7E                  126 	bit	7, (hl)
+      00005E 28 07                  127 	jr	Z, 00143$
+      000060 CB 7A                  128 	bit	7, d
+      000062 20 08                  129 	jr	NZ, 00144$
+      000064 BF                     130 	cp	a, a
+      000065 18 05                  131 	jr	00144$
+      000067                        132 00143$:
+      000067 CB 7A                  133 	bit	7, d
+      000069 28 01                  134 	jr	Z, 00144$
+      00006B 37                     135 	scf
+      00006C                        136 00144$:
+      00006C 38 1C                  137 	jr	C, 00109$
+      00006E F8 02                  138 	ldhl	sp,	#2
+      000070 7E                     139 	ld	a, (hl)
+      000071 F8 0E                  140 	ldhl	sp,	#14
+      000073 96                     141 	sub	a, (hl)
+      000074 38 14                  142 	jr	C, 00109$
+      000076 23                     143 	inc	hl
+      000077 7E                     144 	ld	a, (hl)
+      000078 F8 01                  145 	ldhl	sp,	#1
+      00007A 96                     146 	sub	a, (hl)
+      00007B 38 0D                  147 	jr	C, 00109$
+      00007D 23                     148 	inc	hl
+      00007E 23                     149 	inc	hl
+      00007F 7E                     150 	ld	a, (hl)
+      000080 F8 0F                  151 	ldhl	sp,	#15
+      000082 96                     152 	sub	a, (hl)
+      000083 38 05                  153 	jr	C, 00109$
+                                    154 ;/tmp/_gbsbuild/src/core/Trigger_b.c:15: return i;
+      000085 F8 00                  155 	ldhl	sp,	#0
+      000087 5E                     156 	ld	e, (hl)
+      000088 18 09                  157 	jr	00110$
+      00008A                        158 00109$:
+                                    159 ;/tmp/_gbsbuild/src/core/Trigger_b.c:8: for (i = 0; i != triggers_len; i++) {
+      00008A 0C                     160 	inc	c
+      00008B F8 00                  161 	ldhl	sp,	#0
+      00008D 71                     162 	ld	(hl), c
+      00008E C3r08r00               163 	jp	00108$
+      000091                        164 00106$:
+                                    165 ;/tmp/_gbsbuild/src/core/Trigger_b.c:19: return NO_TRIGGER_COLLISON;
+      000091 1E FF                  166 	ld	e, #0xff
+      000093                        167 00110$:
+                                    168 ;/tmp/_gbsbuild/src/core/Trigger_b.c:20: }
+      000093 E8 08                  169 	add	sp, #8
+      000095 C9                     170 	ret
+                                    171 	.area _CODE_1
+                                    172 	.area _CABS (ABS)

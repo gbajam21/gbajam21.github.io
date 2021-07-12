@@ -1,0 +1,166 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Projectiles
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_UpdateProjectiles_b
+                                     12 	.globl _UpdateProjectiles_b
+                                     13 	.globl b_ProjectileLaunch_b
+                                     14 	.globl _ProjectileLaunch_b
+                                     15 	.globl b_WeaponAttack_b
+                                     16 	.globl _WeaponAttack_b
+                                     17 	.globl b_ProjectilesInit_b
+                                     18 	.globl _ProjectilesInit_b
+                                     19 	.globl _ProjectilesInit
+                                     20 	.globl _WeaponAttack
+                                     21 	.globl _ProjectileLaunch
+                                     22 	.globl _UpdateProjectiles
+                                     23 ;--------------------------------------------------------
+                                     24 ; special function registers
+                                     25 ;--------------------------------------------------------
+                                     26 ;--------------------------------------------------------
+                                     27 ; ram data
+                                     28 ;--------------------------------------------------------
+                                     29 	.area _DATA
+                                     30 ;--------------------------------------------------------
+                                     31 ; absolute external ram data
+                                     32 ;--------------------------------------------------------
+                                     33 	.area _DABS (ABS)
+                                     34 ;--------------------------------------------------------
+                                     35 ; global & static initialisations
+                                     36 ;--------------------------------------------------------
+                                     37 	.area _HOME
+                                     38 	.area _GSINIT
+                                     39 	.area _GSFINAL
+                                     40 	.area _GSINIT
+                                     41 ;--------------------------------------------------------
+                                     42 ; Home
+                                     43 ;--------------------------------------------------------
+                                     44 	.area _HOME
+                                     45 	.area _HOME
+                                     46 ;--------------------------------------------------------
+                                     47 ; code
+                                     48 ;--------------------------------------------------------
+                                     49 	.area _CODE
+                                     50 ;/tmp/_gbsbuild/src/core/Projectiles.c:20: void ProjectilesInit() {
+                                     51 ;	---------------------------------
+                                     52 ; Function ProjectilesInit
+                                     53 ; ---------------------------------
+      000000                         54 _ProjectilesInit::
+                                     55 ;/tmp/_gbsbuild/src/core/Projectiles.c:21: ProjectilesInit_b();
+      000000 1Er00                   56 	ld	e, #b_ProjectilesInit_b
+      000002 21r00r00                57 	ld	hl, #_ProjectilesInit_b
+                                     58 ;/tmp/_gbsbuild/src/core/Projectiles.c:22: }
+      000005 C3r00r00                59 	jp  ___sdcc_bcall_ehl
+                                     60 ;/tmp/_gbsbuild/src/core/Projectiles.c:24: void WeaponAttack(UBYTE sprite, UBYTE palette, UBYTE actor, UBYTE offset, UBYTE col_group, UBYTE col_mask) {
+                                     61 ;	---------------------------------
+                                     62 ; Function WeaponAttack
+                                     63 ; ---------------------------------
+      000008                         64 _WeaponAttack::
+                                     65 ;/tmp/_gbsbuild/src/core/Projectiles.c:25: WeaponAttack_b(sprite, palette, actor, offset, col_group, col_mask);
+      000008 F8 07                   66 	ldhl	sp,	#7
+      00000A 7E                      67 	ld	a, (hl)
+      00000B F5                      68 	push	af
+      00000C 33                      69 	inc	sp
+      00000D 2B                      70 	dec	hl
+      00000E 7E                      71 	ld	a, (hl)
+      00000F F5                      72 	push	af
+      000010 33                      73 	inc	sp
+      000011 2B                      74 	dec	hl
+      000012 7E                      75 	ld	a, (hl)
+      000013 F5                      76 	push	af
+      000014 33                      77 	inc	sp
+      000015 2B                      78 	dec	hl
+      000016 7E                      79 	ld	a, (hl)
+      000017 F5                      80 	push	af
+      000018 33                      81 	inc	sp
+      000019 2B                      82 	dec	hl
+      00001A 7E                      83 	ld	a, (hl)
+      00001B F5                      84 	push	af
+      00001C 33                      85 	inc	sp
+      00001D 2B                      86 	dec	hl
+      00001E 7E                      87 	ld	a, (hl)
+      00001F F5                      88 	push	af
+      000020 33                      89 	inc	sp
+      000021 1Er00                   90 	ld	e, #b_WeaponAttack_b
+      000023 21r00r00                91 	ld	hl, #_WeaponAttack_b
+      000026 CDr00r00                92 	call	___sdcc_bcall_ehl
+      000029 E8 06                   93 	add	sp, #6
+                                     94 ;/tmp/_gbsbuild/src/core/Projectiles.c:26: }
+      00002B C9                      95 	ret
+                                     96 ;/tmp/_gbsbuild/src/core/Projectiles.c:28: void ProjectileLaunch(UBYTE sprite,
+                                     97 ;	---------------------------------
+                                     98 ; Function ProjectileLaunch
+                                     99 ; ---------------------------------
+      00002C                        100 _ProjectileLaunch::
+                                    101 ;/tmp/_gbsbuild/src/core/Projectiles.c:39: ProjectileLaunch_b(sprite, palette, x, y, dir_x, dir_y, moving, move_speed, life_time, col_group,
+      00002C F8 0E                  102 	ldhl	sp,	#14
+      00002E 7E                     103 	ld	a, (hl)
+      00002F F5                     104 	push	af
+      000030 33                     105 	inc	sp
+      000031 2B                     106 	dec	hl
+      000032 7E                     107 	ld	a, (hl)
+      000033 F5                     108 	push	af
+      000034 33                     109 	inc	sp
+      000035 2B                     110 	dec	hl
+      000036 7E                     111 	ld	a, (hl)
+      000037 F5                     112 	push	af
+      000038 33                     113 	inc	sp
+      000039 2B                     114 	dec	hl
+      00003A 7E                     115 	ld	a, (hl)
+      00003B F5                     116 	push	af
+      00003C 33                     117 	inc	sp
+      00003D 2B                     118 	dec	hl
+      00003E 7E                     119 	ld	a, (hl)
+      00003F F5                     120 	push	af
+      000040 33                     121 	inc	sp
+      000041 2B                     122 	dec	hl
+      000042 7E                     123 	ld	a, (hl)
+      000043 F5                     124 	push	af
+      000044 33                     125 	inc	sp
+      000045 2B                     126 	dec	hl
+      000046 7E                     127 	ld	a, (hl)
+      000047 F5                     128 	push	af
+      000048 33                     129 	inc	sp
+      000049 2B                     130 	dec	hl
+      00004A 2B                     131 	dec	hl
+      00004B 2A                     132 	ld	a, (hl+)
+      00004C 66                     133 	ld	h, (hl)
+      00004D 6F                     134 	ld	l, a
+      00004E E5                     135 	push	hl
+      00004F F8 0D                  136 	ldhl	sp,	#13
+      000051 2A                     137 	ld	a, (hl+)
+      000052 66                     138 	ld	h, (hl)
+      000053 6F                     139 	ld	l, a
+      000054 E5                     140 	push	hl
+      000055 F8 0E                  141 	ldhl	sp,	#14
+      000057 7E                     142 	ld	a, (hl)
+      000058 F5                     143 	push	af
+      000059 33                     144 	inc	sp
+      00005A 2B                     145 	dec	hl
+      00005B 7E                     146 	ld	a, (hl)
+      00005C F5                     147 	push	af
+      00005D 33                     148 	inc	sp
+      00005E 1Er00                  149 	ld	e, #b_ProjectileLaunch_b
+      000060 21r00r00               150 	ld	hl, #_ProjectileLaunch_b
+      000063 CDr00r00               151 	call	___sdcc_bcall_ehl
+      000066 E8 0D                  152 	add	sp, #13
+                                    153 ;/tmp/_gbsbuild/src/core/Projectiles.c:41: }
+      000068 C9                     154 	ret
+                                    155 ;/tmp/_gbsbuild/src/core/Projectiles.c:43: void UpdateProjectiles() {
+                                    156 ;	---------------------------------
+                                    157 ; Function UpdateProjectiles
+                                    158 ; ---------------------------------
+      000069                        159 _UpdateProjectiles::
+                                    160 ;/tmp/_gbsbuild/src/core/Projectiles.c:44: UpdateProjectiles_b();
+      000069 1Er00                  161 	ld	e, #b_UpdateProjectiles_b
+      00006B 21r00r00               162 	ld	hl, #_UpdateProjectiles_b
+                                    163 ;/tmp/_gbsbuild/src/core/Projectiles.c:45: }
+      00006E C3r00r00               164 	jp  ___sdcc_bcall_ehl
+                                    165 	.area _CODE
+                                    166 	.area _CABS (ABS)

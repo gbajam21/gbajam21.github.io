@@ -1,0 +1,56 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+  6 _avatar_bank_ptrs                                              00005A GR
+  6 _background_attr_bank_ptrs                                     000015 GR
+  6 _background_bank_ptrs                                          000006 GR
+  6 _collision_bank_ptrs                                           00004B GR
+  1 _engine_fields_addr                                            000022 GR
+  1 _fade_style                                                    000021 GR
+  6 _music_banks                                                   000067 GR
+  6 _music_tracks                                                  00005D GR
+  6 _palette_bank_ptrs                                             000024 GR
+  1 _plat_dec                                                      000016 GR
+  1 _plat_grav                                                     00001A GR
+  1 _plat_hold_grav                                                00001C GR
+  1 _plat_jump_vel                                                 000018 GR
+  1 _plat_max_fall_vel                                             00001E GR
+  1 _plat_min_vel                                                  00000C GR
+  1 _plat_run_acc                                                  000014 GR
+  1 _plat_run_vel                                                  000010 GR
+  1 _plat_walk_acc                                                 000012 GR
+  1 _plat_walk_vel                                                 00000E GR
+  6 _scene_bank_ptrs                                               00003C GR
+  1 _script_variables                                              000024 GR
+  6 _sprite_bank_ptrs                                              000036 GR
+  1 _start_player_anim_speed                                       00000B GR
+  1 _start_player_move_speed                                       00000A GR
+  1 _start_player_sprite                                           000008 GR
+  1 _start_scene_dir_x                                             000006 GR
+  1 _start_scene_dir_y                                             000007 GR
+  1 _start_scene_index                                             000000 GR
+  1 _start_scene_x                                                 000002 GR
+  1 _start_scene_y                                                 000004 GR
+  6 _tileset_bank_ptrs                                             000000 GR
+  1 _topdown_grid                                                  000020 GR
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size      0   flags    0
+   1 _DATA                                      size    218   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size     96   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CODE_5                                    size     6C   flags    0
+   7 _CABS                                      size      0   flags    8
+

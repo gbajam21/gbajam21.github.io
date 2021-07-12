@@ -1,0 +1,158 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module FadeManager
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_ApplyPaletteChange_b
+                                     12 	.globl _ApplyPaletteChange_b
+                                     13 	.globl b_FadeUpdate_b
+                                     14 	.globl _FadeUpdate_b
+                                     15 	.globl b_FadeOut_b
+                                     16 	.globl _FadeOut_b
+                                     17 	.globl b_FadeIn_b
+                                     18 	.globl _FadeIn_b
+                                     19 	.globl _fade_timer
+                                     20 	.globl _fade_black
+                                     21 	.globl _fade_frames_per_step
+                                     22 	.globl _fade_running
+                                     23 	.globl _fade_speeds
+                                     24 	.globl _FadeInit
+                                     25 	.globl _FadeIn
+                                     26 	.globl _FadeOut
+                                     27 	.globl _FadeUpdate
+                                     28 	.globl _ApplyPaletteChange
+                                     29 	.globl _FadeSetSpeed
+                                     30 	.globl _IsFading
+                                     31 ;--------------------------------------------------------
+                                     32 ; special function registers
+                                     33 ;--------------------------------------------------------
+                                     34 ;--------------------------------------------------------
+                                     35 ; ram data
+                                     36 ;--------------------------------------------------------
+                                     37 	.area _DATA
+      000000                         38 _fade_running::
+      000000                         39 	.ds 1
+      000001                         40 _fade_frames_per_step::
+      000001                         41 	.ds 1
+      000002                         42 _fade_black::
+      000002                         43 	.ds 1
+      000003                         44 _fade_timer::
+      000003                         45 	.ds 1
+                                     46 ;--------------------------------------------------------
+                                     47 ; absolute external ram data
+                                     48 ;--------------------------------------------------------
+                                     49 	.area _DABS (ABS)
+                                     50 ;--------------------------------------------------------
+                                     51 ; global & static initialisations
+                                     52 ;--------------------------------------------------------
+                                     53 	.area _HOME
+                                     54 	.area _GSINIT
+                                     55 	.area _GSFINAL
+                                     56 	.area _GSINIT
+                                     57 ;/tmp/_gbsbuild/src/core/FadeManager.c:7: UBYTE fade_black = 0;
+      000000 21r02r00                58 	ld	hl, #_fade_black
+      000003 36 00                   59 	ld	(hl), #0x00
+                                     60 ;/tmp/_gbsbuild/src/core/FadeManager.c:8: UBYTE fade_timer = 0;
+      000005 21r03r00                61 	ld	hl, #_fade_timer
+      000008 36 00                   62 	ld	(hl), #0x00
+                                     63 ;--------------------------------------------------------
+                                     64 ; Home
+                                     65 ;--------------------------------------------------------
+                                     66 	.area _HOME
+                                     67 	.area _HOME
+                                     68 ;--------------------------------------------------------
+                                     69 ; code
+                                     70 ;--------------------------------------------------------
+                                     71 	.area _CODE
+                                     72 ;/tmp/_gbsbuild/src/core/FadeManager.c:17: void FadeInit() {
+                                     73 ;	---------------------------------
+                                     74 ; Function FadeInit
+                                     75 ; ---------------------------------
+      000000                         76 _FadeInit::
+                                     77 ;/tmp/_gbsbuild/src/core/FadeManager.c:18: fade_frames_per_step = fade_speeds[2];
+      000000 FAr09r00                78 	ld	a, (#(_fade_speeds + 0x0002) + 0)
+      000003 EAr01r00                79 	ld	(#_fade_frames_per_step),a
+                                     80 ;/tmp/_gbsbuild/src/core/FadeManager.c:19: }
+      000006 C9                      81 	ret
+      000007                         82 _fade_speeds:
+      000007 00                      83 	.db #0x00	; 0
+      000008 01                      84 	.db #0x01	; 1
+      000009 03                      85 	.db #0x03	; 3
+      00000A 07                      86 	.db #0x07	; 7
+      00000B 0F                      87 	.db #0x0f	; 15
+      00000C 1F                      88 	.db #0x1f	; 31
+      00000D 3F                      89 	.db #0x3f	; 63
+                                     90 ;/tmp/_gbsbuild/src/core/FadeManager.c:21: void FadeIn() {
+                                     91 ;	---------------------------------
+                                     92 ; Function FadeIn
+                                     93 ; ---------------------------------
+      00000E                         94 _FadeIn::
+                                     95 ;/tmp/_gbsbuild/src/core/FadeManager.c:22: FadeIn_b();
+      00000E 1Er00                   96 	ld	e, #b_FadeIn_b
+      000010 21r00r00                97 	ld	hl, #_FadeIn_b
+                                     98 ;/tmp/_gbsbuild/src/core/FadeManager.c:23: }
+      000013 C3r00r00                99 	jp  ___sdcc_bcall_ehl
+                                    100 ;/tmp/_gbsbuild/src/core/FadeManager.c:25: void FadeOut() {
+                                    101 ;	---------------------------------
+                                    102 ; Function FadeOut
+                                    103 ; ---------------------------------
+      000016                        104 _FadeOut::
+                                    105 ;/tmp/_gbsbuild/src/core/FadeManager.c:26: FadeOut_b();
+      000016 1Er00                  106 	ld	e, #b_FadeOut_b
+      000018 21r00r00               107 	ld	hl, #_FadeOut_b
+                                    108 ;/tmp/_gbsbuild/src/core/FadeManager.c:27: }
+      00001B C3r00r00               109 	jp  ___sdcc_bcall_ehl
+                                    110 ;/tmp/_gbsbuild/src/core/FadeManager.c:29: void FadeUpdate() {
+                                    111 ;	---------------------------------
+                                    112 ; Function FadeUpdate
+                                    113 ; ---------------------------------
+      00001E                        114 _FadeUpdate::
+                                    115 ;/tmp/_gbsbuild/src/core/FadeManager.c:30: FadeUpdate_b();
+      00001E 1Er00                  116 	ld	e, #b_FadeUpdate_b
+      000020 21r00r00               117 	ld	hl, #_FadeUpdate_b
+                                    118 ;/tmp/_gbsbuild/src/core/FadeManager.c:31: }
+      000023 C3r00r00               119 	jp  ___sdcc_bcall_ehl
+                                    120 ;/tmp/_gbsbuild/src/core/FadeManager.c:33: void ApplyPaletteChange() {
+                                    121 ;	---------------------------------
+                                    122 ; Function ApplyPaletteChange
+                                    123 ; ---------------------------------
+      000026                        124 _ApplyPaletteChange::
+                                    125 ;/tmp/_gbsbuild/src/core/FadeManager.c:34: ApplyPaletteChange_b();
+      000026 1Er00                  126 	ld	e, #b_ApplyPaletteChange_b
+      000028 21r00r00               127 	ld	hl, #_ApplyPaletteChange_b
+                                    128 ;/tmp/_gbsbuild/src/core/FadeManager.c:35: }
+      00002B C3r00r00               129 	jp  ___sdcc_bcall_ehl
+                                    130 ;/tmp/_gbsbuild/src/core/FadeManager.c:37: void FadeSetSpeed(UBYTE speed) {
+                                    131 ;	---------------------------------
+                                    132 ; Function FadeSetSpeed
+                                    133 ; ---------------------------------
+      00002E                        134 _FadeSetSpeed::
+                                    135 ;/tmp/_gbsbuild/src/core/FadeManager.c:38: fade_frames_per_step = fade_speeds[speed];
+      00002E 01r07r00               136 	ld	bc, #_fade_speeds+0
+      000031 F8 02                  137 	ldhl	sp,	#2
+      000033 6E                     138 	ld	l, (hl)
+      000034 26 00                  139 	ld	h, #0x00
+      000036 09                     140 	add	hl, bc
+      000037 4D                     141 	ld	c, l
+      000038 44                     142 	ld	b, h
+      000039 0A                     143 	ld	a, (bc)
+      00003A EAr01r00               144 	ld	(#_fade_frames_per_step),a
+                                    145 ;/tmp/_gbsbuild/src/core/FadeManager.c:39: }
+      00003D C9                     146 	ret
+                                    147 ;/tmp/_gbsbuild/src/core/FadeManager.c:41: UBYTE IsFading() {
+                                    148 ;	---------------------------------
+                                    149 ; Function IsFading
+                                    150 ; ---------------------------------
+      00003E                        151 _IsFading::
+                                    152 ;/tmp/_gbsbuild/src/core/FadeManager.c:42: return fade_running;
+      00003E 21r00r00               153 	ld	hl, #_fade_running
+      000041 5E                     154 	ld	e, (hl)
+                                    155 ;/tmp/_gbsbuild/src/core/FadeManager.c:43: }
+      000042 C9                     156 	ret
+                                    157 	.area _CODE
+                                    158 	.area _CABS (ABS)

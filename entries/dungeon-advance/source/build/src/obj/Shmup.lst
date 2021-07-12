@@ -1,0 +1,1112 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Shmup
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _ActivateTriggerAt
+                                     12 	.globl _ScriptStartBg
+                                     13 	.globl _TileAt
+                                     14 	.globl _ActorOverlapsPlayer
+                                     15 	.globl _Gt16
+                                     16 	.globl _Lt16
+                                     17 	.globl _shooter_reached_end
+                                     18 	.globl _shooter_direction
+                                     19 	.globl _shooter_horizontal
+                                     20 	.globl _Start_Shmup
+                                     21 	.globl _Update_Shmup
+                                     22 ;--------------------------------------------------------
+                                     23 ; special function registers
+                                     24 ;--------------------------------------------------------
+                                     25 ;--------------------------------------------------------
+                                     26 ; ram data
+                                     27 ;--------------------------------------------------------
+                                     28 	.area _DATA
+      000000                         29 _shooter_horizontal::
+      000000                         30 	.ds 1
+      000001                         31 _shooter_direction::
+      000001                         32 	.ds 1
+      000002                         33 _shooter_reached_end::
+      000002                         34 	.ds 1
+                                     35 ;--------------------------------------------------------
+                                     36 ; absolute external ram data
+                                     37 ;--------------------------------------------------------
+                                     38 	.area _DABS (ABS)
+                                     39 ;--------------------------------------------------------
+                                     40 ; global & static initialisations
+                                     41 ;--------------------------------------------------------
+                                     42 	.area _HOME
+                                     43 	.area _GSINIT
+                                     44 	.area _GSFINAL
+                                     45 	.area _GSINIT
+                                     46 ;/tmp/_gbsbuild/src/states/Shmup.c:15: UBYTE shooter_horizontal = 0;
+      000000 21r00r00                47 	ld	hl, #_shooter_horizontal
+      000003 36 00                   48 	ld	(hl), #0x00
+                                     49 ;/tmp/_gbsbuild/src/states/Shmup.c:16: BYTE shooter_direction = 0;
+      000005 21r01r00                50 	ld	hl, #_shooter_direction
+      000008 36 00                   51 	ld	(hl), #0x00
+                                     52 ;/tmp/_gbsbuild/src/states/Shmup.c:17: UBYTE shooter_reached_end = 0;
+      00000A 21r02r00                53 	ld	hl, #_shooter_reached_end
+      00000D 36 00                   54 	ld	(hl), #0x00
+                                     55 ;--------------------------------------------------------
+                                     56 ; Home
+                                     57 ;--------------------------------------------------------
+                                     58 	.area _HOME
+                                     59 	.area _HOME
+                                     60 ;--------------------------------------------------------
+                                     61 ; code
+                                     62 ;--------------------------------------------------------
+                                     63 	.area _CODE_5
+                                     64 ;/tmp/_gbsbuild/src/states/Shmup.c:19: void Start_Shmup() {
+                                     65 ;	---------------------------------
+                                     66 ; Function Start_Shmup
+                                     67 ; ---------------------------------
+      000000                         68 _Start_Shmup::
+                                     69 ;/tmp/_gbsbuild/src/states/Shmup.c:20: camera_offset.x = 0;
+      000000 21r00r00                70 	ld	hl, #_camera_offset
+      000003 36 00                   71 	ld	(hl), #0x00
+                                     72 ;/tmp/_gbsbuild/src/states/Shmup.c:21: camera_offset.y = 0;
+      000005 21r01r00                73 	ld	hl, #(_camera_offset + 0x0001)
+      000008 36 00                   74 	ld	(hl), #0x00
+                                     75 ;/tmp/_gbsbuild/src/states/Shmup.c:22: camera_deadzone.x = 0;
+      00000A 21r00r00                76 	ld	hl, #_camera_deadzone
+      00000D 36 00                   77 	ld	(hl), #0x00
+                                     78 ;/tmp/_gbsbuild/src/states/Shmup.c:23: camera_deadzone.y = 0;
+      00000F 21r01r00                79 	ld	hl, #(_camera_deadzone + 0x0001)
+      000012 36 00                   80 	ld	(hl), #0x00
+                                     81 ;/tmp/_gbsbuild/src/states/Shmup.c:25: if (player.dir.x < 0) {
+      000014 21r05r00                82 	ld	hl, #(_actors + 0x0005)
+      000017 4E                      83 	ld	c, (hl)
+      000018 CB 79                   84 	bit	7, c
+      00001A 28 16                   85 	jr	Z, 00108$
+                                     86 ;/tmp/_gbsbuild/src/states/Shmup.c:27: camera_offset.x = 56;
+      00001C 21r00r00                87 	ld	hl, #_camera_offset
+      00001F 36 38                   88 	ld	(hl), #0x38
+                                     89 ;/tmp/_gbsbuild/src/states/Shmup.c:28: shooter_horizontal = 1;
+      000021 21r00r00                90 	ld	hl, #_shooter_horizontal
+      000024 36 01                   91 	ld	(hl), #0x01
+                                     92 ;/tmp/_gbsbuild/src/states/Shmup.c:29: shooter_direction = -1;
+      000026 21r01r00                93 	ld	hl, #_shooter_direction
+      000029 36 FF                   94 	ld	(hl), #0xff
+                                     95 ;/tmp/_gbsbuild/src/states/Shmup.c:32: player.dir.x = 1;
+      00002B 21r05r00                96 	ld	hl, #(_actors + 0x0005)
+      00002E 36 01                   97 	ld	(hl), #0x01
+      000030 18 4F                   98 	jr	00109$
+      000032                         99 00108$:
+                                    100 ;/tmp/_gbsbuild/src/states/Shmup.c:33: } else if (player.dir.x > 0) {
+      000032 59                     101 	ld	e, c
+      000033 16 00                  102 	ld	d, #0x00
+      000035 AF                     103 	xor	a, a
+      000036 91                     104 	sub	a, c
+      000037 CB 7B                  105 	bit	7, e
+      000039 28 07                  106 	jr	Z, 00127$
+      00003B CB 7A                  107 	bit	7, d
+      00003D 20 08                  108 	jr	NZ, 00128$
+      00003F BF                     109 	cp	a, a
+      000040 18 05                  110 	jr	00128$
+      000042                        111 00127$:
+      000042 CB 7A                  112 	bit	7, d
+      000044 28 01                  113 	jr	Z, 00128$
+      000046 37                     114 	scf
+      000047                        115 00128$:
+      000047 30 11                  116 	jr	NC, 00105$
+                                    117 ;/tmp/_gbsbuild/src/states/Shmup.c:35: camera_offset.x = -56;
+      000049 21r00r00               118 	ld	hl, #_camera_offset
+      00004C 36 C8                  119 	ld	(hl), #0xc8
+                                    120 ;/tmp/_gbsbuild/src/states/Shmup.c:36: shooter_horizontal = 1;
+      00004E 21r00r00               121 	ld	hl, #_shooter_horizontal
+      000051 36 01                  122 	ld	(hl), #0x01
+                                    123 ;/tmp/_gbsbuild/src/states/Shmup.c:37: shooter_direction = 1;
+      000053 21r01r00               124 	ld	hl, #_shooter_direction
+      000056 36 01                  125 	ld	(hl), #0x01
+      000058 18 27                  126 	jr	00109$
+      00005A                        127 00105$:
+                                    128 ;/tmp/_gbsbuild/src/states/Shmup.c:38: } else if (player.dir.y < 0) {
+      00005A 21r06r00               129 	ld	hl, #(_actors + 0x0006)
+      00005D CB 7E                  130 	bit	7, (hl)
+      00005F 28 11                  131 	jr	Z, 00102$
+                                    132 ;/tmp/_gbsbuild/src/states/Shmup.c:40: camera_offset.y = 56;
+      000061 21r01r00               133 	ld	hl, #(_camera_offset + 0x0001)
+      000064 36 38                  134 	ld	(hl), #0x38
+                                    135 ;/tmp/_gbsbuild/src/states/Shmup.c:41: shooter_horizontal = 0;
+      000066 21r00r00               136 	ld	hl, #_shooter_horizontal
+      000069 36 00                  137 	ld	(hl), #0x00
+                                    138 ;/tmp/_gbsbuild/src/states/Shmup.c:42: shooter_direction = -1;
+      00006B 21r01r00               139 	ld	hl, #_shooter_direction
+      00006E 36 FF                  140 	ld	(hl), #0xff
+      000070 18 0F                  141 	jr	00109$
+      000072                        142 00102$:
+                                    143 ;/tmp/_gbsbuild/src/states/Shmup.c:45: camera_offset.y = -40;
+      000072 21r01r00               144 	ld	hl, #(_camera_offset + 0x0001)
+      000075 36 D8                  145 	ld	(hl), #0xd8
+                                    146 ;/tmp/_gbsbuild/src/states/Shmup.c:46: shooter_horizontal = 0;
+      000077 21r00r00               147 	ld	hl, #_shooter_horizontal
+      00007A 36 00                  148 	ld	(hl), #0x00
+                                    149 ;/tmp/_gbsbuild/src/states/Shmup.c:47: shooter_direction = 1;
+      00007C 21r01r00               150 	ld	hl, #_shooter_direction
+      00007F 36 01                  151 	ld	(hl), #0x01
+      000081                        152 00109$:
+                                    153 ;/tmp/_gbsbuild/src/states/Shmup.c:50: shooter_reached_end = FALSE;
+      000081 21r02r00               154 	ld	hl, #_shooter_reached_end
+      000084 36 00                  155 	ld	(hl), #0x00
+                                    156 ;/tmp/_gbsbuild/src/states/Shmup.c:52: player.animate = TRUE;
+      000086 21r11r00               157 	ld	hl, #(_actors + 0x0011)
+      000089 36 01                  158 	ld	(hl), #0x01
+                                    159 ;/tmp/_gbsbuild/src/states/Shmup.c:53: }
+      00008B C9                     160 	ret
+                                    161 ;/tmp/_gbsbuild/src/states/Shmup.c:55: void Update_Shmup() {
+                                    162 ;	---------------------------------
+                                    163 ; Function Update_Shmup
+                                    164 ; ---------------------------------
+      00008C                        165 _Update_Shmup::
+      00008C E8 FB                  166 	add	sp, #-5
+                                    167 ;/tmp/_gbsbuild/src/states/Shmup.c:58: tile_x = DIV_8(player.pos.x);
+      00008E 21r00r00               168 	ld	hl, #_actors
+      000091 2A                     169 	ld	a, (hl+)
+      000092 4F                     170 	ld	c, a
+      000093 46                     171 	ld	b, (hl)
+      000094 CB 28                  172 	sra	b
+      000096 CB 19                  173 	rr	c
+      000098 CB 28                  174 	sra	b
+      00009A CB 19                  175 	rr	c
+      00009C CB 28                  176 	sra	b
+      00009E CB 19                  177 	rr	c
+      0000A0 F8 01                  178 	ldhl	sp,	#1
+      0000A2 71                     179 	ld	(hl), c
+                                    180 ;/tmp/_gbsbuild/src/states/Shmup.c:59: tile_y = DIV_8(player.pos.y);
+      0000A3 21r02r00               181 	ld	hl, #(_actors + 0x0002)
+      0000A6 2A                     182 	ld	a, (hl+)
+      0000A7 4F                     183 	ld	c, a
+      0000A8 46                     184 	ld	b, (hl)
+      0000A9 CB 28                  185 	sra	b
+      0000AB CB 19                  186 	rr	c
+      0000AD CB 28                  187 	sra	b
+      0000AF CB 19                  188 	rr	c
+      0000B1 CB 28                  189 	sra	b
+      0000B3 CB 19                  190 	rr	c
+      0000B5 F8 04                  191 	ldhl	sp,	#4
+      0000B7 71                     192 	ld	(hl), c
+                                    193 ;/tmp/_gbsbuild/src/states/Shmup.c:62: if (ActivateTriggerAt(tile_x, tile_y, FALSE)) {
+      0000B8 AF                     194 	xor	a, a
+      0000B9 F5                     195 	push	af
+      0000BA 33                     196 	inc	sp
+      0000BB 7E                     197 	ld	a, (hl)
+      0000BC F5                     198 	push	af
+      0000BD 33                     199 	inc	sp
+      0000BE F8 03                  200 	ldhl	sp,	#3
+      0000C0 7E                     201 	ld	a, (hl)
+      0000C1 F5                     202 	push	af
+      0000C2 33                     203 	inc	sp
+      0000C3 CDr00r00               204 	call	_ActivateTriggerAt
+      0000C6 E8 03                  205 	add	sp, #3
+      0000C8 E5                     206 	push	hl
+      0000C9 F8 05                  207 	ldhl	sp,	#5
+      0000CB 73                     208 	ld	(hl), e
+      0000CC E1                     209 	pop	hl
+      0000CD F8 03                  210 	ldhl	sp,	#3
+      0000CF 7E                     211 	ld	a, (hl)
+      0000D0 B7                     212 	or	a, a
+                                    213 ;/tmp/_gbsbuild/src/states/Shmup.c:63: return;
+      0000D1 C2rBEr05               214 	jp	NZ,00207$
+                                    215 ;/tmp/_gbsbuild/src/states/Shmup.c:68: if (INPUT_RECENT_UP && Gt16(player.pos.y, 8) &&
+      0000D4 FAr00r00               216 	ld	a, (#_recent_joy)
+      0000D7 F8 02                  217 	ldhl	sp,	#2
+      0000D9 77                     218 	ld	(hl), a
+      0000DA FAr00r00               219 	ld	a, (#_joy)
+      0000DD F8 03                  220 	ldhl	sp,	#3
+      0000DF 77                     221 	ld	(hl), a
+                                    222 ;/tmp/_gbsbuild/src/states/Shmup.c:66: if (shooter_horizontal) {
+      0000E0 FAr00r00               223 	ld	a, (#_shooter_horizontal)
+      0000E3 B7                     224 	or	a, a
+      0000E4 CAr15r03               225 	jp	Z, 00198$
+                                    226 ;/tmp/_gbsbuild/src/states/Shmup.c:69: !(TileAt(tile_x, tile_y - 1) & COLLISION_BOTTOM)) {
+                                    227 ;/tmp/_gbsbuild/src/states/Shmup.c:68: if (INPUT_RECENT_UP && Gt16(player.pos.y, 8) &&
+      0000E7 FAr00r00               228 	ld	a, (#_ui_block)
+      0000EA B7                     229 	or	a, a
+      0000EB 20 07                  230 	jr	NZ, 00118$
+      0000ED 21r00r00               231 	ld	hl, #_input_override_default
+      0000F0 CB 56                  232 	bit	2, (hl)
+      0000F2 20 46                  233 	jr	NZ, 00113$
+      0000F4                        234 00118$:
+      0000F4 F8 02                  235 	ldhl	sp,	#2
+      0000F6 CB 56                  236 	bit	2, (hl)
+      0000F8 20 0C                  237 	jr	NZ, 00119$
+      0000FA FAr00r00               238 	ld	a, (#_recent_joy)
+      0000FD B7                     239 	or	a, a
+      0000FE 20 3A                  240 	jr	NZ, 00113$
+      000100 F8 03                  241 	ldhl	sp,	#3
+      000102 CB 56                  242 	bit	2, (hl)
+      000104 28 34                  243 	jr	Z, 00113$
+      000106                        244 00119$:
+      000106 21r02r00               245 	ld	hl, #(_actors + 0x0002)
+      000109 2A                     246 	ld	a, (hl+)
+      00010A 4F                     247 	ld	c, a
+      00010B 46                     248 	ld	b, (hl)
+      00010C 21 08 00               249 	ld	hl, #0x0008
+      00010F E5                     250 	push	hl
+      000110 C5                     251 	push	bc
+      000111 CDr00r00               252 	call	_Gt16
+      000114 E8 04                  253 	add	sp, #4
+      000116 7B                     254 	ld	a, e
+      000117 B7                     255 	or	a, a
+      000118 28 20                  256 	jr	Z, 00113$
+                                    257 ;/tmp/_gbsbuild/src/states/Shmup.c:69: !(TileAt(tile_x, tile_y - 1) & COLLISION_BOTTOM)) {
+      00011A F8 04                  258 	ldhl	sp,	#4
+      00011C 7E                     259 	ld	a, (hl)
+      00011D 3D                     260 	dec	a
+      00011E F5                     261 	push	af
+      00011F 33                     262 	inc	sp
+      000120 F8 02                  263 	ldhl	sp,	#2
+      000122 7E                     264 	ld	a, (hl)
+      000123 F5                     265 	push	af
+      000124 33                     266 	inc	sp
+      000125 CDr00r00               267 	call	_TileAt
+      000128 E8 02                  268 	add	sp, #2
+      00012A CB 4B                  269 	bit	1, e
+      00012C 20 0C                  270 	jr	NZ, 00113$
+                                    271 ;/tmp/_gbsbuild/src/states/Shmup.c:70: player.dir.y = -1;
+      00012E 21r06r00               272 	ld	hl, #(_actors + 0x0006)
+      000131 36 FF                  273 	ld	(hl), #0xff
+                                    274 ;/tmp/_gbsbuild/src/states/Shmup.c:71: player.dir.x = 0;
+      000133 21r05r00               275 	ld	hl, #(_actors + 0x0005)
+      000136 36 00                  276 	ld	(hl), #0x00
+      000138 18 68                  277 	jr	00114$
+      00013A                        278 00113$:
+                                    279 ;/tmp/_gbsbuild/src/states/Shmup.c:72: } else if (INPUT_RECENT_DOWN && Lt16(player.pos.y, (image_height - 8)) &&
+      00013A FAr00r00               280 	ld	a, (#_ui_block)
+      00013D B7                     281 	or	a, a
+      00013E 20 07                  282 	jr	NZ, 00109$
+      000140 21r00r00               283 	ld	hl, #_input_override_default
+      000143 CB 5E                  284 	bit	3, (hl)
+      000145 20 51                  285 	jr	NZ, 00104$
+      000147                        286 00109$:
+      000147 FAr00r00               287 	ld	a, (#_recent_joy)
+      00014A CB 5F                  288 	bit	3, a
+      00014C 20 0D                  289 	jr	NZ, 00110$
+      00014E FAr00r00               290 	ld	a, (#_recent_joy)
+      000151 B7                     291 	or	a, a
+      000152 20 44                  292 	jr	NZ, 00104$
+      000154 FAr00r00               293 	ld	a, (#_joy)
+      000157 CB 5F                  294 	bit	3, a
+      000159 28 3D                  295 	jr	Z, 00104$
+      00015B                        296 00110$:
+      00015B 21r00r00               297 	ld	hl, #_image_height
+      00015E 7E                     298 	ld	a, (hl)
+      00015F C6 F8                  299 	add	a, #0xf8
+      000161 4F                     300 	ld	c, a
+      000162 23                     301 	inc	hl
+      000163 7E                     302 	ld	a, (hl)
+      000164 CE FF                  303 	adc	a, #0xff
+      000166 47                     304 	ld	b, a
+      000167 21r02r00               305 	ld	hl, #(_actors + 0x0002)
+      00016A 2A                     306 	ld	a, (hl+)
+      00016B 66                     307 	ld	h, (hl)
+      00016C 6F                     308 	ld	l, a
+      00016D C5                     309 	push	bc
+      00016E E5                     310 	push	hl
+      00016F CDr00r00               311 	call	_Lt16
+      000172 E8 04                  312 	add	sp, #4
+      000174 7B                     313 	ld	a, e
+      000175 B7                     314 	or	a, a
+      000176 28 20                  315 	jr	Z, 00104$
+                                    316 ;/tmp/_gbsbuild/src/states/Shmup.c:73: !(TileAt(tile_x, tile_y + 1) & COLLISION_TOP)) {
+      000178 F8 04                  317 	ldhl	sp,	#4
+      00017A 7E                     318 	ld	a, (hl)
+      00017B 3C                     319 	inc	a
+      00017C F5                     320 	push	af
+      00017D 33                     321 	inc	sp
+      00017E F8 02                  322 	ldhl	sp,	#2
+      000180 7E                     323 	ld	a, (hl)
+      000181 F5                     324 	push	af
+      000182 33                     325 	inc	sp
+      000183 CDr00r00               326 	call	_TileAt
+      000186 E8 02                  327 	add	sp, #2
+      000188 7B                     328 	ld	a, e
+      000189 0F                     329 	rrca
+      00018A 38 0C                  330 	jr	C, 00104$
+                                    331 ;/tmp/_gbsbuild/src/states/Shmup.c:74: player.dir.y = 1;
+      00018C 21r06r00               332 	ld	hl, #(_actors + 0x0006)
+      00018F 36 01                  333 	ld	(hl), #0x01
+                                    334 ;/tmp/_gbsbuild/src/states/Shmup.c:75: player.dir.x = 0;
+      000191 21r05r00               335 	ld	hl, #(_actors + 0x0005)
+      000194 36 00                  336 	ld	(hl), #0x00
+      000196 18 0A                  337 	jr	00114$
+      000198                        338 00104$:
+                                    339 ;/tmp/_gbsbuild/src/states/Shmup.c:77: player.dir.y = 0;
+      000198 21r06r00               340 	ld	hl, #(_actors + 0x0006)
+      00019B 36 00                  341 	ld	(hl), #0x00
+                                    342 ;/tmp/_gbsbuild/src/states/Shmup.c:78: player.dir.x = 1;
+      00019D 21r05r00               343 	ld	hl, #(_actors + 0x0005)
+      0001A0 36 01                  344 	ld	(hl), #0x01
+      0001A2                        345 00114$:
+                                    346 ;/tmp/_gbsbuild/src/states/Shmup.c:68: if (INPUT_RECENT_UP && Gt16(player.pos.y, 8) &&
+      0001A2 21r00r00               347 	ld	hl, #_joy
+      0001A5 4E                     348 	ld	c, (hl)
+                                    349 ;/tmp/_gbsbuild/src/states/Shmup.c:81: if (INPUT_UP_PRESSED || INPUT_DOWN_PRESSED) {
+      0001A6 21r00r00               350 	ld	hl, #_last_joy
+      0001A9 46                     351 	ld	b, (hl)
+      0001AA FAr00r00               352 	ld	a, (#_ui_block)
+      0001AD B7                     353 	or	a, a
+      0001AE 20 07                  354 	jr	NZ, 00125$
+      0001B0 21r00r00               355 	ld	hl, #_input_override_default
+      0001B3 CB 56                  356 	bit	2, (hl)
+      0001B5 20 08                  357 	jr	NZ, 00129$
+      0001B7                        358 00125$:
+      0001B7 CB 51                  359 	bit	2, c
+      0001B9 28 04                  360 	jr	Z, 00129$
+      0001BB CB 50                  361 	bit	2, b
+      0001BD 28 15                  362 	jr	Z, 00121$
+      0001BF                        363 00129$:
+      0001BF FAr00r00               364 	ld	a, (#_ui_block)
+      0001C2 B7                     365 	or	a, a
+      0001C3 20 07                  366 	jr	NZ, 00128$
+      0001C5 21r00r00               367 	ld	hl, #_input_override_default
+      0001C8 CB 5E                  368 	bit	3, (hl)
+      0001CA 20 0D                  369 	jr	NZ, 00122$
+      0001CC                        370 00128$:
+      0001CC CB 59                  371 	bit	3, c
+      0001CE 28 09                  372 	jr	Z, 00122$
+      0001D0 CB 58                  373 	bit	3, b
+      0001D2 20 05                  374 	jr	NZ, 00122$
+      0001D4                        375 00121$:
+                                    376 ;/tmp/_gbsbuild/src/states/Shmup.c:83: player.rerender = TRUE;
+      0001D4 21r14r00               377 	ld	hl, #(_actors + 0x0014)
+      0001D7 36 01                  378 	ld	(hl), #0x01
+      0001D9                        379 00122$:
+                                    380 ;/tmp/_gbsbuild/src/states/Shmup.c:58: tile_x = DIV_8(player.pos.x);
+      0001D9 11r00r00               381 	ld	de, #_actors
+      0001DC 1A                     382 	ld	a, (de)
+      0001DD F8 03                  383 	ldhl	sp,	#3
+      0001DF 22                     384 	ld	(hl+), a
+      0001E0 13                     385 	inc	de
+      0001E1 1A                     386 	ld	a, (de)
+      0001E2 77                     387 	ld	(hl), a
+                                    388 ;/tmp/_gbsbuild/src/states/Shmup.c:87: if (shooter_direction == 1) {
+      0001E3 FAr01r00               389 	ld	a, (#_shooter_direction)
+      0001E6 3D                     390 	dec	a
+      0001E7 20 23                  391 	jr	NZ, 00135$
+                                    392 ;/tmp/_gbsbuild/src/states/Shmup.c:89: if (Gt16(player.pos.x, image_width - SCREEN_WIDTH_HALF - 64)) {
+      0001E9 21r00r00               393 	ld	hl, #_image_width
+      0001EC 7E                     394 	ld	a, (hl)
+      0001ED C6 70                  395 	add	a, #0x70
+      0001EF 4F                     396 	ld	c, a
+      0001F0 23                     397 	inc	hl
+      0001F1 7E                     398 	ld	a, (hl)
+      0001F2 CE FF                  399 	adc	a, #0xff
+      0001F4 47                     400 	ld	b, a
+      0001F5 C5                     401 	push	bc
+      0001F6 F8 05                  402 	ldhl	sp,	#5
+      0001F8 2A                     403 	ld	a, (hl+)
+      0001F9 66                     404 	ld	h, (hl)
+      0001FA 6F                     405 	ld	l, a
+      0001FB E5                     406 	push	hl
+      0001FC CDr00r00               407 	call	_Gt16
+      0001FF E8 04                  408 	add	sp, #4
+      000201 7B                     409 	ld	a, e
+      000202 B7                     410 	or	a, a
+      000203 28 1F                  411 	jr	Z, 00136$
+                                    412 ;/tmp/_gbsbuild/src/states/Shmup.c:90: shooter_reached_end = TRUE;
+      000205 21r02r00               413 	ld	hl, #_shooter_reached_end
+      000208 36 01                  414 	ld	(hl), #0x01
+      00020A 18 18                  415 	jr	00136$
+      00020C                        416 00135$:
+                                    417 ;/tmp/_gbsbuild/src/states/Shmup.c:94: if (Lt16(player.pos.x, SCREEN_WIDTH_HALF + 48)) {
+      00020C 21 80 00               418 	ld	hl, #0x0080
+      00020F E5                     419 	push	hl
+      000210 F8 05                  420 	ldhl	sp,	#5
+      000212 2A                     421 	ld	a, (hl+)
+      000213 66                     422 	ld	h, (hl)
+      000214 6F                     423 	ld	l, a
+      000215 E5                     424 	push	hl
+      000216 CDr00r00               425 	call	_Lt16
+      000219 E8 04                  426 	add	sp, #4
+      00021B 7B                     427 	ld	a, e
+      00021C B7                     428 	or	a, a
+      00021D 28 05                  429 	jr	Z, 00136$
+                                    430 ;/tmp/_gbsbuild/src/states/Shmup.c:95: shooter_reached_end = TRUE;
+      00021F 21r02r00               431 	ld	hl, #_shooter_reached_end
+      000222 36 01                  432 	ld	(hl), #0x01
+      000224                        433 00136$:
+                                    434 ;/tmp/_gbsbuild/src/states/Shmup.c:104: if (IS_FRAME_2) {
+      000224 FAr00r00               435 	ld	a, (#_game_time)
+      000227 E6 01                  436 	and	a, #0x01
+      000229 4F                     437 	ld	c, a
+      00022A 06 00                  438 	ld	b, #0x00
+                                    439 ;/tmp/_gbsbuild/src/states/Shmup.c:100: if (shooter_reached_end) {
+      00022C FAr02r00               440 	ld	a, (#_shooter_reached_end)
+      00022F B7                     441 	or	a, a
+      000230 28 53                  442 	jr	Z, 00148$
+                                    443 ;/tmp/_gbsbuild/src/states/Shmup.c:102: if (player.move_speed == 0) {
+      000232 FAr04r00               444 	ld	a, (#(_actors + 0x0004) + 0)
+      000235 F8 04                  445 	ldhl	sp,	#4
+      000237 77                     446 	ld	(hl), a
+                                    447 ;/tmp/_gbsbuild/src/states/Shmup.c:105: player.pos.y += (WORD)player.dir.y;
+                                    448 ;/tmp/_gbsbuild/src/states/Shmup.c:102: if (player.move_speed == 0) {
+      000238 F8 04                  449 	ldhl	sp,	#4
+      00023A 7E                     450 	ld	a, (hl)
+      00023B B7                     451 	or	a, a
+      00023C 20 21                  452 	jr	NZ, 00140$
+                                    453 ;/tmp/_gbsbuild/src/states/Shmup.c:104: if (IS_FRAME_2) {
+      00023E 78                     454 	ld	a, b
+      00023F B1                     455 	or	a, c
+      000240 C2r3Ar05               456 	jp	NZ, 00199$
+                                    457 ;/tmp/_gbsbuild/src/states/Shmup.c:105: player.pos.y += (WORD)player.dir.y;
+      000243 21r02r00               458 	ld	hl, #(_actors + 0x0002)
+      000246 2A                     459 	ld	a, (hl+)
+      000247 4F                     460 	ld	c, a
+      000248 46                     461 	ld	b, (hl)
+      000249 FAr06r00               462 	ld	a, (#(_actors + 0x0006) + 0)
+      00024C 5F                     463 	ld	e, a
+      00024D 17                     464 	rla
+      00024E 9F                     465 	sbc	a, a
+      00024F 57                     466 	ld	d, a
+      000250 79                     467 	ld	a, c
+      000251 83                     468 	add	a, e
+      000252 4F                     469 	ld	c, a
+      000253 78                     470 	ld	a, b
+      000254 8A                     471 	adc	a, d
+      000255 47                     472 	ld	b, a
+      000256 21r02r00               473 	ld	hl, #(_actors + 0x0002)
+      000259 79                     474 	ld	a, c
+      00025A 22                     475 	ld	(hl+), a
+      00025B 70                     476 	ld	(hl), b
+      00025C C3r3Ar05               477 	jp	00199$
+      00025F                        478 00140$:
+                                    479 ;/tmp/_gbsbuild/src/states/Shmup.c:108: player.pos.y += (WORD)(player.dir.y * player.move_speed);
+      00025F 21r02r00               480 	ld	hl, #(_actors + 0x0002)
+      000262 2A                     481 	ld	a, (hl+)
+      000263 4F                     482 	ld	c, a
+      000264 46                     483 	ld	b, (hl)
+      000265 FAr06r00               484 	ld	a, (#(_actors + 0x0006) + 0)
+      000268 C5                     485 	push	bc
+      000269 F8 06                  486 	ldhl	sp,	#6
+      00026B 66                     487 	ld	h, (hl)
+      00026C E5                     488 	push	hl
+      00026D 33                     489 	inc	sp
+      00026E F5                     490 	push	af
+      00026F 33                     491 	inc	sp
+      000270 CDr00r00               492 	call	__muluschar
+      000273 E8 02                  493 	add	sp, #2
+      000275 C1                     494 	pop	bc
+      000276 7B                     495 	ld	a, e
+      000277 81                     496 	add	a, c
+      000278 4F                     497 	ld	c, a
+      000279 7A                     498 	ld	a, d
+      00027A 88                     499 	adc	a, b
+      00027B 47                     500 	ld	b, a
+      00027C 21r02r00               501 	ld	hl, #(_actors + 0x0002)
+      00027F 79                     502 	ld	a, c
+      000280 22                     503 	ld	(hl+), a
+      000281 70                     504 	ld	(hl), b
+      000282 C3r3Ar05               505 	jp	00199$
+      000285                        506 00148$:
+                                    507 ;/tmp/_gbsbuild/src/states/Shmup.c:111: if (player.move_speed == 0) {
+      000285 FAr04r00               508 	ld	a, (#(_actors + 0x0004) + 0)
+      000288 F8 04                  509 	ldhl	sp,	#4
+      00028A 77                     510 	ld	(hl), a
+                                    511 ;/tmp/_gbsbuild/src/states/Shmup.c:115: player.pos.y += (WORD)player.dir.y;
+                                    512 ;/tmp/_gbsbuild/src/states/Shmup.c:111: if (player.move_speed == 0) {
+      00028B F8 04                  513 	ldhl	sp,	#4
+      00028D 7E                     514 	ld	a, (hl)
+      00028E B7                     515 	or	a, a
+      00028F 20 3A                  516 	jr	NZ, 00145$
+                                    517 ;/tmp/_gbsbuild/src/states/Shmup.c:113: if (IS_FRAME_2) {
+      000291 78                     518 	ld	a, b
+      000292 B1                     519 	or	a, c
+      000293 C2r3Ar05               520 	jp	NZ, 00199$
+                                    521 ;/tmp/_gbsbuild/src/states/Shmup.c:114: player.pos.x += (WORD)shooter_direction;
+      000296 21r00r00               522 	ld	hl, #_actors
+      000299 2A                     523 	ld	a, (hl+)
+      00029A 4F                     524 	ld	c, a
+      00029B 46                     525 	ld	b, (hl)
+      00029C FAr01r00               526 	ld	a, (#_shooter_direction)
+      00029F 5F                     527 	ld	e, a
+      0002A0 17                     528 	rla
+      0002A1 9F                     529 	sbc	a, a
+      0002A2 57                     530 	ld	d, a
+      0002A3 7B                     531 	ld	a, e
+      0002A4 81                     532 	add	a, c
+      0002A5 4F                     533 	ld	c, a
+      0002A6 7A                     534 	ld	a, d
+      0002A7 88                     535 	adc	a, b
+      0002A8 47                     536 	ld	b, a
+      0002A9 21r00r00               537 	ld	hl, #_actors
+      0002AC 79                     538 	ld	a, c
+      0002AD 22                     539 	ld	(hl+), a
+      0002AE 70                     540 	ld	(hl), b
+                                    541 ;/tmp/_gbsbuild/src/states/Shmup.c:115: player.pos.y += (WORD)player.dir.y;
+      0002AF 21r02r00               542 	ld	hl, #(_actors + 0x0002)
+      0002B2 2A                     543 	ld	a, (hl+)
+      0002B3 4F                     544 	ld	c, a
+      0002B4 46                     545 	ld	b, (hl)
+      0002B5 FAr06r00               546 	ld	a, (#(_actors + 0x0006) + 0)
+      0002B8 5F                     547 	ld	e, a
+      0002B9 17                     548 	rla
+      0002BA 9F                     549 	sbc	a, a
+      0002BB 57                     550 	ld	d, a
+      0002BC 79                     551 	ld	a, c
+      0002BD 83                     552 	add	a, e
+      0002BE 4F                     553 	ld	c, a
+      0002BF 78                     554 	ld	a, b
+      0002C0 8A                     555 	adc	a, d
+      0002C1 47                     556 	ld	b, a
+      0002C2 21r02r00               557 	ld	hl, #(_actors + 0x0002)
+      0002C5 79                     558 	ld	a, c
+      0002C6 22                     559 	ld	(hl+), a
+      0002C7 70                     560 	ld	(hl), b
+      0002C8 C3r3Ar05               561 	jp	00199$
+      0002CB                        562 00145$:
+                                    563 ;/tmp/_gbsbuild/src/states/Shmup.c:118: player.pos.x += (WORD)(shooter_direction * player.move_speed);
+      0002CB 21r00r00               564 	ld	hl, #_actors
+      0002CE 2A                     565 	ld	a, (hl+)
+      0002CF 4F                     566 	ld	c, a
+      0002D0 46                     567 	ld	b, (hl)
+      0002D1 C5                     568 	push	bc
+      0002D2 F8 06                  569 	ldhl	sp,	#6
+      0002D4 7E                     570 	ld	a, (hl)
+      0002D5 F5                     571 	push	af
+      0002D6 33                     572 	inc	sp
+      0002D7 FAr01r00               573 	ld	a, (#_shooter_direction)
+      0002DA F5                     574 	push	af
+      0002DB 33                     575 	inc	sp
+      0002DC CDr00r00               576 	call	__muluschar
+      0002DF E8 02                  577 	add	sp, #2
+      0002E1 C1                     578 	pop	bc
+      0002E2 7B                     579 	ld	a, e
+      0002E3 81                     580 	add	a, c
+      0002E4 4F                     581 	ld	c, a
+      0002E5 7A                     582 	ld	a, d
+      0002E6 88                     583 	adc	a, b
+      0002E7 47                     584 	ld	b, a
+      0002E8 21r00r00               585 	ld	hl, #_actors
+      0002EB 79                     586 	ld	a, c
+      0002EC 22                     587 	ld	(hl+), a
+      0002ED 70                     588 	ld	(hl), b
+                                    589 ;/tmp/_gbsbuild/src/states/Shmup.c:119: player.pos.y += (WORD)(player.dir.y * player.move_speed);
+      0002EE 21r02r00               590 	ld	hl, #(_actors + 0x0002)
+      0002F1 2A                     591 	ld	a, (hl+)
+      0002F2 4F                     592 	ld	c, a
+      0002F3 46                     593 	ld	b, (hl)
+      0002F4 FAr06r00               594 	ld	a, (#(_actors + 0x0006) + 0)
+      0002F7 21r04r00               595 	ld	hl, #(_actors + 0x0004)
+      0002FA 66                     596 	ld	h, (hl)
+      0002FB C5                     597 	push	bc
+      0002FC E5                     598 	push	hl
+      0002FD 33                     599 	inc	sp
+      0002FE F5                     600 	push	af
+      0002FF 33                     601 	inc	sp
+      000300 CDr00r00               602 	call	__muluschar
+      000303 E8 02                  603 	add	sp, #2
+      000305 C1                     604 	pop	bc
+      000306 7B                     605 	ld	a, e
+      000307 81                     606 	add	a, c
+      000308 4F                     607 	ld	c, a
+      000309 7A                     608 	ld	a, d
+      00030A 88                     609 	adc	a, b
+      00030B 47                     610 	ld	b, a
+      00030C 21r02r00               611 	ld	hl, #(_actors + 0x0002)
+      00030F 79                     612 	ld	a, c
+      000310 22                     613 	ld	(hl+), a
+      000311 70                     614 	ld	(hl), b
+      000312 C3r3Ar05               615 	jp	00199$
+      000315                        616 00198$:
+                                    617 ;/tmp/_gbsbuild/src/states/Shmup.c:125: if (INPUT_RECENT_LEFT && (player.pos.x > 0) && !(TileAt(tile_x, tile_y) & COLLISION_RIGHT)) {
+      000315 FAr00r00               618 	ld	a, (#_ui_block)
+      000318 B7                     619 	or	a, a
+      000319 20 07                  620 	jr	NZ, 00165$
+      00031B 21r00r00               621 	ld	hl, #_input_override_default
+      00031E CB 4E                  622 	bit	1, (hl)
+      000320 20 4F                  623 	jr	NZ, 00160$
+      000322                        624 00165$:
+      000322 F8 02                  625 	ldhl	sp,	#2
+      000324 CB 4E                  626 	bit	1, (hl)
+      000326 20 0C                  627 	jr	NZ, 00166$
+      000328 FAr00r00               628 	ld	a, (#_recent_joy)
+      00032B B7                     629 	or	a, a
+      00032C 20 43                  630 	jr	NZ, 00160$
+      00032E F8 03                  631 	ldhl	sp,	#3
+      000330 CB 4E                  632 	bit	1, (hl)
+      000332 28 3D                  633 	jr	Z, 00160$
+      000334                        634 00166$:
+      000334 21r00r00               635 	ld	hl, #_actors
+      000337 2A                     636 	ld	a, (hl+)
+      000338 4F                     637 	ld	c, a
+      000339 46                     638 	ld	b, (hl)
+      00033A 58                     639 	ld	e, b
+      00033B 16 00                  640 	ld	d, #0x00
+      00033D AF                     641 	xor	a, a
+      00033E B9                     642 	cp	a, c
+      00033F 98                     643 	sbc	a, b
+      000340 CB 7B                  644 	bit	7, e
+      000342 28 07                  645 	jr	Z, 00489$
+      000344 CB 7A                  646 	bit	7, d
+      000346 20 08                  647 	jr	NZ, 00490$
+      000348 BF                     648 	cp	a, a
+      000349 18 05                  649 	jr	00490$
+      00034B                        650 00489$:
+      00034B CB 7A                  651 	bit	7, d
+      00034D 28 01                  652 	jr	Z, 00490$
+      00034F 37                     653 	scf
+      000350                        654 00490$:
+      000350 30 1F                  655 	jr	NC, 00160$
+      000352 F8 04                  656 	ldhl	sp,	#4
+      000354 7E                     657 	ld	a, (hl)
+      000355 F5                     658 	push	af
+      000356 33                     659 	inc	sp
+      000357 F8 02                  660 	ldhl	sp,	#2
+      000359 7E                     661 	ld	a, (hl)
+      00035A F5                     662 	push	af
+      00035B 33                     663 	inc	sp
+      00035C CDr00r00               664 	call	_TileAt
+      00035F E8 02                  665 	add	sp, #2
+      000361 CB 5B                  666 	bit	3, e
+      000363 20 0C                  667 	jr	NZ, 00160$
+                                    668 ;/tmp/_gbsbuild/src/states/Shmup.c:126: player.dir.x = -1;
+      000365 21r05r00               669 	ld	hl, #(_actors + 0x0005)
+      000368 36 FF                  670 	ld	(hl), #0xff
+                                    671 ;/tmp/_gbsbuild/src/states/Shmup.c:127: player.dir.y = 0;
+      00036A 21r06r00               672 	ld	hl, #(_actors + 0x0006)
+      00036D 36 00                  673 	ld	(hl), #0x00
+      00036F 18 69                  674 	jr	00161$
+      000371                        675 00160$:
+                                    676 ;/tmp/_gbsbuild/src/states/Shmup.c:128: } else if (INPUT_RECENT_RIGHT && Lt16(player.pos.x, image_width - 16) &&
+      000371 FAr00r00               677 	ld	a, (#_ui_block)
+      000374 B7                     678 	or	a, a
+      000375 20 07                  679 	jr	NZ, 00156$
+      000377 21r00r00               680 	ld	hl, #_input_override_default
+      00037A CB 46                  681 	bit	0, (hl)
+      00037C 20 50                  682 	jr	NZ, 00151$
+      00037E                        683 00156$:
+      00037E FAr00r00               684 	ld	a, (#_recent_joy)
+      000381 0F                     685 	rrca
+      000382 38 0C                  686 	jr	C, 00157$
+      000384 FAr00r00               687 	ld	a, (#_recent_joy)
+      000387 B7                     688 	or	a, a
+      000388 20 44                  689 	jr	NZ, 00151$
+      00038A FAr00r00               690 	ld	a, (#_joy)
+      00038D 0F                     691 	rrca
+      00038E 30 3E                  692 	jr	NC, 00151$
+      000390                        693 00157$:
+      000390 21r00r00               694 	ld	hl, #_image_width
+      000393 7E                     695 	ld	a, (hl)
+      000394 C6 F0                  696 	add	a, #0xf0
+      000396 4F                     697 	ld	c, a
+      000397 23                     698 	inc	hl
+      000398 7E                     699 	ld	a, (hl)
+      000399 CE FF                  700 	adc	a, #0xff
+      00039B 47                     701 	ld	b, a
+      00039C 21r00r00               702 	ld	hl, #_actors
+      00039F 2A                     703 	ld	a, (hl+)
+      0003A0 66                     704 	ld	h, (hl)
+      0003A1 6F                     705 	ld	l, a
+      0003A2 C5                     706 	push	bc
+      0003A3 E5                     707 	push	hl
+      0003A4 CDr00r00               708 	call	_Lt16
+      0003A7 E8 04                  709 	add	sp, #4
+      0003A9 7B                     710 	ld	a, e
+      0003AA B7                     711 	or	a, a
+      0003AB 28 21                  712 	jr	Z, 00151$
+                                    713 ;/tmp/_gbsbuild/src/states/Shmup.c:129: !(TileAt(tile_x + 2, tile_y) & COLLISION_LEFT)) {
+      0003AD F8 01                  714 	ldhl	sp,	#1
+      0003AF 7E                     715 	ld	a, (hl)
+      0003B0 C6 02                  716 	add	a, #0x02
+      0003B2 F8 04                  717 	ldhl	sp,	#4
+      0003B4 66                     718 	ld	h, (hl)
+      0003B5 E5                     719 	push	hl
+      0003B6 33                     720 	inc	sp
+      0003B7 F5                     721 	push	af
+      0003B8 33                     722 	inc	sp
+      0003B9 CDr00r00               723 	call	_TileAt
+      0003BC E8 02                  724 	add	sp, #2
+      0003BE CB 53                  725 	bit	2, e
+      0003C0 20 0C                  726 	jr	NZ, 00151$
+                                    727 ;/tmp/_gbsbuild/src/states/Shmup.c:130: player.dir.x = 1;
+      0003C2 21r05r00               728 	ld	hl, #(_actors + 0x0005)
+      0003C5 36 01                  729 	ld	(hl), #0x01
+                                    730 ;/tmp/_gbsbuild/src/states/Shmup.c:131: player.dir.y = 0;
+      0003C7 21r06r00               731 	ld	hl, #(_actors + 0x0006)
+      0003CA 36 00                  732 	ld	(hl), #0x00
+      0003CC 18 0C                  733 	jr	00161$
+      0003CE                        734 00151$:
+                                    735 ;/tmp/_gbsbuild/src/states/Shmup.c:133: player.dir.x = 0;
+      0003CE 21r05r00               736 	ld	hl, #(_actors + 0x0005)
+      0003D1 36 00                  737 	ld	(hl), #0x00
+                                    738 ;/tmp/_gbsbuild/src/states/Shmup.c:134: player.dir.y = shooter_direction;
+      0003D3 11r06r00               739 	ld	de, #(_actors + 0x0006)
+      0003D6 FAr01r00               740 	ld	a, (#_shooter_direction)
+      0003D9 12                     741 	ld	(de), a
+      0003DA                        742 00161$:
+                                    743 ;/tmp/_gbsbuild/src/states/Shmup.c:68: if (INPUT_RECENT_UP && Gt16(player.pos.y, 8) &&
+      0003DA 21r00r00               744 	ld	hl, #_joy
+      0003DD 4E                     745 	ld	c, (hl)
+                                    746 ;/tmp/_gbsbuild/src/states/Shmup.c:81: if (INPUT_UP_PRESSED || INPUT_DOWN_PRESSED) {
+      0003DE 21r00r00               747 	ld	hl, #_last_joy
+      0003E1 46                     748 	ld	b, (hl)
+                                    749 ;/tmp/_gbsbuild/src/states/Shmup.c:137: if (INPUT_LEFT_PRESSED || INPUT_RIGHT_PRESSED) {
+      0003E2 FAr00r00               750 	ld	a, (#_ui_block)
+      0003E5 B7                     751 	or	a, a
+      0003E6 20 07                  752 	jr	NZ, 00172$
+      0003E8 21r00r00               753 	ld	hl, #_input_override_default
+      0003EB CB 4E                  754 	bit	1, (hl)
+      0003ED 20 08                  755 	jr	NZ, 00176$
+      0003EF                        756 00172$:
+      0003EF CB 49                  757 	bit	1, c
+      0003F1 28 04                  758 	jr	Z, 00176$
+      0003F3 CB 48                  759 	bit	1, b
+      0003F5 28 15                  760 	jr	Z, 00168$
+      0003F7                        761 00176$:
+      0003F7 FAr00r00               762 	ld	a, (#_ui_block)
+      0003FA B7                     763 	or	a, a
+      0003FB 20 07                  764 	jr	NZ, 00175$
+      0003FD 21r00r00               765 	ld	hl, #_input_override_default
+      000400 CB 46                  766 	bit	0, (hl)
+      000402 20 0D                  767 	jr	NZ, 00169$
+      000404                        768 00175$:
+      000404 CB 41                  769 	bit	0, c
+      000406 28 09                  770 	jr	Z, 00169$
+      000408 CB 40                  771 	bit	0, b
+      00040A 20 05                  772 	jr	NZ, 00169$
+      00040C                        773 00168$:
+                                    774 ;/tmp/_gbsbuild/src/states/Shmup.c:139: player.rerender = TRUE;
+      00040C 21r14r00               775 	ld	hl, #(_actors + 0x0014)
+      00040F 36 01                  776 	ld	(hl), #0x01
+      000411                        777 00169$:
+                                    778 ;/tmp/_gbsbuild/src/states/Shmup.c:59: tile_y = DIV_8(player.pos.y);
+      000411 21r02r00               779 	ld	hl, #(_actors + 0x0002)
+      000414 2A                     780 	ld	a, (hl+)
+      000415 4F                     781 	ld	c, a
+      000416 46                     782 	ld	b, (hl)
+                                    783 ;/tmp/_gbsbuild/src/states/Shmup.c:142: if (shooter_direction == 1) {
+      000417 FAr01r00               784 	ld	a, (#_shooter_direction)
+      00041A 3D                     785 	dec	a
+      00041B 20 1E                  786 	jr	NZ, 00182$
+                                    787 ;/tmp/_gbsbuild/src/states/Shmup.c:144: if (Gt16(player.pos.y, image_height - SCREEN_WIDTH_HALF - 40)) {
+      00041D 21r00r00               788 	ld	hl, #_image_height
+      000420 7E                     789 	ld	a, (hl)
+      000421 C6 88                  790 	add	a, #0x88
+      000423 5F                     791 	ld	e, a
+      000424 23                     792 	inc	hl
+      000425 7E                     793 	ld	a, (hl)
+      000426 CE FF                  794 	adc	a, #0xff
+      000428 57                     795 	ld	d, a
+      000429 D5                     796 	push	de
+      00042A C5                     797 	push	bc
+      00042B CDr00r00               798 	call	_Gt16
+      00042E E8 04                  799 	add	sp, #4
+      000430 7B                     800 	ld	a, e
+      000431 B7                     801 	or	a, a
+      000432 28 1A                  802 	jr	Z, 00183$
+                                    803 ;/tmp/_gbsbuild/src/states/Shmup.c:145: shooter_reached_end = TRUE;
+      000434 21r02r00               804 	ld	hl, #_shooter_reached_end
+      000437 36 01                  805 	ld	(hl), #0x01
+      000439 18 13                  806 	jr	00183$
+      00043B                        807 00182$:
+                                    808 ;/tmp/_gbsbuild/src/states/Shmup.c:149: if (Lt16(player.pos.y, SCREEN_WIDTH_HALF + 40)) {
+      00043B 21 78 00               809 	ld	hl, #0x0078
+      00043E E5                     810 	push	hl
+      00043F C5                     811 	push	bc
+      000440 CDr00r00               812 	call	_Lt16
+      000443 E8 04                  813 	add	sp, #4
+      000445 7B                     814 	ld	a, e
+      000446 B7                     815 	or	a, a
+      000447 28 05                  816 	jr	Z, 00183$
+                                    817 ;/tmp/_gbsbuild/src/states/Shmup.c:150: shooter_reached_end = TRUE;
+      000449 21r02r00               818 	ld	hl, #_shooter_reached_end
+      00044C 36 01                  819 	ld	(hl), #0x01
+      00044E                        820 00183$:
+                                    821 ;/tmp/_gbsbuild/src/states/Shmup.c:104: if (IS_FRAME_2) {
+      00044E FAr00r00               822 	ld	a, (#_game_time)
+      000451 E6 01                  823 	and	a, #0x01
+      000453 4F                     824 	ld	c, a
+      000454 06 00                  825 	ld	b, #0x00
+                                    826 ;/tmp/_gbsbuild/src/states/Shmup.c:155: if (shooter_reached_end) {
+      000456 FAr02r00               827 	ld	a, (#_shooter_reached_end)
+      000459 B7                     828 	or	a, a
+      00045A 28 57                  829 	jr	Z, 00195$
+                                    830 ;/tmp/_gbsbuild/src/states/Shmup.c:157: if (player.move_speed == 0) {
+      00045C FAr04r00               831 	ld	a, (#(_actors + 0x0004) + 0)
+      00045F F8 04                  832 	ldhl	sp,	#4
+      000461 77                     833 	ld	(hl), a
+                                    834 ;/tmp/_gbsbuild/src/states/Shmup.c:160: player.pos.x += (WORD)player.dir.x;
+                                    835 ;/tmp/_gbsbuild/src/states/Shmup.c:157: if (player.move_speed == 0) {
+      000462 F8 04                  836 	ldhl	sp,	#4
+      000464 7E                     837 	ld	a, (hl)
+      000465 B7                     838 	or	a, a
+      000466 20 25                  839 	jr	NZ, 00187$
+                                    840 ;/tmp/_gbsbuild/src/states/Shmup.c:159: if (IS_FRAME_2) {
+      000468 78                     841 	ld	a, b
+      000469 B1                     842 	or	a, c
+      00046A C2r3Ar05               843 	jp	NZ, 00199$
+                                    844 ;/tmp/_gbsbuild/src/states/Shmup.c:160: player.pos.x += (WORD)player.dir.x;
+      00046D 11r00r00               845 	ld	de, #_actors
+      000470 1A                     846 	ld	a, (de)
+      000471 2B                     847 	dec	hl
+      000472 22                     848 	ld	(hl+), a
+      000473 13                     849 	inc	de
+      000474 1A                     850 	ld	a, (de)
+      000475 77                     851 	ld	(hl), a
+      000476 FAr05r00               852 	ld	a, (#(_actors + 0x0005) + 0)
+      000479 4F                     853 	ld	c, a
+      00047A 17                     854 	rla
+      00047B 9F                     855 	sbc	a, a
+      00047C 47                     856 	ld	b, a
+      00047D 2B                     857 	dec	hl
+      00047E 2A                     858 	ld	a, (hl+)
+      00047F 66                     859 	ld	h, (hl)
+      000480 6F                     860 	ld	l, a
+      000481 09                     861 	add	hl, bc
+      000482 4D                     862 	ld	c, l
+      000483 44                     863 	ld	b, h
+      000484 21r00r00               864 	ld	hl, #_actors
+      000487 79                     865 	ld	a, c
+      000488 22                     866 	ld	(hl+), a
+      000489 70                     867 	ld	(hl), b
+      00048A C3r3Ar05               868 	jp	00199$
+      00048D                        869 00187$:
+                                    870 ;/tmp/_gbsbuild/src/states/Shmup.c:163: player.pos.x += (WORD)(player.dir.x * player.move_speed);
+      00048D 21r00r00               871 	ld	hl, #_actors
+      000490 2A                     872 	ld	a, (hl+)
+      000491 4F                     873 	ld	c, a
+      000492 46                     874 	ld	b, (hl)
+      000493 FAr05r00               875 	ld	a, (#(_actors + 0x0005) + 0)
+      000496 C5                     876 	push	bc
+      000497 F8 06                  877 	ldhl	sp,	#6
+      000499 66                     878 	ld	h, (hl)
+      00049A E5                     879 	push	hl
+      00049B 33                     880 	inc	sp
+      00049C F5                     881 	push	af
+      00049D 33                     882 	inc	sp
+      00049E CDr00r00               883 	call	__muluschar
+      0004A1 E8 02                  884 	add	sp, #2
+      0004A3 C1                     885 	pop	bc
+      0004A4 7B                     886 	ld	a, e
+      0004A5 81                     887 	add	a, c
+      0004A6 4F                     888 	ld	c, a
+      0004A7 7A                     889 	ld	a, d
+      0004A8 88                     890 	adc	a, b
+      0004A9 47                     891 	ld	b, a
+      0004AA 21r00r00               892 	ld	hl, #_actors
+      0004AD 79                     893 	ld	a, c
+      0004AE 22                     894 	ld	(hl+), a
+      0004AF 70                     895 	ld	(hl), b
+      0004B0 C3r3Ar05               896 	jp	00199$
+      0004B3                        897 00195$:
+                                    898 ;/tmp/_gbsbuild/src/states/Shmup.c:166: if (player.move_speed == 0) {
+      0004B3 FAr04r00               899 	ld	a, (#(_actors + 0x0004) + 0)
+      0004B6 F8 04                  900 	ldhl	sp,	#4
+      0004B8 77                     901 	ld	(hl), a
+                                    902 ;/tmp/_gbsbuild/src/states/Shmup.c:169: player.pos.x += (WORD)player.dir.x;
+                                    903 ;/tmp/_gbsbuild/src/states/Shmup.c:170: player.pos.y += (WORD)shooter_direction;
+                                    904 ;/tmp/_gbsbuild/src/states/Shmup.c:166: if (player.move_speed == 0) {
+      0004B9 F8 04                  905 	ldhl	sp,	#4
+      0004BB 7E                     906 	ld	a, (hl)
+      0004BC B7                     907 	or	a, a
+      0004BD 20 35                  908 	jr	NZ, 00192$
+                                    909 ;/tmp/_gbsbuild/src/states/Shmup.c:168: if (IS_FRAME_2) {
+      0004BF 78                     910 	ld	a, b
+      0004C0 B1                     911 	or	a, c
+      0004C1 20 77                  912 	jr	NZ, 00199$
+                                    913 ;/tmp/_gbsbuild/src/states/Shmup.c:169: player.pos.x += (WORD)player.dir.x;
+      0004C3 21r00r00               914 	ld	hl, #_actors
+      0004C6 2A                     915 	ld	a, (hl+)
+      0004C7 4F                     916 	ld	c, a
+      0004C8 46                     917 	ld	b, (hl)
+      0004C9 FAr05r00               918 	ld	a, (#(_actors + 0x0005) + 0)
+      0004CC 6F                     919 	ld	l, a
+      0004CD 17                     920 	rla
+      0004CE 9F                     921 	sbc	a, a
+      0004CF 67                     922 	ld	h, a
+      0004D0 09                     923 	add	hl, bc
+      0004D1 4D                     924 	ld	c, l
+      0004D2 44                     925 	ld	b, h
+      0004D3 21r00r00               926 	ld	hl, #_actors
+      0004D6 79                     927 	ld	a, c
+      0004D7 22                     928 	ld	(hl+), a
+      0004D8 70                     929 	ld	(hl), b
+                                    930 ;/tmp/_gbsbuild/src/states/Shmup.c:170: player.pos.y += (WORD)shooter_direction;
+      0004D9 21r02r00               931 	ld	hl, #(_actors + 0x0002)
+      0004DC 2A                     932 	ld	a, (hl+)
+      0004DD 4F                     933 	ld	c, a
+      0004DE 46                     934 	ld	b, (hl)
+      0004DF FAr01r00               935 	ld	a, (#_shooter_direction)
+      0004E2 5F                     936 	ld	e, a
+      0004E3 17                     937 	rla
+      0004E4 9F                     938 	sbc	a, a
+      0004E5 57                     939 	ld	d, a
+      0004E6 7B                     940 	ld	a, e
+      0004E7 81                     941 	add	a, c
+      0004E8 4F                     942 	ld	c, a
+      0004E9 7A                     943 	ld	a, d
+      0004EA 88                     944 	adc	a, b
+      0004EB 47                     945 	ld	b, a
+      0004EC 21r02r00               946 	ld	hl, #(_actors + 0x0002)
+      0004EF 79                     947 	ld	a, c
+      0004F0 22                     948 	ld	(hl+), a
+      0004F1 70                     949 	ld	(hl), b
+      0004F2 18 46                  950 	jr	00199$
+      0004F4                        951 00192$:
+                                    952 ;/tmp/_gbsbuild/src/states/Shmup.c:173: player.pos.x += (WORD)(player.dir.x * player.move_speed);
+      0004F4 21r00r00               953 	ld	hl, #_actors
+      0004F7 2A                     954 	ld	a, (hl+)
+      0004F8 4F                     955 	ld	c, a
+      0004F9 46                     956 	ld	b, (hl)
+      0004FA FAr05r00               957 	ld	a, (#(_actors + 0x0005) + 0)
+      0004FD C5                     958 	push	bc
+      0004FE F8 06                  959 	ldhl	sp,	#6
+      000500 66                     960 	ld	h, (hl)
+      000501 E5                     961 	push	hl
+      000502 33                     962 	inc	sp
+      000503 F5                     963 	push	af
+      000504 33                     964 	inc	sp
+      000505 CDr00r00               965 	call	__muluschar
+      000508 E8 02                  966 	add	sp, #2
+      00050A C1                     967 	pop	bc
+      00050B 7B                     968 	ld	a, e
+      00050C 81                     969 	add	a, c
+      00050D 4F                     970 	ld	c, a
+      00050E 7A                     971 	ld	a, d
+      00050F 88                     972 	adc	a, b
+      000510 47                     973 	ld	b, a
+      000511 21r00r00               974 	ld	hl, #_actors
+      000514 79                     975 	ld	a, c
+      000515 22                     976 	ld	(hl+), a
+      000516 70                     977 	ld	(hl), b
+                                    978 ;/tmp/_gbsbuild/src/states/Shmup.c:174: player.pos.y += (WORD)(shooter_direction * player.move_speed);
+      000517 21r02r00               979 	ld	hl, #(_actors + 0x0002)
+      00051A 2A                     980 	ld	a, (hl+)
+      00051B 4F                     981 	ld	c, a
+      00051C 46                     982 	ld	b, (hl)
+      00051D FAr04r00               983 	ld	a, (#(_actors + 0x0004) + 0)
+      000520 C5                     984 	push	bc
+      000521 F5                     985 	push	af
+      000522 33                     986 	inc	sp
+      000523 FAr01r00               987 	ld	a, (#_shooter_direction)
+      000526 F5                     988 	push	af
+      000527 33                     989 	inc	sp
+      000528 CDr00r00               990 	call	__muluschar
+      00052B E8 02                  991 	add	sp, #2
+      00052D C1                     992 	pop	bc
+      00052E 7B                     993 	ld	a, e
+      00052F 81                     994 	add	a, c
+      000530 4F                     995 	ld	c, a
+      000531 7A                     996 	ld	a, d
+      000532 88                     997 	adc	a, b
+      000533 47                     998 	ld	b, a
+      000534 21r02r00               999 	ld	hl, #(_actors + 0x0002)
+      000537 79                    1000 	ld	a, c
+      000538 22                    1001 	ld	(hl+), a
+      000539 70                    1002 	ld	(hl), b
+      00053A                       1003 00199$:
+                                   1004 ;/tmp/_gbsbuild/src/states/Shmup.c:180: hit_actor = ActorOverlapsPlayer(FALSE);
+      00053A AF                    1005 	xor	a, a
+      00053B F5                    1006 	push	af
+      00053C 33                    1007 	inc	sp
+      00053D CDr00r00              1008 	call	_ActorOverlapsPlayer
+      000540 33                    1009 	inc	sp
+      000541 F8 00                 1010 	ldhl	sp,	#0
+      000543 73                    1011 	ld	(hl), e
+                                   1012 ;/tmp/_gbsbuild/src/states/Shmup.c:181: if (hit_actor && hit_actor != NO_ACTOR_COLLISON && player_iframes == 0) {
+      000544 7E                    1013 	ld	a, (hl)
+      000545 B7                    1014 	or	a, a
+      000546 28 76                 1015 	jr	Z, 00207$
+      000548 7E                    1016 	ld	a, (hl)
+      000549 3C                    1017 	inc	a
+      00054A 28 72                 1018 	jr	Z, 00207$
+      00054C FAr00r00              1019 	ld	a, (#_player_iframes)
+      00054F B7                    1020 	or	a, a
+      000550 20 6C                 1021 	jr	NZ, 00207$
+                                   1022 ;/tmp/_gbsbuild/src/states/Shmup.c:182: if (actors[hit_actor].collision_group) {
+      000552 F8 00                 1023 	ldhl	sp,	#0
+      000554 4E                    1024 	ld	c, (hl)
+      000555 06 00                 1025 	ld	b, #0x00
+      000557 69                    1026 	ld	l, c
+      000558 60                    1027 	ld	h, b
+      000559 29                    1028 	add	hl, hl
+      00055A 29                    1029 	add	hl, hl
+      00055B 09                    1030 	add	hl, bc
+      00055C 29                    1031 	add	hl, hl
+      00055D 09                    1032 	add	hl, bc
+      00055E 29                    1033 	add	hl, hl
+      00055F 09                    1034 	add	hl, bc
+      000560 29                    1035 	add	hl, hl
+      000561 01r00r00              1036 	ld	bc,#_actors
+      000564 09                    1037 	add	hl,bc
+      000565 E5                    1038 	push	hl
+      000566 7D                    1039 	ld	a, l
+      000567 F8 03                 1040 	ldhl	sp,	#3
+      000569 77                    1041 	ld	(hl), a
+      00056A E1                    1042 	pop	hl
+      00056B 7C                    1043 	ld	a, h
+      00056C F8 02                 1044 	ldhl	sp,	#2
+                                   1045 ;c
+      00056E 32                    1046 	ld	(hl-), a
+      00056F 2A                    1047 	ld	a, (hl+)
+      000570 5F                    1048 	ld	e, a
+      000571 56                    1049 	ld	d, (hl)
+      000572 21 18 00              1050 	ld	hl, #0x0018
+      000575 19                    1051 	add	hl, de
+      000576 E5                    1052 	push	hl
+      000577 7D                    1053 	ld	a, l
+      000578 F8 05                 1054 	ldhl	sp,	#5
+      00057A 77                    1055 	ld	(hl), a
+      00057B E1                    1056 	pop	hl
+      00057C 7C                    1057 	ld	a, h
+      00057D F8 04                 1058 	ldhl	sp,	#4
+      00057F 32                    1059 	ld	(hl-), a
+      000580 2A                    1060 	ld	a, (hl+)
+      000581 5F                    1061 	ld	e, a
+      000582 56                    1062 	ld	d, (hl)
+      000583 1A                    1063 	ld	a, (de)
+      000584 77                    1064 	ld	(hl), a
+      000585 B7                    1065 	or	a, a
+      000586 28 0E                 1066 	jr	Z, 00201$
+                                   1067 ;/tmp/_gbsbuild/src/states/Shmup.c:183: player.hit_actor = 0;
+      000588 21r1Ar00              1068 	ld	hl, #(_actors + 0x001a)
+      00058B 36 00                 1069 	ld	(hl), #0x00
+                                   1070 ;/tmp/_gbsbuild/src/states/Shmup.c:184: player.hit_actor = hit_actor;
+      00058D 11r1Ar00              1071 	ld	de, #(_actors + 0x001a)
+      000590 F8 00                 1072 	ldhl	sp,	#0
+      000592 7E                    1073 	ld	a, (hl)
+      000593 12                    1074 	ld	(de), a
+      000594 18 28                 1075 	jr	00207$
+      000596                       1076 00201$:
+                                   1077 ;/tmp/_gbsbuild/src/states/Shmup.c:186: player_iframes = SHOOTER_HURT_IFRAMES;
+      000596 21r00r00              1078 	ld	hl, #_player_iframes
+      000599 36 0A                 1079 	ld	(hl), #0x0a
+                                   1080 ;/tmp/_gbsbuild/src/states/Shmup.c:187: ScriptStartBg(&actors[hit_actor].events_ptr, hit_actor);
+                                   1081 ;c
+      00059B F8 01                 1082 	ldhl	sp,#1
+      00059D 2A                    1083 	ld	a, (hl+)
+      00059E 5F                    1084 	ld	e, a
+      00059F 56                    1085 	ld	d, (hl)
+      0005A0 21 1E 00              1086 	ld	hl, #0x001e
+      0005A3 19                    1087 	add	hl, de
+      0005A4 E5                    1088 	push	hl
+      0005A5 7D                    1089 	ld	a, l
+      0005A6 F8 05                 1090 	ldhl	sp,	#5
+      0005A8 77                    1091 	ld	(hl), a
+      0005A9 E1                    1092 	pop	hl
+      0005AA 7C                    1093 	ld	a, h
+      0005AB F8 04                 1094 	ldhl	sp,	#4
+      0005AD 77                    1095 	ld	(hl), a
+      0005AE F8 00                 1096 	ldhl	sp,	#0
+      0005B0 7E                    1097 	ld	a, (hl)
+      0005B1 F5                    1098 	push	af
+      0005B2 33                    1099 	inc	sp
+      0005B3 F8 04                 1100 	ldhl	sp,	#4
+      0005B5 2A                    1101 	ld	a, (hl+)
+      0005B6 66                    1102 	ld	h, (hl)
+      0005B7 6F                    1103 	ld	l, a
+      0005B8 E5                    1104 	push	hl
+      0005B9 CDr00r00              1105 	call	_ScriptStartBg
+      0005BC E8 03                 1106 	add	sp, #3
+      0005BE                       1107 00207$:
+                                   1108 ;/tmp/_gbsbuild/src/states/Shmup.c:190: }
+      0005BE E8 05                 1109 	add	sp, #5
+      0005C0 C9                    1110 	ret
+                                   1111 	.area _CODE_5
+                                   1112 	.area _CABS (ABS)

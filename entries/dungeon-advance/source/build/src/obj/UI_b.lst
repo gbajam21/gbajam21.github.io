@@ -1,0 +1,2132 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module UI_b
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_UIShowMenu_b
+                                     12 	.globl _UIShowMenu_b
+                                     13 	.globl _UICloseDialogue_b
+                                     14 	.globl b_UIShowText_b
+                                     15 	.globl _UIShowText_b
+                                     16 	.globl b_UISetColor_b
+                                     17 	.globl _UISetColor_b
+                                     18 	.globl b_UIDrawDialogueFrame_b
+                                     19 	.globl _UIDrawDialogueFrame_b
+                                     20 	.globl b_UIDrawFrame_b
+                                     21 	.globl _UIDrawFrame_b
+                                     22 	.globl b_UIReset_b
+                                     23 	.globl _UIReset_b
+                                     24 	.globl b_UIInit_b
+                                     25 	.globl _UIInit_b
+                                     26 	.globl _GetToken_b
+                                     27 	.globl _itoa
+                                     28 	.globl _strlen
+                                     29 	.globl _GetWinAddr
+                                     30 	.globl _SetTile
+                                     31 	.globl _SetBankedBkgData
+                                     32 	.globl _UIShowText
+                                     33 	.globl _UIDrawDialogueFrame
+                                     34 	.globl _UIDrawFrame
+                                     35 	.globl _UIMoveTo
+                                     36 	.globl _UISetPos
+                                     37 	.globl _fill_win_rect
+                                     38 	.globl _set_bkg_data
+                                     39 	.globl _current_text_speed
+                                     40 	.globl _text_draw_speeds
+                                     41 	.globl _ui_black
+                                     42 	.globl _ui_white
+                                     43 	.globl b_UIUpdate_b
+                                     44 	.globl _UIUpdate_b
+                                     45 	.globl _UIDrawTextBufferChar_b
+                                     46 	.globl b_UIOnInteract_b
+                                     47 	.globl _UIOnInteract_b
+                                     48 	.globl _UIDrawMenuCursor_b
+                                     49 ;--------------------------------------------------------
+                                     50 ; special function registers
+                                     51 ;--------------------------------------------------------
+                                     52 ;--------------------------------------------------------
+                                     53 ; ram data
+                                     54 ;--------------------------------------------------------
+                                     55 	.area _DATA
+      000000                         56 _current_text_speed::
+      000000                         57 	.ds 1
+      000001                         58 _UIShowText_b_src_65537_149:
+      000001                         59 	.ds 2
+      000003                         60 _UIShowText_b_dest_65537_149:
+      000003                         61 	.ds 2
+                                     62 ;--------------------------------------------------------
+                                     63 ; absolute external ram data
+                                     64 ;--------------------------------------------------------
+                                     65 	.area _DABS (ABS)
+                                     66 ;--------------------------------------------------------
+                                     67 ; global & static initialisations
+                                     68 ;--------------------------------------------------------
+                                     69 	.area _HOME
+                                     70 	.area _GSINIT
+                                     71 	.area _GSFINAL
+                                     72 	.area _GSINIT
+                                     73 ;--------------------------------------------------------
+                                     74 ; Home
+                                     75 ;--------------------------------------------------------
+                                     76 	.area _HOME
+                                     77 	.area _HOME
+                                     78 ;--------------------------------------------------------
+                                     79 ; code
+                                     80 ;--------------------------------------------------------
+                                     81 	.area _CODE_1
+                                     82 ;/tmp/_gbsbuild/src/core/UI_b.c:49: void UIInit_b() __banked {
+                                     83 ;	---------------------------------
+                                     84 ; Function UIInit_b
+                                     85 ; ---------------------------------
+                           000001    86 	b_UIInit_b	= 1
+      000000                         87 _UIInit_b::
+                                     88 ;/tmp/_gbsbuild/src/core/UI_b.c:53: VBK_REG = 1;
+      000000 3E 01                   89 	ld	a, #0x01
+      000002 E0r00                   90 	ldh	(_VBK_REG+0),a
+                                     91 ;/tmp/_gbsbuild/src/core/UI_b.c:54: fill_win_rect(0, 0, 20, 18, ui_bkg_tile);
+      000004 11 12 07                92 	ld	de, #0x0712
+      000007 D5                      93 	push	de
+      000008 3E 14                   94 	ld	a, #0x14
+      00000A F5                      95 	push	af
+      00000B 33                      96 	inc	sp
+      00000C AF                      97 	xor	a, a
+      00000D F5                      98 	push	af
+      00000E 33                      99 	inc	sp
+      00000F AF                     100 	xor	a, a
+      000010 F5                     101 	push	af
+      000011 33                     102 	inc	sp
+      000012 CDr00r00               103 	call	_fill_win_rect
+      000015 E8 05                  104 	add	sp, #5
+                                    105 ;/tmp/_gbsbuild/src/core/UI_b.c:55: VBK_REG = 0;
+      000017 3E 00                  106 	ld	a, #0x00
+      000019 E0r00                  107 	ldh	(_VBK_REG+0),a
+                                    108 ;/tmp/_gbsbuild/src/core/UI_b.c:58: UISetPos(0, 144);
+      00001B 3E 90                  109 	ld	a, #0x90
+      00001D F5                     110 	push	af
+      00001E 33                     111 	inc	sp
+      00001F AF                     112 	xor	a, a
+      000020 F5                     113 	push	af
+      000021 33                     114 	inc	sp
+      000022 CDr00r00               115 	call	_UISetPos
+      000025 E8 02                  116 	add	sp, #2
+                                    117 ;/tmp/_gbsbuild/src/core/UI_b.c:62: SetBankedBkgData(192, 9, ptr, FRAME_BANK);
+      000027 3E 06                  118 	ld	a, #0x06
+      000029 F5                     119 	push	af
+      00002A 33                     120 	inc	sp
+      00002B 21 00 4E               121 	ld	hl, #0x4e00
+      00002E E5                     122 	push	hl
+      00002F 11 C0 09               123 	ld	de, #0x09c0
+      000032 D5                     124 	push	de
+      000033 CDr00r00               125 	call	_SetBankedBkgData
+      000036 E8 05                  126 	add	sp, #5
+                                    127 ;/tmp/_gbsbuild/src/core/UI_b.c:64: set_bkg_data(ui_while_tile, 1, ui_white);
+      000038 21r64r00               128 	ld	hl, #_ui_white
+      00003B E5                     129 	push	hl
+      00003C 11 C9 01               130 	ld	de, #0x01c9
+      00003F D5                     131 	push	de
+      000040 CDr00r00               132 	call	_set_bkg_data
+      000043 E8 04                  133 	add	sp, #4
+                                    134 ;/tmp/_gbsbuild/src/core/UI_b.c:65: set_bkg_data(ui_black_tile, 1, ui_black);
+      000045 21r74r00               135 	ld	hl, #_ui_black
+      000048 E5                     136 	push	hl
+      000049 11 CA 01               137 	ld	de, #0x01ca
+      00004C D5                     138 	push	de
+      00004D CDr00r00               139 	call	_set_bkg_data
+      000050 E8 04                  140 	add	sp, #4
+                                    141 ;/tmp/_gbsbuild/src/core/UI_b.c:68: SetBankedBkgData(0xCB, 1, ptr, CURSOR_BANK);
+      000052 3E 06                  142 	ld	a, #0x06
+      000054 F5                     143 	push	af
+      000055 33                     144 	inc	sp
+      000056 21 90 4E               145 	ld	hl, #0x4e90
+      000059 E5                     146 	push	hl
+      00005A 11 CB 01               147 	ld	de, #0x01cb
+      00005D D5                     148 	push	de
+      00005E CDr00r00               149 	call	_SetBankedBkgData
+      000061 E8 05                  150 	add	sp, #5
+                                    151 ;/tmp/_gbsbuild/src/core/UI_b.c:69: }
+      000063 C9                     152 	ret
+      000064                        153 _ui_white:
+      000064 00                     154 	.db #0x00	; 0
+      000065 00                     155 	.db #0x00	; 0
+      000066 00                     156 	.db #0x00	; 0
+      000067 00                     157 	.db #0x00	; 0
+      000068 00                     158 	.db #0x00	; 0
+      000069 00                     159 	.db #0x00	; 0
+      00006A 00                     160 	.db #0x00	; 0
+      00006B 00                     161 	.db #0x00	; 0
+      00006C 00                     162 	.db #0x00	; 0
+      00006D 00                     163 	.db #0x00	; 0
+      00006E 00                     164 	.db #0x00	; 0
+      00006F 00                     165 	.db #0x00	; 0
+      000070 00                     166 	.db #0x00	; 0
+      000071 00                     167 	.db #0x00	; 0
+      000072 00                     168 	.db #0x00	; 0
+      000073 00                     169 	.db #0x00	; 0
+      000074                        170 _ui_black:
+      000074 FF                     171 	.db #0xff	; 255
+      000075 FF                     172 	.db #0xff	; 255
+      000076 FF                     173 	.db #0xff	; 255
+      000077 FF                     174 	.db #0xff	; 255
+      000078 FF                     175 	.db #0xff	; 255
+      000079 FF                     176 	.db #0xff	; 255
+      00007A FF                     177 	.db #0xff	; 255
+      00007B FF                     178 	.db #0xff	; 255
+      00007C FF                     179 	.db #0xff	; 255
+      00007D FF                     180 	.db #0xff	; 255
+      00007E FF                     181 	.db #0xff	; 255
+      00007F FF                     182 	.db #0xff	; 255
+      000080 FF                     183 	.db #0xff	; 255
+      000081 FF                     184 	.db #0xff	; 255
+      000082 FF                     185 	.db #0xff	; 255
+      000083 FF                     186 	.db #0xff	; 255
+      000084                        187 _text_draw_speeds:
+      000084 00                     188 	.db #0x00	; 0
+      000085 01                     189 	.db #0x01	; 1
+      000086 03                     190 	.db #0x03	; 3
+      000087 07                     191 	.db #0x07	; 7
+      000088 0F                     192 	.db #0x0f	; 15
+      000089 1F                     193 	.db #0x1f	; 31
+                                    194 ;/tmp/_gbsbuild/src/core/UI_b.c:71: void UIReset_b() __banked {
+                                    195 ;	---------------------------------
+                                    196 ; Function UIReset_b
+                                    197 ; ---------------------------------
+                           000001   198 	b_UIReset_b	= 1
+      00008A                        199 _UIReset_b::
+                                    200 ;/tmp/_gbsbuild/src/core/UI_b.c:72: UISetPos(0, 144);
+      00008A 3E 90                  201 	ld	a, #0x90
+      00008C F5                     202 	push	af
+      00008D 33                     203 	inc	sp
+      00008E AF                     204 	xor	a, a
+      00008F F5                     205 	push	af
+      000090 33                     206 	inc	sp
+      000091 CDr00r00               207 	call	_UISetPos
+      000094 E8 02                  208 	add	sp, #2
+                                    209 ;/tmp/_gbsbuild/src/core/UI_b.c:73: }
+      000096 C9                     210 	ret
+                                    211 ;/tmp/_gbsbuild/src/core/UI_b.c:75: void UIUpdate_b() __banked {
+                                    212 ;	---------------------------------
+                                    213 ; Function UIUpdate_b
+                                    214 ; ---------------------------------
+                           000001   215 	b_UIUpdate_b	= 1
+      000097                        216 _UIUpdate_b::
+                                    217 ;/tmp/_gbsbuild/src/core/UI_b.c:78: if (win_speed == 5 && ((game_time & 0x7) != 0)) {
+      000097 21r00r00               218 	ld	hl, #_game_time
+      00009A 4E                     219 	ld	c, (hl)
+      00009B FAr00r00               220 	ld	a, (#_win_speed)
+      00009E D6 05                  221 	sub	a, #0x05
+      0000A0 20 04                  222 	jr	NZ, 00112$
+      0000A2 79                     223 	ld	a, c
+      0000A3 E6 07                  224 	and	a, #0x07
+                                    225 ;/tmp/_gbsbuild/src/core/UI_b.c:79: return;
+      0000A5 C0                     226 	ret	NZ
+      0000A6                        227 00112$:
+                                    228 ;/tmp/_gbsbuild/src/core/UI_b.c:80: } else if (win_speed == 4 && ((game_time & 0x3) != 0)) {
+      0000A6 FAr00r00               229 	ld	a, (#_win_speed)
+      0000A9 D6 04                  230 	sub	a, #0x04
+      0000AB 20 04                  231 	jr	NZ, 00108$
+      0000AD 79                     232 	ld	a, c
+      0000AE E6 03                  233 	and	a, #0x03
+                                    234 ;/tmp/_gbsbuild/src/core/UI_b.c:81: return;
+      0000B0 C0                     235 	ret	NZ
+      0000B1                        236 00108$:
+                                    237 ;/tmp/_gbsbuild/src/core/UI_b.c:82: } else if (win_speed == 3 && ((game_time & 0x1) != 0)) {
+      0000B1 FAr00r00               238 	ld	a, (#_win_speed)
+      0000B4 D6 03                  239 	sub	a, #0x03
+      0000B6 20 03                  240 	jr	NZ, 00104$
+      0000B8 CB 41                  241 	bit	0, c
+                                    242 ;/tmp/_gbsbuild/src/core/UI_b.c:83: return;
+      0000BA C0                     243 	ret	NZ
+      0000BB                        244 00104$:
+                                    245 ;/tmp/_gbsbuild/src/core/UI_b.c:84: } else if (win_speed == 0xFF) {
+      0000BB FAr00r00               246 	ld	a, (#_win_speed)
+      0000BE 3C                     247 	inc	a
+      0000BF 20 06                  248 	jr	NZ, 00109$
+                                    249 ;/tmp/_gbsbuild/src/core/UI_b.c:86: win_speed = 0;
+      0000C1 21r00r00               250 	ld	hl, #_win_speed
+      0000C4 36 00                  251 	ld	(hl), #0x00
+                                    252 ;/tmp/_gbsbuild/src/core/UI_b.c:87: return;
+      0000C6 C9                     253 	ret
+      0000C7                        254 00109$:
+                                    255 ;/tmp/_gbsbuild/src/core/UI_b.c:90: if (win_speed == 1) {
+      0000C7 FAr00r00               256 	ld	a, (#_win_speed)
+      0000CA 3D                     257 	dec	a
+                                    258 ;/tmp/_gbsbuild/src/core/UI_b.c:91: interval = 2;
+                                    259 ;/tmp/_gbsbuild/src/core/UI_b.c:93: interval = 1;
+      0000CB 0E 02                  260 	ld	c, #0x02
+      0000CD 28 02                  261 	jr	Z, 00117$
+      0000CF 0E 01                  262 	ld	c, #0x01
+      0000D1                        263 00117$:
+                                    264 ;/tmp/_gbsbuild/src/core/UI_b.c:96: if (win_pos_x != win_dest_pos_x) {
+      0000D1 FAr00r00               265 	ld	a, (#_win_pos_x)
+      0000D4 21r00r00               266 	ld	hl, #_win_dest_pos_x
+      0000D7 96                     267 	sub	a, (hl)
+      0000D8 28 17                  268 	jr	Z, 00122$
+                                    269 ;/tmp/_gbsbuild/src/core/UI_b.c:97: if (win_pos_x < win_dest_pos_x) {
+      0000DA FAr00r00               270 	ld	a, (#_win_pos_x)
+      0000DD 21r00r00               271 	ld	hl, #_win_dest_pos_x
+      0000E0 96                     272 	sub	a, (hl)
+      0000E1 30 08                  273 	jr	NC, 00119$
+                                    274 ;/tmp/_gbsbuild/src/core/UI_b.c:98: win_pos_x += interval;
+      0000E3 21r00r00               275 	ld	hl, #_win_pos_x
+      0000E6 7E                     276 	ld	a, (hl)
+      0000E7 81                     277 	add	a, c
+      0000E8 77                     278 	ld	(hl), a
+      0000E9 18 06                  279 	jr	00122$
+      0000EB                        280 00119$:
+                                    281 ;/tmp/_gbsbuild/src/core/UI_b.c:100: win_pos_x -= interval;
+      0000EB 21r00r00               282 	ld	hl, #_win_pos_x
+      0000EE 7E                     283 	ld	a, (hl)
+      0000EF 91                     284 	sub	a, c
+      0000F0 77                     285 	ld	(hl), a
+      0000F1                        286 00122$:
+                                    287 ;/tmp/_gbsbuild/src/core/UI_b.c:104: if (win_pos_y != win_dest_pos_y) {
+      0000F1 FAr00r00               288 	ld	a, (#_win_pos_y)
+      0000F4 21r00r00               289 	ld	hl, #_win_dest_pos_y
+      0000F7 96                     290 	sub	a, (hl)
+      0000F8 28 19                  291 	jr	Z, 00131$
+                                    292 ;/tmp/_gbsbuild/src/core/UI_b.c:105: if (win_pos_y < win_dest_pos_y) {
+      0000FA FAr00r00               293 	ld	a, (#_win_pos_y)
+      0000FD 21r00r00               294 	ld	hl, #_win_dest_pos_y
+      000100 96                     295 	sub	a, (hl)
+      000101 30 08                  296 	jr	NC, 00124$
+                                    297 ;/tmp/_gbsbuild/src/core/UI_b.c:106: win_pos_y += interval;
+      000103 21r00r00               298 	ld	hl, #_win_pos_y
+      000106 7E                     299 	ld	a, (hl)
+      000107 81                     300 	add	a, c
+      000108 77                     301 	ld	(hl), a
+      000109 18 29                  302 	jr	00132$
+      00010B                        303 00124$:
+                                    304 ;/tmp/_gbsbuild/src/core/UI_b.c:108: win_pos_y -= interval;
+      00010B 21r00r00               305 	ld	hl, #_win_pos_y
+      00010E 7E                     306 	ld	a, (hl)
+      00010F 91                     307 	sub	a, c
+      000110 77                     308 	ld	(hl), a
+      000111 18 21                  309 	jr	00132$
+      000113                        310 00131$:
+                                    311 ;/tmp/_gbsbuild/src/core/UI_b.c:110: } else if(!text_drawn) {
+      000113 FAr00r00               312 	ld	a, (#_text_drawn)
+      000116 B7                     313 	or	a, a
+      000117 20 1B                  314 	jr	NZ, 00132$
+                                    315 ;/tmp/_gbsbuild/src/core/UI_b.c:111: if ( (joy & text_ff_joypad) | ((game_time & current_text_speed) == 0) ) {
+      000119 FAr00r00               316 	ld	a, (#_joy)
+      00011C 21r00r00               317 	ld	hl, #_text_ff_joypad
+      00011F A6                     318 	and	a, (hl)
+      000120 4F                     319 	ld	c, a
+      000121 FAr00r00               320 	ld	a, (#_game_time)
+      000124 21r00r00               321 	ld	hl, #_current_text_speed
+      000127 A6                     322 	and	a,(hl)
+      000128 3E 01                  323 	ld	a, #0x01
+      00012A 28 01                  324 	jr	Z, 00221$
+      00012C AF                     325 	xor	a, a
+      00012D                        326 00221$:
+      00012D B1                     327 	or	a, c
+      00012E B7                     328 	or	a, a
+      00012F 28 03                  329 	jr	Z, 00132$
+                                    330 ;/tmp/_gbsbuild/src/core/UI_b.c:112: UIDrawTextBufferChar_b();
+      000131 CDr61r04               331 	call	_UIDrawTextBufferChar_b
+      000134                        332 00132$:
+                                    333 ;/tmp/_gbsbuild/src/core/UI_b.c:116: WX_REG = win_pos_x + 7;
+      000134 FAr00r00               334 	ld	a, (#_win_pos_x)
+      000137 C6 07                  335 	add	a, #0x07
+      000139 E0r00                  336 	ldh	(_WX_REG+0),a
+                                    337 ;/tmp/_gbsbuild/src/core/UI_b.c:117: WY_REG = win_pos_y;
+      00013B FAr00r00               338 	ld	a, (#_win_pos_y)
+      00013E E0r00                  339 	ldh	(_WY_REG+0),a
+                                    340 ;/tmp/_gbsbuild/src/core/UI_b.c:118: }
+      000140 C9                     341 	ret
+                                    342 ;/tmp/_gbsbuild/src/core/UI_b.c:120: void UIDrawFrame_b(UBYTE x, UBYTE y, UBYTE width, UBYTE height) __banked {
+                                    343 ;	---------------------------------
+                                    344 ; Function UIDrawFrame_b
+                                    345 ; ---------------------------------
+                           000001   346 	b_UIDrawFrame_b	= 1
+      000141                        347 _UIDrawFrame_b::
+      000141 3B                     348 	dec	sp
+                                    349 ;/tmp/_gbsbuild/src/core/UI_b.c:121: fill_win_rect(x,         y,              1,         1,      ui_frame_tl_tiles);  // top-left
+      000142 11 01 C0               350 	ld	de, #0xc001
+      000145 D5                     351 	push	de
+      000146 3E 01                  352 	ld	a, #0x01
+      000148 F5                     353 	push	af
+      000149 33                     354 	inc	sp
+      00014A F8 0B                  355 	ldhl	sp,	#11
+      00014C 7E                     356 	ld	a, (hl)
+      00014D F5                     357 	push	af
+      00014E 33                     358 	inc	sp
+      00014F 2B                     359 	dec	hl
+      000150 7E                     360 	ld	a, (hl)
+      000151 F5                     361 	push	af
+      000152 33                     362 	inc	sp
+      000153 CDr00r00               363 	call	_fill_win_rect
+      000156 E8 05                  364 	add	sp, #5
+                                    365 ;/tmp/_gbsbuild/src/core/UI_b.c:122: fill_win_rect(x + 1,     y,              width - 1, 1,      ui_frame_t_tiles);   // top
+      000158 F8 09                  366 	ldhl	sp,	#9
+      00015A 46                     367 	ld	b, (hl)
+      00015B 05                     368 	dec	b
+      00015C 2B                     369 	dec	hl
+      00015D 2B                     370 	dec	hl
+      00015E 4E                     371 	ld	c, (hl)
+      00015F 0C                     372 	inc	c
+      000160 11 01 C1               373 	ld	de, #0xc101
+      000163 D5                     374 	push	de
+      000164 C5                     375 	push	bc
+      000165 33                     376 	inc	sp
+      000166 23                     377 	inc	hl
+      000167 7E                     378 	ld	a, (hl)
+      000168 F5                     379 	push	af
+      000169 33                     380 	inc	sp
+      00016A 79                     381 	ld	a, c
+      00016B F5                     382 	push	af
+      00016C 33                     383 	inc	sp
+      00016D CDr00r00               384 	call	_fill_win_rect
+      000170 E8 05                  385 	add	sp, #5
+                                    386 ;/tmp/_gbsbuild/src/core/UI_b.c:123: fill_win_rect(x + width, y,              1,         1,      ui_frame_tr_tiles);  // top-right
+      000172 F8 07                  387 	ldhl	sp,	#7
+      000174 2A                     388 	ld	a, (hl+)
+      000175 23                     389 	inc	hl
+      000176 86                     390 	add	a, (hl)
+      000177 F8 00                  391 	ldhl	sp,	#0
+      000179 77                     392 	ld	(hl), a
+      00017A 11 01 C2               393 	ld	de, #0xc201
+      00017D D5                     394 	push	de
+      00017E 3E 01                  395 	ld	a, #0x01
+      000180 F5                     396 	push	af
+      000181 33                     397 	inc	sp
+      000182 F8 0B                  398 	ldhl	sp,	#11
+      000184 7E                     399 	ld	a, (hl)
+      000185 F5                     400 	push	af
+      000186 33                     401 	inc	sp
+      000187 F8 04                  402 	ldhl	sp,	#4
+      000189 7E                     403 	ld	a, (hl)
+      00018A F5                     404 	push	af
+      00018B 33                     405 	inc	sp
+      00018C CDr00r00               406 	call	_fill_win_rect
+      00018F E8 05                  407 	add	sp, #5
+                                    408 ;/tmp/_gbsbuild/src/core/UI_b.c:124: fill_win_rect(x,         y + 1,          1,         height, ui_frame_l_tiles);   // left
+      000191 F8 08                  409 	ldhl	sp,	#8
+      000193 5E                     410 	ld	e, (hl)
+      000194 1C                     411 	inc	e
+      000195 D5                     412 	push	de
+      000196 3E C3                  413 	ld	a, #0xc3
+      000198 F5                     414 	push	af
+      000199 33                     415 	inc	sp
+      00019A 23                     416 	inc	hl
+      00019B 23                     417 	inc	hl
+      00019C 7E                     418 	ld	a, (hl)
+      00019D F5                     419 	push	af
+      00019E 33                     420 	inc	sp
+      00019F 16 01                  421 	ld	d, #0x01
+      0001A1 D5                     422 	push	de
+      0001A2 F8 0D                  423 	ldhl	sp,	#13
+      0001A4 7E                     424 	ld	a, (hl)
+      0001A5 F5                     425 	push	af
+      0001A6 33                     426 	inc	sp
+      0001A7 CDr00r00               427 	call	_fill_win_rect
+      0001AA E8 05                  428 	add	sp, #5
+      0001AC D1                     429 	pop	de
+                                    430 ;/tmp/_gbsbuild/src/core/UI_b.c:125: fill_win_rect(x + width, y + 1,          1,         height, ui_frame_r_tiles);   // right
+      0001AD D5                     431 	push	de
+      0001AE 3E C5                  432 	ld	a, #0xc5
+      0001B0 F5                     433 	push	af
+      0001B1 33                     434 	inc	sp
+      0001B2 F8 0D                  435 	ldhl	sp,	#13
+      0001B4 7E                     436 	ld	a, (hl)
+      0001B5 F5                     437 	push	af
+      0001B6 33                     438 	inc	sp
+      0001B7 16 01                  439 	ld	d, #0x01
+      0001B9 D5                     440 	push	de
+      0001BA F8 06                  441 	ldhl	sp,	#6
+      0001BC 7E                     442 	ld	a, (hl)
+      0001BD F5                     443 	push	af
+      0001BE 33                     444 	inc	sp
+      0001BF CDr00r00               445 	call	_fill_win_rect
+      0001C2 E8 05                  446 	add	sp, #5
+      0001C4 D1                     447 	pop	de
+                                    448 ;/tmp/_gbsbuild/src/core/UI_b.c:126: fill_win_rect(x,         y + height + 1, 1,         1,      ui_frame_bl_tiles);  // bottom-left
+      0001C5 F8 08                  449 	ldhl	sp,	#8
+      0001C7 2A                     450 	ld	a, (hl+)
+      0001C8 23                     451 	inc	hl
+      0001C9 86                     452 	add	a, (hl)
+      0001CA 57                     453 	ld	d, a
+      0001CB 14                     454 	inc	d
+      0001CC D5                     455 	push	de
+      0001CD 21 01 C6               456 	ld	hl, #0xc601
+      0001D0 E5                     457 	push	hl
+      0001D1 3E 01                  458 	ld	a, #0x01
+      0001D3 F5                     459 	push	af
+      0001D4 33                     460 	inc	sp
+      0001D5 D5                     461 	push	de
+      0001D6 33                     462 	inc	sp
+      0001D7 F8 0D                  463 	ldhl	sp,	#13
+      0001D9 7E                     464 	ld	a, (hl)
+      0001DA F5                     465 	push	af
+      0001DB 33                     466 	inc	sp
+      0001DC CDr00r00               467 	call	_fill_win_rect
+      0001DF E8 05                  468 	add	sp, #5
+      0001E1 D1                     469 	pop	de
+                                    470 ;/tmp/_gbsbuild/src/core/UI_b.c:127: fill_win_rect(x + 1,     y + height + 1, width - 1, 1,      ui_frame_b_tiles);   // bottom
+      0001E2 D5                     471 	push	de
+      0001E3 21 01 C7               472 	ld	hl, #0xc701
+      0001E6 E5                     473 	push	hl
+      0001E7 C5                     474 	push	bc
+      0001E8 33                     475 	inc	sp
+      0001E9 59                     476 	ld	e, c
+      0001EA D5                     477 	push	de
+      0001EB CDr00r00               478 	call	_fill_win_rect
+      0001EE E8 05                  479 	add	sp, #5
+      0001F0 D1                     480 	pop	de
+                                    481 ;/tmp/_gbsbuild/src/core/UI_b.c:128: fill_win_rect(x + width, y + height + 1, 1,         1,      ui_frame_br_tiles);  // bottom-right
+      0001F1 D5                     482 	push	de
+      0001F2 21 01 C8               483 	ld	hl, #0xc801
+      0001F5 E5                     484 	push	hl
+      0001F6 3E 01                  485 	ld	a, #0x01
+      0001F8 F5                     486 	push	af
+      0001F9 33                     487 	inc	sp
+      0001FA D5                     488 	push	de
+      0001FB 33                     489 	inc	sp
+      0001FC F8 06                  490 	ldhl	sp,	#6
+      0001FE 7E                     491 	ld	a, (hl)
+      0001FF F5                     492 	push	af
+      000200 33                     493 	inc	sp
+      000201 CDr00r00               494 	call	_fill_win_rect
+      000204 E8 05                  495 	add	sp, #5
+      000206 D1                     496 	pop	de
+                                    497 ;/tmp/_gbsbuild/src/core/UI_b.c:129: fill_win_rect(x + 1,     y + 1,          width - 1, height, ui_frame_bg_tiles);  // background
+      000207 3E C4                  498 	ld	a, #0xc4
+      000209 F5                     499 	push	af
+      00020A 33                     500 	inc	sp
+      00020B F8 0B                  501 	ldhl	sp,	#11
+      00020D 7E                     502 	ld	a, (hl)
+      00020E F5                     503 	push	af
+      00020F 33                     504 	inc	sp
+      000210 C5                     505 	push	bc
+      000211 33                     506 	inc	sp
+      000212 43                     507 	ld	b, e
+      000213 C5                     508 	push	bc
+      000214 CDr00r00               509 	call	_fill_win_rect
+      000217 E8 05                  510 	add	sp, #5
+                                    511 ;/tmp/_gbsbuild/src/core/UI_b.c:130: }
+      000219 33                     512 	inc	sp
+      00021A C9                     513 	ret
+                                    514 ;/tmp/_gbsbuild/src/core/UI_b.c:132: void UIDrawDialogueFrame_b(UBYTE h) __banked {
+                                    515 ;	---------------------------------
+                                    516 ; Function UIDrawDialogueFrame_b
+                                    517 ; ---------------------------------
+                           000001   518 	b_UIDrawDialogueFrame_b	= 1
+      00021B                        519 _UIDrawDialogueFrame_b::
+                                    520 ;/tmp/_gbsbuild/src/core/UI_b.c:133: UIDrawFrame_b(0, 0, 19, h);
+      00021B F8 06                  521 	ldhl	sp,	#6
+      00021D 56                     522 	ld	d, (hl)
+      00021E 1E 13                  523 	ld	e,#0x13
+      000220 D5                     524 	push	de
+      000221 AF                     525 	xor	a, a
+      000222 F5                     526 	push	af
+      000223 33                     527 	inc	sp
+      000224 AF                     528 	xor	a, a
+      000225 F5                     529 	push	af
+      000226 33                     530 	inc	sp
+      000227 1E 01                  531 	ld	e, #b_UIDrawFrame_b
+      000229 21r41r01               532 	ld	hl, #_UIDrawFrame_b
+      00022C CDr00r00               533 	call	___sdcc_bcall_ehl
+      00022F E8 04                  534 	add	sp, #4
+                                    535 ;/tmp/_gbsbuild/src/core/UI_b.c:134: }
+      000231 C9                     536 	ret
+                                    537 ;/tmp/_gbsbuild/src/core/UI_b.c:136: void UISetColor_b(UBYTE color) __banked {
+                                    538 ;	---------------------------------
+                                    539 ; Function UISetColor_b
+                                    540 ; ---------------------------------
+                           000001   541 	b_UISetColor_b	= 1
+      000232                        542 _UISetColor_b::
+                                    543 ;/tmp/_gbsbuild/src/core/UI_b.c:137: UBYTE id = ((color) ? ui_while_tile : ui_black_tile);
+      000232 F8 06                  544 	ldhl	sp,	#6
+      000234 7E                     545 	ld	a, (hl)
+      000235 B7                     546 	or	a, a
+      000236 28 05                  547 	jr	Z, 00103$
+      000238 01 C9 00               548 	ld	bc, #0x00c9
+      00023B 18 03                  549 	jr	00104$
+      00023D                        550 00103$:
+      00023D 01 CA 00               551 	ld	bc, #0x00ca
+      000240                        552 00104$:
+                                    553 ;/tmp/_gbsbuild/src/core/UI_b.c:141: set_bkg_data(ui_while_tile, 1, ui_white);
+      000240 21r64r00               554 	ld	hl, #_ui_white
+      000243 E5                     555 	push	hl
+      000244 11 C9 01               556 	ld	de, #0x01c9
+      000247 D5                     557 	push	de
+      000248 CDr00r00               558 	call	_set_bkg_data
+      00024B E8 04                  559 	add	sp, #4
+                                    560 ;/tmp/_gbsbuild/src/core/UI_b.c:142: set_bkg_data(ui_black_tile, 1, ui_black);
+      00024D 21r74r00               561 	ld	hl, #_ui_black
+      000250 E5                     562 	push	hl
+      000251 11 CA 01               563 	ld	de, #0x01ca
+      000254 D5                     564 	push	de
+      000255 CDr00r00               565 	call	_set_bkg_data
+      000258 E8 04                  566 	add	sp, #4
+                                    567 ;/tmp/_gbsbuild/src/core/UI_b.c:143: fill_win_rect(0, 0, 20, 18, id);
+      00025A 51                     568 	ld	d, c
+      00025B 1E 12                  569 	ld	e,#0x12
+      00025D D5                     570 	push	de
+      00025E 3E 14                  571 	ld	a, #0x14
+      000260 F5                     572 	push	af
+      000261 33                     573 	inc	sp
+      000262 AF                     574 	xor	a, a
+      000263 F5                     575 	push	af
+      000264 33                     576 	inc	sp
+      000265 AF                     577 	xor	a, a
+      000266 F5                     578 	push	af
+      000267 33                     579 	inc	sp
+      000268 CDr00r00               580 	call	_fill_win_rect
+      00026B E8 05                  581 	add	sp, #5
+                                    582 ;/tmp/_gbsbuild/src/core/UI_b.c:144: }
+      00026D C9                     583 	ret
+                                    584 ;/tmp/_gbsbuild/src/core/UI_b.c:146: void UIShowText_b() __banked {
+                                    585 ;	---------------------------------
+                                    586 ; Function UIShowText_b
+                                    587 ; ---------------------------------
+                           000001   588 	b_UIShowText_b	= 1
+      00026E                        589 _UIShowText_b::
+      00026E E8 FC                  590 	add	sp, #-4
+                                    591 ;/tmp/_gbsbuild/src/core/UI_b.c:150: ui_block = TRUE;
+      000270 21r00r00               592 	ld	hl, #_ui_block
+      000273 36 01                  593 	ld	(hl), #0x01
+                                    594 ;/tmp/_gbsbuild/src/core/UI_b.c:151: current_text_speed = text_draw_speed;
+      000275 FAr00r00               595 	ld	a, (#_text_draw_speed)
+      000278 EAr00r00               596 	ld	(#_current_text_speed),a
+                                    597 ;/tmp/_gbsbuild/src/core/UI_b.c:154: src = tmp_text_lines + 1, dest = text_lines;
+      00027B 21r01r00               598 	ld	hl, #_UIShowText_b_src_65537_149
+      00027E 3Er01                  599 	ld	a, #<((_tmp_text_lines + 0x0001))
+      000280 22                     600 	ld	(hl+), a
+      000281 36s00                  601 	ld	(hl), #>((_tmp_text_lines + 0x0001))
+      000283 21r03r00               602 	ld	hl, #_UIShowText_b_dest_65537_149
+      000286 3Er00                  603 	ld	a, #<(_text_lines)
+      000288 22                     604 	ld	(hl+), a
+      000289 36s00                  605 	ld	(hl), #>(_text_lines)
+                                    606 ;/tmp/_gbsbuild/src/core/UI_b.c:155: for (i = 0; (*src) && (i != 80u); i++) {
+      00028B AF                     607 	xor	a, a
+      00028C F8 03                  608 	ldhl	sp,	#3
+      00028E 77                     609 	ld	(hl), a
+      00028F                        610 00122$:
+      00028F 21r02r00               611 	ld	hl, #_UIShowText_b_src_65537_149 + 1
+      000292 2B                     612 	dec	hl
+      000293 2A                     613 	ld	a, (hl+)
+      000294 4F                     614 	ld	c, a
+      000295 46                     615 	ld	b, (hl)
+      000296 0A                     616 	ld	a, (bc)
+      000297 4F                     617 	ld	c, a
+      000298 B7                     618 	or	a, a
+      000299 CArB5r03               619 	jp	Z, 00114$
+      00029C F8 03                  620 	ldhl	sp,	#3
+      00029E 7E                     621 	ld	a, (hl)
+      00029F D6 50                  622 	sub	a, #0x50
+      0002A1 CArB5r03               623 	jp	Z,00114$
+                                    624 ;/tmp/_gbsbuild/src/core/UI_b.c:158: l = GetToken_b(src + 1, '$', &var_index);
+      0002A4 21r02r00               625 	ld	hl, #_UIShowText_b_src_65537_149 + 1
+      0002A7 2B                     626 	dec	hl
+      0002A8 2A                     627 	ld	a, (hl+)
+      0002A9 5F                     628 	ld	e, a
+      0002AA 56                     629 	ld	d, (hl)
+      0002AB 13                     630 	inc	de
+                                    631 ;/tmp/_gbsbuild/src/core/UI_b.c:156: switch (*src) {
+      0002AC 79                     632 	ld	a,c
+      0002AD FE 21                  633 	cp	a,#0x21
+      0002AF CAr49r03               634 	jp	Z,00107$
+      0002B2 FE 23                  635 	cp	a,#0x23
+      0002B4 28 53                  636 	jr	Z, 00104$
+      0002B6 D6 24                  637 	sub	a, #0x24
+      0002B8 C2r8Fr03               638 	jp	NZ,00112$
+                                    639 ;/tmp/_gbsbuild/src/core/UI_b.c:158: l = GetToken_b(src + 1, '$', &var_index);
+      0002BB F8 00                  640 	ldhl	sp,	#0
+      0002BD 4D                     641 	ld	c, l
+      0002BE 44                     642 	ld	b, h
+      0002BF C5                     643 	push	bc
+      0002C0 3E 24                  644 	ld	a, #0x24
+      0002C2 F5                     645 	push	af
+      0002C3 33                     646 	inc	sp
+      0002C4 D5                     647 	push	de
+      0002C5 CDr00r00               648 	call	_GetToken_b
+      0002C8 E8 05                  649 	add	sp, #5
+      0002CA 4B                     650 	ld	c, e
+                                    651 ;/tmp/_gbsbuild/src/core/UI_b.c:159: if (l) {
+      0002CB 79                     652 	ld	a, c
+      0002CC B7                     653 	or	a, a
+      0002CD CAr8Fr03               654 	jp	Z, 00112$
+                                    655 ;/tmp/_gbsbuild/src/core/UI_b.c:160: dest += strlen(itoa(script_variables[var_index], dest));
+                                    656 ;c
+      0002D0 11r00r00               657 	ld	de, #_script_variables
+      0002D3 E1                     658 	pop	hl
+      0002D4 E5                     659 	push	hl
+      0002D5 19                     660 	add	hl, de
+      0002D6 5D                     661 	ld	e, l
+      0002D7 54                     662 	ld	d, h
+      0002D8 1A                     663 	ld	a, (de)
+      0002D9 5F                     664 	ld	e, a
+      0002DA 16 00                  665 	ld	d, #0x00
+      0002DC C5                     666 	push	bc
+      0002DD 21r03r00               667 	ld	hl, #_UIShowText_b_dest_65537_149
+      0002E0 2A                     668 	ld	a, (hl+)
+      0002E1 66                     669 	ld	h, (hl)
+      0002E2 6F                     670 	ld	l, a
+      0002E3 E5                     671 	push	hl
+      0002E4 D5                     672 	push	de
+      0002E5 CDr00r00               673 	call	_itoa
+      0002E8 E8 04                  674 	add	sp, #4
+      0002EA D5                     675 	push	de
+      0002EB CDr00r00               676 	call	_strlen
+      0002EE E8 02                  677 	add	sp, #2
+      0002F0 C1                     678 	pop	bc
+      0002F1 21r03r00               679 	ld	hl, #_UIShowText_b_dest_65537_149
+      0002F4 7E                     680 	ld	a, (hl)
+      0002F5 83                     681 	add	a, e
+      0002F6 22                     682 	ld	(hl+), a
+      0002F7 7E                     683 	ld	a, (hl)
+      0002F8 8A                     684 	adc	a, d
+      0002F9 77                     685 	ld	(hl), a
+                                    686 ;/tmp/_gbsbuild/src/core/UI_b.c:161: src += l + 1; 
+      0002FA 06 00                  687 	ld	b, #0x00
+      0002FC 03                     688 	inc	bc
+      0002FD 21r01r00               689 	ld	hl, #_UIShowText_b_src_65537_149
+      000300 7E                     690 	ld	a, (hl)
+      000301 81                     691 	add	a, c
+      000302 22                     692 	ld	(hl+), a
+      000303 7E                     693 	ld	a, (hl)
+      000304 88                     694 	adc	a, b
+      000305 77                     695 	ld	(hl), a
+                                    696 ;/tmp/_gbsbuild/src/core/UI_b.c:162: continue;
+      000306 C3rAFr03               697 	jp	00113$
+                                    698 ;/tmp/_gbsbuild/src/core/UI_b.c:166: case '#':
+      000309                        699 00104$:
+                                    700 ;/tmp/_gbsbuild/src/core/UI_b.c:167: l = GetToken_b(src + 1, '#', &var_index);
+      000309 F8 00                  701 	ldhl	sp,	#0
+      00030B E5                     702 	push	hl
+      00030C 3E 23                  703 	ld	a, #0x23
+      00030E F5                     704 	push	af
+      00030F 33                     705 	inc	sp
+      000310 D5                     706 	push	de
+      000311 CDr00r00               707 	call	_GetToken_b
+      000314 E8 05                  708 	add	sp, #5
+      000316 F8 02                  709 	ldhl	sp,	#2
+      000318 73                     710 	ld	(hl), e
+                                    711 ;/tmp/_gbsbuild/src/core/UI_b.c:168: if (l) {
+      000319 7E                     712 	ld	a, (hl)
+      00031A B7                     713 	or	a, a
+      00031B 28 72                  714 	jr	Z, 00112$
+                                    715 ;/tmp/_gbsbuild/src/core/UI_b.c:169: *dest++ = script_variables[var_index] + 0x20u; 
+      00031D 21r04r00               716 	ld	hl, #_UIShowText_b_dest_65537_149 + 1
+      000320 2B                     717 	dec	hl
+      000321 2A                     718 	ld	a, (hl+)
+      000322 4F                     719 	ld	c, a
+      000323 46                     720 	ld	b, (hl)
+                                    721 ;c
+      000324 11r00r00               722 	ld	de, #_script_variables
+      000327 E1                     723 	pop	hl
+      000328 E5                     724 	push	hl
+      000329 19                     725 	add	hl, de
+      00032A 5D                     726 	ld	e, l
+      00032B 54                     727 	ld	d, h
+      00032C 1A                     728 	ld	a, (de)
+      00032D C6 20                  729 	add	a, #0x20
+      00032F 02                     730 	ld	(bc), a
+      000330 21r03r00               731 	ld	hl, #_UIShowText_b_dest_65537_149
+      000333 34                     732 	inc	(hl)
+      000334 20 02                  733 	jr	NZ, 00198$
+      000336 23                     734 	inc	hl
+      000337 34                     735 	inc	(hl)
+      000338                        736 00198$:
+                                    737 ;/tmp/_gbsbuild/src/core/UI_b.c:170: src += l + 1; 
+      000338 F8 02                  738 	ldhl	sp,	#2
+      00033A 4E                     739 	ld	c, (hl)
+      00033B 06 00                  740 	ld	b, #0x00
+      00033D 03                     741 	inc	bc
+      00033E 21r01r00               742 	ld	hl, #_UIShowText_b_src_65537_149
+      000341 7E                     743 	ld	a, (hl)
+      000342 81                     744 	add	a, c
+      000343 22                     745 	ld	(hl+), a
+      000344 7E                     746 	ld	a, (hl)
+      000345 88                     747 	adc	a, b
+      000346 77                     748 	ld	(hl), a
+                                    749 ;/tmp/_gbsbuild/src/core/UI_b.c:171: continue;
+      000347 18 66                  750 	jr	00113$
+                                    751 ;/tmp/_gbsbuild/src/core/UI_b.c:175: case '!':
+      000349                        752 00107$:
+                                    753 ;/tmp/_gbsbuild/src/core/UI_b.c:176: if (*(src+1) == 'S') {
+      000349 1A                     754 	ld	a, (de)
+      00034A D6 53                  755 	sub	a, #0x53
+      00034C 20 41                  756 	jr	NZ, 00112$
+                                    757 ;/tmp/_gbsbuild/src/core/UI_b.c:177: l = GetToken_b(src + 2, '!', &var_index);
+      00034E F8 00                  758 	ldhl	sp,	#0
+      000350 4D                     759 	ld	c, l
+      000351 44                     760 	ld	b, h
+      000352 21r02r00               761 	ld	hl, #_UIShowText_b_src_65537_149 + 1
+      000355 2B                     762 	dec	hl
+      000356 2A                     763 	ld	a, (hl+)
+      000357 5F                     764 	ld	e, a
+      000358 56                     765 	ld	d, (hl)
+      000359 13                     766 	inc	de
+      00035A 13                     767 	inc	de
+      00035B C5                     768 	push	bc
+      00035C 3E 21                  769 	ld	a, #0x21
+      00035E F5                     770 	push	af
+      00035F 33                     771 	inc	sp
+      000360 D5                     772 	push	de
+      000361 CDr00r00               773 	call	_GetToken_b
+      000364 E8 05                  774 	add	sp, #5
+                                    775 ;/tmp/_gbsbuild/src/core/UI_b.c:178: if (l) {
+      000366 7B                     776 	ld	a, e
+      000367 B7                     777 	or	a, a
+      000368 28 25                  778 	jr	Z, 00112$
+                                    779 ;/tmp/_gbsbuild/src/core/UI_b.c:179: *dest++ = var_index + 0x10u;
+      00036A 21r04r00               780 	ld	hl, #_UIShowText_b_dest_65537_149 + 1
+      00036D 2B                     781 	dec	hl
+      00036E 2A                     782 	ld	a, (hl+)
+      00036F 4F                     783 	ld	c, a
+      000370 46                     784 	ld	b, (hl)
+      000371 F8 00                  785 	ldhl	sp,	#0
+      000373 7E                     786 	ld	a, (hl)
+      000374 C6 10                  787 	add	a, #0x10
+      000376 02                     788 	ld	(bc), a
+      000377 21r03r00               789 	ld	hl, #_UIShowText_b_dest_65537_149
+      00037A 34                     790 	inc	(hl)
+      00037B 20 02                  791 	jr	NZ, 00201$
+      00037D 23                     792 	inc	hl
+      00037E 34                     793 	inc	(hl)
+      00037F                        794 00201$:
+                                    795 ;/tmp/_gbsbuild/src/core/UI_b.c:180: src += l + 2;
+      00037F 16 00                  796 	ld	d, #0x00
+      000381 13                     797 	inc	de
+      000382 13                     798 	inc	de
+      000383 4B                     799 	ld	c, e
+      000384 21r01r00               800 	ld	hl, #_UIShowText_b_src_65537_149
+      000387 7E                     801 	ld	a, (hl)
+      000388 81                     802 	add	a, c
+      000389 22                     803 	ld	(hl+), a
+      00038A 7E                     804 	ld	a, (hl)
+      00038B 8A                     805 	adc	a, d
+      00038C 77                     806 	ld	(hl), a
+                                    807 ;/tmp/_gbsbuild/src/core/UI_b.c:181: continue;
+      00038D 18 20                  808 	jr	00113$
+                                    809 ;/tmp/_gbsbuild/src/core/UI_b.c:185: }
+      00038F                        810 00112$:
+                                    811 ;/tmp/_gbsbuild/src/core/UI_b.c:186: *dest++ = *src++;
+      00038F 21r04r00               812 	ld	hl, #_UIShowText_b_dest_65537_149 + 1
+      000392 2B                     813 	dec	hl
+      000393 2A                     814 	ld	a, (hl+)
+      000394 4F                     815 	ld	c, a
+      000395 46                     816 	ld	b, (hl)
+      000396 21r02r00               817 	ld	hl, #_UIShowText_b_src_65537_149 + 1
+      000399 2B                     818 	dec	hl
+      00039A 2A                     819 	ld	a, (hl+)
+      00039B 5F                     820 	ld	e, a
+      00039C 56                     821 	ld	d, (hl)
+      00039D 1A                     822 	ld	a, (de)
+      00039E 5F                     823 	ld	e, a
+      00039F 2B                     824 	dec	hl
+      0003A0 34                     825 	inc	(hl)
+      0003A1 20 02                  826 	jr	NZ, 00202$
+      0003A3 23                     827 	inc	hl
+      0003A4 34                     828 	inc	(hl)
+      0003A5                        829 00202$:
+      0003A5 7B                     830 	ld	a, e
+      0003A6 02                     831 	ld	(bc), a
+      0003A7 21r03r00               832 	ld	hl, #_UIShowText_b_dest_65537_149
+      0003AA 34                     833 	inc	(hl)
+      0003AB 20 02                  834 	jr	NZ, 00203$
+      0003AD 23                     835 	inc	hl
+      0003AE 34                     836 	inc	(hl)
+      0003AF                        837 00203$:
+      0003AF                        838 00113$:
+                                    839 ;/tmp/_gbsbuild/src/core/UI_b.c:155: for (i = 0; (*src) && (i != 80u); i++) {
+      0003AF F8 03                  840 	ldhl	sp,	#3
+      0003B1 34                     841 	inc	(hl)
+      0003B2 C3r8Fr02               842 	jp	00122$
+      0003B5                        843 00114$:
+                                    844 ;/tmp/_gbsbuild/src/core/UI_b.c:188: *dest = 0;
+      0003B5 21r04r00               845 	ld	hl, #_UIShowText_b_dest_65537_149 + 1
+      0003B8 2B                     846 	dec	hl
+      0003B9 2A                     847 	ld	a, (hl+)
+      0003BA 4F                     848 	ld	c, a
+      0003BB 46                     849 	ld	b, (hl)
+      0003BC AF                     850 	xor	a, a
+      0003BD 02                     851 	ld	(bc), a
+                                    852 ;/tmp/_gbsbuild/src/core/UI_b.c:191: text_num_lines = tmp_text_lines[0];
+      0003BE 21r00r00               853 	ld	hl, #_tmp_text_lines
+      0003C1 4E                     854 	ld	c, (hl)
+                                    855 ;/tmp/_gbsbuild/src/core/UI_b.c:190: if (menu_layout) {
+      0003C2 FAr00r00               856 	ld	a, (#_menu_layout)
+      0003C5 B7                     857 	or	a, a
+      0003C6 28 39                  858 	jr	Z, 00116$
+                                    859 ;/tmp/_gbsbuild/src/core/UI_b.c:191: text_num_lines = tmp_text_lines[0];
+      0003C8 21r00r00               860 	ld	hl, #_text_num_lines
+      0003CB 71                     861 	ld	(hl), c
+                                    862 ;/tmp/_gbsbuild/src/core/UI_b.c:192: UIDrawFrame(0, 0, 8, text_num_lines);
+      0003CC 56                     863 	ld	d, (hl)
+      0003CD 1E 08                  864 	ld	e,#0x08
+      0003CF D5                     865 	push	de
+      0003D0 AF                     866 	xor	a, a
+      0003D1 F5                     867 	push	af
+      0003D2 33                     868 	inc	sp
+      0003D3 AF                     869 	xor	a, a
+      0003D4 F5                     870 	push	af
+      0003D5 33                     871 	inc	sp
+      0003D6 CDr00r00               872 	call	_UIDrawFrame
+      0003D9 E8 04                  873 	add	sp, #4
+                                    874 ;/tmp/_gbsbuild/src/core/UI_b.c:193: UISetPos(MENU_LAYOUT_INITIAL_X, MENU_CLOSED_Y);
+      0003DB 11 58 90               875 	ld	de, #0x9058
+      0003DE D5                     876 	push	de
+      0003DF CDr00r00               877 	call	_UISetPos
+      0003E2 E8 02                  878 	add	sp, #2
+                                    879 ;/tmp/_gbsbuild/src/core/UI_b.c:194: UIMoveTo(MENU_LAYOUT_INITIAL_X, MENU_CLOSED_Y - ((text_num_lines + 2) << 3), text_in_speed);
+      0003E4 FAr00r00               880 	ld	a, (#_text_num_lines)
+      0003E7 C6 02                  881 	add	a, #0x02
+      0003E9 87                     882 	add	a, a
+      0003EA 87                     883 	add	a, a
+      0003EB 87                     884 	add	a, a
+      0003EC 4F                     885 	ld	c, a
+      0003ED 3E 90                  886 	ld	a, #0x90
+      0003EF 91                     887 	sub	a, c
+      0003F0 21r00r00               888 	ld	hl, #_text_in_speed
+      0003F3 66                     889 	ld	h, (hl)
+      0003F4 E5                     890 	push	hl
+      0003F5 33                     891 	inc	sp
+      0003F6 57                     892 	ld	d,a
+      0003F7 1E 58                  893 	ld	e,#0x58
+      0003F9 D5                     894 	push	de
+      0003FA CDr00r00               895 	call	_UIMoveTo
+      0003FD E8 03                  896 	add	sp, #3
+      0003FF 18 3B                  897 	jr	00117$
+      000401                        898 00116$:
+                                    899 ;/tmp/_gbsbuild/src/core/UI_b.c:196: text_num_lines = MIN(tmp_text_lines[0], 4);
+      000401 79                     900 	ld	a, c
+      000402 D6 04                  901 	sub	a, #0x04
+      000404 38 03                  902 	jr	C, 00126$
+      000406 01 04 00               903 	ld	bc, #0x0004
+      000409                        904 00126$:
+      000409 21r00r00               905 	ld	hl, #_text_num_lines
+      00040C 71                     906 	ld	(hl), c
+                                    907 ;/tmp/_gbsbuild/src/core/UI_b.c:197: UIDrawDialogueFrame(text_num_lines);
+      00040D 7E                     908 	ld	a, (hl)
+      00040E F5                     909 	push	af
+      00040F 33                     910 	inc	sp
+      000410 CDr00r00               911 	call	_UIDrawDialogueFrame
+      000413 33                     912 	inc	sp
+                                    913 ;/tmp/_gbsbuild/src/core/UI_b.c:198: UISetPos(0, MENU_CLOSED_Y);
+      000414 3E 90                  914 	ld	a, #0x90
+      000416 F5                     915 	push	af
+      000417 33                     916 	inc	sp
+      000418 AF                     917 	xor	a, a
+      000419 F5                     918 	push	af
+      00041A 33                     919 	inc	sp
+      00041B CDr00r00               920 	call	_UISetPos
+      00041E E8 02                  921 	add	sp, #2
+                                    922 ;/tmp/_gbsbuild/src/core/UI_b.c:199: UIMoveTo(0, MENU_CLOSED_Y - ((text_num_lines + 2) << 3), text_in_speed);
+      000420 FAr00r00               923 	ld	a, (#_text_num_lines)
+      000423 C6 02                  924 	add	a, #0x02
+      000425 87                     925 	add	a, a
+      000426 87                     926 	add	a, a
+      000427 87                     927 	add	a, a
+      000428 4F                     928 	ld	c, a
+      000429 3E 90                  929 	ld	a, #0x90
+      00042B 91                     930 	sub	a, c
+      00042C 21r00r00               931 	ld	hl, #_text_in_speed
+      00042F 66                     932 	ld	h, (hl)
+      000430 E5                     933 	push	hl
+      000431 33                     934 	inc	sp
+      000432 F5                     935 	push	af
+      000433 33                     936 	inc	sp
+      000434 AF                     937 	xor	a, a
+      000435 F5                     938 	push	af
+      000436 33                     939 	inc	sp
+      000437 CDr00r00               940 	call	_UIMoveTo
+      00043A E8 03                  941 	add	sp, #3
+      00043C                        942 00117$:
+                                    943 ;/tmp/_gbsbuild/src/core/UI_b.c:202: text_drawn = FALSE;
+      00043C 21r00r00               944 	ld	hl, #_text_drawn
+      00043F 36 00                  945 	ld	(hl), #0x00
+                                    946 ;/tmp/_gbsbuild/src/core/UI_b.c:203: text_x = 0;
+      000441 21r00r00               947 	ld	hl, #_text_x
+      000444 36 00                  948 	ld	(hl), #0x00
+                                    949 ;/tmp/_gbsbuild/src/core/UI_b.c:204: text_y = 0;
+      000446 21r00r00               950 	ld	hl, #_text_y
+      000449 36 00                  951 	ld	(hl), #0x00
+                                    952 ;/tmp/_gbsbuild/src/core/UI_b.c:205: text_count = 0;
+      00044B 21r00r00               953 	ld	hl, #_text_count
+      00044E 36 00                  954 	ld	(hl), #0x00
+                                    955 ;/tmp/_gbsbuild/src/core/UI_b.c:206: text_tile_count = 0;
+      000450 21r00r00               956 	ld	hl, #_text_tile_count
+      000453 36 00                  957 	ld	(hl), #0x00
+                                    958 ;/tmp/_gbsbuild/src/core/UI_b.c:209: if (text_draw_speed == 0) {
+      000455 FAr00r00               959 	ld	a, (#_text_draw_speed)
+      000458 B7                     960 	or	a, a
+      000459 20 03                  961 	jr	NZ, 00123$
+                                    962 ;/tmp/_gbsbuild/src/core/UI_b.c:210: UIDrawTextBufferChar_b();
+      00045B CDr61r04               963 	call	_UIDrawTextBufferChar_b
+      00045E                        964 00123$:
+                                    965 ;/tmp/_gbsbuild/src/core/UI_b.c:212: }
+      00045E E8 04                  966 	add	sp, #4
+      000460 C9                     967 	ret
+                                    968 ;/tmp/_gbsbuild/src/core/UI_b.c:214: void UIDrawTextBufferChar_b() {
+                                    969 ;	---------------------------------
+                                    970 ; Function UIDrawTextBufferChar_b
+                                    971 ; ---------------------------------
+      000461                        972 _UIDrawTextBufferChar_b::
+      000461 E8 F7                  973 	add	sp, #-9
+                                    974 ;/tmp/_gbsbuild/src/core/UI_b.c:222: if (text_wait != 0) {
+      000463 21r00r00               975 	ld	hl, #_text_wait
+      000466 7E                     976 	ld	a, (hl)
+      000467 B7                     977 	or	a, a
+      000468 28 04                  978 	jr	Z, 00102$
+                                    979 ;/tmp/_gbsbuild/src/core/UI_b.c:223: text_wait--;
+      00046A 35                     980 	dec	(hl)
+                                    981 ;/tmp/_gbsbuild/src/core/UI_b.c:224: return;
+      00046B C3r0Dr07               982 	jp	00129$
+      00046E                        983 00102$:
+                                    984 ;/tmp/_gbsbuild/src/core/UI_b.c:227: text_size = strlen(text_lines);
+      00046E 21r00r00               985 	ld	hl, #_text_lines
+      000471 E5                     986 	push	hl
+      000472 CDr00r00               987 	call	_strlen
+      000475 E8 02                  988 	add	sp, #2
+      000477 4B                     989 	ld	c, e
+                                    990 ;/tmp/_gbsbuild/src/core/UI_b.c:229: if (UBYTE_LESS_THAN(text_count, text_size)) {
+      000478 FAr00r00               991 	ld	a, (#_text_count)
+      00047B 69                     992 	ld	l, c
+      00047C 95                     993 	sub	a, l
+      00047D CB 7F                  994 	bit	7,a
+      00047F CAr08r07               995 	jp	Z,00124$
+                                    996 ;/tmp/_gbsbuild/src/core/UI_b.c:230: text_drawn = FALSE;
+      000482 21r00r00               997 	ld	hl, #_text_drawn
+      000485 36 00                  998 	ld	(hl), #0x00
+                                    999 ;/tmp/_gbsbuild/src/core/UI_b.c:232: if (text_count == 0) {
+      000487 FAr00r00              1000 	ld	a, (#_text_count)
+      00048A B7                    1001 	or	a, a
+      00048B 20 0A                 1002 	jr	NZ, 00104$
+                                   1003 ;/tmp/_gbsbuild/src/core/UI_b.c:233: text_x = 0;
+      00048D 21r00r00              1004 	ld	hl, #_text_x
+      000490 36 00                 1005 	ld	(hl), #0x00
+                                   1006 ;/tmp/_gbsbuild/src/core/UI_b.c:234: text_y = 0;
+      000492 21r00r00              1007 	ld	hl, #_text_y
+      000495 36 00                 1008 	ld	(hl), #0x00
+      000497                       1009 00104$:
+                                   1010 ;/tmp/_gbsbuild/src/core/UI_b.c:237: letter = text_lines[text_count] - 32;
+                                   1011 ;c
+      000497 11r00r00              1012 	ld	de, #_text_lines
+      00049A 21r00r00              1013 	ld	hl, #_text_count
+      00049D 6E                    1014 	ld	l, (hl)
+      00049E 26 00                 1015 	ld	h, #0x00
+      0004A0 19                    1016 	add	hl, de
+      0004A1 E5                    1017 	push	hl
+      0004A2 7D                    1018 	ld	a, l
+      0004A3 F8 03                 1019 	ldhl	sp,	#3
+      0004A5 77                    1020 	ld	(hl), a
+      0004A6 E1                    1021 	pop	hl
+      0004A7 7C                    1022 	ld	a, h
+      0004A8 F8 02                 1023 	ldhl	sp,	#2
+      0004AA 32                    1024 	ld	(hl-), a
+      0004AB 2A                    1025 	ld	a, (hl+)
+      0004AC 5F                    1026 	ld	e, a
+      0004AD 56                    1027 	ld	d, (hl)
+      0004AE 1A                    1028 	ld	a, (de)
+      0004AF C6 E0                 1029 	add	a, #0xe0
+      0004B1 F8 07                 1030 	ldhl	sp,	#7
+      0004B3 77                    1031 	ld	(hl), a
+                                   1032 ;/tmp/_gbsbuild/src/core/UI_b.c:243: text_remaining = 18 - text_x;
+      0004B4 21r00r00              1033 	ld	hl, #_text_x
+      0004B7 46                    1034 	ld	b, (hl)
+      0004B8 3E 12                 1035 	ld	a, #0x12
+      0004BA 90                    1036 	sub	a, b
+      0004BB 47                    1037 	ld	b, a
+                                   1038 ;/tmp/_gbsbuild/src/core/UI_b.c:245: for (i = text_count; i != text_size; i++) {
+      0004BC 21r00r00              1039 	ld	hl, #_text_count
+      0004BF 5E                    1040 	ld	e, (hl)
+      0004C0 16 00                 1041 	ld	d, #0x00
+      0004C2                       1042 00127$:
+      0004C2 79                    1043 	ld	a, c
+      0004C3 93                    1044 	sub	a, e
+      0004C4 28 12                 1045 	jr	Z, 00107$
+                                   1046 ;/tmp/_gbsbuild/src/core/UI_b.c:247: if (text_lines[i] < ' ') {
+      0004C6 3Er00                 1047 	ld	a, #<(_text_lines)
+      0004C8 83                    1048 	add	a, e
+      0004C9 6F                    1049 	ld	l, a
+      0004CA 3Es00                 1050 	ld	a, #>(_text_lines)
+      0004CC CE 00                 1051 	adc	a, #0x00
+      0004CE 67                    1052 	ld	h, a
+      0004CF 7E                    1053 	ld	a, (hl)
+      0004D0 D6 20                 1054 	sub	a, #0x20
+      0004D2 38 04                 1055 	jr	C, 00107$
+                                   1056 ;/tmp/_gbsbuild/src/core/UI_b.c:250: word_len++;
+      0004D4 14                    1057 	inc	d
+                                   1058 ;/tmp/_gbsbuild/src/core/UI_b.c:245: for (i = text_count; i != text_size; i++) {
+      0004D5 1C                    1059 	inc	e
+      0004D6 18 EA                 1060 	jr	00127$
+      0004D8                       1061 00107$:
+                                   1062 ;/tmp/_gbsbuild/src/core/UI_b.c:252: if (UBYTE_LESS_THAN(text_remaining, word_len) && UBYTE_LESS_THAN(word_len, 18u)) {
+      0004D8 0E 00                 1063 	ld	c, #0x00
+      0004DA F8 05                 1064 	ldhl	sp,	#5
+      0004DC 72                    1065 	ld	(hl), d
+      0004DD AF                    1066 	xor	a, a
+      0004DE 23                    1067 	inc	hl
+      0004DF 77                    1068 	ld	(hl), a
+      0004E0 58                    1069 	ld	e, b
+      0004E1 2B                    1070 	dec	hl
+      0004E2 2A                    1071 	ld	a, (hl+)
+      0004E3 6F                    1072 	ld	l, a
+      0004E4 7B                    1073 	ld	a, e
+      0004E5 95                    1074 	sub	a, l
+      0004E6 CB 7F                 1075 	bit	7,a
+      0004E8 28 25                 1076 	jr	Z, 00109$
+      0004EA F8 05                 1077 	ldhl	sp,	#5
+      0004EC 2A                    1078 	ld	a, (hl+)
+      0004ED 5E                    1079 	ld	e, (hl)
+      0004EE F8 03                 1080 	ldhl	sp,	#3
+      0004F0 22                    1081 	ld	(hl+), a
+      0004F1 7B                    1082 	ld	a, e
+      0004F2 32                    1083 	ld	(hl-), a
+      0004F3 2A                    1084 	ld	a, (hl+)
+      0004F4 5F                    1085 	ld	e, a
+      0004F5 56                    1086 	ld	d, (hl)
+      0004F6 21 12 00              1087 	ld	hl, #0x0012
+      0004F9 7B                    1088 	ld	a, e
+      0004FA 95                    1089 	sub	a, l
+      0004FB 5F                    1090 	ld	e, a
+      0004FC 7A                    1091 	ld	a, d
+      0004FD 9C                    1092 	sbc	a, h
+      0004FE F8 06                 1093 	ldhl	sp,	#6
+      000500 32                    1094 	ld	(hl-), a
+      000501 73                    1095 	ld	(hl), e
+      000502 CB 7E                 1096 	bit	7, (hl)
+      000504 28 09                 1097 	jr	Z, 00109$
+                                   1098 ;/tmp/_gbsbuild/src/core/UI_b.c:253: text_x = 0;
+      000506 21r00r00              1099 	ld	hl, #_text_x
+      000509 36 00                 1100 	ld	(hl), #0x00
+                                   1101 ;/tmp/_gbsbuild/src/core/UI_b.c:254: text_y++;
+      00050B 21r00r00              1102 	ld	hl, #_text_y
+      00050E 34                    1103 	inc	(hl)
+      00050F                       1104 00109$:
+                                   1105 ;/tmp/_gbsbuild/src/core/UI_b.c:258: if (text_lines[text_count] >= ' ') {
+      00050F F8 01                 1106 	ldhl	sp,#1
+      000511 2A                    1107 	ld	a, (hl+)
+      000512 5F                    1108 	ld	e, a
+      000513 56                    1109 	ld	d, (hl)
+      000514 1A                    1110 	ld	a, (de)
+      000515 D6 20                 1111 	sub	a, #0x20
+      000517 DAr7Cr06              1112 	jp	C, 00112$
+                                   1113 ;/tmp/_gbsbuild/src/core/UI_b.c:259: i = text_tile_count + avatar_enabled * 4;
+      00051A FAr00r00              1114 	ld	a, (#_avatar_enabled)
+      00051D 87                    1115 	add	a, a
+      00051E 87                    1116 	add	a, a
+      00051F F8 06                 1117 	ldhl	sp,	#6
+      000521 77                    1118 	ld	(hl), a
+      000522 FAr00r00              1119 	ld	a, (#_text_tile_count)
+      000525 F8 08                 1120 	ldhl	sp,	#8
+      000527 77                    1121 	ld	(hl), a
+      000528 3A                    1122 	ld	a, (hl-)
+      000529 2B                    1123 	dec	hl
+      00052A 86                    1124 	add	a, (hl)
+      00052B 23                    1125 	inc	hl
+      00052C 23                    1126 	inc	hl
+                                   1127 ;/tmp/_gbsbuild/src/core/UI_b.c:261: SetBankedBkgData(TEXT_BUFFER_START + i, 1, ptr + ((UWORD)letter * 16), FONT_BANK);
+      00052D 32                    1128 	ld	(hl-), a
+      00052E 3A                    1129 	ld	a, (hl-)
+      00052F 77                    1130 	ld	(hl), a
+      000530 AF                    1131 	xor	a, a
+      000531 23                    1132 	inc	hl
+      000532 77                    1133 	ld	(hl), a
+      000533 3E 04                 1134 	ld	a, #0x04
+      000535                       1135 00213$:
+      000535 F8 06                 1136 	ldhl	sp,	#6
+      000537 CB 26                 1137 	sla	(hl)
+      000539 23                    1138 	inc	hl
+      00053A CB 16                 1139 	rl	(hl)
+      00053C 3D                    1140 	dec	a
+      00053D 20 F6                 1141 	jr	NZ, 00213$
+                                   1142 ;c
+      00053F 2B                    1143 	dec	hl
+      000540 2A                    1144 	ld	a, (hl+)
+      000541 5F                    1145 	ld	e, a
+      000542 56                    1146 	ld	d, (hl)
+      000543 21 00 40              1147 	ld	hl, #0x4000
+      000546 19                    1148 	add	hl, de
+      000547 E5                    1149 	push	hl
+      000548 7D                    1150 	ld	a, l
+      000549 F8 06                 1151 	ldhl	sp,	#6
+      00054B 77                    1152 	ld	(hl), a
+      00054C E1                    1153 	pop	hl
+      00054D 7C                    1154 	ld	a, h
+      00054E F8 05                 1155 	ldhl	sp,	#5
+      000550 77                    1156 	ld	(hl), a
+      000551 F8 08                 1157 	ldhl	sp,	#8
+      000553 7E                    1158 	ld	a, (hl)
+      000554 C6 CC                 1159 	add	a, #0xcc
+      000556 47                    1160 	ld	b, a
+      000557 C5                    1161 	push	bc
+      000558 3E 06                 1162 	ld	a, #0x06
+      00055A F5                    1163 	push	af
+      00055B 33                    1164 	inc	sp
+      00055C F8 07                 1165 	ldhl	sp,	#7
+      00055E 2A                    1166 	ld	a, (hl+)
+      00055F 66                    1167 	ld	h, (hl)
+      000560 6F                    1168 	ld	l, a
+      000561 E5                    1169 	push	hl
+      000562 3E 01                 1170 	ld	a, #0x01
+      000564 F5                    1171 	push	af
+      000565 33                    1172 	inc	sp
+      000566 C5                    1173 	push	bc
+      000567 33                    1174 	inc	sp
+      000568 CDr00r00              1175 	call	_SetBankedBkgData
+      00056B E8 05                 1176 	add	sp, #5
+      00056D C1                    1177 	pop	bc
+                                   1178 ;/tmp/_gbsbuild/src/core/UI_b.c:262: tile = TEXT_BUFFER_START + i;
+      00056E F8 00                 1179 	ldhl	sp,	#0
+      000570 70                    1180 	ld	(hl), b
+                                   1181 ;/tmp/_gbsbuild/src/core/UI_b.c:263: id = (UINT16)GetWinAddr() +
+      000571 CDr00r00              1182 	call	_GetWinAddr
+      000574 F8 01                 1183 	ldhl	sp,	#1
+      000576 7B                    1184 	ld	a, e
+      000577 22                    1185 	ld	(hl+), a
+      000578 72                    1186 	ld	(hl), d
+                                   1187 ;/tmp/_gbsbuild/src/core/UI_b.c:264: MOD_32((text_x + 1 + avatar_enabled * 2 + menu_enabled +
+      000579 21r00r00              1188 	ld	hl, #_text_x
+      00057C 4E                    1189 	ld	c, (hl)
+      00057D 06 00                 1190 	ld	b, #0x00
+      00057F 03                    1191 	inc	bc
+      000580 F8 03                 1192 	ldhl	sp,	#3
+      000582 79                    1193 	ld	a, c
+      000583 22                    1194 	ld	(hl+), a
+      000584 70                    1195 	ld	(hl), b
+      000585 FAr00r00              1196 	ld	a, (#_avatar_enabled)
+      000588 F8 07                 1197 	ldhl	sp,	#7
+      00058A 77                    1198 	ld	(hl), a
+      00058B AF                    1199 	xor	a, a
+      00058C 23                    1200 	inc	hl
+      00058D 32                    1201 	ld	(hl-), a
+      00058E 3A                    1202 	ld	a, (hl-)
+      00058F 2B                    1203 	dec	hl
+      000590 77                    1204 	ld	(hl), a
+      000591 F8 08                 1205 	ldhl	sp,	#8
+      000593 3A                    1206 	ld	a, (hl-)
+      000594 2B                    1207 	dec	hl
+      000595 32                    1208 	ld	(hl-), a
+      000596 CB 26                 1209 	sla	(hl)
+      000598 23                    1210 	inc	hl
+      000599 CB 16                 1211 	rl	(hl)
+                                   1212 ;c
+      00059B 2B                    1213 	dec	hl
+      00059C 2A                    1214 	ld	a, (hl+)
+      00059D 5F                    1215 	ld	e, a
+      00059E 56                    1216 	ld	d, (hl)
+      00059F F8 03                 1217 	ldhl	sp,	#3
+      0005A1 2A                    1218 	ld	a, (hl+)
+      0005A2 66                    1219 	ld	h, (hl)
+      0005A3 6F                    1220 	ld	l, a
+      0005A4 19                    1221 	add	hl, de
+      0005A5 E5                    1222 	push	hl
+      0005A6 7D                    1223 	ld	a, l
+      0005A7 F8 09                 1224 	ldhl	sp,	#9
+      0005A9 77                    1225 	ld	(hl), a
+      0005AA E1                    1226 	pop	hl
+      0005AB 7C                    1227 	ld	a, h
+      0005AC F8 08                 1228 	ldhl	sp,	#8
+      0005AE 77                    1229 	ld	(hl), a
+      0005AF 21r00r00              1230 	ld	hl, #_menu_enabled
+      0005B2 4E                    1231 	ld	c, (hl)
+      0005B3 06 00                 1232 	ld	b, #0x00
+      0005B5 F8 07                 1233 	ldhl	sp,	#7
+      0005B7 2A                    1234 	ld	a, (hl+)
+      0005B8 66                    1235 	ld	h, (hl)
+      0005B9 6F                    1236 	ld	l, a
+      0005BA 09                    1237 	add	hl, bc
+      0005BB E5                    1238 	push	hl
+      0005BC 7D                    1239 	ld	a, l
+      0005BD F8 05                 1240 	ldhl	sp,	#5
+      0005BF 77                    1241 	ld	(hl), a
+      0005C0 E1                    1242 	pop	hl
+      0005C1 7C                    1243 	ld	a, h
+      0005C2 F8 04                 1244 	ldhl	sp,	#4
+      0005C4 77                    1245 	ld	(hl), a
+      0005C5 FAr00r00              1246 	ld	a, (#_text_y)
+      0005C8 21r00r00              1247 	ld	hl, #_text_num_lines
+      0005CB 96                    1248 	sub	a, (hl)
+      0005CC 38 09                 1249 	jr	C, 00131$
+      0005CE F8 05                 1250 	ldhl	sp,	#5
+      0005D0 36 09                 1251 	ld	(hl), #0x09
+      0005D2 AF                    1252 	xor	a, a
+      0005D3 23                    1253 	inc	hl
+      0005D4 77                    1254 	ld	(hl), a
+      0005D5 18 05                 1255 	jr	00132$
+      0005D7                       1256 00131$:
+      0005D7 AF                    1257 	xor	a, a
+      0005D8 F8 05                 1258 	ldhl	sp,	#5
+      0005DA 22                    1259 	ld	(hl+), a
+      0005DB 77                    1260 	ld	(hl), a
+      0005DC                       1261 00132$:
+                                   1262 ;c
+      0005DC F8 05                 1263 	ldhl	sp,#5
+      0005DE 2A                    1264 	ld	a, (hl+)
+      0005DF 5F                    1265 	ld	e, a
+      0005E0 56                    1266 	ld	d, (hl)
+      0005E1 F8 03                 1267 	ldhl	sp,	#3
+      0005E3 2A                    1268 	ld	a, (hl+)
+      0005E4 66                    1269 	ld	h, (hl)
+      0005E5 6F                    1270 	ld	l, a
+      0005E6 19                    1271 	add	hl, de
+      0005E7 E5                    1272 	push	hl
+      0005E8 7D                    1273 	ld	a, l
+      0005E9 F8 09                 1274 	ldhl	sp,	#9
+      0005EB 77                    1275 	ld	(hl), a
+      0005EC E1                    1276 	pop	hl
+      0005ED 7C                    1277 	ld	a, h
+      0005EE F8 08                 1278 	ldhl	sp,	#8
+      0005F0 32                    1279 	ld	(hl-), a
+      0005F1 7E                    1280 	ld	a, (hl)
+      0005F2 E6 1F                 1281 	and	a, #0x1f
+      0005F4 2B                    1282 	dec	hl
+      0005F5 2B                    1283 	dec	hl
+      0005F6 77                    1284 	ld	(hl), a
+      0005F7 AF                    1285 	xor	a, a
+      0005F8 23                    1286 	inc	hl
+      0005F9 32                    1287 	ld	(hl-), a
+      0005FA 2A                    1288 	ld	a, (hl+)
+      0005FB 5E                    1289 	ld	e, (hl)
+      0005FC 23                    1290 	inc	hl
+      0005FD 22                    1291 	ld	(hl+), a
+                                   1292 ;c
+      0005FE 7B                    1293 	ld	a, e
+      0005FF 32                    1294 	ld	(hl-), a
+      000600 2A                    1295 	ld	a, (hl+)
+      000601 5F                    1296 	ld	e, a
+      000602 56                    1297 	ld	d, (hl)
+      000603 F8 01                 1298 	ldhl	sp,	#1
+      000605 2A                    1299 	ld	a, (hl+)
+      000606 66                    1300 	ld	h, (hl)
+      000607 6F                    1301 	ld	l, a
+      000608 19                    1302 	add	hl, de
+      000609 E5                    1303 	push	hl
+      00060A 7D                    1304 	ld	a, l
+      00060B F8 07                 1305 	ldhl	sp,	#7
+      00060D 77                    1306 	ld	(hl), a
+      00060E E1                    1307 	pop	hl
+      00060F 7C                    1308 	ld	a, h
+      000610 F8 06                 1309 	ldhl	sp,	#6
+      000612 77                    1310 	ld	(hl), a
+                                   1311 ;/tmp/_gbsbuild/src/core/UI_b.c:266: ((UINT16)MOD_32((text_y % text_num_lines) + 1) << 5);
+      000613 FAr00r00              1312 	ld	a, (#_text_num_lines)
+      000616 F5                    1313 	push	af
+      000617 33                    1314 	inc	sp
+      000618 FAr00r00              1315 	ld	a, (#_text_y)
+      00061B F5                    1316 	push	af
+      00061C 33                    1317 	inc	sp
+      00061D CDr00r00              1318 	call	__moduchar
+      000620 E8 02                 1319 	add	sp, #2
+      000622 F8 07                 1320 	ldhl	sp,	#7
+      000624 73                    1321 	ld	(hl), e
+      000625 AF                    1322 	xor	a, a
+      000626 23                    1323 	inc	hl
+                                   1324 ;c
+      000627 32                    1325 	ld	(hl-), a
+      000628 2A                    1326 	ld	a, (hl+)
+      000629 5F                    1327 	ld	e, a
+      00062A 56                    1328 	ld	d, (hl)
+      00062B 6B                    1329 	ld	l, e
+      00062C 62                    1330 	ld	h, d
+      00062D 23                    1331 	inc	hl
+      00062E E5                    1332 	push	hl
+      00062F 7D                    1333 	ld	a, l
+      000630 F8 05                 1334 	ldhl	sp,	#5
+      000632 77                    1335 	ld	(hl), a
+      000633 E1                    1336 	pop	hl
+      000634 7C                    1337 	ld	a, h
+      000635 F8 04                 1338 	ldhl	sp,	#4
+      000637 32                    1339 	ld	(hl-), a
+      000638 7E                    1340 	ld	a, (hl)
+      000639 E6 1F                 1341 	and	a, #0x1f
+      00063B F8 07                 1342 	ldhl	sp,	#7
+      00063D 77                    1343 	ld	(hl), a
+      00063E AF                    1344 	xor	a, a
+      00063F 23                    1345 	inc	hl
+      000640 32                    1346 	ld	(hl-), a
+      000641 7E                    1347 	ld	a, (hl)
+      000642 F8 03                 1348 	ldhl	sp,	#3
+      000644 77                    1349 	ld	(hl), a
+      000645 F8 08                 1350 	ldhl	sp,	#8
+      000647 7E                    1351 	ld	a, (hl)
+      000648 F8 04                 1352 	ldhl	sp,	#4
+      00064A 77                    1353 	ld	(hl), a
+      00064B 3E 05                 1354 	ld	a, #0x05
+      00064D                       1355 00215$:
+      00064D F8 03                 1356 	ldhl	sp,	#3
+      00064F CB 26                 1357 	sla	(hl)
+      000651 23                    1358 	inc	hl
+      000652 CB 16                 1359 	rl	(hl)
+      000654 3D                    1360 	dec	a
+      000655 20 F6                 1361 	jr	NZ, 00215$
+                                   1362 ;c
+      000657 2B                    1363 	dec	hl
+      000658 2A                    1364 	ld	a, (hl+)
+      000659 5F                    1365 	ld	e, a
+      00065A 2A                    1366 	ld	a, (hl+)
+      00065B 57                    1367 	ld	d, a
+      00065C 2A                    1368 	ld	a, (hl+)
+      00065D 66                    1369 	ld	h, (hl)
+      00065E 6F                    1370 	ld	l, a
+      00065F 19                    1371 	add	hl, de
+      000660 E5                    1372 	push	hl
+      000661 7D                    1373 	ld	a, l
+      000662 F8 09                 1374 	ldhl	sp,	#9
+      000664 77                    1375 	ld	(hl), a
+      000665 E1                    1376 	pop	hl
+      000666 7C                    1377 	ld	a, h
+      000667 F8 08                 1378 	ldhl	sp,	#8
+      000669 32                    1379 	ld	(hl-), a
+      00066A 2A                    1380 	ld	a, (hl+)
+      00066B 4F                    1381 	ld	c, a
+      00066C 46                    1382 	ld	b, (hl)
+                                   1383 ;/tmp/_gbsbuild/src/core/UI_b.c:267: SetTile(id, tile);
+      00066D F8 00                 1384 	ldhl	sp,	#0
+      00066F 7E                    1385 	ld	a, (hl)
+      000670 F5                    1386 	push	af
+      000671 33                    1387 	inc	sp
+      000672 C5                    1388 	push	bc
+      000673 CDr00r00              1389 	call	_SetTile
+      000676 E8 03                 1390 	add	sp, #3
+                                   1391 ;/tmp/_gbsbuild/src/core/UI_b.c:269: text_tile_count++;
+      000678 21r00r00              1392 	ld	hl, #_text_tile_count
+      00067B 34                    1393 	inc	(hl)
+      00067C                       1394 00112$:
+                                   1395 ;/tmp/_gbsbuild/src/core/UI_b.c:273: if (text_lines[text_count] >= 0x10 && text_lines[text_count] < 0x16) {
+      00067C 3Er00                 1396 	ld	a, #<(_text_lines)
+      00067E 21r00r00              1397 	ld	hl, #_text_count
+      000681 86                    1398 	add	a, (hl)
+      000682 4F                    1399 	ld	c, a
+      000683 3Es00                 1400 	ld	a, #>(_text_lines)
+      000685 CE 00                 1401 	adc	a, #0x00
+      000687 47                    1402 	ld	b, a
+      000688 0A                    1403 	ld	a, (bc)
+      000689 F8 08                 1404 	ldhl	sp,	#8
+      00068B 77                    1405 	ld	(hl), a
+      00068C D6 10                 1406 	sub	a, #0x10
+      00068E 38 2C                 1407 	jr	C, 00114$
+                                   1408 ;/tmp/_gbsbuild/src/core/UI_b.c:274: current_text_speed = text_draw_speeds[text_lines[text_count] - 0x10];
+      000690 7E                    1409 	ld	a,(hl)
+      000691 FE 16                 1410 	cp	a,#0x16
+      000693 30 27                 1411 	jr	NC, 00114$
+      000695 C6 F0                 1412 	add	a, #0xf0
+      000697 77                    1413 	ld	(hl), a
+      000698 F8 05                 1414 	ldhl	sp,	#5
+      00069A 77                    1415 	ld	(hl), a
+      00069B 17                    1416 	rla
+      00069C 9F                    1417 	sbc	a, a
+      00069D 23                    1418 	inc	hl
+      00069E 77                    1419 	ld	(hl), a
+                                   1420 ;c
+      00069F 11r84r00              1421 	ld	de, #_text_draw_speeds
+      0006A2 2B                    1422 	dec	hl
+      0006A3 2A                    1423 	ld	a, (hl+)
+      0006A4 66                    1424 	ld	h, (hl)
+      0006A5 6F                    1425 	ld	l, a
+      0006A6 19                    1426 	add	hl, de
+      0006A7 E5                    1427 	push	hl
+      0006A8 7D                    1428 	ld	a, l
+      0006A9 F8 09                 1429 	ldhl	sp,	#9
+      0006AB 77                    1430 	ld	(hl), a
+      0006AC E1                    1431 	pop	hl
+      0006AD 7C                    1432 	ld	a, h
+      0006AE F8 08                 1433 	ldhl	sp,	#8
+      0006B0 32                    1434 	ld	(hl-), a
+      0006B1 2A                    1435 	ld	a, (hl+)
+      0006B2 5F                    1436 	ld	e, a
+      0006B3 56                    1437 	ld	d, (hl)
+      0006B4 1A                    1438 	ld	a, (de)
+      0006B5 EAr00r00              1439 	ld	(#_current_text_speed),a
+                                   1440 ;/tmp/_gbsbuild/src/core/UI_b.c:275: text_x--;
+      0006B8 21r00r00              1441 	ld	hl, #_text_x
+      0006BB 35                    1442 	dec	(hl)
+      0006BC                       1443 00114$:
+                                   1444 ;/tmp/_gbsbuild/src/core/UI_b.c:278: text_count++;
+      0006BC 21r00r00              1445 	ld	hl, #_text_count
+      0006BF 34                    1446 	inc	(hl)
+                                   1447 ;/tmp/_gbsbuild/src/core/UI_b.c:279: text_x++;
+      0006C0 21r00r00              1448 	ld	hl, #_text_x
+      0006C3 34                    1449 	inc	(hl)
+                                   1450 ;/tmp/_gbsbuild/src/core/UI_b.c:280: if (text_lines[text_count] == '\n') {
+      0006C4 3Er00                 1451 	ld	a, #<(_text_lines)
+      0006C6 21r00r00              1452 	ld	hl, #_text_count
+      0006C9 86                    1453 	add	a, (hl)
+      0006CA 4F                    1454 	ld	c, a
+      0006CB 3Es00                 1455 	ld	a, #>(_text_lines)
+      0006CD CE 00                 1456 	adc	a, #0x00
+      0006CF 47                    1457 	ld	b, a
+      0006D0 0A                    1458 	ld	a, (bc)
+                                   1459 ;/tmp/_gbsbuild/src/core/UI_b.c:254: text_y++;
+      0006D1 21r00r00              1460 	ld	hl, #_text_y
+      0006D4 4E                    1461 	ld	c, (hl)
+      0006D5 0C                    1462 	inc	c
+                                   1463 ;/tmp/_gbsbuild/src/core/UI_b.c:280: if (text_lines[text_count] == '\n') {
+      0006D6 D6 0A                 1464 	sub	a, #0x0a
+      0006D8 20 0F                 1465 	jr	NZ, 00119$
+                                   1466 ;/tmp/_gbsbuild/src/core/UI_b.c:281: text_x = 0;
+      0006DA 21r00r00              1467 	ld	hl, #_text_x
+      0006DD 36 00                 1468 	ld	(hl), #0x00
+                                   1469 ;/tmp/_gbsbuild/src/core/UI_b.c:282: text_y++;
+      0006DF 21r00r00              1470 	ld	hl, #_text_y
+      0006E2 71                    1471 	ld	(hl), c
+                                   1472 ;/tmp/_gbsbuild/src/core/UI_b.c:283: text_count++;
+      0006E3 21r00r00              1473 	ld	hl, #_text_count
+      0006E6 34                    1474 	inc	(hl)
+      0006E7 18 14                 1475 	jr	00120$
+      0006E9                       1476 00119$:
+                                   1477 ;/tmp/_gbsbuild/src/core/UI_b.c:284: } else if (UBYTE_GT_THAN(text_x, 17u)) {
+      0006E9 21r00r00              1478 	ld	hl, #_text_x
+      0006EC 5E                    1479 	ld	e, (hl)
+      0006ED 3E 11                 1480 	ld	a, #0x11
+      0006EF 93                    1481 	sub	a, e
+      0006F0 CB 7F                 1482 	bit	7,a
+      0006F2 28 09                 1483 	jr	Z, 00120$
+                                   1484 ;/tmp/_gbsbuild/src/core/UI_b.c:285: text_x = 0;
+      0006F4 21r00r00              1485 	ld	hl, #_text_x
+      0006F7 36 00                 1486 	ld	(hl), #0x00
+                                   1487 ;/tmp/_gbsbuild/src/core/UI_b.c:286: text_y++;
+      0006F9 21r00r00              1488 	ld	hl, #_text_y
+      0006FC 71                    1489 	ld	(hl), c
+      0006FD                       1490 00120$:
+                                   1491 ;/tmp/_gbsbuild/src/core/UI_b.c:289: if (current_text_speed == 0) {
+      0006FD FAr00r00              1492 	ld	a, (#_current_text_speed)
+      000700 B7                    1493 	or	a, a
+      000701 20 0A                 1494 	jr	NZ, 00129$
+                                   1495 ;/tmp/_gbsbuild/src/core/UI_b.c:290: UIDrawTextBufferChar_b();
+      000703 CDr61r04              1496 	call	_UIDrawTextBufferChar_b
+      000706 18 05                 1497 	jr	00129$
+      000708                       1498 00124$:
+                                   1499 ;/tmp/_gbsbuild/src/core/UI_b.c:293: text_drawn = TRUE;
+      000708 21r00r00              1500 	ld	hl, #_text_drawn
+      00070B 36 01                 1501 	ld	(hl), #0x01
+      00070D                       1502 00129$:
+                                   1503 ;/tmp/_gbsbuild/src/core/UI_b.c:295: }
+      00070D E8 09                 1504 	add	sp, #9
+      00070F C9                    1505 	ret
+                                   1506 ;/tmp/_gbsbuild/src/core/UI_b.c:297: void UICloseDialogue_b() {
+                                   1507 ;	---------------------------------
+                                   1508 ; Function UICloseDialogue_b
+                                   1509 ; ---------------------------------
+      000710                       1510 _UICloseDialogue_b::
+                                   1511 ;/tmp/_gbsbuild/src/core/UI_b.c:298: UIMoveTo(menu_layout ? MENU_LAYOUT_INITIAL_X : 0, MENU_CLOSED_Y, text_out_speed);
+      000710 FAr00r00              1512 	ld	a, (#_menu_layout)
+      000713 B7                    1513 	or	a, a
+      000714 28 05                 1514 	jr	Z, 00103$
+      000716 01 58 00              1515 	ld	bc, #0x0058
+      000719 18 03                 1516 	jr	00104$
+      00071B                       1517 00103$:
+      00071B 01 00 00              1518 	ld	bc, #0x0000
+      00071E                       1519 00104$:
+      00071E 79                    1520 	ld	a, c
+      00071F 21r00r00              1521 	ld	hl, #_text_out_speed
+      000722 66                    1522 	ld	h, (hl)
+      000723 E5                    1523 	push	hl
+      000724 33                    1524 	inc	sp
+      000725 26 90                 1525 	ld	h, #0x90
+      000727 E5                    1526 	push	hl
+      000728 33                    1527 	inc	sp
+      000729 F5                    1528 	push	af
+      00072A 33                    1529 	inc	sp
+      00072B CDr00r00              1530 	call	_UIMoveTo
+      00072E E8 03                 1531 	add	sp, #3
+                                   1532 ;/tmp/_gbsbuild/src/core/UI_b.c:301: text_count = 0;
+      000730 21r00r00              1533 	ld	hl, #_text_count
+      000733 36 00                 1534 	ld	(hl), #0x00
+                                   1535 ;/tmp/_gbsbuild/src/core/UI_b.c:302: text_lines[0] = '\0';
+      000735 21r00r00              1536 	ld	hl, #_text_lines
+      000738 36 00                 1537 	ld	(hl), #0x00
+                                   1538 ;/tmp/_gbsbuild/src/core/UI_b.c:303: text_tile_count = 0;
+      00073A 21r00r00              1539 	ld	hl, #_text_tile_count
+      00073D 36 00                 1540 	ld	(hl), #0x00
+                                   1541 ;/tmp/_gbsbuild/src/core/UI_b.c:304: text_num_lines = 3;
+      00073F 21r00r00              1542 	ld	hl, #_text_num_lines
+      000742 36 03                 1543 	ld	(hl), #0x03
+                                   1544 ;/tmp/_gbsbuild/src/core/UI_b.c:305: menu_enabled = FALSE;
+      000744 21r00r00              1545 	ld	hl, #_menu_enabled
+      000747 36 00                 1546 	ld	(hl), #0x00
+                                   1547 ;/tmp/_gbsbuild/src/core/UI_b.c:306: menu_layout = 0;
+      000749 21r00r00              1548 	ld	hl, #_menu_layout
+      00074C 36 00                 1549 	ld	(hl), #0x00
+                                   1550 ;/tmp/_gbsbuild/src/core/UI_b.c:307: avatar_enabled = FALSE;
+      00074E 21r00r00              1551 	ld	hl, #_avatar_enabled
+      000751 36 00                 1552 	ld	(hl), #0x00
+                                   1553 ;/tmp/_gbsbuild/src/core/UI_b.c:308: ui_block = FALSE;
+      000753 21r00r00              1554 	ld	hl, #_ui_block
+      000756 36 00                 1555 	ld	(hl), #0x00
+                                   1556 ;/tmp/_gbsbuild/src/core/UI_b.c:309: }
+      000758 C9                    1557 	ret
+                                   1558 ;/tmp/_gbsbuild/src/core/UI_b.c:311: void UIOnInteract_b() __banked {
+                                   1559 ;	---------------------------------
+                                   1560 ; Function UIOnInteract_b
+                                   1561 ; ---------------------------------
+                           000001  1562 	b_UIOnInteract_b	= 1
+      000759                       1563 _UIOnInteract_b::
+      000759 E8 F4                 1564 	add	sp, #-12
+                                   1565 ;/tmp/_gbsbuild/src/core/UI_b.c:312: if (INPUT_A_PRESSED) {
+      00075B FAr00r00              1566 	ld	a, (#_joy)
+      00075E F8 02                 1567 	ldhl	sp,	#2
+      000760 77                    1568 	ld	(hl), a
+      000761 FAr00r00              1569 	ld	a, (#_last_joy)
+      000764 F8 03                 1570 	ldhl	sp,	#3
+      000766 77                    1571 	ld	(hl), a
+                                   1572 ;/tmp/_gbsbuild/src/core/UI_b.c:315: if (menu_cancel_on_last_option && menu_index + 1 == menu_num_options) {
+      000767 FAr00r00              1573 	ld	a, (#_menu_index)
+      00076A F8 04                 1574 	ldhl	sp,	#4
+      00076C 77                    1575 	ld	(hl), a
+      00076D 17                    1576 	rla
+      00076E 9F                    1577 	sbc	a, a
+      00076F 23                    1578 	inc	hl
+      000770 77                    1579 	ld	(hl), a
+      000771 FAr00r00              1580 	ld	a, (#_menu_num_options)
+      000774 F8 00                 1581 	ldhl	sp,	#0
+      000776 77                    1582 	ld	(hl), a
+      000777 AF                    1583 	xor	a, a
+      000778 23                    1584 	inc	hl
+      000779 77                    1585 	ld	(hl), a
+                                   1586 ;/tmp/_gbsbuild/src/core/UI_b.c:318: script_variables[menu_flag] = menu_index + 1;
+      00077A FAr00r00              1587 	ld	a, (#_menu_index)
+      00077D 3C                    1588 	inc	a
+      00077E F8 06                 1589 	ldhl	sp,	#6
+                                   1590 ;/tmp/_gbsbuild/src/core/UI_b.c:315: if (menu_cancel_on_last_option && menu_index + 1 == menu_num_options) {
+                                   1591 ;c
+      000780 32                    1592 	ld	(hl-), a
+      000781 2B                    1593 	dec	hl
+      000782 2A                    1594 	ld	a, (hl+)
+      000783 5F                    1595 	ld	e, a
+      000784 56                    1596 	ld	d, (hl)
+      000785 6B                    1597 	ld	l, e
+      000786 62                    1598 	ld	h, d
+      000787 23                    1599 	inc	hl
+      000788 E5                    1600 	push	hl
+      000789 7D                    1601 	ld	a, l
+      00078A F8 09                 1602 	ldhl	sp,	#9
+      00078C 77                    1603 	ld	(hl), a
+      00078D E1                    1604 	pop	hl
+      00078E 7C                    1605 	ld	a, h
+      00078F F8 08                 1606 	ldhl	sp,	#8
+      000791 77                    1607 	ld	(hl), a
+                                   1608 ;/tmp/_gbsbuild/src/core/UI_b.c:312: if (INPUT_A_PRESSED) {
+      000792 FAr00r00              1609 	ld	a, (#_ui_block)
+      000795 B7                    1610 	or	a, a
+      000796 20 07                 1611 	jr	NZ, 00154$
+      000798 21r00r00              1612 	ld	hl, #_input_override_default
+      00079B CB 66                 1613 	bit	4, (hl)
+      00079D 20 62                 1614 	jr	NZ, 00150$
+      00079F                       1615 00154$:
+      00079F F8 02                 1616 	ldhl	sp,	#2
+      0007A1 CB 66                 1617 	bit	4, (hl)
+      0007A3 28 5C                 1618 	jr	Z, 00150$
+      0007A5 F8 03                 1619 	ldhl	sp,	#3
+      0007A7 CB 66                 1620 	bit	4, (hl)
+      0007A9 20 56                 1621 	jr	NZ, 00150$
+                                   1622 ;/tmp/_gbsbuild/src/core/UI_b.c:313: if (text_drawn && text_count != 0) {
+      0007AB FAr00r00              1623 	ld	a, (#_text_drawn)
+      0007AE B7                    1624 	or	a, a
+      0007AF CArB4r09              1625 	jp	Z, 00155$
+      0007B2 FAr00r00              1626 	ld	a, (#_text_count)
+      0007B5 B7                    1627 	or	a, a
+      0007B6 CArB4r09              1628 	jp	Z, 00155$
+                                   1629 ;/tmp/_gbsbuild/src/core/UI_b.c:314: if (menu_enabled) {
+      0007B9 FAr00r00              1630 	ld	a, (#_menu_enabled)
+      0007BC B7                    1631 	or	a, a
+      0007BD 28 3C                 1632 	jr	Z, 00106$
+                                   1633 ;/tmp/_gbsbuild/src/core/UI_b.c:315: if (menu_cancel_on_last_option && menu_index + 1 == menu_num_options) {
+      0007BF FAr00r00              1634 	ld	a, (#_menu_cancel_on_last_option)
+      0007C2 B7                    1635 	or	a, a
+      0007C3 28 20                 1636 	jr	Z, 00102$
+      0007C5 F8 00                 1637 	ldhl	sp,	#0
+      0007C7 7E                    1638 	ld	a, (hl)
+      0007C8 F8 07                 1639 	ldhl	sp,	#7
+      0007CA 96                    1640 	sub	a, (hl)
+      0007CB 20 18                 1641 	jr	NZ, 00102$
+      0007CD F8 01                 1642 	ldhl	sp,	#1
+      0007CF 7E                    1643 	ld	a, (hl)
+      0007D0 F8 08                 1644 	ldhl	sp,	#8
+      0007D2 96                    1645 	sub	a, (hl)
+      0007D3 20 10                 1646 	jr	NZ, 00102$
+                                   1647 ;/tmp/_gbsbuild/src/core/UI_b.c:316: script_variables[menu_flag] = 0;
+      0007D5 3Er00                 1648 	ld	a, #<(_script_variables)
+      0007D7 21r00r00              1649 	ld	hl, #_menu_flag
+      0007DA 86                    1650 	add	a, (hl)
+      0007DB 4F                    1651 	ld	c, a
+      0007DC 3Es00                 1652 	ld	a, #>(_script_variables)
+      0007DE 23                    1653 	inc	hl
+      0007DF 8E                    1654 	adc	a, (hl)
+      0007E0 47                    1655 	ld	b, a
+      0007E1 AF                    1656 	xor	a, a
+      0007E2 02                    1657 	ld	(bc), a
+      0007E3 18 10                 1658 	jr	00103$
+      0007E5                       1659 00102$:
+                                   1660 ;/tmp/_gbsbuild/src/core/UI_b.c:318: script_variables[menu_flag] = menu_index + 1;
+      0007E5 3Er00                 1661 	ld	a, #<(_script_variables)
+      0007E7 21r00r00              1662 	ld	hl, #_menu_flag
+      0007EA 86                    1663 	add	a, (hl)
+      0007EB 4F                    1664 	ld	c, a
+      0007EC 3Es00                 1665 	ld	a, #>(_script_variables)
+      0007EE 23                    1666 	inc	hl
+      0007EF 8E                    1667 	adc	a, (hl)
+      0007F0 47                    1668 	ld	b, a
+      0007F1 F8 06                 1669 	ldhl	sp,	#6
+      0007F3 7E                    1670 	ld	a, (hl)
+      0007F4 02                    1671 	ld	(bc), a
+      0007F5                       1672 00103$:
+                                   1673 ;/tmp/_gbsbuild/src/core/UI_b.c:320: UICloseDialogue_b();
+      0007F5 CDr10r07              1674 	call	_UICloseDialogue_b
+      0007F8 C3rB4r09              1675 	jp	00155$
+      0007FB                       1676 00106$:
+                                   1677 ;/tmp/_gbsbuild/src/core/UI_b.c:322: UICloseDialogue_b();
+      0007FB CDr10r07              1678 	call	_UICloseDialogue_b
+      0007FE C3rB4r09              1679 	jp	00155$
+      000801                       1680 00150$:
+                                   1681 ;/tmp/_gbsbuild/src/core/UI_b.c:325: } else if (menu_enabled) {
+      000801 FAr00r00              1682 	ld	a, (#_menu_enabled)
+      000804 B7                    1683 	or	a, a
+      000805 CArB4r09              1684 	jp	Z, 00155$
+                                   1685 ;/tmp/_gbsbuild/src/core/UI_b.c:326: if (INPUT_UP_PRESSED) {
+      000808 FAr00r00              1686 	ld	a, (#_ui_block)
+      00080B B7                    1687 	or	a, a
+      00080C 20 07                 1688 	jr	NZ, 00146$
+      00080E 21r00r00              1689 	ld	hl, #_input_override_default
+      000811 CB 56                 1690 	bit	2, (hl)
+      000813 20 48                 1691 	jr	NZ, 00142$
+      000815                       1692 00146$:
+      000815 F8 02                 1693 	ldhl	sp,	#2
+      000817 CB 56                 1694 	bit	2, (hl)
+      000819 28 42                 1695 	jr	Z, 00142$
+      00081B F8 03                 1696 	ldhl	sp,	#3
+      00081D CB 56                 1697 	bit	2, (hl)
+      00081F 20 3C                 1698 	jr	NZ, 00142$
+                                   1699 ;/tmp/_gbsbuild/src/core/UI_b.c:327: menu_index = MAX(menu_index - 1, 0);
+      000821 F8 04                 1700 	ldhl	sp,#4
+      000823 2A                    1701 	ld	a, (hl+)
+      000824 4F                    1702 	ld	c, a
+      000825 46                    1703 	ld	b, (hl)
+      000826 0B                    1704 	dec	bc
+      000827 58                    1705 	ld	e, b
+      000828 16 00                 1706 	ld	d, #0x00
+      00082A AF                    1707 	xor	a, a
+      00082B B9                    1708 	cp	a, c
+      00082C 98                    1709 	sbc	a, b
+      00082D CB 7B                 1710 	bit	7, e
+      00082F 28 07                 1711 	jr	Z, 00332$
+      000831 CB 7A                 1712 	bit	7, d
+      000833 20 08                 1713 	jr	NZ, 00333$
+      000835 BF                    1714 	cp	a, a
+      000836 18 05                 1715 	jr	00333$
+      000838                       1716 00332$:
+      000838 CB 7A                 1717 	bit	7, d
+      00083A 28 01                 1718 	jr	Z, 00333$
+      00083C 37                    1719 	scf
+      00083D                       1720 00333$:
+      00083D 30 0D                 1721 	jr	NC, 00157$
+      00083F FAr00r00              1722 	ld	a, (#_menu_index)
+      000842 3D                    1723 	dec	a
+      000843 F8 0A                 1724 	ldhl	sp,	#10
+      000845 77                    1725 	ld	(hl), a
+      000846 17                    1726 	rla
+      000847 9F                    1727 	sbc	a, a
+      000848 23                    1728 	inc	hl
+      000849 77                    1729 	ld	(hl), a
+      00084A 18 05                 1730 	jr	00158$
+      00084C                       1731 00157$:
+      00084C AF                    1732 	xor	a, a
+      00084D F8 0A                 1733 	ldhl	sp,	#10
+      00084F 22                    1734 	ld	(hl+), a
+      000850 77                    1735 	ld	(hl), a
+      000851                       1736 00158$:
+      000851 F8 0A                 1737 	ldhl	sp,	#10
+      000853 7E                    1738 	ld	a, (hl)
+      000854 EAr00r00              1739 	ld	(#_menu_index),a
+                                   1740 ;/tmp/_gbsbuild/src/core/UI_b.c:328: UIDrawMenuCursor_b();
+      000857 CDr04r0A              1741 	call	_UIDrawMenuCursor_b
+      00085A C3rB4r09              1742 	jp	00155$
+      00085D                       1743 00142$:
+                                   1744 ;/tmp/_gbsbuild/src/core/UI_b.c:330: menu_index = MIN(menu_index + 1, menu_num_options - 1);
+      00085D 21r00r00              1745 	ld	hl, #_menu_num_options
+      000860 4E                    1746 	ld	c, (hl)
+      000861 D1                    1747 	pop	de
+      000862 D5                    1748 	push	de
+      000863 21 01 00              1749 	ld	hl, #0x0001
+      000866 7B                    1750 	ld	a, e
+      000867 95                    1751 	sub	a, l
+      000868 5F                    1752 	ld	e, a
+      000869 7A                    1753 	ld	a, d
+      00086A 9C                    1754 	sbc	a, h
+      00086B F8 0A                 1755 	ldhl	sp,	#10
+      00086D 32                    1756 	ld	(hl-), a
+      00086E 73                    1757 	ld	(hl), e
+      00086F 79                    1758 	ld	a, c
+      000870 C6 FF                 1759 	add	a, #0xff
+      000872 23                    1760 	inc	hl
+      000873 23                    1761 	inc	hl
+      000874 77                    1762 	ld	(hl), a
+                                   1763 ;/tmp/_gbsbuild/src/core/UI_b.c:329: } else if (INPUT_DOWN_PRESSED) {
+      000875 FAr00r00              1764 	ld	a, (#_ui_block)
+      000878 B7                    1765 	or	a, a
+      000879 20 07                 1766 	jr	NZ, 00140$
+      00087B 21r00r00              1767 	ld	hl, #_input_override_default
+      00087E CB 5E                 1768 	bit	3, (hl)
+      000880 20 3E                 1769 	jr	NZ, 00136$
+      000882                       1770 00140$:
+      000882 F8 02                 1771 	ldhl	sp,	#2
+      000884 CB 5E                 1772 	bit	3, (hl)
+      000886 28 38                 1773 	jr	Z, 00136$
+      000888 F8 03                 1774 	ldhl	sp,	#3
+      00088A CB 5E                 1775 	bit	3, (hl)
+      00088C 20 32                 1776 	jr	NZ, 00136$
+                                   1777 ;/tmp/_gbsbuild/src/core/UI_b.c:330: menu_index = MIN(menu_index + 1, menu_num_options - 1);
+      00088E F8 07                 1778 	ldhl	sp,	#7
+      000890 5D                    1779 	ld	e, l
+      000891 54                    1780 	ld	d, h
+      000892 F8 09                 1781 	ldhl	sp,	#9
+      000894 1A                    1782 	ld	a, (de)
+      000895 96                    1783 	sub	a, (hl)
+      000896 23                    1784 	inc	hl
+      000897 13                    1785 	inc	de
+      000898 1A                    1786 	ld	a, (de)
+      000899 9E                    1787 	sbc	a, (hl)
+      00089A 1A                    1788 	ld	a, (de)
+      00089B 57                    1789 	ld	d, a
+      00089C CB 7E                 1790 	bit	7, (hl)
+      00089E 28 07                 1791 	jr	Z, 00339$
+      0008A0 CB 7A                 1792 	bit	7, d
+      0008A2 20 08                 1793 	jr	NZ, 00340$
+      0008A4 BF                    1794 	cp	a, a
+      0008A5 18 05                 1795 	jr	00340$
+      0008A7                       1796 00339$:
+      0008A7 CB 7A                 1797 	bit	7, d
+      0008A9 28 01                 1798 	jr	Z, 00340$
+      0008AB 37                    1799 	scf
+      0008AC                       1800 00340$:
+      0008AC 30 06                 1801 	jr	NC, 00159$
+      0008AE F8 06                 1802 	ldhl	sp,	#6
+      0008B0 7E                    1803 	ld	a, (hl)
+      0008B1 F8 0B                 1804 	ldhl	sp,	#11
+      0008B3 77                    1805 	ld	(hl), a
+      0008B4                       1806 00159$:
+      0008B4 F8 0B                 1807 	ldhl	sp,	#11
+      0008B6 7E                    1808 	ld	a, (hl)
+      0008B7 EAr00r00              1809 	ld	(#_menu_index),a
+                                   1810 ;/tmp/_gbsbuild/src/core/UI_b.c:331: UIDrawMenuCursor_b();
+      0008BA CDr04r0A              1811 	call	_UIDrawMenuCursor_b
+      0008BD C3rB4r09              1812 	jp	00155$
+      0008C0                       1813 00136$:
+                                   1814 ;/tmp/_gbsbuild/src/core/UI_b.c:332: } else if (INPUT_LEFT_PRESSED) {
+      0008C0 FAr00r00              1815 	ld	a, (#_ui_block)
+      0008C3 B7                    1816 	or	a, a
+      0008C4 20 07                 1817 	jr	NZ, 00134$
+      0008C6 21r00r00              1818 	ld	hl, #_input_override_default
+      0008C9 CB 4E                 1819 	bit	1, (hl)
+      0008CB 20 56                 1820 	jr	NZ, 00130$
+      0008CD                       1821 00134$:
+      0008CD F8 02                 1822 	ldhl	sp,	#2
+      0008CF CB 4E                 1823 	bit	1, (hl)
+      0008D1 28 50                 1824 	jr	Z, 00130$
+      0008D3 F8 03                 1825 	ldhl	sp,	#3
+      0008D5 CB 4E                 1826 	bit	1, (hl)
+      0008D7 20 4A                 1827 	jr	NZ, 00130$
+                                   1828 ;/tmp/_gbsbuild/src/core/UI_b.c:333: if (menu_layout == 0) {
+      0008D9 FAr00r00              1829 	ld	a, (#_menu_layout)
+      0008DC B7                    1830 	or	a, a
+      0008DD 20 39                 1831 	jr	NZ, 00112$
+                                   1832 ;/tmp/_gbsbuild/src/core/UI_b.c:334: menu_index = MAX(menu_index - 4, 0);
+      0008DF F8 04                 1833 	ldhl	sp,#4
+      0008E1 2A                    1834 	ld	a, (hl+)
+      0008E2 5F                    1835 	ld	e, a
+      0008E3 56                    1836 	ld	d, (hl)
+      0008E4 21 04 00              1837 	ld	hl, #0x0004
+      0008E7 7B                    1838 	ld	a, e
+      0008E8 95                    1839 	sub	a, l
+      0008E9 5F                    1840 	ld	e, a
+      0008EA 7A                    1841 	ld	a, d
+      0008EB 9C                    1842 	sbc	a, h
+      0008EC 47                    1843 	ld	b, a
+      0008ED 4B                    1844 	ld	c, e
+      0008EE 58                    1845 	ld	e, b
+      0008EF 16 00                 1846 	ld	d, #0x00
+      0008F1 AF                    1847 	xor	a, a
+      0008F2 B9                    1848 	cp	a, c
+      0008F3 98                    1849 	sbc	a, b
+      0008F4 CB 7B                 1850 	bit	7, e
+      0008F6 28 07                 1851 	jr	Z, 00346$
+      0008F8 CB 7A                 1852 	bit	7, d
+      0008FA 20 08                 1853 	jr	NZ, 00347$
+      0008FC BF                    1854 	cp	a, a
+      0008FD 18 05                 1855 	jr	00347$
+      0008FF                       1856 00346$:
+      0008FF CB 7A                 1857 	bit	7, d
+      000901 28 01                 1858 	jr	Z, 00347$
+      000903 37                    1859 	scf
+      000904                       1860 00347$:
+      000904 30 09                 1861 	jr	NC, 00161$
+      000906 FAr00r00              1862 	ld	a, (#_menu_index)
+      000909 C6 FC                 1863 	add	a, #0xfc
+      00090B 4F                    1864 	ld	c, a
+      00090C 17                    1865 	rla
+      00090D 18 03                 1866 	jr	00162$
+      00090F                       1867 00161$:
+      00090F 01 00 00              1868 	ld	bc, #0x0000
+      000912                       1869 00162$:
+      000912 21r00r00              1870 	ld	hl, #_menu_index
+      000915 71                    1871 	ld	(hl), c
+      000916 18 05                 1872 	jr	00113$
+      000918                       1873 00112$:
+                                   1874 ;/tmp/_gbsbuild/src/core/UI_b.c:336: menu_index = 0;
+      000918 21r00r00              1875 	ld	hl, #_menu_index
+      00091B 36 00                 1876 	ld	(hl), #0x00
+      00091D                       1877 00113$:
+                                   1878 ;/tmp/_gbsbuild/src/core/UI_b.c:338: UIDrawMenuCursor_b();
+      00091D CDr04r0A              1879 	call	_UIDrawMenuCursor_b
+      000920 C3rB4r09              1880 	jp	00155$
+      000923                       1881 00130$:
+                                   1882 ;/tmp/_gbsbuild/src/core/UI_b.c:339: } else if (INPUT_RIGHT_PRESSED) {
+      000923 FAr00r00              1883 	ld	a, (#_ui_block)
+      000926 B7                    1884 	or	a, a
+      000927 20 07                 1885 	jr	NZ, 00128$
+      000929 21r00r00              1886 	ld	hl, #_input_override_default
+      00092C CB 46                 1887 	bit	0, (hl)
+      00092E 20 54                 1888 	jr	NZ, 00124$
+      000930                       1889 00128$:
+      000930 F8 02                 1890 	ldhl	sp,	#2
+      000932 CB 46                 1891 	bit	0, (hl)
+      000934 28 4E                 1892 	jr	Z, 00124$
+      000936 F8 03                 1893 	ldhl	sp,	#3
+      000938 CB 46                 1894 	bit	0, (hl)
+      00093A 20 48                 1895 	jr	NZ, 00124$
+                                   1896 ;/tmp/_gbsbuild/src/core/UI_b.c:340: if (menu_layout == 0) {
+      00093C FAr00r00              1897 	ld	a, (#_menu_layout)
+      00093F B7                    1898 	or	a, a
+      000940 20 37                 1899 	jr	NZ, 00115$
+                                   1900 ;/tmp/_gbsbuild/src/core/UI_b.c:341: menu_index = MIN(menu_index + 4, menu_num_options - 1);
+                                   1901 ;c
+      000942 F8 04                 1902 	ldhl	sp,#4
+      000944 2A                    1903 	ld	a, (hl+)
+      000945 5F                    1904 	ld	e, a
+      000946 56                    1905 	ld	d, (hl)
+      000947 21 04 00              1906 	ld	hl, #0x0004
+      00094A 19                    1907 	add	hl, de
+      00094B 4D                    1908 	ld	c, l
+      00094C 44                    1909 	ld	b, h
+      00094D F8 09                 1910 	ldhl	sp,	#9
+      00094F 79                    1911 	ld	a, c
+      000950 96                    1912 	sub	a, (hl)
+      000951 23                    1913 	inc	hl
+      000952 78                    1914 	ld	a, b
+      000953 9E                    1915 	sbc	a, (hl)
+      000954 78                    1916 	ld	a, b
+      000955 57                    1917 	ld	d, a
+      000956 CB 7E                 1918 	bit	7, (hl)
+      000958 28 07                 1919 	jr	Z, 00353$
+      00095A CB 7A                 1920 	bit	7, d
+      00095C 20 08                 1921 	jr	NZ, 00354$
+      00095E BF                    1922 	cp	a, a
+      00095F 18 05                 1923 	jr	00354$
+      000961                       1924 00353$:
+      000961 CB 7A                 1925 	bit	7, d
+      000963 28 01                 1926 	jr	Z, 00354$
+      000965 37                    1927 	scf
+      000966                       1928 00354$:
+      000966 30 09                 1929 	jr	NC, 00163$
+      000968 FAr00r00              1930 	ld	a, (#_menu_index)
+      00096B 3C                    1931 	inc	a
+      00096C 3C                    1932 	inc	a
+      00096D 3C                    1933 	inc	a
+      00096E 3C                    1934 	inc	a
+      00096F 18 03                 1935 	jr	00164$
+      000971                       1936 00163$:
+      000971 F8 0B                 1937 	ldhl	sp,	#11
+      000973 7E                    1938 	ld	a, (hl)
+      000974                       1939 00164$:
+      000974 EAr00r00              1940 	ld	(#_menu_index),a
+      000977 18 06                 1941 	jr	00116$
+      000979                       1942 00115$:
+                                   1943 ;/tmp/_gbsbuild/src/core/UI_b.c:343: menu_index = menu_num_options - 1;
+      000979 F8 0B                 1944 	ldhl	sp,	#11
+      00097B 7E                    1945 	ld	a, (hl)
+      00097C EAr00r00              1946 	ld	(#_menu_index),a
+      00097F                       1947 00116$:
+                                   1948 ;/tmp/_gbsbuild/src/core/UI_b.c:345: UIDrawMenuCursor_b();
+      00097F CDr04r0A              1949 	call	_UIDrawMenuCursor_b
+      000982 18 30                 1950 	jr	00155$
+      000984                       1951 00124$:
+                                   1952 ;/tmp/_gbsbuild/src/core/UI_b.c:346: } else if (menu_cancel_on_b && INPUT_B_PRESSED) {
+      000984 FAr00r00              1953 	ld	a, (#_menu_cancel_on_b)
+      000987 B7                    1954 	or	a, a
+      000988 28 2A                 1955 	jr	Z, 00155$
+      00098A FAr00r00              1956 	ld	a, (#_ui_block)
+      00098D B7                    1957 	or	a, a
+      00098E 20 07                 1958 	jr	NZ, 00121$
+      000990 21r00r00              1959 	ld	hl, #_input_override_default
+      000993 CB 6E                 1960 	bit	5, (hl)
+      000995 20 1D                 1961 	jr	NZ, 00155$
+      000997                       1962 00121$:
+      000997 F8 02                 1963 	ldhl	sp,	#2
+      000999 CB 6E                 1964 	bit	5, (hl)
+      00099B 28 17                 1965 	jr	Z, 00155$
+      00099D F8 03                 1966 	ldhl	sp,	#3
+      00099F CB 6E                 1967 	bit	5, (hl)
+      0009A1 20 11                 1968 	jr	NZ, 00155$
+                                   1969 ;/tmp/_gbsbuild/src/core/UI_b.c:347: script_variables[menu_flag] = 0;
+      0009A3 3Er00                 1970 	ld	a, #<(_script_variables)
+      0009A5 21r00r00              1971 	ld	hl, #_menu_flag
+      0009A8 86                    1972 	add	a, (hl)
+      0009A9 4F                    1973 	ld	c, a
+      0009AA 3Es00                 1974 	ld	a, #>(_script_variables)
+      0009AC 23                    1975 	inc	hl
+      0009AD 8E                    1976 	adc	a, (hl)
+      0009AE 47                    1977 	ld	b, a
+      0009AF AF                    1978 	xor	a, a
+      0009B0 02                    1979 	ld	(bc), a
+                                   1980 ;/tmp/_gbsbuild/src/core/UI_b.c:348: UICloseDialogue_b();
+      0009B1 CDr10r07              1981 	call	_UICloseDialogue_b
+      0009B4                       1982 00155$:
+                                   1983 ;/tmp/_gbsbuild/src/core/UI_b.c:351: }
+      0009B4 E8 0C                 1984 	add	sp, #12
+      0009B6 C9                    1985 	ret
+                                   1986 ;/tmp/_gbsbuild/src/core/UI_b.c:353: void UIShowMenu_b(UWORD flag_index,
+                                   1987 ;	---------------------------------
+                                   1988 ; Function UIShowMenu_b
+                                   1989 ; ---------------------------------
+                           000001  1990 	b_UIShowMenu_b	= 1
+      0009B7                       1991 _UIShowMenu_b::
+                                   1992 ;/tmp/_gbsbuild/src/core/UI_b.c:361: menu_index = 0;
+      0009B7 21r00r00              1993 	ld	hl, #_menu_index
+      0009BA 36 00                 1994 	ld	(hl), #0x00
+                                   1995 ;/tmp/_gbsbuild/src/core/UI_b.c:362: menu_flag = flag_index;
+      0009BC F8 06                 1996 	ldhl	sp,	#6
+      0009BE 2A                    1997 	ld	a, (hl+)
+      0009BF 5E                    1998 	ld	e, (hl)
+      0009C0 21r00r00              1999 	ld	hl, #_menu_flag
+      0009C3 22                    2000 	ld	(hl+), a
+      0009C4 73                    2001 	ld	(hl), e
+                                   2002 ;/tmp/_gbsbuild/src/core/UI_b.c:363: menu_enabled = TRUE;
+      0009C5 21r00r00              2003 	ld	hl, #_menu_enabled
+      0009C8 36 01                 2004 	ld	(hl), #0x01
+                                   2005 ;/tmp/_gbsbuild/src/core/UI_b.c:364: menu_cancel_on_last_option = cancel_config & MENU_CANCEL_ON_LAST_OPTION;
+      0009CA F8 0C                 2006 	ldhl	sp,	#12
+      0009CC 7E                    2007 	ld	a, (hl)
+      0009CD F5                    2008 	push	af
+      0009CE E6 01                 2009 	and	a, #0x01
+      0009D0 EAr00r00              2010 	ld	(#_menu_cancel_on_last_option),a
+      0009D3 F1                    2011 	pop	af
+                                   2012 ;/tmp/_gbsbuild/src/core/UI_b.c:365: menu_cancel_on_b = cancel_config & MENU_CANCEL_ON_B_PRESSED;
+      0009D4 E6 02                 2013 	and	a, #0x02
+      0009D6 EAr00r00              2014 	ld	(#_menu_cancel_on_b),a
+                                   2015 ;/tmp/_gbsbuild/src/core/UI_b.c:366: menu_layout = layout;
+      0009D9 F8 0B                 2016 	ldhl	sp,	#11
+      0009DB 7E                    2017 	ld	a, (hl)
+      0009DC EAr00r00              2018 	ld	(#_menu_layout),a
+                                   2019 ;/tmp/_gbsbuild/src/core/UI_b.c:367: tmp_text_draw_speed = text_draw_speed;
+      0009DF 21r00r00              2020 	ld	hl, #_text_draw_speed
+      0009E2 4E                    2021 	ld	c, (hl)
+                                   2022 ;/tmp/_gbsbuild/src/core/UI_b.c:368: text_draw_speed = 0;
+      0009E3 36 00                 2023 	ld	(hl), #0x00
+                                   2024 ;/tmp/_gbsbuild/src/core/UI_b.c:370: UIShowText(bank, bank_offset);
+      0009E5 C5                    2025 	push	bc
+      0009E6 F8 0B                 2026 	ldhl	sp,	#11
+      0009E8 2A                    2027 	ld	a, (hl+)
+      0009E9 66                    2028 	ld	h, (hl)
+      0009EA 6F                    2029 	ld	l, a
+      0009EB E5                    2030 	push	hl
+      0009EC F8 0C                 2031 	ldhl	sp,	#12
+      0009EE 7E                    2032 	ld	a, (hl)
+      0009EF F5                    2033 	push	af
+      0009F0 33                    2034 	inc	sp
+      0009F1 CDr00r00              2035 	call	_UIShowText
+      0009F4 E8 03                 2036 	add	sp, #3
+      0009F6 C1                    2037 	pop	bc
+                                   2038 ;/tmp/_gbsbuild/src/core/UI_b.c:372: text_draw_speed = tmp_text_draw_speed;
+      0009F7 21r00r00              2039 	ld	hl, #_text_draw_speed
+      0009FA 71                    2040 	ld	(hl), c
+                                   2041 ;/tmp/_gbsbuild/src/core/UI_b.c:373: menu_num_options = tmp_text_lines[0];
+      0009FB FAr00r00              2042 	ld	a, (#_tmp_text_lines + 0)
+      0009FE EAr00r00              2043 	ld	(#_menu_num_options),a
+                                   2044 ;/tmp/_gbsbuild/src/core/UI_b.c:375: UIDrawMenuCursor_b();
+                                   2045 ;/tmp/_gbsbuild/src/core/UI_b.c:376: }
+      000A01 C3r04r0A              2046 	jp  _UIDrawMenuCursor_b
+                                   2047 ;/tmp/_gbsbuild/src/core/UI_b.c:378: void UIDrawMenuCursor_b() {
+                                   2048 ;	---------------------------------
+                                   2049 ; Function UIDrawMenuCursor_b
+                                   2050 ; ---------------------------------
+      000A04                       2051 _UIDrawMenuCursor_b::
+      000A04 E8 FD                 2052 	add	sp, #-3
+                                   2053 ;/tmp/_gbsbuild/src/core/UI_b.c:381: for (i = 0; i != menu_num_options; i++) {
+      000A06 AF                    2054 	xor	a, a
+      000A07 F8 02                 2055 	ldhl	sp,	#2
+      000A09 77                    2056 	ld	(hl), a
+      000A0A                       2057 00103$:
+      000A0A FAr00r00              2058 	ld	a, (#_menu_num_options)
+      000A0D F8 02                 2059 	ldhl	sp,	#2
+      000A0F 96                    2060 	sub	a, (hl)
+      000A10 28 58                 2061 	jr	Z, 00105$
+                                   2062 ;/tmp/_gbsbuild/src/core/UI_b.c:382: addr = (UINT16)GetWinAddr() +
+      000A12 CDr00r00              2063 	call	_GetWinAddr
+      000A15 33                    2064 	inc	sp
+      000A16 33                    2065 	inc	sp
+      000A17 D5                    2066 	push	de
+                                   2067 ;/tmp/_gbsbuild/src/core/UI_b.c:383: (i >= text_num_lines ? 10 : 1) +
+      000A18 F8 02                 2068 	ldhl	sp,	#2
+      000A1A 7E                    2069 	ld	a, (hl)
+      000A1B 21r00r00              2070 	ld	hl, #_text_num_lines
+      000A1E 96                    2071 	sub	a, (hl)
+      000A1F 38 05                 2072 	jr	C, 00107$
+      000A21 01 0A 00              2073 	ld	bc, #0x000a
+      000A24 18 03                 2074 	jr	00108$
+      000A26                       2075 00107$:
+      000A26 01 01 00              2076 	ld	bc, #0x0001
+      000A29                       2077 00108$:
+      000A29 E1                    2078 	pop	hl
+      000A2A E5                    2079 	push	hl
+      000A2B 09                    2080 	add	hl, bc
+                                   2081 ;/tmp/_gbsbuild/src/core/UI_b.c:384: (((i % text_num_lines) + 1) << 5);
+      000A2C E5                    2082 	push	hl
+      000A2D FAr00r00              2083 	ld	a, (#_text_num_lines)
+      000A30 F5                    2084 	push	af
+      000A31 33                    2085 	inc	sp
+      000A32 F8 05                 2086 	ldhl	sp,	#5
+      000A34 7E                    2087 	ld	a, (hl)
+      000A35 F5                    2088 	push	af
+      000A36 33                    2089 	inc	sp
+      000A37 CDr00r00              2090 	call	__moduchar
+      000A3A E8 02                 2091 	add	sp, #2
+      000A3C C1                    2092 	pop	bc
+      000A3D 16 00                 2093 	ld	d, #0x00
+      000A3F 13                    2094 	inc	de
+      000A40 7A                    2095 	ld	a, d
+      000A41 6B                    2096 	ld	l, e
+      000A42 67                    2097 	ld	h, a
+      000A43 29                    2098 	add	hl, hl
+      000A44 29                    2099 	add	hl, hl
+      000A45 29                    2100 	add	hl, hl
+      000A46 29                    2101 	add	hl, hl
+      000A47 29                    2102 	add	hl, hl
+      000A48 09                    2103 	add	hl, bc
+      000A49 4D                    2104 	ld	c, l
+      000A4A 44                    2105 	ld	b, h
+                                   2106 ;/tmp/_gbsbuild/src/core/UI_b.c:385: SetTile(addr, menu_index == (BYTE)i ? ui_cursor_tiles : ui_bg_tiles);
+      000A4B F8 02                 2107 	ldhl	sp,	#2
+      000A4D 5E                    2108 	ld	e, (hl)
+      000A4E FAr00r00              2109 	ld	a, (#_menu_index)
+      000A51 93                    2110 	sub	a, e
+      000A52 20 05                 2111 	jr	NZ, 00109$
+      000A54 11 CB 00              2112 	ld	de, #0x00cb
+      000A57 18 03                 2113 	jr	00110$
+      000A59                       2114 00109$:
+      000A59 11 C4 00              2115 	ld	de, #0x00c4
+      000A5C                       2116 00110$:
+      000A5C 7B                    2117 	ld	a, e
+      000A5D F5                    2118 	push	af
+      000A5E 33                    2119 	inc	sp
+      000A5F C5                    2120 	push	bc
+      000A60 CDr00r00              2121 	call	_SetTile
+      000A63 E8 03                 2122 	add	sp, #3
+                                   2123 ;/tmp/_gbsbuild/src/core/UI_b.c:381: for (i = 0; i != menu_num_options; i++) {
+      000A65 F8 02                 2124 	ldhl	sp,	#2
+      000A67 34                    2125 	inc	(hl)
+      000A68 18 A0                 2126 	jr	00103$
+      000A6A                       2127 00105$:
+                                   2128 ;/tmp/_gbsbuild/src/core/UI_b.c:387: }
+      000A6A E8 03                 2129 	add	sp, #3
+      000A6C C9                    2130 	ret
+                                   2131 	.area _CODE_1
+                                   2132 	.area _CABS (ABS)

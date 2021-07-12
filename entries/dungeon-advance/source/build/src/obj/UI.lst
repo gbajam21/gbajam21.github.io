@@ -1,0 +1,1030 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module UI
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_UIShowMenu_b
+                                     12 	.globl _UIShowMenu_b
+                                     13 	.globl b_UIOnInteract_b
+                                     14 	.globl _UIOnInteract_b
+                                     15 	.globl b_UIShowText_b
+                                     16 	.globl _UIShowText_b
+                                     17 	.globl b_UISetColor_b
+                                     18 	.globl _UISetColor_b
+                                     19 	.globl b_UIDrawDialogueFrame_b
+                                     20 	.globl _UIDrawDialogueFrame_b
+                                     21 	.globl b_UIDrawFrame_b
+                                     22 	.globl _UIDrawFrame_b
+                                     23 	.globl b_UIReset_b
+                                     24 	.globl _UIReset_b
+                                     25 	.globl b_UIUpdate_b
+                                     26 	.globl _UIUpdate_b
+                                     27 	.globl b_UIInit_b
+                                     28 	.globl _UIInit_b
+                                     29 	.globl _PopBank
+                                     30 	.globl _PushBank
+                                     31 	.globl _ReadBankedBankPtr
+                                     32 	.globl _ReadBankedUBYTE
+                                     33 	.globl _SetBankedBkgData
+                                     34 	.globl _strcat
+                                     35 	.globl _memcpy
+                                     36 	.globl _strcpy
+                                     37 	.globl _set_win_tiles
+                                     38 	.globl _tmp_text_lines
+                                     39 	.globl _text_lines
+                                     40 	.globl _menu_layout
+                                     41 	.globl _menu_cancel_on_b
+                                     42 	.globl _menu_cancel_on_last_option
+                                     43 	.globl _menu_num_options
+                                     44 	.globl _menu_flag
+                                     45 	.globl _menu_index
+                                     46 	.globl _menu_enabled
+                                     47 	.globl _avatar_enabled
+                                     48 	.globl _text_num_lines
+                                     49 	.globl _tmp_text_out_speed
+                                     50 	.globl _tmp_text_in_speed
+                                     51 	.globl _text_ff_joypad
+                                     52 	.globl _text_draw_speed
+                                     53 	.globl _text_out_speed
+                                     54 	.globl _text_in_speed
+                                     55 	.globl _text_wait
+                                     56 	.globl _text_tile_count
+                                     57 	.globl _text_count
+                                     58 	.globl _text_drawn
+                                     59 	.globl _text_y
+                                     60 	.globl _text_x
+                                     61 	.globl _win_speed
+                                     62 	.globl _win_dest_pos_y
+                                     63 	.globl _win_dest_pos_x
+                                     64 	.globl _win_pos_y
+                                     65 	.globl _win_pos_x
+                                     66 	.globl _ui_block
+                                     67 	.globl _UIInit
+                                     68 	.globl _UIUpdate
+                                     69 	.globl _UIReset
+                                     70 	.globl _UIDrawFrame
+                                     71 	.globl _UIDrawDialogueFrame
+                                     72 	.globl _UIShowText
+                                     73 	.globl _UIShowAvatar
+                                     74 	.globl _UIShowChoice
+                                     75 	.globl _UIShowMenu
+                                     76 	.globl _UISetPos
+                                     77 	.globl _UIMoveTo
+                                     78 	.globl _UIIsClosed
+                                     79 	.globl _UIOnInteract
+                                     80 	.globl _UIAtDest
+                                     81 	.globl _UISetColor
+                                     82 ;--------------------------------------------------------
+                                     83 ; special function registers
+                                     84 ;--------------------------------------------------------
+                                     85 ;--------------------------------------------------------
+                                     86 ; ram data
+                                     87 ;--------------------------------------------------------
+                                     88 	.area _DATA
+      000000                         89 _ui_block::
+      000000                         90 	.ds 1
+      000001                         91 _win_pos_x::
+      000001                         92 	.ds 1
+      000002                         93 _win_pos_y::
+      000002                         94 	.ds 1
+      000003                         95 _win_dest_pos_x::
+      000003                         96 	.ds 1
+      000004                         97 _win_dest_pos_y::
+      000004                         98 	.ds 1
+      000005                         99 _win_speed::
+      000005                        100 	.ds 1
+      000006                        101 _text_x::
+      000006                        102 	.ds 1
+      000007                        103 _text_y::
+      000007                        104 	.ds 1
+      000008                        105 _text_drawn::
+      000008                        106 	.ds 1
+      000009                        107 _text_count::
+      000009                        108 	.ds 1
+      00000A                        109 _text_tile_count::
+      00000A                        110 	.ds 1
+      00000B                        111 _text_wait::
+      00000B                        112 	.ds 1
+      00000C                        113 _text_in_speed::
+      00000C                        114 	.ds 1
+      00000D                        115 _text_out_speed::
+      00000D                        116 	.ds 1
+      00000E                        117 _text_draw_speed::
+      00000E                        118 	.ds 1
+      00000F                        119 _text_ff_joypad::
+      00000F                        120 	.ds 1
+      000010                        121 _tmp_text_in_speed::
+      000010                        122 	.ds 1
+      000011                        123 _tmp_text_out_speed::
+      000011                        124 	.ds 1
+      000012                        125 _text_num_lines::
+      000012                        126 	.ds 1
+      000013                        127 _avatar_enabled::
+      000013                        128 	.ds 1
+      000014                        129 _menu_enabled::
+      000014                        130 	.ds 1
+      000015                        131 _menu_index::
+      000015                        132 	.ds 1
+      000016                        133 _menu_flag::
+      000016                        134 	.ds 2
+      000018                        135 _menu_num_options::
+      000018                        136 	.ds 1
+      000019                        137 _menu_cancel_on_last_option::
+      000019                        138 	.ds 1
+      00001A                        139 _menu_cancel_on_b::
+      00001A                        140 	.ds 1
+      00001B                        141 _menu_layout::
+      00001B                        142 	.ds 1
+      00001C                        143 _text_lines::
+      00001C                        144 	.ds 80
+      00006C                        145 _tmp_text_lines::
+      00006C                        146 	.ds 80
+                                    147 ;--------------------------------------------------------
+                                    148 ; absolute external ram data
+                                    149 ;--------------------------------------------------------
+                                    150 	.area _DABS (ABS)
+                                    151 ;--------------------------------------------------------
+                                    152 ; global & static initialisations
+                                    153 ;--------------------------------------------------------
+                                    154 	.area _HOME
+                                    155 	.area _GSINIT
+                                    156 	.area _GSFINAL
+                                    157 	.area _GSINIT
+                                    158 ;/tmp/_gbsbuild/src/core/UI.c:27: UBYTE ui_block = FALSE;
+      000000 21r00r00               159 	ld	hl, #_ui_block
+      000003 36 00                  160 	ld	(hl), #0x00
+                                    161 ;/tmp/_gbsbuild/src/core/UI.c:37: UBYTE text_count = 0;
+      000005 21r09r00               162 	ld	hl, #_text_count
+      000008 36 00                  163 	ld	(hl), #0x00
+                                    164 ;/tmp/_gbsbuild/src/core/UI.c:39: UBYTE text_wait = 0;
+      00000A 21r0Br00               165 	ld	hl, #_text_wait
+      00000D 36 00                  166 	ld	(hl), #0x00
+                                    167 ;/tmp/_gbsbuild/src/core/UI.c:40: UBYTE text_in_speed = 1;
+      00000F 21r0Cr00               168 	ld	hl, #_text_in_speed
+      000012 36 01                  169 	ld	(hl), #0x01
+                                    170 ;/tmp/_gbsbuild/src/core/UI.c:41: UBYTE text_out_speed = 1;
+      000014 21r0Dr00               171 	ld	hl, #_text_out_speed
+      000017 36 01                  172 	ld	(hl), #0x01
+                                    173 ;/tmp/_gbsbuild/src/core/UI.c:42: UBYTE text_draw_speed = 1;
+      000019 21r0Er00               174 	ld	hl, #_text_draw_speed
+      00001C 36 01                  175 	ld	(hl), #0x01
+                                    176 ;/tmp/_gbsbuild/src/core/UI.c:43: UBYTE text_ff_joypad = J_A | J_B;
+      00001E 21r0Fr00               177 	ld	hl, #_text_ff_joypad
+      000021 36 30                  178 	ld	(hl), #0x30
+                                    179 ;/tmp/_gbsbuild/src/core/UI.c:44: UBYTE tmp_text_in_speed = 1;
+      000023 21r10r00               180 	ld	hl, #_tmp_text_in_speed
+      000026 36 01                  181 	ld	(hl), #0x01
+                                    182 ;/tmp/_gbsbuild/src/core/UI.c:45: UBYTE tmp_text_out_speed = 1;
+      000028 21r11r00               183 	ld	hl, #_tmp_text_out_speed
+      00002B 36 01                  184 	ld	(hl), #0x01
+                                    185 ;/tmp/_gbsbuild/src/core/UI.c:46: UBYTE text_num_lines = 0;
+      00002D 21r12r00               186 	ld	hl, #_text_num_lines
+      000030 36 00                  187 	ld	(hl), #0x00
+                                    188 ;/tmp/_gbsbuild/src/core/UI.c:48: UBYTE avatar_enabled = 0;
+      000032 21r13r00               189 	ld	hl, #_avatar_enabled
+      000035 36 00                  190 	ld	(hl), #0x00
+                                    191 ;/tmp/_gbsbuild/src/core/UI.c:49: UBYTE menu_enabled = FALSE;
+      000037 21r14r00               192 	ld	hl, #_menu_enabled
+      00003A 36 00                  193 	ld	(hl), #0x00
+                                    194 ;/tmp/_gbsbuild/src/core/UI.c:50: BYTE menu_index = 0;
+      00003C 21r15r00               195 	ld	hl, #_menu_index
+      00003F 36 00                  196 	ld	(hl), #0x00
+                                    197 ;/tmp/_gbsbuild/src/core/UI.c:52: UBYTE menu_num_options = 2;
+      000041 21r18r00               198 	ld	hl, #_menu_num_options
+      000044 36 02                  199 	ld	(hl), #0x02
+                                    200 ;/tmp/_gbsbuild/src/core/UI.c:53: UBYTE menu_cancel_on_last_option = TRUE;
+      000046 21r19r00               201 	ld	hl, #_menu_cancel_on_last_option
+      000049 36 01                  202 	ld	(hl), #0x01
+                                    203 ;/tmp/_gbsbuild/src/core/UI.c:54: UBYTE menu_cancel_on_b = TRUE;
+      00004B 21r1Ar00               204 	ld	hl, #_menu_cancel_on_b
+      00004E 36 01                  205 	ld	(hl), #0x01
+                                    206 ;/tmp/_gbsbuild/src/core/UI.c:55: UBYTE menu_layout = FALSE;
+      000050 21r1Br00               207 	ld	hl, #_menu_layout
+      000053 36 00                  208 	ld	(hl), #0x00
+                                    209 ;/tmp/_gbsbuild/src/core/UI.c:57: unsigned char text_lines[80] = "";
+      000055 21r1Cr00               210 	ld	hl, #_text_lines
+      000058 36 00                  211 	ld	(hl), #0x00
+      00005A 21r1Dr00               212 	ld	hl, #(_text_lines + 0x0001)
+      00005D 36 00                  213 	ld	(hl), #0x00
+      00005F 21r1Er00               214 	ld	hl, #(_text_lines + 0x0002)
+      000062 36 00                  215 	ld	(hl), #0x00
+      000064 21r1Fr00               216 	ld	hl, #(_text_lines + 0x0003)
+      000067 36 00                  217 	ld	(hl), #0x00
+      000069 21r20r00               218 	ld	hl, #(_text_lines + 0x0004)
+      00006C 36 00                  219 	ld	(hl), #0x00
+      00006E 21r21r00               220 	ld	hl, #(_text_lines + 0x0005)
+      000071 36 00                  221 	ld	(hl), #0x00
+      000073 21r22r00               222 	ld	hl, #(_text_lines + 0x0006)
+      000076 36 00                  223 	ld	(hl), #0x00
+      000078 21r23r00               224 	ld	hl, #(_text_lines + 0x0007)
+      00007B 36 00                  225 	ld	(hl), #0x00
+      00007D 21r24r00               226 	ld	hl, #(_text_lines + 0x0008)
+      000080 36 00                  227 	ld	(hl), #0x00
+      000082 21r25r00               228 	ld	hl, #(_text_lines + 0x0009)
+      000085 36 00                  229 	ld	(hl), #0x00
+      000087 21r26r00               230 	ld	hl, #(_text_lines + 0x000a)
+      00008A 36 00                  231 	ld	(hl), #0x00
+      00008C 21r27r00               232 	ld	hl, #(_text_lines + 0x000b)
+      00008F 36 00                  233 	ld	(hl), #0x00
+      000091 21r28r00               234 	ld	hl, #(_text_lines + 0x000c)
+      000094 36 00                  235 	ld	(hl), #0x00
+      000096 21r29r00               236 	ld	hl, #(_text_lines + 0x000d)
+      000099 36 00                  237 	ld	(hl), #0x00
+      00009B 21r2Ar00               238 	ld	hl, #(_text_lines + 0x000e)
+      00009E 36 00                  239 	ld	(hl), #0x00
+      0000A0 21r2Br00               240 	ld	hl, #(_text_lines + 0x000f)
+      0000A3 36 00                  241 	ld	(hl), #0x00
+      0000A5 21r2Cr00               242 	ld	hl, #(_text_lines + 0x0010)
+      0000A8 36 00                  243 	ld	(hl), #0x00
+      0000AA 21r2Dr00               244 	ld	hl, #(_text_lines + 0x0011)
+      0000AD 36 00                  245 	ld	(hl), #0x00
+      0000AF 21r2Er00               246 	ld	hl, #(_text_lines + 0x0012)
+      0000B2 36 00                  247 	ld	(hl), #0x00
+      0000B4 21r2Fr00               248 	ld	hl, #(_text_lines + 0x0013)
+      0000B7 36 00                  249 	ld	(hl), #0x00
+      0000B9 21r30r00               250 	ld	hl, #(_text_lines + 0x0014)
+      0000BC 36 00                  251 	ld	(hl), #0x00
+      0000BE 21r31r00               252 	ld	hl, #(_text_lines + 0x0015)
+      0000C1 36 00                  253 	ld	(hl), #0x00
+      0000C3 21r32r00               254 	ld	hl, #(_text_lines + 0x0016)
+      0000C6 36 00                  255 	ld	(hl), #0x00
+      0000C8 21r33r00               256 	ld	hl, #(_text_lines + 0x0017)
+      0000CB 36 00                  257 	ld	(hl), #0x00
+      0000CD 21r34r00               258 	ld	hl, #(_text_lines + 0x0018)
+      0000D0 36 00                  259 	ld	(hl), #0x00
+      0000D2 21r35r00               260 	ld	hl, #(_text_lines + 0x0019)
+      0000D5 36 00                  261 	ld	(hl), #0x00
+      0000D7 21r36r00               262 	ld	hl, #(_text_lines + 0x001a)
+      0000DA 36 00                  263 	ld	(hl), #0x00
+      0000DC 21r37r00               264 	ld	hl, #(_text_lines + 0x001b)
+      0000DF 36 00                  265 	ld	(hl), #0x00
+      0000E1 21r38r00               266 	ld	hl, #(_text_lines + 0x001c)
+      0000E4 36 00                  267 	ld	(hl), #0x00
+      0000E6 21r39r00               268 	ld	hl, #(_text_lines + 0x001d)
+      0000E9 36 00                  269 	ld	(hl), #0x00
+      0000EB 21r3Ar00               270 	ld	hl, #(_text_lines + 0x001e)
+      0000EE 36 00                  271 	ld	(hl), #0x00
+      0000F0 21r3Br00               272 	ld	hl, #(_text_lines + 0x001f)
+      0000F3 36 00                  273 	ld	(hl), #0x00
+      0000F5 21r3Cr00               274 	ld	hl, #(_text_lines + 0x0020)
+      0000F8 36 00                  275 	ld	(hl), #0x00
+      0000FA 21r3Dr00               276 	ld	hl, #(_text_lines + 0x0021)
+      0000FD 36 00                  277 	ld	(hl), #0x00
+      0000FF 21r3Er00               278 	ld	hl, #(_text_lines + 0x0022)
+      000102 36 00                  279 	ld	(hl), #0x00
+      000104 21r3Fr00               280 	ld	hl, #(_text_lines + 0x0023)
+      000107 36 00                  281 	ld	(hl), #0x00
+      000109 21r40r00               282 	ld	hl, #(_text_lines + 0x0024)
+      00010C 36 00                  283 	ld	(hl), #0x00
+      00010E 21r41r00               284 	ld	hl, #(_text_lines + 0x0025)
+      000111 36 00                  285 	ld	(hl), #0x00
+      000113 21r42r00               286 	ld	hl, #(_text_lines + 0x0026)
+      000116 36 00                  287 	ld	(hl), #0x00
+      000118 21r43r00               288 	ld	hl, #(_text_lines + 0x0027)
+      00011B 36 00                  289 	ld	(hl), #0x00
+      00011D 21r44r00               290 	ld	hl, #(_text_lines + 0x0028)
+      000120 36 00                  291 	ld	(hl), #0x00
+      000122 21r45r00               292 	ld	hl, #(_text_lines + 0x0029)
+      000125 36 00                  293 	ld	(hl), #0x00
+      000127 21r46r00               294 	ld	hl, #(_text_lines + 0x002a)
+      00012A 36 00                  295 	ld	(hl), #0x00
+      00012C 21r47r00               296 	ld	hl, #(_text_lines + 0x002b)
+      00012F 36 00                  297 	ld	(hl), #0x00
+      000131 21r48r00               298 	ld	hl, #(_text_lines + 0x002c)
+      000134 36 00                  299 	ld	(hl), #0x00
+      000136 21r49r00               300 	ld	hl, #(_text_lines + 0x002d)
+      000139 36 00                  301 	ld	(hl), #0x00
+      00013B 21r4Ar00               302 	ld	hl, #(_text_lines + 0x002e)
+      00013E 36 00                  303 	ld	(hl), #0x00
+      000140 21r4Br00               304 	ld	hl, #(_text_lines + 0x002f)
+      000143 36 00                  305 	ld	(hl), #0x00
+      000145 21r4Cr00               306 	ld	hl, #(_text_lines + 0x0030)
+      000148 36 00                  307 	ld	(hl), #0x00
+      00014A 21r4Dr00               308 	ld	hl, #(_text_lines + 0x0031)
+      00014D 36 00                  309 	ld	(hl), #0x00
+      00014F 21r4Er00               310 	ld	hl, #(_text_lines + 0x0032)
+      000152 36 00                  311 	ld	(hl), #0x00
+      000154 21r4Fr00               312 	ld	hl, #(_text_lines + 0x0033)
+      000157 36 00                  313 	ld	(hl), #0x00
+      000159 21r50r00               314 	ld	hl, #(_text_lines + 0x0034)
+      00015C 36 00                  315 	ld	(hl), #0x00
+      00015E 21r51r00               316 	ld	hl, #(_text_lines + 0x0035)
+      000161 36 00                  317 	ld	(hl), #0x00
+      000163 21r52r00               318 	ld	hl, #(_text_lines + 0x0036)
+      000166 36 00                  319 	ld	(hl), #0x00
+      000168 21r53r00               320 	ld	hl, #(_text_lines + 0x0037)
+      00016B 36 00                  321 	ld	(hl), #0x00
+      00016D 21r54r00               322 	ld	hl, #(_text_lines + 0x0038)
+      000170 36 00                  323 	ld	(hl), #0x00
+      000172 21r55r00               324 	ld	hl, #(_text_lines + 0x0039)
+      000175 36 00                  325 	ld	(hl), #0x00
+      000177 21r56r00               326 	ld	hl, #(_text_lines + 0x003a)
+      00017A 36 00                  327 	ld	(hl), #0x00
+      00017C 21r57r00               328 	ld	hl, #(_text_lines + 0x003b)
+      00017F 36 00                  329 	ld	(hl), #0x00
+      000181 21r58r00               330 	ld	hl, #(_text_lines + 0x003c)
+      000184 36 00                  331 	ld	(hl), #0x00
+      000186 21r59r00               332 	ld	hl, #(_text_lines + 0x003d)
+      000189 36 00                  333 	ld	(hl), #0x00
+      00018B 21r5Ar00               334 	ld	hl, #(_text_lines + 0x003e)
+      00018E 36 00                  335 	ld	(hl), #0x00
+      000190 21r5Br00               336 	ld	hl, #(_text_lines + 0x003f)
+      000193 36 00                  337 	ld	(hl), #0x00
+      000195 21r5Cr00               338 	ld	hl, #(_text_lines + 0x0040)
+      000198 36 00                  339 	ld	(hl), #0x00
+      00019A 21r5Dr00               340 	ld	hl, #(_text_lines + 0x0041)
+      00019D 36 00                  341 	ld	(hl), #0x00
+      00019F 21r5Er00               342 	ld	hl, #(_text_lines + 0x0042)
+      0001A2 36 00                  343 	ld	(hl), #0x00
+      0001A4 21r5Fr00               344 	ld	hl, #(_text_lines + 0x0043)
+      0001A7 36 00                  345 	ld	(hl), #0x00
+      0001A9 21r60r00               346 	ld	hl, #(_text_lines + 0x0044)
+      0001AC 36 00                  347 	ld	(hl), #0x00
+      0001AE 21r61r00               348 	ld	hl, #(_text_lines + 0x0045)
+      0001B1 36 00                  349 	ld	(hl), #0x00
+      0001B3 21r62r00               350 	ld	hl, #(_text_lines + 0x0046)
+      0001B6 36 00                  351 	ld	(hl), #0x00
+      0001B8 21r63r00               352 	ld	hl, #(_text_lines + 0x0047)
+      0001BB 36 00                  353 	ld	(hl), #0x00
+      0001BD 21r64r00               354 	ld	hl, #(_text_lines + 0x0048)
+      0001C0 36 00                  355 	ld	(hl), #0x00
+      0001C2 21r65r00               356 	ld	hl, #(_text_lines + 0x0049)
+      0001C5 36 00                  357 	ld	(hl), #0x00
+      0001C7 21r66r00               358 	ld	hl, #(_text_lines + 0x004a)
+      0001CA 36 00                  359 	ld	(hl), #0x00
+      0001CC 21r67r00               360 	ld	hl, #(_text_lines + 0x004b)
+      0001CF 36 00                  361 	ld	(hl), #0x00
+      0001D1 21r68r00               362 	ld	hl, #(_text_lines + 0x004c)
+      0001D4 36 00                  363 	ld	(hl), #0x00
+      0001D6 21r69r00               364 	ld	hl, #(_text_lines + 0x004d)
+      0001D9 36 00                  365 	ld	(hl), #0x00
+      0001DB 21r6Ar00               366 	ld	hl, #(_text_lines + 0x004e)
+      0001DE 36 00                  367 	ld	(hl), #0x00
+      0001E0 21r6Br00               368 	ld	hl, #(_text_lines + 0x004f)
+      0001E3 36 00                  369 	ld	(hl), #0x00
+                                    370 ;/tmp/_gbsbuild/src/core/UI.c:58: unsigned char tmp_text_lines[80] = "";
+      0001E5 21r6Cr00               371 	ld	hl, #_tmp_text_lines
+      0001E8 36 00                  372 	ld	(hl), #0x00
+      0001EA 21r6Dr00               373 	ld	hl, #(_tmp_text_lines + 0x0001)
+      0001ED 36 00                  374 	ld	(hl), #0x00
+      0001EF 21r6Er00               375 	ld	hl, #(_tmp_text_lines + 0x0002)
+      0001F2 36 00                  376 	ld	(hl), #0x00
+      0001F4 21r6Fr00               377 	ld	hl, #(_tmp_text_lines + 0x0003)
+      0001F7 36 00                  378 	ld	(hl), #0x00
+      0001F9 21r70r00               379 	ld	hl, #(_tmp_text_lines + 0x0004)
+      0001FC 36 00                  380 	ld	(hl), #0x00
+      0001FE 21r71r00               381 	ld	hl, #(_tmp_text_lines + 0x0005)
+      000201 36 00                  382 	ld	(hl), #0x00
+      000203 21r72r00               383 	ld	hl, #(_tmp_text_lines + 0x0006)
+      000206 36 00                  384 	ld	(hl), #0x00
+      000208 21r73r00               385 	ld	hl, #(_tmp_text_lines + 0x0007)
+      00020B 36 00                  386 	ld	(hl), #0x00
+      00020D 21r74r00               387 	ld	hl, #(_tmp_text_lines + 0x0008)
+      000210 36 00                  388 	ld	(hl), #0x00
+      000212 21r75r00               389 	ld	hl, #(_tmp_text_lines + 0x0009)
+      000215 36 00                  390 	ld	(hl), #0x00
+      000217 21r76r00               391 	ld	hl, #(_tmp_text_lines + 0x000a)
+      00021A 36 00                  392 	ld	(hl), #0x00
+      00021C 21r77r00               393 	ld	hl, #(_tmp_text_lines + 0x000b)
+      00021F 36 00                  394 	ld	(hl), #0x00
+      000221 21r78r00               395 	ld	hl, #(_tmp_text_lines + 0x000c)
+      000224 36 00                  396 	ld	(hl), #0x00
+      000226 21r79r00               397 	ld	hl, #(_tmp_text_lines + 0x000d)
+      000229 36 00                  398 	ld	(hl), #0x00
+      00022B 21r7Ar00               399 	ld	hl, #(_tmp_text_lines + 0x000e)
+      00022E 36 00                  400 	ld	(hl), #0x00
+      000230 21r7Br00               401 	ld	hl, #(_tmp_text_lines + 0x000f)
+      000233 36 00                  402 	ld	(hl), #0x00
+      000235 21r7Cr00               403 	ld	hl, #(_tmp_text_lines + 0x0010)
+      000238 36 00                  404 	ld	(hl), #0x00
+      00023A 21r7Dr00               405 	ld	hl, #(_tmp_text_lines + 0x0011)
+      00023D 36 00                  406 	ld	(hl), #0x00
+      00023F 21r7Er00               407 	ld	hl, #(_tmp_text_lines + 0x0012)
+      000242 36 00                  408 	ld	(hl), #0x00
+      000244 21r7Fr00               409 	ld	hl, #(_tmp_text_lines + 0x0013)
+      000247 36 00                  410 	ld	(hl), #0x00
+      000249 21r80r00               411 	ld	hl, #(_tmp_text_lines + 0x0014)
+      00024C 36 00                  412 	ld	(hl), #0x00
+      00024E 21r81r00               413 	ld	hl, #(_tmp_text_lines + 0x0015)
+      000251 36 00                  414 	ld	(hl), #0x00
+      000253 21r82r00               415 	ld	hl, #(_tmp_text_lines + 0x0016)
+      000256 36 00                  416 	ld	(hl), #0x00
+      000258 21r83r00               417 	ld	hl, #(_tmp_text_lines + 0x0017)
+      00025B 36 00                  418 	ld	(hl), #0x00
+      00025D 21r84r00               419 	ld	hl, #(_tmp_text_lines + 0x0018)
+      000260 36 00                  420 	ld	(hl), #0x00
+      000262 21r85r00               421 	ld	hl, #(_tmp_text_lines + 0x0019)
+      000265 36 00                  422 	ld	(hl), #0x00
+      000267 21r86r00               423 	ld	hl, #(_tmp_text_lines + 0x001a)
+      00026A 36 00                  424 	ld	(hl), #0x00
+      00026C 21r87r00               425 	ld	hl, #(_tmp_text_lines + 0x001b)
+      00026F 36 00                  426 	ld	(hl), #0x00
+      000271 21r88r00               427 	ld	hl, #(_tmp_text_lines + 0x001c)
+      000274 36 00                  428 	ld	(hl), #0x00
+      000276 21r89r00               429 	ld	hl, #(_tmp_text_lines + 0x001d)
+      000279 36 00                  430 	ld	(hl), #0x00
+      00027B 21r8Ar00               431 	ld	hl, #(_tmp_text_lines + 0x001e)
+      00027E 36 00                  432 	ld	(hl), #0x00
+      000280 21r8Br00               433 	ld	hl, #(_tmp_text_lines + 0x001f)
+      000283 36 00                  434 	ld	(hl), #0x00
+      000285 21r8Cr00               435 	ld	hl, #(_tmp_text_lines + 0x0020)
+      000288 36 00                  436 	ld	(hl), #0x00
+      00028A 21r8Dr00               437 	ld	hl, #(_tmp_text_lines + 0x0021)
+      00028D 36 00                  438 	ld	(hl), #0x00
+      00028F 21r8Er00               439 	ld	hl, #(_tmp_text_lines + 0x0022)
+      000292 36 00                  440 	ld	(hl), #0x00
+      000294 21r8Fr00               441 	ld	hl, #(_tmp_text_lines + 0x0023)
+      000297 36 00                  442 	ld	(hl), #0x00
+      000299 21r90r00               443 	ld	hl, #(_tmp_text_lines + 0x0024)
+      00029C 36 00                  444 	ld	(hl), #0x00
+      00029E 21r91r00               445 	ld	hl, #(_tmp_text_lines + 0x0025)
+      0002A1 36 00                  446 	ld	(hl), #0x00
+      0002A3 21r92r00               447 	ld	hl, #(_tmp_text_lines + 0x0026)
+      0002A6 36 00                  448 	ld	(hl), #0x00
+      0002A8 21r93r00               449 	ld	hl, #(_tmp_text_lines + 0x0027)
+      0002AB 36 00                  450 	ld	(hl), #0x00
+      0002AD 21r94r00               451 	ld	hl, #(_tmp_text_lines + 0x0028)
+      0002B0 36 00                  452 	ld	(hl), #0x00
+      0002B2 21r95r00               453 	ld	hl, #(_tmp_text_lines + 0x0029)
+      0002B5 36 00                  454 	ld	(hl), #0x00
+      0002B7 21r96r00               455 	ld	hl, #(_tmp_text_lines + 0x002a)
+      0002BA 36 00                  456 	ld	(hl), #0x00
+      0002BC 21r97r00               457 	ld	hl, #(_tmp_text_lines + 0x002b)
+      0002BF 36 00                  458 	ld	(hl), #0x00
+      0002C1 21r98r00               459 	ld	hl, #(_tmp_text_lines + 0x002c)
+      0002C4 36 00                  460 	ld	(hl), #0x00
+      0002C6 21r99r00               461 	ld	hl, #(_tmp_text_lines + 0x002d)
+      0002C9 36 00                  462 	ld	(hl), #0x00
+      0002CB 21r9Ar00               463 	ld	hl, #(_tmp_text_lines + 0x002e)
+      0002CE 36 00                  464 	ld	(hl), #0x00
+      0002D0 21r9Br00               465 	ld	hl, #(_tmp_text_lines + 0x002f)
+      0002D3 36 00                  466 	ld	(hl), #0x00
+      0002D5 21r9Cr00               467 	ld	hl, #(_tmp_text_lines + 0x0030)
+      0002D8 36 00                  468 	ld	(hl), #0x00
+      0002DA 21r9Dr00               469 	ld	hl, #(_tmp_text_lines + 0x0031)
+      0002DD 36 00                  470 	ld	(hl), #0x00
+      0002DF 21r9Er00               471 	ld	hl, #(_tmp_text_lines + 0x0032)
+      0002E2 36 00                  472 	ld	(hl), #0x00
+      0002E4 21r9Fr00               473 	ld	hl, #(_tmp_text_lines + 0x0033)
+      0002E7 36 00                  474 	ld	(hl), #0x00
+      0002E9 21rA0r00               475 	ld	hl, #(_tmp_text_lines + 0x0034)
+      0002EC 36 00                  476 	ld	(hl), #0x00
+      0002EE 21rA1r00               477 	ld	hl, #(_tmp_text_lines + 0x0035)
+      0002F1 36 00                  478 	ld	(hl), #0x00
+      0002F3 21rA2r00               479 	ld	hl, #(_tmp_text_lines + 0x0036)
+      0002F6 36 00                  480 	ld	(hl), #0x00
+      0002F8 21rA3r00               481 	ld	hl, #(_tmp_text_lines + 0x0037)
+      0002FB 36 00                  482 	ld	(hl), #0x00
+      0002FD 21rA4r00               483 	ld	hl, #(_tmp_text_lines + 0x0038)
+      000300 36 00                  484 	ld	(hl), #0x00
+      000302 21rA5r00               485 	ld	hl, #(_tmp_text_lines + 0x0039)
+      000305 36 00                  486 	ld	(hl), #0x00
+      000307 21rA6r00               487 	ld	hl, #(_tmp_text_lines + 0x003a)
+      00030A 36 00                  488 	ld	(hl), #0x00
+      00030C 21rA7r00               489 	ld	hl, #(_tmp_text_lines + 0x003b)
+      00030F 36 00                  490 	ld	(hl), #0x00
+      000311 21rA8r00               491 	ld	hl, #(_tmp_text_lines + 0x003c)
+      000314 36 00                  492 	ld	(hl), #0x00
+      000316 21rA9r00               493 	ld	hl, #(_tmp_text_lines + 0x003d)
+      000319 36 00                  494 	ld	(hl), #0x00
+      00031B 21rAAr00               495 	ld	hl, #(_tmp_text_lines + 0x003e)
+      00031E 36 00                  496 	ld	(hl), #0x00
+      000320 21rABr00               497 	ld	hl, #(_tmp_text_lines + 0x003f)
+      000323 36 00                  498 	ld	(hl), #0x00
+      000325 21rACr00               499 	ld	hl, #(_tmp_text_lines + 0x0040)
+      000328 36 00                  500 	ld	(hl), #0x00
+      00032A 21rADr00               501 	ld	hl, #(_tmp_text_lines + 0x0041)
+      00032D 36 00                  502 	ld	(hl), #0x00
+      00032F 21rAEr00               503 	ld	hl, #(_tmp_text_lines + 0x0042)
+      000332 36 00                  504 	ld	(hl), #0x00
+      000334 21rAFr00               505 	ld	hl, #(_tmp_text_lines + 0x0043)
+      000337 36 00                  506 	ld	(hl), #0x00
+      000339 21rB0r00               507 	ld	hl, #(_tmp_text_lines + 0x0044)
+      00033C 36 00                  508 	ld	(hl), #0x00
+      00033E 21rB1r00               509 	ld	hl, #(_tmp_text_lines + 0x0045)
+      000341 36 00                  510 	ld	(hl), #0x00
+      000343 21rB2r00               511 	ld	hl, #(_tmp_text_lines + 0x0046)
+      000346 36 00                  512 	ld	(hl), #0x00
+      000348 21rB3r00               513 	ld	hl, #(_tmp_text_lines + 0x0047)
+      00034B 36 00                  514 	ld	(hl), #0x00
+      00034D 21rB4r00               515 	ld	hl, #(_tmp_text_lines + 0x0048)
+      000350 36 00                  516 	ld	(hl), #0x00
+      000352 21rB5r00               517 	ld	hl, #(_tmp_text_lines + 0x0049)
+      000355 36 00                  518 	ld	(hl), #0x00
+      000357 21rB6r00               519 	ld	hl, #(_tmp_text_lines + 0x004a)
+      00035A 36 00                  520 	ld	(hl), #0x00
+      00035C 21rB7r00               521 	ld	hl, #(_tmp_text_lines + 0x004b)
+      00035F 36 00                  522 	ld	(hl), #0x00
+      000361 21rB8r00               523 	ld	hl, #(_tmp_text_lines + 0x004c)
+      000364 36 00                  524 	ld	(hl), #0x00
+      000366 21rB9r00               525 	ld	hl, #(_tmp_text_lines + 0x004d)
+      000369 36 00                  526 	ld	(hl), #0x00
+      00036B 21rBAr00               527 	ld	hl, #(_tmp_text_lines + 0x004e)
+      00036E 36 00                  528 	ld	(hl), #0x00
+      000370 21rBBr00               529 	ld	hl, #(_tmp_text_lines + 0x004f)
+      000373 36 00                  530 	ld	(hl), #0x00
+                                    531 ;--------------------------------------------------------
+                                    532 ; Home
+                                    533 ;--------------------------------------------------------
+                                    534 	.area _HOME
+                                    535 	.area _HOME
+                                    536 ;--------------------------------------------------------
+                                    537 ; code
+                                    538 ;--------------------------------------------------------
+                                    539 	.area _CODE
+                                    540 ;/tmp/_gbsbuild/src/core/UI.c:60: void UIInit() {
+                                    541 ;	---------------------------------
+                                    542 ; Function UIInit
+                                    543 ; ---------------------------------
+      000000                        544 _UIInit::
+                                    545 ;/tmp/_gbsbuild/src/core/UI.c:61: ui_block = FALSE;
+      000000 21r00r00               546 	ld	hl, #_ui_block
+      000003 36 00                  547 	ld	(hl), #0x00
+                                    548 ;/tmp/_gbsbuild/src/core/UI.c:62: text_drawn = TRUE;
+      000005 21r08r00               549 	ld	hl, #_text_drawn
+      000008 36 01                  550 	ld	(hl), #0x01
+                                    551 ;/tmp/_gbsbuild/src/core/UI.c:63: UIInit_b();
+      00000A 1Er00                  552 	ld	e, #b_UIInit_b
+      00000C 21r00r00               553 	ld	hl, #_UIInit_b
+                                    554 ;/tmp/_gbsbuild/src/core/UI.c:64: }
+      00000F C3r00r00               555 	jp  ___sdcc_bcall_ehl
+                                    556 ;/tmp/_gbsbuild/src/core/UI.c:66: void UIUpdate() {
+                                    557 ;	---------------------------------
+                                    558 ; Function UIUpdate
+                                    559 ; ---------------------------------
+      000012                        560 _UIUpdate::
+                                    561 ;/tmp/_gbsbuild/src/core/UI.c:67: UIUpdate_b();
+      000012 1Er00                  562 	ld	e, #b_UIUpdate_b
+      000014 21r00r00               563 	ld	hl, #_UIUpdate_b
+                                    564 ;/tmp/_gbsbuild/src/core/UI.c:68: }
+      000017 C3r00r00               565 	jp  ___sdcc_bcall_ehl
+                                    566 ;/tmp/_gbsbuild/src/core/UI.c:70: void UIReset() {
+                                    567 ;	---------------------------------
+                                    568 ; Function UIReset
+                                    569 ; ---------------------------------
+      00001A                        570 _UIReset::
+                                    571 ;/tmp/_gbsbuild/src/core/UI.c:71: UIReset_b();
+      00001A 1Er00                  572 	ld	e, #b_UIReset_b
+      00001C 21r00r00               573 	ld	hl, #_UIReset_b
+                                    574 ;/tmp/_gbsbuild/src/core/UI.c:72: }
+      00001F C3r00r00               575 	jp  ___sdcc_bcall_ehl
+                                    576 ;/tmp/_gbsbuild/src/core/UI.c:74: void UIDrawFrame(UBYTE x, UBYTE y, UBYTE width, UBYTE height) {
+                                    577 ;	---------------------------------
+                                    578 ; Function UIDrawFrame
+                                    579 ; ---------------------------------
+      000022                        580 _UIDrawFrame::
+                                    581 ;/tmp/_gbsbuild/src/core/UI.c:75: UIDrawFrame_b(x, y, width, height);
+      000022 F8 05                  582 	ldhl	sp,	#5
+      000024 7E                     583 	ld	a, (hl)
+      000025 F5                     584 	push	af
+      000026 33                     585 	inc	sp
+      000027 2B                     586 	dec	hl
+      000028 7E                     587 	ld	a, (hl)
+      000029 F5                     588 	push	af
+      00002A 33                     589 	inc	sp
+      00002B 2B                     590 	dec	hl
+      00002C 7E                     591 	ld	a, (hl)
+      00002D F5                     592 	push	af
+      00002E 33                     593 	inc	sp
+      00002F 2B                     594 	dec	hl
+      000030 7E                     595 	ld	a, (hl)
+      000031 F5                     596 	push	af
+      000032 33                     597 	inc	sp
+      000033 1Er00                  598 	ld	e, #b_UIDrawFrame_b
+      000035 21r00r00               599 	ld	hl, #_UIDrawFrame_b
+      000038 CDr00r00               600 	call	___sdcc_bcall_ehl
+      00003B E8 04                  601 	add	sp, #4
+                                    602 ;/tmp/_gbsbuild/src/core/UI.c:76: }
+      00003D C9                     603 	ret
+                                    604 ;/tmp/_gbsbuild/src/core/UI.c:78: void UIDrawDialogueFrame(UBYTE h) {
+                                    605 ;	---------------------------------
+                                    606 ; Function UIDrawDialogueFrame
+                                    607 ; ---------------------------------
+      00003E                        608 _UIDrawDialogueFrame::
+                                    609 ;/tmp/_gbsbuild/src/core/UI.c:79: UIDrawDialogueFrame_b(h);
+      00003E F8 02                  610 	ldhl	sp,	#2
+      000040 7E                     611 	ld	a, (hl)
+      000041 F5                     612 	push	af
+      000042 33                     613 	inc	sp
+      000043 1Er00                  614 	ld	e, #b_UIDrawDialogueFrame_b
+      000045 21r00r00               615 	ld	hl, #_UIDrawDialogueFrame_b
+      000048 CDr00r00               616 	call	___sdcc_bcall_ehl
+      00004B 33                     617 	inc	sp
+                                    618 ;/tmp/_gbsbuild/src/core/UI.c:80: }
+      00004C C9                     619 	ret
+                                    620 ;/tmp/_gbsbuild/src/core/UI.c:82: void UIShowText(UBYTE bank, UWORD bank_offset) {
+                                    621 ;	---------------------------------
+                                    622 ; Function UIShowText
+                                    623 ; ---------------------------------
+      00004D                        624 _UIShowText::
+                                    625 ;/tmp/_gbsbuild/src/core/UI.c:85: strcpy(tmp_text_lines, "");
+      00004D 21r81r00               626 	ld	hl, #___str_0
+      000050 E5                     627 	push	hl
+      000051 21r6Cr00               628 	ld	hl, #_tmp_text_lines
+      000054 E5                     629 	push	hl
+      000055 CDr00r00               630 	call	_strcpy
+      000058 E8 04                  631 	add	sp, #4
+                                    632 ;/tmp/_gbsbuild/src/core/UI.c:87: ptr = (BankDataPtr(bank)) + bank_offset;
+                                    633 ;c
+      00005A F8 03                  634 	ldhl	sp,#3
+      00005C 2A                     635 	ld	a, (hl+)
+      00005D 5F                     636 	ld	e, a
+      00005E 56                     637 	ld	d, (hl)
+      00005F 21 00 40               638 	ld	hl, #0x4000
+      000062 19                     639 	add	hl, de
+                                    640 ;/tmp/_gbsbuild/src/core/UI.c:89: PUSH_BANK(bank);
+      000063 E5                     641 	push	hl
+      000064 F8 04                  642 	ldhl	sp,	#4
+      000066 7E                     643 	ld	a, (hl)
+      000067 F5                     644 	push	af
+      000068 33                     645 	inc	sp
+      000069 CDr00r00               646 	call	_PushBank
+      00006C 33                     647 	inc	sp
+      00006D 21r6Cr00               648 	ld	hl, #_tmp_text_lines
+      000070 E5                     649 	push	hl
+      000071 CDr00r00               650 	call	_strcat
+      000074 E8 04                  651 	add	sp, #4
+                                    652 ;/tmp/_gbsbuild/src/core/UI.c:91: POP_BANK;
+      000076 CDr00r00               653 	call	_PopBank
+                                    654 ;/tmp/_gbsbuild/src/core/UI.c:93: UIShowText_b();
+      000079 1Er00                  655 	ld	e, #b_UIShowText_b
+      00007B 21r00r00               656 	ld	hl, #_UIShowText_b
+                                    657 ;/tmp/_gbsbuild/src/core/UI.c:94: }
+      00007E C3r00r00               658 	jp  ___sdcc_bcall_ehl
+      000081                        659 ___str_0:
+      000081 00                     660 	.db 0x00
+                                    661 ;/tmp/_gbsbuild/src/core/UI.c:96: void UIShowAvatar(UBYTE avatar_index) {
+                                    662 ;	---------------------------------
+                                    663 ; Function UIShowAvatar
+                                    664 ; ---------------------------------
+      000082                        665 _UIShowAvatar::
+      000082 E8 80                  666 	add	sp, #-128
+      000084 E8 AC                  667 	add	sp, #-84
+                                    668 ;/tmp/_gbsbuild/src/core/UI.c:104: ReadBankedBankPtr(DATA_PTRS_BANK, &avatar_bank_ptr, &avatar_bank_ptrs[avatar_index]);
+      000086 21 D6 00               669 	ld	hl, #214
+      000089 39                     670 	add	hl, sp
+      00008A 4E                     671 	ld	c, (hl)
+      00008B 06 00                  672 	ld	b, #0x00
+      00008D 69                     673 	ld	l, c
+      00008E 60                     674 	ld	h, b
+      00008F 29                     675 	add	hl, hl
+      000090 09                     676 	add	hl, bc
+      000091 01r00r00               677 	ld	bc,#_avatar_bank_ptrs
+      000094 09                     678 	add	hl,bc
+      000095 5D                     679 	ld	e, l
+      000096 54                     680 	ld	d, h
+      000097 F8 00                  681 	ldhl	sp,	#0
+      000099 E5                     682 	push	hl
+      00009A D5                     683 	push	de
+      00009B E5                     684 	push	hl
+      00009C 3E 05                  685 	ld	a, #0x05
+      00009E F5                     686 	push	af
+      00009F 33                     687 	inc	sp
+      0000A0 CDr00r00               688 	call	_ReadBankedBankPtr
+      0000A3 E8 05                  689 	add	sp, #5
+      0000A5 C1                     690 	pop	bc
+                                    691 ;/tmp/_gbsbuild/src/core/UI.c:105: avatar_ptr = (BankDataPtr(avatar_bank_ptr.bank)) + avatar_bank_ptr.offset;
+      0000A6 69                     692 	ld	l, c
+      0000A7 60                     693 	ld	h, b
+      0000A8 23                     694 	inc	hl
+      0000A9 2A                     695 	ld	a, (hl+)
+      0000AA 6E                     696 	ld	l, (hl)
+      0000AB 5F                     697 	ld	e, a
+      0000AC 7D                     698 	ld	a, l
+      0000AD C6 40                  699 	add	a, #0x40
+      0000AF 57                     700 	ld	d, a
+                                    701 ;/tmp/_gbsbuild/src/core/UI.c:106: avatar_len = MUL_4(ReadBankedUBYTE(avatar_bank_ptr.bank, avatar_ptr));
+      0000B0 0A                     702 	ld	a, (bc)
+      0000B1 C5                     703 	push	bc
+      0000B2 D5                     704 	push	de
+      0000B3 D5                     705 	push	de
+      0000B4 F5                     706 	push	af
+      0000B5 33                     707 	inc	sp
+      0000B6 CDr00r00               708 	call	_ReadBankedUBYTE
+      0000B9 E8 03                  709 	add	sp, #3
+      0000BB 7B                     710 	ld	a, e
+      0000BC D1                     711 	pop	de
+      0000BD C1                     712 	pop	bc
+      0000BE 87                     713 	add	a, a
+      0000BF 87                     714 	add	a, a
+      0000C0 21 CF 00               715 	ld	hl, #207
+      0000C3 39                     716 	add	hl, sp
+      0000C4 77                     717 	ld	(hl), a
+                                    718 ;/tmp/_gbsbuild/src/core/UI.c:108: PUSH_BANK(avatar_bank_ptr.bank);
+      0000C5 0A                     719 	ld	a, (bc)
+      0000C6 D5                     720 	push	de
+      0000C7 F5                     721 	push	af
+      0000C8 33                     722 	inc	sp
+      0000C9 CDr00r00               723 	call	_PushBank
+      0000CC 33                     724 	inc	sp
+      0000CD D1                     725 	pop	de
+                                    726 ;/tmp/_gbsbuild/src/core/UI.c:109: memcpy(tmp_avatar_ptr, avatar_ptr + 1, avatar_len * 16);
+      0000CE 21 CF 00               727 	ld	hl, #207
+      0000D1 39                     728 	add	hl, sp
+      0000D2 4E                     729 	ld	c, (hl)
+      0000D3 AF                     730 	xor	a, a
+      0000D4 CB 21                  731 	sla	c
+      0000D6 8F                     732 	adc	a, a
+      0000D7 CB 21                  733 	sla	c
+      0000D9 8F                     734 	adc	a, a
+      0000DA CB 21                  735 	sla	c
+      0000DC 8F                     736 	adc	a, a
+      0000DD CB 21                  737 	sla	c
+      0000DF 8F                     738 	adc	a, a
+      0000E0 23                     739 	inc	hl
+      0000E1 71                     740 	ld	(hl), c
+      0000E2 23                     741 	inc	hl
+      0000E3 77                     742 	ld	(hl), a
+      0000E4 13                     743 	inc	de
+      0000E5 F8 07                  744 	ldhl	sp,	#7
+      0000E7 4D                     745 	ld	c, l
+      0000E8 44                     746 	ld	b, h
+      0000E9 21 D2 00               747 	ld	hl, #210
+      0000EC 39                     748 	add	hl, sp
+      0000ED 79                     749 	ld	a, c
+      0000EE 22                     750 	ld	(hl+), a
+      0000EF 70                     751 	ld	(hl), b
+      0000F0 C5                     752 	push	bc
+      0000F1 21 D2 00               753 	ld	hl, #210
+      0000F4 39                     754 	add	hl, sp
+      0000F5 2A                     755 	ld	a, (hl+)
+      0000F6 66                     756 	ld	h, (hl)
+      0000F7 6F                     757 	ld	l, a
+      0000F8 E5                     758 	push	hl
+      0000F9 D5                     759 	push	de
+      0000FA 21 D8 00               760 	ld	hl, #216
+      0000FD 39                     761 	add	hl, sp
+      0000FE 2A                     762 	ld	a, (hl+)
+      0000FF 66                     763 	ld	h, (hl)
+      000100 6F                     764 	ld	l, a
+      000101 E5                     765 	push	hl
+      000102 CDr00r00               766 	call	_memcpy
+      000105 E8 06                  767 	add	sp, #6
+      000107 CDr00r00               768 	call	_PopBank
+      00010A C1                     769 	pop	bc
+                                    770 ;/tmp/_gbsbuild/src/core/UI.c:111: SetBankedBkgData(TEXT_BUFFER_START, avatar_len, (unsigned char *)tmp_avatar_ptr, FONT_BANK);
+      00010B 3E 06                  771 	ld	a, #0x06
+      00010D F5                     772 	push	af
+      00010E 33                     773 	inc	sp
+      00010F C5                     774 	push	bc
+      000110 21 D2 00               775 	ld	hl, #210
+      000113 39                     776 	add	hl, sp
+      000114 56                     777 	ld	d, (hl)
+      000115 1E CC                  778 	ld	e,#0xcc
+      000117 D5                     779 	push	de
+      000118 CDr00r00               780 	call	_SetBankedBkgData
+      00011B E8 05                  781 	add	sp, #5
+                                    782 ;/tmp/_gbsbuild/src/core/UI.c:113: tile1 = TEXT_BUFFER_START;
+      00011D F8 03                  783 	ldhl	sp,	#3
+                                    784 ;/tmp/_gbsbuild/src/core/UI.c:114: tile2 = TEXT_BUFFER_START + 1U;
+      00011F 3E CC                  785 	ld	a, #0xcc
+      000121 22                     786 	ld	(hl+), a
+                                    787 ;/tmp/_gbsbuild/src/core/UI.c:115: tile3 = TEXT_BUFFER_START + 2U;
+      000122 3E CD                  788 	ld	a, #0xcd
+      000124 22                     789 	ld	(hl+), a
+                                    790 ;/tmp/_gbsbuild/src/core/UI.c:116: tile4 = TEXT_BUFFER_START + 3U;
+      000125 3E CE                  791 	ld	a, #0xce
+      000127 22                     792 	ld	(hl+), a
+      000128 36 CF                  793 	ld	(hl), #0xcf
+                                    794 ;/tmp/_gbsbuild/src/core/UI.c:118: set_win_tiles(1, 1, 1, 1, &tile1);
+      00012A F8 03                  795 	ldhl	sp,	#3
+      00012C E5                     796 	push	hl
+      00012D 11 01 01               797 	ld	de, #0x0101
+      000130 D5                     798 	push	de
+      000131 11 01 01               799 	ld	de, #0x0101
+      000134 D5                     800 	push	de
+      000135 CDr00r00               801 	call	_set_win_tiles
+      000138 E8 06                  802 	add	sp, #6
+                                    803 ;/tmp/_gbsbuild/src/core/UI.c:119: set_win_tiles(2, 1, 1, 1, &tile2);
+      00013A F8 04                  804 	ldhl	sp,	#4
+      00013C E5                     805 	push	hl
+      00013D 11 01 01               806 	ld	de, #0x0101
+      000140 D5                     807 	push	de
+      000141 11 02 01               808 	ld	de, #0x0102
+      000144 D5                     809 	push	de
+      000145 CDr00r00               810 	call	_set_win_tiles
+      000148 E8 06                  811 	add	sp, #6
+                                    812 ;/tmp/_gbsbuild/src/core/UI.c:120: set_win_tiles(1, 2, 1, 1, &tile3);
+      00014A F8 05                  813 	ldhl	sp,	#5
+      00014C E5                     814 	push	hl
+      00014D 11 01 01               815 	ld	de, #0x0101
+      000150 D5                     816 	push	de
+      000151 11 01 02               817 	ld	de, #0x0201
+      000154 D5                     818 	push	de
+      000155 CDr00r00               819 	call	_set_win_tiles
+      000158 E8 06                  820 	add	sp, #6
+                                    821 ;/tmp/_gbsbuild/src/core/UI.c:121: set_win_tiles(2, 2, 1, 1, &tile4);
+      00015A F8 06                  822 	ldhl	sp,	#6
+      00015C E5                     823 	push	hl
+      00015D 11 01 01               824 	ld	de, #0x0101
+      000160 D5                     825 	push	de
+      000161 11 02 02               826 	ld	de, #0x0202
+      000164 D5                     827 	push	de
+      000165 CDr00r00               828 	call	_set_win_tiles
+      000168 E8 06                  829 	add	sp, #6
+                                    830 ;/tmp/_gbsbuild/src/core/UI.c:122: }
+      00016A E8 7F                  831 	add	sp, #127
+      00016C E8 55                  832 	add	sp, #85
+      00016E C9                     833 	ret
+                                    834 ;/tmp/_gbsbuild/src/core/UI.c:124: void UIShowChoice(UWORD flag_index, UBYTE bank, UWORD bank_offset) {
+                                    835 ;	---------------------------------
+                                    836 ; Function UIShowChoice
+                                    837 ; ---------------------------------
+      00016F                        838 _UIShowChoice::
+                                    839 ;/tmp/_gbsbuild/src/core/UI.c:125: UIShowMenu_b(flag_index, bank, bank_offset, 0,
+      00016F 3E 01                  840 	ld	a, #0x01
+      000171 F5                     841 	push	af
+      000172 33                     842 	inc	sp
+      000173 AF                     843 	xor	a, a
+      000174 F5                     844 	push	af
+      000175 33                     845 	inc	sp
+      000176 F8 07                  846 	ldhl	sp,	#7
+      000178 2A                     847 	ld	a, (hl+)
+      000179 66                     848 	ld	h, (hl)
+      00017A 6F                     849 	ld	l, a
+      00017B E5                     850 	push	hl
+      00017C F8 08                  851 	ldhl	sp,	#8
+      00017E 7E                     852 	ld	a, (hl)
+      00017F F5                     853 	push	af
+      000180 33                     854 	inc	sp
+      000181 2B                     855 	dec	hl
+      000182 2B                     856 	dec	hl
+      000183 2A                     857 	ld	a, (hl+)
+      000184 66                     858 	ld	h, (hl)
+      000185 6F                     859 	ld	l, a
+      000186 E5                     860 	push	hl
+      000187 1Er00                  861 	ld	e, #b_UIShowMenu_b
+      000189 21r00r00               862 	ld	hl, #_UIShowMenu_b
+      00018C CDr00r00               863 	call	___sdcc_bcall_ehl
+      00018F E8 07                  864 	add	sp, #7
+                                    865 ;/tmp/_gbsbuild/src/core/UI.c:127: }
+      000191 C9                     866 	ret
+                                    867 ;/tmp/_gbsbuild/src/core/UI.c:129: void UIShowMenu(UWORD flag_index,
+                                    868 ;	---------------------------------
+                                    869 ; Function UIShowMenu
+                                    870 ; ---------------------------------
+      000192                        871 _UIShowMenu::
+                                    872 ;/tmp/_gbsbuild/src/core/UI.c:134: UIShowMenu_b(flag_index, bank, bank_offset, layout, cancel_config);
+      000192 F8 08                  873 	ldhl	sp,	#8
+      000194 7E                     874 	ld	a, (hl)
+      000195 F5                     875 	push	af
+      000196 33                     876 	inc	sp
+      000197 2B                     877 	dec	hl
+      000198 7E                     878 	ld	a, (hl)
+      000199 F5                     879 	push	af
+      00019A 33                     880 	inc	sp
+      00019B 2B                     881 	dec	hl
+      00019C 2B                     882 	dec	hl
+      00019D 2A                     883 	ld	a, (hl+)
+      00019E 66                     884 	ld	h, (hl)
+      00019F 6F                     885 	ld	l, a
+      0001A0 E5                     886 	push	hl
+      0001A1 F8 08                  887 	ldhl	sp,	#8
+      0001A3 7E                     888 	ld	a, (hl)
+      0001A4 F5                     889 	push	af
+      0001A5 33                     890 	inc	sp
+      0001A6 2B                     891 	dec	hl
+      0001A7 2B                     892 	dec	hl
+      0001A8 2A                     893 	ld	a, (hl+)
+      0001A9 66                     894 	ld	h, (hl)
+      0001AA 6F                     895 	ld	l, a
+      0001AB E5                     896 	push	hl
+      0001AC 1Er00                  897 	ld	e, #b_UIShowMenu_b
+      0001AE 21r00r00               898 	ld	hl, #_UIShowMenu_b
+      0001B1 CDr00r00               899 	call	___sdcc_bcall_ehl
+      0001B4 E8 07                  900 	add	sp, #7
+                                    901 ;/tmp/_gbsbuild/src/core/UI.c:135: }
+      0001B6 C9                     902 	ret
+                                    903 ;/tmp/_gbsbuild/src/core/UI.c:137: void UISetPos(UBYTE x, UBYTE y) {
+                                    904 ;	---------------------------------
+                                    905 ; Function UISetPos
+                                    906 ; ---------------------------------
+      0001B7                        907 _UISetPos::
+                                    908 ;/tmp/_gbsbuild/src/core/UI.c:138: win_pos_x = x;
+      0001B7 F8 02                  909 	ldhl	sp,	#2
+      0001B9 7E                     910 	ld	a, (hl)
+      0001BA EAr01r00               911 	ld	(#_win_pos_x),a
+                                    912 ;/tmp/_gbsbuild/src/core/UI.c:139: win_dest_pos_x = x;
+      0001BD EAr03r00               913 	ld	(#_win_dest_pos_x),a
+                                    914 ;/tmp/_gbsbuild/src/core/UI.c:140: win_pos_y = y;
+      0001C0 F8 03                  915 	ldhl	sp,	#3
+      0001C2 7E                     916 	ld	a, (hl)
+      0001C3 EAr02r00               917 	ld	(#_win_pos_y),a
+                                    918 ;/tmp/_gbsbuild/src/core/UI.c:141: win_dest_pos_y = y;
+      0001C6 EAr04r00               919 	ld	(#_win_dest_pos_y),a
+                                    920 ;/tmp/_gbsbuild/src/core/UI.c:142: }
+      0001C9 C9                     921 	ret
+                                    922 ;/tmp/_gbsbuild/src/core/UI.c:144: void UIMoveTo(UBYTE x, UBYTE y, UBYTE speed) {
+                                    923 ;	---------------------------------
+                                    924 ; Function UIMoveTo
+                                    925 ; ---------------------------------
+      0001CA                        926 _UIMoveTo::
+                                    927 ;/tmp/_gbsbuild/src/core/UI.c:145: win_dest_pos_x = x;
+      0001CA F8 02                  928 	ldhl	sp,	#2
+      0001CC 4E                     929 	ld	c, (hl)
+      0001CD 21r03r00               930 	ld	hl, #_win_dest_pos_x
+      0001D0 71                     931 	ld	(hl), c
+                                    932 ;/tmp/_gbsbuild/src/core/UI.c:146: win_dest_pos_y = y;
+      0001D1 F8 03                  933 	ldhl	sp,	#3
+      0001D3 46                     934 	ld	b, (hl)
+      0001D4 21r04r00               935 	ld	hl, #_win_dest_pos_y
+      0001D7 70                     936 	ld	(hl), b
+                                    937 ;/tmp/_gbsbuild/src/core/UI.c:147: if (speed == 0) {
+      0001D8 F8 04                  938 	ldhl	sp,	#4
+      0001DA 7E                     939 	ld	a, (hl)
+      0001DB B7                     940 	or	a, a
+      0001DC 20 12                  941 	jr	NZ, 00104$
+                                    942 ;/tmp/_gbsbuild/src/core/UI.c:148: win_pos_x = x;
+      0001DE 21r01r00               943 	ld	hl, #_win_pos_x
+      0001E1 71                     944 	ld	(hl), c
+                                    945 ;/tmp/_gbsbuild/src/core/UI.c:149: win_pos_y = y;
+      0001E2 21r02r00               946 	ld	hl, #_win_pos_y
+                                    947 ;/tmp/_gbsbuild/src/core/UI.c:150: if (y == MENU_CLOSED_Y) {
+      0001E5 78                     948 	ld	a,b
+      0001E6 77                     949 	ld	(hl),a
+      0001E7 D6 90                  950 	sub	a, #0x90
+      0001E9 C0                     951 	ret	NZ
+                                    952 ;/tmp/_gbsbuild/src/core/UI.c:151: win_speed = 0xFF;
+      0001EA 21r05r00               953 	ld	hl, #_win_speed
+      0001ED 36 FF                  954 	ld	(hl), #0xff
+      0001EF C9                     955 	ret
+      0001F0                        956 00104$:
+                                    957 ;/tmp/_gbsbuild/src/core/UI.c:154: win_speed = speed;
+      0001F0 F8 04                  958 	ldhl	sp,	#4
+      0001F2 7E                     959 	ld	a, (hl)
+      0001F3 EAr05r00               960 	ld	(#_win_speed),a
+                                    961 ;/tmp/_gbsbuild/src/core/UI.c:156: }
+      0001F6 C9                     962 	ret
+                                    963 ;/tmp/_gbsbuild/src/core/UI.c:158: UBYTE UIIsClosed() {
+                                    964 ;	---------------------------------
+                                    965 ; Function UIIsClosed
+                                    966 ; ---------------------------------
+      0001F7                        967 _UIIsClosed::
+                                    968 ;/tmp/_gbsbuild/src/core/UI.c:159: return win_pos_y == MENU_CLOSED_Y && win_dest_pos_y == MENU_CLOSED_Y;
+      0001F7 FAr02r00               969 	ld	a, (#_win_pos_y)
+      0001FA D6 90                  970 	sub	a, #0x90
+      0001FC 20 07                  971 	jr	NZ, 00103$
+      0001FE FAr04r00               972 	ld	a, (#_win_dest_pos_y)
+      000201 D6 90                  973 	sub	a, #0x90
+      000203 28 03                  974 	jr	Z, 00104$
+      000205                        975 00103$:
+      000205 1E 00                  976 	ld	e, #0x00
+      000207 C9                     977 	ret
+      000208                        978 00104$:
+      000208 1E 01                  979 	ld	e, #0x01
+                                    980 ;/tmp/_gbsbuild/src/core/UI.c:160: }
+      00020A C9                     981 	ret
+                                    982 ;/tmp/_gbsbuild/src/core/UI.c:162: void UIOnInteract() {
+                                    983 ;	---------------------------------
+                                    984 ; Function UIOnInteract
+                                    985 ; ---------------------------------
+      00020B                        986 _UIOnInteract::
+                                    987 ;/tmp/_gbsbuild/src/core/UI.c:163: UIOnInteract_b();
+      00020B 1Er00                  988 	ld	e, #b_UIOnInteract_b
+      00020D 21r00r00               989 	ld	hl, #_UIOnInteract_b
+                                    990 ;/tmp/_gbsbuild/src/core/UI.c:164: }
+      000210 C3r00r00               991 	jp  ___sdcc_bcall_ehl
+                                    992 ;/tmp/_gbsbuild/src/core/UI.c:166: UBYTE UIAtDest() {
+                                    993 ;	---------------------------------
+                                    994 ; Function UIAtDest
+                                    995 ; ---------------------------------
+      000213                        996 _UIAtDest::
+                                    997 ;/tmp/_gbsbuild/src/core/UI.c:167: return win_pos_x == win_dest_pos_x && win_pos_y == win_dest_pos_y;
+      000213 FAr01r00               998 	ld	a, (#_win_pos_x)
+      000216 21r03r00               999 	ld	hl, #_win_dest_pos_x
+      000219 96                    1000 	sub	a, (hl)
+      00021A 20 09                 1001 	jr	NZ, 00103$
+      00021C FAr02r00              1002 	ld	a, (#_win_pos_y)
+      00021F 21r04r00              1003 	ld	hl, #_win_dest_pos_y
+      000222 96                    1004 	sub	a, (hl)
+      000223 28 03                 1005 	jr	Z, 00104$
+      000225                       1006 00103$:
+      000225 1E 00                 1007 	ld	e, #0x00
+      000227 C9                    1008 	ret
+      000228                       1009 00104$:
+      000228 1E 01                 1010 	ld	e, #0x01
+                                   1011 ;/tmp/_gbsbuild/src/core/UI.c:168: }
+      00022A C9                    1012 	ret
+                                   1013 ;/tmp/_gbsbuild/src/core/UI.c:170: void UISetColor(UBYTE color) {
+                                   1014 ;	---------------------------------
+                                   1015 ; Function UISetColor
+                                   1016 ; ---------------------------------
+      00022B                       1017 _UISetColor::
+                                   1018 ;/tmp/_gbsbuild/src/core/UI.c:171: UISetColor_b(color);
+      00022B F8 02                 1019 	ldhl	sp,	#2
+      00022D 4E                    1020 	ld	c, (hl)
+      00022E 06 00                 1021 	ld	b, #0x00
+      000230 C5                    1022 	push	bc
+      000231 1Er00                 1023 	ld	e, #b_UISetColor_b
+      000233 21r00r00              1024 	ld	hl, #_UISetColor_b
+      000236 CDr00r00              1025 	call	___sdcc_bcall_ehl
+      000239 E8 02                 1026 	add	sp, #2
+                                   1027 ;/tmp/_gbsbuild/src/core/UI.c:172: }
+      00023B C9                    1028 	ret
+                                   1029 	.area _CODE
+                                   1030 	.area _CABS (ABS)

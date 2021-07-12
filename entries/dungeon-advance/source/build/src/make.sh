@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+echo "Compiling: src/data/bank_6.c"
+../_gbstools/gbdk/bin/lcc -Wa-l -Iinclude -DCGB -c -o /tmp/_gbsbuild/obj/bank_6.o /tmp/_gbsbuild/src/data/bank_6.c
+echo "Compiling: src/data/bank_7.c"
+../_gbstools/gbdk/bin/lcc -Wa-l -Iinclude -DCGB -c -o /tmp/_gbsbuild/obj/bank_7.o /tmp/_gbsbuild/src/data/bank_7.c
+echo "Compiling: src/music/music_bank_8.c"
+../_gbstools/gbdk/bin/lcc -Wa-l -Iinclude -DCGB -c -o /tmp/_gbsbuild/obj/music_bank_8.o /tmp/_gbsbuild/src/music/music_bank_8.c
+echo "Linking: game.gb"
+../_gbstools/gbdk/bin/lcc -Wl-yo16 -Wa-l -Wl-m -Wl-j -Wl-yt27 -Wl-ya4 -Wm-yC -o build/rom/game.gb /tmp/_gbsbuild/obj/Actor_a.o /tmp/_gbsbuild/obj/Actor_b.o /tmp/_gbsbuild/obj/Actor.o /tmp/_gbsbuild/obj/asm.macros.o /tmp/_gbsbuild/obj/BankData.o /tmp/_gbsbuild/obj/BankManager.o /tmp/_gbsbuild/obj/Camera_a.o /tmp/_gbsbuild/obj/Camera.o /tmp/_gbsbuild/obj/Collision.o /tmp/_gbsbuild/obj/Core_Main.o /tmp/_gbsbuild/obj/DataManager.o /tmp/_gbsbuild/obj/FadeManager_b.o /tmp/_gbsbuild/obj/FadeManager.o /tmp/_gbsbuild/obj/gbt_player_bank1.o /tmp/_gbsbuild/obj/gbt_player.o /tmp/_gbsbuild/obj/Input.o /tmp/_gbsbuild/obj/Math.o /tmp/_gbsbuild/obj/MusicManager.o /tmp/_gbsbuild/obj/Palette.o /tmp/_gbsbuild/obj/Projectiles_b.o /tmp/_gbsbuild/obj/Projectiles.o /tmp/_gbsbuild/obj/ScriptRunner_b.o /tmp/_gbsbuild/obj/ScriptRunner.o /tmp/_gbsbuild/obj/Scroll_a.o /tmp/_gbsbuild/obj/Scroll_b.o /tmp/_gbsbuild/obj/Scroll.o /tmp/_gbsbuild/obj/Sprite_b.o /tmp/_gbsbuild/obj/Sprite.o /tmp/_gbsbuild/obj/Stack.o /tmp/_gbsbuild/obj/Trigger_b.o /tmp/_gbsbuild/obj/Trigger.o /tmp/_gbsbuild/obj/UI_a.o /tmp/_gbsbuild/obj/UI_b.o /tmp/_gbsbuild/obj/UI.o /tmp/_gbsbuild/obj/bank_6.o /tmp/_gbsbuild/obj/bank_7.o /tmp/_gbsbuild/obj/data_ptrs.o /tmp/_gbsbuild/obj/main.o /tmp/_gbsbuild/obj/music_bank_8.o /tmp/_gbsbuild/obj/Adventure.o /tmp/_gbsbuild/obj/Platform.o /tmp/_gbsbuild/obj/PointNClick.o /tmp/_gbsbuild/obj/Shmup.o /tmp/_gbsbuild/obj/TopDown.o

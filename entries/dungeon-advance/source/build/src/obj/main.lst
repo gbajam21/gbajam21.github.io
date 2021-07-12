@@ -1,0 +1,84 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module main
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _main
+                                     12 	.globl _BGB_profiler_message
+                                     13 	.globl _core_start
+                                     14 	.globl _stateBanks
+                                     15 	.globl _updateFuncs
+                                     16 	.globl _startFuncs
+                                     17 ;--------------------------------------------------------
+                                     18 ; special function registers
+                                     19 ;--------------------------------------------------------
+                                     20 ;--------------------------------------------------------
+                                     21 ; ram data
+                                     22 ;--------------------------------------------------------
+                                     23 	.area _DATA
+      000000                         24 ___BGB_PROFILER_INIT:
+      000000                         25 	.ds 2
+                                     26 ;--------------------------------------------------------
+                                     27 ; absolute external ram data
+                                     28 ;--------------------------------------------------------
+                                     29 	.area _DABS (ABS)
+                                     30 ;--------------------------------------------------------
+                                     31 ; global & static initialisations
+                                     32 ;--------------------------------------------------------
+                                     33 	.area _HOME
+                                     34 	.area _GSINIT
+                                     35 	.area _GSFINAL
+                                     36 	.area _GSINIT
+                                     37 ;/tmp/_gbstools/gbdk/include/gb/bgb_emu.h:42: static void * __BGB_PROFILER_INIT = &BGB_profiler_message;
+      000000 21r00r00                38 	ld	hl, #___BGB_PROFILER_INIT
+      000003 36r00                   39 	ld	(hl), #<(_BGB_profiler_message)
+      000005 23                      40 	inc	hl
+      000006 36s00                   41 	ld	(hl), #>(_BGB_profiler_message)
+                                     42 ;--------------------------------------------------------
+                                     43 ; Home
+                                     44 ;--------------------------------------------------------
+                                     45 	.area _HOME
+                                     46 	.area _HOME
+                                     47 ;--------------------------------------------------------
+                                     48 ; code
+                                     49 ;--------------------------------------------------------
+                                     50 	.area _CODE
+                                     51 ;/tmp/_gbsbuild/src/main.c:17: int main() {
+                                     52 ;	---------------------------------
+                                     53 ; Function main
+                                     54 ; ---------------------------------
+      000000                         55 _main::
+                                     56 ;/tmp/_gbsbuild/src/main.c:18: core_start();
+      000000 CDr00r00                57 	call	_core_start
+                                     58 ;/tmp/_gbsbuild/src/main.c:19: return 0;
+      000003 11 00 00                59 	ld	de, #0x0000
+                                     60 ;/tmp/_gbsbuild/src/main.c:20: }
+      000006 C9                      61 	ret
+      000007                         62 _startFuncs:
+      000007 00 00                   63 	.dw #0x0000
+      000009r00r00                   64 	.dw _Start_TopDown
+      00000Br00r00                   65 	.dw _Start_Platform
+      00000Dr00r00                   66 	.dw _Start_Adventure
+      00000Fr00r00                   67 	.dw _Start_Shmup
+      000011r00r00                   68 	.dw _Start_PointNClick
+      000013                         69 _updateFuncs:
+      000013 00 00                   70 	.dw #0x0000
+      000015r00r00                   71 	.dw _Update_TopDown
+      000017r00r00                   72 	.dw _Update_Platform
+      000019r00r00                   73 	.dw _Update_Adventure
+      00001Br00r00                   74 	.dw _Update_Shmup
+      00001Dr00r00                   75 	.dw _Update_PointNClick
+      00001F                         76 _stateBanks:
+      00001F 00                      77 	.db #0x00	; 0
+      000020 05                      78 	.db #0x05	; 5
+      000021 05                      79 	.db #0x05	; 5
+      000022 05                      80 	.db #0x05	; 5
+      000023 05                      81 	.db #0x05	; 5
+      000024 05                      82 	.db #0x05	; 5
+                                     83 	.area _CODE
+                                     84 	.area _CABS (ABS)

@@ -1,0 +1,155 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+    _ActorRunCollisionScripts                                      ****** GX
+    _ActorsInit                                                    ****** GX
+    _BGP_REG                                                       ****** GX
+    _BkgPalette                                                    ****** GX
+    _BkgPaletteBuffer                                              ****** GX
+    _DIV_REG                                                       ****** GX
+    _FadeIn                                                        ****** GX
+    _FadeInit                                                      ****** GX
+    _FadeOut                                                       ****** GX
+    _FadeUpdate                                                    ****** GX
+    _HandleInputScripts                                            ****** GX
+    _LCDC_REG                                                      ****** GX
+    _LYC_REG                                                       ****** GX
+    _LoadScene                                                     ****** GX
+    _MusicUpdate                                                   ****** GX
+    _OBP0_REG                                                      ****** GX
+    _OBP1_REG                                                      ****** GX
+    _PopBank                                                       ****** GX
+    _PushBank                                                      ****** GX
+    _RefreshScroll                                                 ****** GX
+    _RefreshScroll_b                                               ****** GX
+    _SCX_REG                                                       ****** GX
+    _SCY_REG                                                       ****** GX
+    _STAT_REG                                                      ****** GX
+    _ScriptRestoreCtx                                              ****** GX
+    _ScriptRunnerInit                                              ****** GX
+    _ScriptStart                                                   ****** GX
+    _ScriptTimerUpdate                                             ****** GX
+  0 _SetScene                                                      000000 GR
+    _SprPalette                                                    ****** GX
+    _SprPaletteBuffer                                              ****** GX
+    _TAC_REG                                                       ****** GX
+    _TMA_REG                                                       ****** GX
+    _UIInit                                                        ****** GX
+    _UIOnInteract_b                                                ****** GX
+    _UIUpdate                                                      ****** GX
+    _UIUpdate_b                                                    ****** GX
+    _UpdateActors                                                  ****** GX
+    _UpdateCamera                                                  ****** GX
+    _UpdateProjectiles_b                                           ****** GX
+    _WX_REG                                                        ****** GX
+    _WY_REG                                                        ****** GX
+    ___sdcc_bcall_ehl                                              ****** GX
+    ___sdcc_call_hl                                                ****** GX
+    __cpu                                                          ****** GX
+    _active_script_ctx                                             ****** GX
+    _actors                                                        ****** GX
+    _add_LCD                                                       ****** GX
+    _add_TIM                                                       ****** GX
+    _add_VBL                                                       ****** GX
+    _camera_pos                                                    ****** GX
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    _camera_settings                                               ****** GX
+  0 _core_start                                                    000093 GR
+    _cpu_fast                                                      ****** GX
+  1 _current_state                                                 000005 GR
+  1 _delta_time                                                    000004 GR
+    _display_off                                                   ****** GX
+    _draw_scroll_x                                                 ****** GX
+    _draw_scroll_y                                                 ****** GX
+    _enable_interrupts                                             ****** GX
+    _fade_running                                                  ****** GX
+    _fade_style                                                    ****** GX
+  1 _game_time                                                     000000 GR
+    _gbt_enable_channels                                           ****** GX
+    _hide_sprites                                                  ****** GX
+    _initrand                                                      ****** GX
+    _input_script_ptrs                                             ****** GX
+    _joy                                                           ****** GX
+    _joypad                                                        ****** GX
+    _last_joy                                                      ****** GX
+  0 _lcd_update                                                    000067 GR
+    _map_next_dir                                                  ****** GX
+    _map_next_pos                                                  ****** GX
+    _map_next_sprite                                               ****** GX
+    _memset                                                        ****** GX
+  1 _music_mute_frames                                             00000D GR
+  1 _next_state                                                    000002 GR
+  1 _old_scroll_x                                                  000009 GR
+  1 _old_scroll_y                                                  00000B GR
+    _palette_dirty                                                 ****** GX
+    _palette_update_mask                                           ****** GX
+    _recent_joy                                                    ****** GX
+    _scene_events_start_ptr                                        ****** GX
+    _scene_stack                                                   ****** GX
+    _scene_type                                                    ****** GX
+    _script_bank_stack                                             ****** GX
+    _script_cmd_args                                               ****** GX
+    _script_ctxs                                                   ****** GX
+    _script_stack                                                  ****** GX
+    _script_stack_ptr                                              ****** GX
+    _script_start_stack                                            ****** GX
+    _script_variables                                              ****** GX
+    _scroll_target                                                 ****** GX
+    _scroll_x                                                      ****** GX
+    _scroll_y                                                      ****** GX
+  1 _seedRand                                                      000001 GR
+    _set_bkg_palette                                               ****** GX
+    _set_interrupts                                                ****** GX
+    _set_sprite_palette                                            ****** GX
+    _shadow_OAM                                                    ****** GX
+    _startFuncs                                                    ****** GX
+    _start_player_anim_speed                                       ****** GX
+    _start_player_move_speed                                       ****** GX
+    _start_player_sprite                                           ****** GX
+    _start_scene_dir_x                                             ****** GX
+    _start_scene_dir_y                                             ****** GX
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 3.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    _start_scene_index                                             ****** GX
+    _start_scene_x                                                 ****** GX
+    _start_scene_y                                                 ****** GX
+    _stateBanks                                                    ****** GX
+  1 _state_running                                                 000007 GR
+    _timer_script_duration                                         ****** GX
+    _ui_block                                                      ****** GX
+    _updateFuncs                                                   ****** GX
+  1 _vbl_count                                                     000008 GR
+  0 _vbl_update                                                    00000F GR
+    _wait_vbl_done                                                 ****** GX
+    b_RefreshScroll_b                                              ****** GX
+    b_UIOnInteract_b                                               ****** GX
+    b_UIUpdate_b                                                   ****** GX
+    b_UpdateProjectiles_b                                          ****** GX
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 4.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size    4B7   flags    0
+   1 _DATA                                      size      E   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size     19   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CABS                                      size      0   flags    8
+

@@ -1,0 +1,56 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+  6 _ApplyPaletteChangeColor                                       0000A4 GR
+  6 _ApplyPaletteChangeDMG                                         00029B GR
+  6 _ApplyPaletteChange_b                                          000382 GR
+    _BGP_REG                                                       ****** GX
+    _BkgPalette                                                    ****** GX
+    _BkgPaletteBuffer                                              ****** GX
+    _DespRight                                                     ****** GX
+  6 _FadeIn_b                                                      0002DB GR
+  6 _FadeOut_b                                                     000306 GR
+  6 _FadeUpdate_b                                                  000333 GR
+    _OBP0_REG                                                      ****** GX
+    _SprPalette                                                    ****** GX
+    _SprPaletteBuffer                                              ****** GX
+  6 _UpdateColorBlack                                              000000 GR
+    __cpu                                                          ****** GX
+  6 _bgp_fade_black_vals                                           00009D R
+  6 _bgp_fade_vals                                                 00008F R
+  1 _fade_direction                                                000001 R
+  1 _fade_frame                                                    000000 R
+    _fade_frames_per_step                                          ****** GX
+    _fade_running                                                  ****** GX
+    _fade_style                                                    ****** GX
+    _fade_timer                                                    ****** GX
+    _memcpy                                                        ****** GX
+  6 _obj_fade_black_vals                                           000096 R
+  6 _obj_fade_vals                                                 000088 R
+    _palette_dirty                                                 ****** GX
+    b_ApplyPaletteChange_b                                      =  000001 G
+    b_FadeIn_b                                                  =  000001 G
+    b_FadeOut_b                                                 =  000001 G
+    b_FadeUpdate_b                                              =  000001 G
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size      0   flags    0
+   1 _DATA                                      size      2   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size      0   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CODE_1                                    size    39D   flags    0
+   7 _CABS                                      size      0   flags    8
+

@@ -1,0 +1,63 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Palette
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _BkgPaletteBuffer
+                                     12 	.globl _SprPaletteBuffer
+                                     13 	.globl _BkgPalette
+                                     14 	.globl _SprPalette
+                                     15 	.globl _palette_update_mask
+                                     16 	.globl _palette_dirty
+                                     17 ;--------------------------------------------------------
+                                     18 ; special function registers
+                                     19 ;--------------------------------------------------------
+                                     20 ;--------------------------------------------------------
+                                     21 ; ram data
+                                     22 ;--------------------------------------------------------
+                                     23 	.area _DATA
+      000000                         24 _palette_dirty::
+      000000                         25 	.ds 1
+      000001                         26 _palette_update_mask::
+      000001                         27 	.ds 1
+      000002                         28 _SprPalette::
+      000002                         29 	.ds 64
+      000042                         30 _BkgPalette::
+      000042                         31 	.ds 64
+      000082                         32 _SprPaletteBuffer::
+      000082                         33 	.ds 64
+      0000C2                         34 _BkgPaletteBuffer::
+      0000C2                         35 	.ds 64
+                                     36 ;--------------------------------------------------------
+                                     37 ; absolute external ram data
+                                     38 ;--------------------------------------------------------
+                                     39 	.area _DABS (ABS)
+                                     40 ;--------------------------------------------------------
+                                     41 ; global & static initialisations
+                                     42 ;--------------------------------------------------------
+                                     43 	.area _HOME
+                                     44 	.area _GSINIT
+                                     45 	.area _GSFINAL
+                                     46 	.area _GSINIT
+                                     47 ;/tmp/_gbsbuild/src/core/Palette.c:3: UBYTE palette_dirty = FALSE;
+      000000 21r00r00                48 	ld	hl, #_palette_dirty
+      000003 36 00                   49 	ld	(hl), #0x00
+                                     50 ;/tmp/_gbsbuild/src/core/Palette.c:4: UBYTE palette_update_mask = 0x3F;
+      000005 21r01r00                51 	ld	hl, #_palette_update_mask
+      000008 36 3F                   52 	ld	(hl), #0x3f
+                                     53 ;--------------------------------------------------------
+                                     54 ; Home
+                                     55 ;--------------------------------------------------------
+                                     56 	.area _HOME
+                                     57 	.area _HOME
+                                     58 ;--------------------------------------------------------
+                                     59 ; code
+                                     60 ;--------------------------------------------------------
+                                     61 	.area _CODE
+                                     62 	.area _CODE
+                                     63 	.area _CABS (ABS)

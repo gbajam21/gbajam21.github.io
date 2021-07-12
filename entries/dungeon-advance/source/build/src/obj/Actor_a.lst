@@ -1,0 +1,1017 @@
+                                      1 .include "asm.macros.s"
+                                      1 .macro _signed_add_a regH regL ?lbl
+                                      2         ; If A is negative, we need
+                                      3         ; to substract $100 from HL
+                                      4         ; (since A's "upper byte" is
+                                      5         ; $FF00)
+                                      6         bit 7, a                    ; set z if a signed bit is 0
+                                      7         jr z, lbl                   ; if z is set jump to positive
+                                      8         dec   regH                  ; if negative decrement upper byte
+                                      9     lbl:
+                                     10         ; Then do addition as usual
+                                     11         ; (to handle the "lower byte")
+                                     12         add   a, regL
+                                     13         ld    regL, a
+                                     14         adc   a, regH
+                                     15         sub   regL
+                                     16         ld    regH, a
+                                     17 .endm
+                                     18 
+                                     19 .macro _signed_sub_a regH regL ?lbl
+                                     20 
+                                     21         ; If A is negative, we need
+                                     22         ; to substract $100 from HL
+                                     23         ; (since A's "upper byte" is
+                                     24         ; $FF00)
+                                     25         bit 7, a                    ; set z if a signed bit is 0
+                                     26         jr z, lbl                   ; if z is set jump to positive
+                                     27         dec   regH                  ; if negative decrement upper byte
+                                     28     lbl:
+                                     29         ; Then do addition as usual
+                                     30         ; (to handle the "lower byte")
+                                     31         add   a, regL
+                                     32         ld    regL, a
+                                     33         adc   a, regH
+                                     34         sub   regL
+                                     35         ld    regH, a
+                                     36 
+                                     37 
+                                     38         ; We negate A (since HL - A
+                                     39         ; is the same as HL + -A)
+                                     40         ; neg
+                                     41         ; _signed_sub_a regH, regL
+                                     42     ;     ; Now add the "upper byte"
+                                     43     ;     ; The flags are already set by NEG
+                                     44     ;     ; The JP PE is because -$80 becomes
+                                     45     ;     ; +$80 so we need to handle it too
+                                     46     ;     jp    p, lbl
+                                     47     ;     jp    pe, lbl
+                                     48     ;     dec   h
+                                     49     ; lbl:
+                                     50         
+                                     51     ;     ; Then add the low byte
+                                     52     ;     add   a, l
+                                     53     ;     ld    l, a
+                                     54     ;     adc   a, h
+                                     55     ;     sub   l
+                                     56     ;     ld    h, a
+                                     57 .endm
+                                     58 
+                                     59 .macro _add_a regH regL
+                                     60         ; Then do addition as usual
+                                     61         ; (to handle the "lower byte")
+                                     62         add   a, regL
+                                     63         ld    regL, a
+                                     64         adc   a, regH
+                                     65         sub   regL
+                                     66         ld    regH, a
+                                     67 .endm
+                                     68 
+                                     69 .macro _sub16 h1 l1 h2 l2
+                                     70     ld a, l1
+                                     71     sub a, l2
+                                     72     ld l1, A
+                                     73 
+                                     74     ld a, h1
+                                     75     sbc h2
+                                     76     ld h1, A
+                                     77 .endm
+                                     78 
+                                     79 .macro _if_lt_16 h2 l2 h1 l1 tmp lbl
+                                     80         ld a, l1
+                                     81         sub a, l2
+                                     82         ld	tmp, a
+                                     83         ld	a, h1
+                                     84         sbc	a, h2
+                                     85         ld	tmp, a
+                                     86         bit	7, tmp
+                                     87         jr	Z, lbl    
+                                     88 .endm
+                                     89 
+                                     90 .macro _if_lt_u16 h1 l1 h2 l2 lbl
+                                     91         ld	a, l1
+                                     92         sub	a, l2
+                                     93         ld	a, h1
+                                     94         sbc	a, h2
+                                     95         jr	c, lbl
+                                     96 .endm
+                                     97 
+                                     98 .macro _if_gt_16 h1 l1 h2 l2 tmp lbl
+                                     99         ld a, l1
+                                    100         sub a, l2
+                                    101         ld	tmp, a
+                                    102         ld	a, h1
+                                    103         sbc	a, h2
+                                    104         ld	tmp, a
+                                    105         bit	7, tmp
+                                    106         jr	Z, lbl    
+                                    107 .endm
+                                    108 
+                                    109 ;    0000 21r00r00             62 	ld	hl, #_camera_tmp_a
+                                    110 ;    0003 7E                   63 	ld	a, (hl)
+                                    111 ;    0004 21r02r00             64 	ld	hl, #_camera_tmp_b
+                                    112 ;    0007 96                   65 	sub	a, (hl)
+                                    113 ;    0008 4F                   66 	ld	c, a
+                                    114 ;    0009 21r01r00             67 	ld	hl, #_camera_tmp_a + 1
+                                    115 ;    000C 7E                   68 	ld	a, (hl)
+                                    116 ;    000D 21r03r00             69 	ld	hl, #_camera_tmp_b + 1
+                                    117 ;    0010 9E                   70 	sbc	a, (hl)
+                                    118 ;    0011 47                   71 	ld	b, a
+                                    119 ;    0012 CB 78                72 	bit	7, b
+                                    120 ;    0014 28 08                73 	jr	Z,00102$
+                                      2 
+                           000001     3     GBC = 1
+                                      4 
+                           000002     5     .POS_Y_OFFSET = 0x02
+                           000005     6     .DIR_X_OFFSET = 0x05
+                           000006     7     .DIR_Y_OFFSET = 0x06
+                           000007     8     .MOVING_OFFSET = 0x07
+                           000016     9     .PINNED_OFFSET = 0x16
+                           000008    10     .SPRITE_OFFSET = 0x08
+                           000009    11     .SPRITE_INDEX_OFFSET = 0x09
+                           00000A    12     .PALETTE_INDEX_OFFSET = 0x0A
+                           00000F    13     .FRAME_OFFSET = 0x0F
+                           000010    14     .FRAMES_LEN_OFFSET = 0x10
+                           000011    15     .ANIMATE_OFFSET = 0x11
+                           000012    16     .ENABLED_OFFSET = 0x12
+                           000014    17     .RERENDER_OFFSET = 0x14
+                           000015    18     .ANIM_SPEED_OFFSET = 0x15
+                           000019    19     .SPRITE_TYPE_OFFSET = 0x19
+                                     20 
+                           000011    21     .SCRIPT_ACTOR_OFFSET = 0x11
+                                     22 
+                           000000    23     .SPRITE_STATIC = 0x0
+                           000001    24     .SPRITE_ACTOR = 0x1
+                           000002    25     .SPRITE_ACTOR_ANIMATED = 0x2
+                                     26 
+                           000005    27     .FLIP_BIT = 0x5
+                                     28 
+                           0000E0    29     .SCREENWIDTH_PLUS_64 = 224
+                           0000D0    30     .SCREENHEIGHT_PLUS_64 = 208
+                                     31 
+      000000                         32 .set_spr_prop:                                  ;; c - sprite no, e - value, preserves bc, spoils hl
+      000000 C5                      33         push bc
+      000001 21 03 00                34         ld hl, #_shadow_OAM+3 
+      000004 CB 21                   35         sla c
+      000006 CB 21                   36         sla c
+      000008 06 00                   37         ld b, #0
+      00000A 09                      38         add hl, bc
+      00000B 73                      39         ld (hl), e
+      00000C C1                      40         pop bc
+      00000D C9                      41         ret
+                                     42 
+      00000E                         43 .set_spr_tile:                                  ;; c - sprite no, b - value, preserves bc, spoils hl
+      00000E C5                      44         push bc
+      00000F 21 02 00                45         ld hl, #_shadow_OAM+2 
+      000012 CB 21                   46         sla c
+      000014 CB 21                   47         sla c
+      000016 78                      48         ld a, b
+      000017 06 00                   49         ld b, #0
+      000019 09                      50         add hl, bc
+      00001A 77                      51         ld (hl), a
+      00001B C1                      52         pop bc
+      00001C C9                      53         ret
+      00001D                         54 .mv_spr:                                        ;; a - spr no, b - Y, c - X, preserves a, bc, spoils hl 
+      00001D F5                      55         push af
+      00001E 21 00 00                56         ld hl, #_shadow_OAM
+      000021 87                      57         add a
+      000022 87                      58         add a 
+      000023                         59         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      000023 85                       3         add   a, l
+      000024 6F                       4         ld    l, a
+      000025 8C                       5         adc   a, h
+      000026 95                       6         sub   l
+      000027 67                       7         ld    h, a
+      000028 78                      60         ld a, b
+      000029 22                      61         ld (hl+), a
+      00002A 71                      62         ld (hl), c
+      00002B F1                      63         pop af
+      00002C C9                      64         ret
+                                     65 
+      00002D                         66 _UpdateActors::
+                                     67 
+                                     68     ; Reset delete counter
+      00002D AF                      69         xor a
+      00002E EA 00 00                70         ld (#_actors_active_delete_count), a
+                                     71 
+                                     72     ; b=loop index
+      000031 06 00                   73         ld b, #0                                ;; b = 0
+      000033                         74     loop_cond:
+                                     75     ; If b == actors_active_size
+      000033 21 00 00                76         ld hl, #_actors_active_size             ;; hl = *actors_active_size
+      000036 7E                      77         ld a, (hl)                              ;; a = actors_active_size
+      000037 B8                      78         cp b                                    ;; compare a and b
+      000038 CA 86 02                79         jp z, loop_exit                         ;; if b == a goto loop_exit
+      00003B C5                      80         push bc                                 ;; store loop index
+                                     81 
+                                     82     ; Load actor index into a
+      00003C 21 00 00                83         ld hl, #_actors_active
+      00003F 78                      84         ld a, b
+      000040                         85         _add_a h l         
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      000040 85                       3         add   a, l
+      000041 6F                       4         ld    l, a
+      000042 8C                       5         adc   a, h
+      000043 95                       6         sub   l
+      000044 67                       7         ld    h, a
+      000045 7E                      86         ld a, (hl)
+                                     87 
+                                     88     ; Set hl to actor_ptrs
+      000046 21 00 00                89         ld hl, #_actor_ptrs
+                                     90 
+                                     91     ; Add index offset to hl
+      000049 87                      92         add a, a ; each item is 2 bytes
+      00004A                         93         _add_a h l 
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      00004A 85                       3         add   a, l
+      00004B 6F                       4         ld    l, a
+      00004C 8C                       5         adc   a, h
+      00004D 95                       6         sub   l
+      00004E 67                       7         ld    h, a
+                                     94 
+                                     95     ; Load current actor addr into bc
+      00004F 46                      96         ld b, (hl)
+      000050 23                      97         inc hl
+      000051 4E                      98         ld c, (hl)
+                                     99 
+                                    100     ; Set hl to current actor addr and store on stack
+      000052 61                     101         ld h, c
+      000053 68                     102         ld l, b
+      000054 E5                     103         push hl
+                                    104 
+      000055                        105     check_if_pinned:
+      000055 3E 16                  106         ld a, #.PINNED_OFFSET
+      000057                        107         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      000057 85                       3         add   a, l
+      000058 6F                       4         ld    l, a
+      000059 8C                       5         adc   a, h
+      00005A 95                       6         sub   l
+      00005B 67                       7         ld    h, a
+      00005C 7E                     108         ld a, (hl)
+      00005D FE 00                  109         cp a, #0
+      00005F 28 19                  110         jr z, handle_unpinned
+                                    111 
+      000061                        112     handle_pinned:
+                                    113     
+                                    114     ; Load current pos in de (only lowest bytes)
+      000061 E1                     115         pop hl
+      000062 E5                     116         push hl
+      000063 7E                     117         ld a, (hl)
+      000064 C6 08                  118         add a, #8
+      000066 5F                     119         ld e, a
+      000067 23                     120         inc hl
+      000068 23                     121         inc hl
+      000069 7E                     122         ld a, (hl)
+      00006A C6 08                  123         add a, #8
+      00006C 57                     124         ld d, a
+      00006D D5                     125         push de
+                                    126 
+                                    127     ; Get sprite index into a
+      00006E 3E 07                  128         ld a, #(.SPRITE_INDEX_OFFSET - .POS_Y_OFFSET) ; ptr currently at actor.pos.y(2)
+      000070                        129         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      000070 85                       3         add   a, l
+      000071 6F                       4         ld    l, a
+      000072 8C                       5         adc   a, h
+      000073 95                       6         sub   l
+      000074 67                       7         ld    h, a
+      000075 7E                     130         ld a, (hl)
+      000076 C1                     131         pop bc  ; Restore bc from stack so x can be incremented by 8 for second call
+                                    132 
+      000077 C3 1C 01               133         jp move_sprite_pair
+                                    134 
+      00007A                        135     handle_unpinned:
+                                    136 
+      00007A E1                     137         pop hl
+      00007B E5                     138         push hl
+                                    139 
+      00007C                        140     check_is_onscreen_y:
+                                    141 
+                                    142     ; Load current pos y in de
+      00007C 23                     143         inc hl
+      00007D 23                     144         inc hl
+      00007E 2A                     145         ld a, (hl+)
+      00007F 5F                     146         ld e, a
+      000080 56                     147         ld d, (hl)
+                                    148 
+                                    149     ; Load scroll y in hl
+      000081 21 00 00               150         ld hl, #(_draw_scroll_y)
+      000084 2A                     151         ld a, (hl+)
+      000085 66                     152         ld h, (hl)
+      000086 6F                     153         ld l, a
+                                    154         
+                                    155     ; sub scroll_y from pos_y
+      000087                        156         _sub16 d e h l
+      000087 7B                       1     ld a, e
+      000088 95                       2     sub a, l
+      000089 5F                       3     ld e, A
+                                      4 
+      00008A 7A                       5     ld a, d
+      00008B 9C                       6     sbc h
+      00008C 57                       7     ld d, A
+                                    157 
+                                    158     ; Set dc to scroll_y + 32 for onscreen check
+      00008D 4B                     159         ld c, e
+      00008E 3E 20                  160         ld a, #32
+      000090                        161         _add_a d, c
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      000090 81                       3         add   a, c
+      000091 4F                       4         ld    c, a
+      000092 8A                       5         adc   a, d
+      000093 91                       6         sub   c
+      000094 57                       7         ld    d, a
+                                    162 
+                                    163     ; If screen y > max_y hide
+      000095                        164         _if_lt_u16 d, c, #0, #.SCREENHEIGHT_PLUS_64, is_onscreen_y
+      000095 79                       1         ld	a, c
+      000096 D6 D0                    2         sub	a, #.SCREENHEIGHT_PLUS_64
+      000098 7A                       3         ld	a, d
+      000099 DE 00                    4         sbc	a, #0
+      00009B 38 03                    5         jr	c, is_onscreen_y
+                                    165 
+      00009D C3 58 02               166         jp queue_deactivate_actor
+                                    167 
+      0000A0                        168     is_onscreen_y: 
+                                    169 
+                                    170     ; Add y pos to stack ready for move call
+      0000A0 7B                     171         ld	a, e
+      0000A1 C6 08                  172         add a, #8
+      0000A3 F5                     173         push	af 
+      0000A4 33                     174         inc	sp
+                                    175 
+                                    176     ; Restore hl to actor memory offset
+      0000A5 F8 01                  177         ldhl sp, #1
+      0000A7 2A                     178         ld a, (hl+)
+      0000A8 66                     179         ld h, (hl)
+      0000A9 6F                     180         ld l, a
+                                    181 
+      0000AA                        182     check_is_onscreen_x:
+                                    183 
+                                    184     ; Load current pos x in de
+      0000AA 2A                     185         ld a, (hl+)
+      0000AB 5F                     186         ld e, a
+      0000AC 56                     187         ld d, (hl)
+                                    188 
+                                    189     ; Load scroll x in hl
+      0000AD 21 00 00               190         ld hl, #(_draw_scroll_x)
+      0000B0 2A                     191         ld a, (hl+)
+      0000B1 66                     192         ld h, (hl)
+      0000B2 6F                     193         ld l, a
+                                    194 
+                                    195     ; sub scroll_x from pos_x
+      0000B3                        196         _sub16 d e h l
+      0000B3 7B                       1     ld a, e
+      0000B4 95                       2     sub a, l
+      0000B5 5F                       3     ld e, A
+                                      4 
+      0000B6 7A                       5     ld a, d
+      0000B7 9C                       6     sbc h
+      0000B8 57                       7     ld d, A
+                                    197 
+                                    198     ; Set dc to scroll_x + 32 for onscreen check
+      0000B9 4B                     199         ld c, e
+      0000BA 3E 20                  200         ld a, #32
+      0000BC                        201         _add_a d, c    
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      0000BC 81                       3         add   a, c
+      0000BD 4F                       4         ld    c, a
+      0000BE 8A                       5         adc   a, d
+      0000BF 91                       6         sub   c
+      0000C0 57                       7         ld    d, a
+                                    202 
+                                    203     ; If screen x > max_x hide
+      0000C1                        204         _if_lt_u16 d, c, #0, #.SCREENWIDTH_PLUS_64, is_onscreen_x
+      0000C1 79                       1         ld	a, c
+      0000C2 D6 E0                    2         sub	a, #.SCREENWIDTH_PLUS_64
+      0000C4 7A                       3         ld	a, d
+      0000C5 DE 00                    4         sbc	a, #0
+      0000C7 38 04                    5         jr	c, is_onscreen_x
+                                    205 
+                                    206     ; Remove y value from stack
+      0000C9 33                     207         inc	sp
+                                    208 
+      0000CA C3 58 02               209         jp queue_deactivate_actor
+                                    210 
+      0000CD                        211     is_onscreen_x: 
+                                    212 
+                                    213     ; Add x pos to stack ready for move call
+      0000CD 7B                     214         ld	a, e
+      0000CE C6 08                  215         add a, #8
+      0000D0 F5                     216         push	af 
+      0000D1 33                     217         inc	sp
+                                    218 
+                                    219     ; Restore hl to actor memory offset
+      0000D2 F8 02                  220         ldhl sp, #2
+      0000D4 2A                     221         ld a, (hl+)
+      0000D5 66                     222         ld h, (hl)
+      0000D6 6F                     223         ld l, a
+                                    224 
+      0000D7                        225     check_enabled:
+      0000D7 E5                     226         push hl
+      0000D8 3E 12                  227         ld a, #.ENABLED_OFFSET
+      0000DA                        228         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      0000DA 85                       3         add   a, l
+      0000DB 6F                       4         ld    l, a
+      0000DC 8C                       5         adc   a, h
+      0000DD 95                       6         sub   l
+      0000DE 67                       7         ld    h, a
+      0000DF 7E                     229         ld a, (hl)
+      0000E0 E1                     230         pop hl
+      0000E1 FE 00                  231         cp a, #0
+      0000E3 28 21                  232         jr z, hide_sprite
+                                    233 
+      0000E5                        234     check_under_win:
+                                    235 
+                                    236     ; If WX_REG == 7 - Move sprite
+      0000E5 E5                     237         push hl
+      0000E6 21 4B FF               238         ld hl, #0xFF4B ; WX_REG
+      0000E9 7E                     239         ld a, (hl)
+      0000EA E1                     240         pop hl
+      0000EB FE 07                  241         cp a, #0x7
+      0000ED 28 24                  242         jr z, move_sprite
+                                    243 
+                                    244     ; If WX_REG > screen_x - Move sprite
+      0000EF E5                     245         push hl
+      0000F0 F8 02                  246         ldhl sp, #2 ; screen_x in stack
+      0000F2 5F                     247         ld e, a
+      0000F3 7E                     248         ld a, (hl)
+      0000F4 E1                     249         pop hl
+      0000F5 BB                     250         cp a, e
+      0000F6 38 1B                  251         jr c, move_sprite
+                                    252 
+                                    253     ; If WY_REG < screen_y - 16px - Move sprite
+      0000F8 E5                     254         push hl
+      0000F9 21 4A FF               255         ld hl, #0xFF4A ; WY_REG
+      0000FC 5E                     256         ld e, (hl)
+      0000FD F8 03                  257         ldhl sp, #3; screen_y in stack
+      0000FF 7E                     258         ld a, (hl)
+      000100 D6 10                  259         sub a, #16; screen_y - 16px
+      000102 E1                     260         pop hl
+      000103 BB                     261         cp a, e
+      000104 38 0D                  262         jr c, move_sprite
+                                    263 
+      000106                        264     hide_sprite:
+                                    265     ; Reset stack
+      000106 E8 02                  266         add	sp, #2
+                                    267 
+                                    268     ; Get sprite index into a
+      000108 3E 09                  269         ld a, #.SPRITE_INDEX_OFFSET
+      00010A                        270         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      00010A 85                       3         add   a, l
+      00010B 6F                       4         ld    l, a
+      00010C 8C                       5         adc   a, h
+      00010D 95                       6         sub   l
+      00010E 67                       7         ld    h, a
+      00010F 7E                     271         ld a, (hl)
+      000110 C3 76 02               272         jp hide_sprite_pair
+                                    273 
+      000113                        274     move_sprite:
+                                    275 
+                                    276     ; Get sprite index into a
+      000113 3E 09                  277         ld a, #.SPRITE_INDEX_OFFSET
+      000115                        278         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      000115 85                       3         add   a, l
+      000116 6F                       4         ld    l, a
+      000117 8C                       5         adc   a, h
+      000118 95                       6         sub   l
+      000119 67                       7         ld    h, a
+      00011A 7E                     279         ld a, (hl)
+      00011B C1                     280         pop bc  ; Restore bc from stack so x can be incremented by 8 for second call
+                                    281 
+      00011C                        282     move_sprite_pair:
+                                    283 
+                                    284     ; Move sprite (left)
+      00011C CD 1D 00               285         call	.mv_spr
+                                    286 
+                                    287     ; Build second call data
+      00011F 57                     288         ld d, a
+      000120 14                     289         inc d       ; sprite_index + 1
+      000121 79                     290         ld a, c
+      000122 C6 08                  291         add a, #8   ; x + 8
+      000124 4F                     292         ld c, a
+      000125 7A                     293         ld a, d
+                                    294 
+                                    295     ; Move sprite (right)
+      000126 CD 1D 00               296         call	.mv_spr
+                                    297 
+      000129                        298     check_rerender:
+                                    299 
+      000129 E1                     300         pop hl
+      00012A E5                     301         push hl
+                                    302 
+                                    303     ; Get rerender value into a
+      00012B 3E 14                  304         ld a, #.RERENDER_OFFSET
+      00012D                        305         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      00012D 85                       3         add   a, l
+      00012E 6F                       4         ld    l, a
+      00012F 8C                       5         adc   a, h
+      000130 95                       6         sub   l
+      000131 67                       7         ld    h, a
+      000132 7E                     306         ld a, (hl)  
+      000133 FE 01                  307         cp a, #1
+      000135 C2 B9 01               308         jp nz, skip_rerender
+                                    309 
+                                    310     ; Clear rerender value
+      000138 36 00                  311         ld (hl), #0
+                                    312 
+      00013A                        313     handle_rerender:
+                                    314 
+      00013A E1                     315         pop hl
+      00013B E5                     316         push hl
+                                    317 
+                                    318     ; Get sprite index into c
+      00013C 3E 09                  319         ld a, #.SPRITE_INDEX_OFFSET
+      00013E                        320         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      00013E 85                       3         add   a, l
+      00013F 6F                       4         ld    l, a
+      000140 8C                       5         adc   a, h
+      000141 95                       6         sub   l
+      000142 67                       7         ld    h, a
+      000143 4E                     321         ld c, (hl)
+                                    322 
+                                    323     ; Get tile_index into b - .SPRITE_OFFSET
+      000144 2B                     324         dec hl
+      000145 46                     325         ld b, (hl)
+                                    326 
+                           000001   327 .if GBC
+                                    328     ; Store sprite props in e
+      000146 3E 02                  329         ld a, #(.PALETTE_INDEX_OFFSET - .SPRITE_OFFSET)
+      000148                        330         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      000148 85                       3         add   a, l
+      000149 6F                       4         ld    l, a
+      00014A 8C                       5         adc   a, h
+      00014B 95                       6         sub   l
+      00014C 67                       7         ld    h, a
+      00014D 5E                     331         ld e, (hl)
+                                    332 
+                                    333     ; Add frame offset
+      00014E 3E 05                  334         ld a, #(.FRAME_OFFSET - .PALETTE_INDEX_OFFSET)
+      000150                        335         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      000150 85                       3         add   a, l
+      000151 6F                       4         ld    l, a
+      000152 8C                       5         adc   a, h
+      000153 95                       6         sub   l
+      000154 67                       7         ld    h, a
+      000155 7E                     336         ld a, (hl)
+      000156 80                     337         add a, b
+      000157 47                     338         ld b, a
+                           000000   339 .else
+                                    340     ; Store sprite props in e
+                                    341         ld e, #0
+                                    342 
+                                    343     ; Add frame offset
+                                    344         ld a, #(.FRAME_OFFSET - .SPRITE_OFFSET)
+                                    345         _add_a h, l
+                                    346         ld a, (hl)
+                                    347         add a, b
+                                    348         ld b, a
+                                    349 .endif 
+                                    350 
+                                    351     ; Check sprite type - if static skip direction offset
+      000158 3E 0A                  352         ld a, #(.SPRITE_TYPE_OFFSET - .FRAME_OFFSET)
+      00015A                        353         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      00015A 85                       3         add   a, l
+      00015B 6F                       4         ld    l, a
+      00015C 8C                       5         adc   a, h
+      00015D 95                       6         sub   l
+      00015E 67                       7         ld    h, a
+      00015F 7E                     354         ld a, (hl)
+      000160 FE 00                  355         cp a, #.SPRITE_STATIC
+      000162 28 2B                  356         jr z, update_tile
+                                    357 
+                                    358     ; If sprite type is actor only add 1 frame per dir
+      000164 16 01                  359         ld d, #1
+      000166 FE 01                  360         cp a, #.SPRITE_ACTOR
+      000168 28 01                  361         jr z, check_dir_offset
+                                    362 
+                                    363     ; If sprite type is actor animated add two frames per dir
+      00016A 14                     364         inc d
+                                    365 
+      00016B                        366     check_dir_offset:
+                                    367 
+                                    368     ; check y dir - if positive, just update tile
+      00016B E1                     369         pop hl
+      00016C E5                     370         push hl
+      00016D 3E 06                  371         ld a, #.DIR_Y_OFFSET
+      00016F                        372         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      00016F 85                       3         add   a, l
+      000170 6F                       4         ld    l, a
+      000171 8C                       5         adc   a, h
+      000172 95                       6         sub   l
+      000173 67                       7         ld    h, a
+      000174 7E                     373         ld a, (hl)
+      000175 FE 00                  374         cp a, #0
+      000177 28 04                  375         jr z, add_dir_offset
+      000179 CB 7F                  376         bit 7, a
+      00017B 28 12                  377         jr z, update_tile
+                                    378 
+      00017D                        379     add_dir_offset:
+                                    380 
+                                    381     ; add tile offset to frame - for upwards or sideways movement
+      00017D 7A                     382         ld a, d
+      00017E 80                     383         add a, b
+      00017F 47                     384         ld b, a
+                                    385 
+                                    386     ; check x dir - if zero, just update tile
+      000180 2B                     387         dec hl
+      000181 7E                     388         ld a, (hl)
+      000182 FE 00                  389         cp a, #0
+      000184 28 09                  390         jr z, update_tile
+                                    391 
+                                    392     ;if positive don't set flip value 
+      000186 CB 7F                  393         bit 7, a
+      000188 28 02                  394         jr z, add_dir_x_offset
+                                    395 
+                                    396     ; x was negative so set e (flip) to true
+      00018A CB EB                  397         set .FLIP_BIT, e
+                                    398 
+      00018C                        399     add_dir_x_offset:
+                                    400 
+                                    401     ; add tile offset to frame - for sideways movement
+      00018C 7A                     402         ld a, d
+      00018D 80                     403         add a, b
+      00018E 47                     404         ld b, a
+                                    405 
+      00018F                        406     update_tile:
+                                    407 
+                                    408     ; Load frame offset back into a
+      00018F 78                     409         ld a, b
+                                    410 
+                                    411     ; Multiply tile_index by 4 to get memory offset
+      000190 87                     412         add a, a
+      000191 87                     413         add a, a        
+      000192 47                     414         ld b, a
+                                    415 
+                                    416     ; Render reversed if flipped
+      000193 CB 6B                  417         bit .FLIP_BIT, e
+      000195 20 11                  418         jr nz, update_tile_flipped
+                                    419 
+                                    420     ; Set sprite tile left b=tile_index*4 c=sprite_index
+      000197 CD 0E 00               421         call .set_spr_tile
+                                    422 
+                                    423     ; Set sprite props left
+      00019A CD 00 00               424         call .set_spr_prop    
+                                    425 
+                                    426     ; Set sprite tile right
+      00019D 04                     427         inc b
+      00019E 04                     428         inc b
+      00019F 0C                     429         inc c
+      0001A0 CD 0E 00               430         call .set_spr_tile
+                                    431 
+                                    432     ; Set sprite props right
+      0001A3 CD 00 00               433         call .set_spr_prop    
+                                    434 
+      0001A6 18 11                  435         jr finished_rerender
+                                    436 
+      0001A8                        437     update_tile_flipped:
+                                    438     ; Set sprite tile right
+      0001A8 04                     439         inc b
+      0001A9 04                     440         inc b
+      0001AA CD 0E 00               441         call .set_spr_tile
+                                    442 
+                                    443     ; Set sprite props right
+      0001AD CD 00 00               444         call .set_spr_prop    
+                                    445 
+                                    446     ; Set sprite tile left
+      0001B0 05                     447         dec b
+      0001B1 05                     448         dec b
+      0001B2 0C                     449         inc c
+      0001B3 CD 0E 00               450         call .set_spr_tile
+                                    451 
+                                    452     ; Set sprite props left
+      0001B6 CD 00 00               453         call .set_spr_prop    
+                                    454 
+      0001B9                        455     finished_rerender:
+      0001B9                        456     skip_rerender:
+                                    457 
+      0001B9                        458     handle_anim_update:
+                                    459 
+                                    460     ; Check if frame is 8 (- 1)
+      0001B9 21 00 00               461         ld hl, #_game_time
+      0001BC 7E                     462         ld a, (hl)
+      0001BD E6 07                  463         and a, #0x7
+      0001BF FE 07                  464         cp a, #7
+      0001C1 C2 80 02               465         jp nz, next_actor
+                                    466     
+                                    467     ; If is animating
+      0001C4 E1                     468         pop hl
+      0001C5 E5                     469         push hl    
+      0001C6 3E 11                  470         ld a, #.ANIMATE_OFFSET
+      0001C8                        471         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      0001C8 85                       3         add   a, l
+      0001C9 6F                       4         ld    l, a
+      0001CA 8C                       5         adc   a, h
+      0001CB 95                       6         sub   l
+      0001CC 67                       7         ld    h, a
+      0001CD 7E                     472         ld a, (hl) 
+      0001CE FE 00                  473         cp a, #0
+      0001D0 20 11                  474         jr nz, check_anim_speed
+                                    475 
+                                    476     ; Or if is moving
+      0001D2 E1                     477         pop hl
+      0001D3 E5                     478         push hl     
+      0001D4 3E 07                  479         ld a, #.MOVING_OFFSET
+      0001D6                        480         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      0001D6 85                       3         add   a, l
+      0001D7 6F                       4         ld    l, a
+      0001D8 8C                       5         adc   a, h
+      0001D9 95                       6         sub   l
+      0001DA 67                       7         ld    h, a
+      0001DB 7E                     481         ld a, (hl) 
+      0001DC FE 00                  482         cp a, #0
+      0001DE 20 03                  483         jr nz, check_anim_speed
+                                    484 
+      0001E0                        485     not_animating:
+                                    486     ; Else not animating right now so skip
+      0001E0 C3 80 02               487         jp next_actor
+                                    488 
+      0001E3                        489     check_anim_speed:
+                                    490 
+      0001E3 E1                     491         pop hl
+      0001E4 E5                     492         push hl
+      0001E5 3E 15                  493         ld a, #(.ANIM_SPEED_OFFSET)
+      0001E7                        494         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      0001E7 85                       3         add   a, l
+      0001E8 6F                       4         ld    l, a
+      0001E9 8C                       5         adc   a, h
+      0001EA 95                       6         sub   l
+      0001EB 67                       7         ld    h, a
+      0001EC 7E                     495         ld a, (hl)     
+                                    496 
+                                    497     ; Anim speed == 3
+      0001ED FE 03                  498         cp a, #3
+      0001EF 28 13                  499         jr z, check_is_frame_16
+                                    500 
+                                    501     ; Anim speed == 255 (None)
+      0001F1 FE FF                  502         cp a, #255
+      0001F3 CA 80 02               503         jp z, next_actor
+                                    504 
+                                    505     ; Anim speed == 4
+      0001F6 FE 04                  506         cp a, #4
+      0001F8 28 3A                  507         jr z, update_anim_frames
+                                    508 
+                                    509     ; Anim speed == 2
+      0001FA FE 02                  510         cp a, #2
+      0001FC 28 12                  511         jr z, check_is_frame_32
+                                    512 
+                                    513     ; Anim speed == 1
+      0001FE FE 01                  514         cp a, #1
+      000200 28 1A                  515         jr z, check_is_frame_64
+                                    516 
+                                    517     ; Anim speed == 0
+      000202 18 24                  518         jr check_is_frame_128
+                                    519 
+      000204                        520     check_is_frame_16:
+      000204 21 00 00               521         ld hl, #_game_time
+      000207 7E                     522         ld a, (hl)
+      000208 E6 0F                  523         and a, #0xF
+      00020A FE 0F                  524         cp a, #0xF
+      00020C 28 26                  525         jr z, update_anim_frames
+      00020E 18 70                  526         jr next_actor
+                                    527 
+      000210                        528     check_is_frame_32:
+      000210 21 00 00               529         ld hl, #_game_time
+      000213 7E                     530         ld a, (hl)
+      000214 E6 1F                  531         and a, #0x1F
+      000216 FE 1F                  532         cp a, #0x1F
+      000218 28 1A                  533         jr z, update_anim_frames
+      00021A 18 64                  534         jr next_actor
+                                    535 
+      00021C                        536     check_is_frame_64:
+      00021C 21 00 00               537         ld hl, #_game_time
+      00021F 7E                     538         ld a, (hl)
+      000220 E6 3F                  539         and a, #0x3F
+      000222 FE 3F                  540         cp a, #0x3F
+      000224 28 0E                  541         jr z, update_anim_frames
+      000226 18 58                  542         jr next_actor
+                                    543 
+      000228                        544     check_is_frame_128:
+      000228 21 00 00               545         ld hl, #_game_time
+      00022B 7E                     546         ld a, (hl)
+      00022C E6 7F                  547         and a, #0x7F
+      00022E FE 7F                  548         cp a, #0x7F
+      000230 28 02                  549         jr z, update_anim_frames
+      000232 18 4C                  550         jr next_actor
+                                    551 
+      000234                        552     update_anim_frames:
+                                    553 
+                                    554     ; Handle animation update
+      000234 E1                     555         pop hl
+      000235 E5                     556         push hl
+                                    557 
+                                    558     ; Load frame offset into b
+      000236 3E 0F                  559         ld a, #.FRAME_OFFSET
+      000238                        560         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      000238 85                       3         add   a, l
+      000239 6F                       4         ld    l, a
+      00023A 8C                       5         adc   a, h
+      00023B 95                       6         sub   l
+      00023C 67                       7         ld    h, a
+      00023D 46                     561         ld b, (hl)
+                                    562 
+                                    563     ; Load frames_len into a
+      00023E 23                     564         inc hl
+      00023F 7E                     565         ld a, (hl)
+                                    566 
+                                    567     ; If frame != frames_len - 1
+      000240 3D                     568         dec a
+      000241 B8                     569         cp a, b
+      000242 20 05                  570         jr nz, inc_frame
+                                    571 
+      000244                        572     reset_frame_to_zero:
+      000244 2B                     573         dec hl
+      000245 36 00                  574         ld (hl), #0
+      000247 18 02                  575         jr set_rerender_next_frame
+                                    576 
+      000249                        577     inc_frame:
+      000249 2B                     578         dec hl
+      00024A 34                     579         inc (hl)
+                                    580         
+      00024B                        581     set_rerender_next_frame:
+                                    582     ; Set rerender flag for next frame
+      00024B E1                     583         pop hl
+      00024C E5                     584         push hl
+      00024D 3E 14                  585         ld a, #.RERENDER_OFFSET
+      00024F                        586         _add_a h, l        
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      00024F 85                       3         add   a, l
+      000250 6F                       4         ld    l, a
+      000251 8C                       5         adc   a, h
+      000252 95                       6         sub   l
+      000253 67                       7         ld    h, a
+      000254 36 01                  587         ld (hl), #1
+      000256 18 28                  588         jr next_actor
+                                    589 
+      000258                        590     queue_deactivate_actor:
+                                    591         
+                                    592     ; Load current main script actor into a
+      000258 21 11 00               593         ld hl, #(_script_ctxs + .SCRIPT_ACTOR_OFFSET)
+      00025B 7E                     594         ld a, (hl)
+                                    595 
+                                    596     ; Load active actor index into b
+      00025C F8 03                  597         ldhl sp, #3
+      00025E 46                     598         ld b, (hl)
+                                    599 
+                                    600     ; If main script actor is active actor then don't deactivate
+      00025F B8                     601         cp a, b
+      000260 28 1E                  602         jr z, next_actor
+                                    603 
+                                    604     ; Load delete counter into c
+      000262 21 00 00               605         ld hl, #_actors_active_delete_count
+      000265 4E                     606         ld c, (hl)
+                                    607 
+                                    608     ; Add current active actor index into delete list
+      000266 21 00 00               609         ld hl, #_actors_active_delete
+      000269 79                     610         ld a, c
+      00026A                        611         _add_a h, l
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      00026A 85                       3         add   a, l
+      00026B 6F                       4         ld    l, a
+      00026C 8C                       5         adc   a, h
+      00026D 95                       6         sub   l
+      00026E 67                       7         ld    h, a
+      00026F 70                     612         ld (hl), b
+                                    613 
+                                    614     ; Increment delete counter
+      000270 21 00 00               615         ld hl, #_actors_active_delete_count
+      000273 34                     616         inc (hl)
+                                    617 
+      000274 18 0A                  618         jr next_actor
+                                    619 
+      000276                        620     hide_sprite_pair:
+      000276 01 00 00               621         ld bc, #0
+                                    622     ; Move sprite (left)
+      000279 CD 1D 00               623         call .mv_spr
+                                    624 
+                                    625     ; sprite value incrementing by 1
+      00027C 3C                     626         inc a
+                                    627 
+                                    628     ; Move sprite (right)
+      00027D CD 1D 00               629         call .mv_spr
+                                    630 
+      000280                        631     next_actor:
+                                    632     ; Clear current actor from stack
+      000280 E1                     633         pop hl
+                                    634     ; Restore loop index from stack
+      000281 C1                     635         pop bc                                  ;; retreive b as loop index
+      000282 04                     636         inc b                                   ;; b++
+      000283 C3 33 00               637         jp loop_cond                            ;; goto loop_cond
+                                    638 
+      000286                        639     loop_exit:
+                                    640 
+                                    641     ;; Deactivate Offscreen Actors ----------------------------------------------
+                                    642 
+                                    643     ; b=loop index
+      000286 06 00                  644         ld b, #0                                ;; b = 0
+      000288                        645     delete_loop_cond:
+                                    646     ; If b == actors_active_size
+      000288 21 00 00               647         ld hl, #_actors_active_delete_count    
+      00028B 7E                     648         ld a, (hl)                              ;; a = actors_active_delete_count
+      00028C B8                     649         cp b                                    ;; compare a and b
+      00028D 28 15                  650         jr z, delete_loop_exit                  ;; if b == a goto loop_exit
+      00028F C5                     651         push bc                                 ;; store loop index
+                                    652 
+                                    653     ; Load actor index into a
+      000290 21 00 00               654         ld hl, #_actors_active_delete
+      000293 78                     655         ld a, b
+      000294                        656         _add_a h l         
+                                      1         ; Then do addition as usual
+                                      2         ; (to handle the "lower byte")
+      000294 85                       3         add   a, l
+      000295 6F                       4         ld    l, a
+      000296 8C                       5         adc   a, h
+      000297 95                       6         sub   l
+      000298 67                       7         ld    h, a
+      000299 7E                     657         ld a, (hl)
+                                    658 
+                                    659     ; Call DeactivateActiveActor(a)
+      00029A F5                     660         push af
+      00029B 33                     661         inc sp
+      00029C CD 00 00               662         call _DeactivateActiveActor
+      00029F 33                     663         inc sp
+                                    664 
+                                    665     ; Restore loop index from stack
+      0002A0 C1                     666         pop bc                                  ;; retreive b as loop index
+      0002A1 04                     667         inc b                                   ;; b++
+      0002A2 18 E4                  668         jr delete_loop_cond                     ;; goto loop_cond
+                                    669 
+      0002A4                        670     delete_loop_exit:
+                                    671 
+      0002A4 C9                     672         ret
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .ANIMATE=  000011     |     .ANIM_SP=  000015     |     .DIR_X_O=  000005 
+    .DIR_Y_O=  000006     |     .ENABLED=  000012     |     .FLIP_BI=  000005 
+    .FRAMES_=  000010     |     .FRAME_O=  00000F     |     .MOVING_=  000007 
+    .PALETTE=  00000A     |     .PINNED_=  000016     |     .POS_Y_O=  000002 
+    .RERENDE=  000014     |     .SCREENH=  0000D0     |     .SCREENW=  0000E0 
+    .SCRIPT_=  000011     |     .SPRITE_=  000001     |     .SPRITE_=  000002 
+    .SPRITE_=  000009     |     .SPRITE_=  000008     |     .SPRITE_=  000000 
+    .SPRITE_=  000019     |     .__.$$$.=  002710 L   |     .__.ABS.=  000000 G
+    .__.CPU.=  000000 L   |     .__.H$L.=  000000 L   |   0 .mv_spr    00001D R
+  0 .set_spr   000000 R   |   0 .set_spr   00000E R   |     GBC     =  000001 
+    _Deactiv   ****** GX  |   0 _UpdateA   00002D GR  |     _actor_p   ****** GX
+    _actors_   ****** GX  |     _actors_   ****** GX  |     _actors_   ****** GX
+    _actors_   ****** GX  |     _draw_sc   ****** GX  |     _draw_sc   ****** GX
+    _game_ti   ****** GX  |     _script_   ****** GX  |     _shadow_   ****** GX
+  0 add_dir_   00017D R   |   0 add_dir_   00018C R   |   0 check_an   0001E3 R
+  0 check_di   00016B R   |   0 check_en   0000D7 R   |   0 check_if   000055 R
+  0 check_is   000228 R   |   0 check_is   000204 R   |   0 check_is   000210 R
+  0 check_is   00021C R   |   0 check_is   0000AA R   |   0 check_is   00007C R
+  0 check_re   000129 R   |   0 check_un   0000E5 R   |   0 delete_l   000288 R
+  0 delete_l   0002A4 R   |   0 finished   0001B9 R   |   0 handle_a   0001B9 R
+  0 handle_p   000061 R   |   0 handle_r   00013A R   |   0 handle_u   00007A R
+  0 hide_spr   000106 R   |   0 hide_spr   000276 R   |   0 inc_fram   000249 R
+  0 is_onscr   0000CD R   |   0 is_onscr   0000A0 R   |   0 loop_con   000033 R
+  0 loop_exi   000286 R   |   0 move_spr   000113 R   |   0 move_spr   00011C R
+  0 next_act   000280 R   |   0 not_anim   0001E0 R   |   0 queue_de   000258 R
+  0 reset_fr   000244 R   |   0 set_rere   00024B R   |   0 skip_rer   0001B9 R
+  0 update_a   000234 R   |   0 update_t   00018F R   |   0 update_t   0001A8 R
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE      size    2A5   flags    0
+

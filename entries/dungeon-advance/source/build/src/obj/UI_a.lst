@@ -1,0 +1,87 @@
+                                      1         .area   _CODE_1
+                                      2 
+                                      3 ; extracts token from string
+      000000                          4 _GetToken_b::
+      000000 C5                       5         push    bc
+      000001 F8 06                    6         lda     hl, 6(sp)
+      000003 3A                       7         ld      a, (hl-)
+      000004 57                       8         ld      d, a
+      000005 3A                       9         ld      a, (hl-)
+      000006 6E                      10         ld      l, (hl)
+      000007 67                      11         ld      h, a
+      000008 AF                      12         xor     a
+      000009 5F                      13         ld      e, a            ; e: length
+      00000A 47                      14         ld      b, a
+      00000B 4F                      15         ld      c, a            ; bc: result
+      00000C                         16 1$:
+      00000C 2A                      17         ld      a, (hl+)
+      00000D BA                      18         cp      d
+      00000E 28 1F                   19         jr      z, 3$           ; terminator found
+      000010 FE 30                   20         cp      #'0'
+      000012 38 2E                   21         jr      c, 2$
+      000014 FE 3A                   22         cp      #('9' + 1)
+      000016 30 2A                   23         jr      nc, 2$
+      000018 D6 30                   24         sub     #'0'
+                                     25 
+      00001A E5                      26         push    hl
+      00001B 60                      27         ld      h, b
+      00001C 69                      28         ld      l, c
+      00001D 29                      29         add     hl, hl
+      00001E 29                      30         add     hl, hl
+      00001F 09                      31         add     hl, bc
+      000020 29                      32         add     hl, hl          ; hl = bc * 10
+                                     33 
+      000021 85                      34         add     l
+      000022 4F                      35         ld      c, a
+      000023 8C                      36         adc     h
+      000024 91                      37         sub     c
+      000025 47                      38         ld      b, a            ; bc = hl + a
+      000026 E1                      39         pop     hl
+                                     40 
+      000027 1C                      41         inc     e
+      000028 7B                      42         ld      a, e
+      000029 FE 05                   43         cp      #5
+      00002B 38 DF                   44         jr      c,  1$
+                                     45 
+      00002D 18 13                   46         jr      2$              ; token too long
+      00002F                         47 3$:
+      00002F 7B                      48         ld      a, e
+      000030 B7                      49         or      a
+      000031 28 0F                   50         jr      z, 2$           ; token too short
+      000033 FE 05                   51         cp      #5
+      000035 30 0B                   52         jr      nc, 2$          ; token too long
+                                     53 
+                                     54         ; token is ok
+      000037 F8 07                   55         lda     hl, 7(sp)
+      000039 2A                      56         ld      a, (hl+)
+      00003A 66                      57         ld      h, (hl)
+      00003B 6F                      58         ld      l, a
+      00003C 71                      59         ld      (hl), c
+      00003D 23                      60         inc     hl
+      00003E 70                      61         ld      (hl), b         ; *res = bc
+                                     62 
+      00003F 1C                      63         inc     e               ; include terminator
+                                     64 
+      000040 C1                      65         pop     bc
+      000041 C9                      66         ret
+      000042                         67 2$:
+                                     68         ; token is bad
+      000042 1E 00                   69         ld      e, #0
+      000044 C1                      70         pop     bc
+      000045 C9                      71         ret
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.=  002710 L   |     .__.ABS.=  000000 G   |     .__.CPU.=  000000 L
+    .__.H$L.=  000000 L   |   1 _GetToke   000000 GR
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE      size      0   flags    0
+   1 _CODE_1    size     46   flags    0
+

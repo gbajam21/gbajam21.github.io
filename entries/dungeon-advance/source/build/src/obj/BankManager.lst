@@ -1,0 +1,91 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module BankManager
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _StackPop
+                                     12 	.globl _StackPush
+                                     13 	.globl _bank_stack
+                                     14 	.globl _PushBank
+                                     15 	.globl _PopBank
+                                     16 ;--------------------------------------------------------
+                                     17 ; special function registers
+                                     18 ;--------------------------------------------------------
+                                     19 ;--------------------------------------------------------
+                                     20 ; ram data
+                                     21 ;--------------------------------------------------------
+                                     22 	.area _DATA
+      000000                         23 _bank_stack::
+      000000                         24 	.ds 11
+                                     25 ;--------------------------------------------------------
+                                     26 ; absolute external ram data
+                                     27 ;--------------------------------------------------------
+                                     28 	.area _DABS (ABS)
+                                     29 ;--------------------------------------------------------
+                                     30 ; global & static initialisations
+                                     31 ;--------------------------------------------------------
+                                     32 	.area _HOME
+                                     33 	.area _GSINIT
+                                     34 	.area _GSFINAL
+                                     35 	.area _GSINIT
+                                     36 ;/tmp/_gbsbuild/src/core/BankManager.c:3: DECLARE_STACK(bank_stack, N_PUSH_BANKS);
+      000000 21r00r00                37 	ld	hl, #_bank_stack
+      000003 36 00                   38 	ld	(hl), #0x00
+                                     39 ;--------------------------------------------------------
+                                     40 ; Home
+                                     41 ;--------------------------------------------------------
+                                     42 	.area _HOME
+                                     43 	.area _HOME
+                                     44 ;--------------------------------------------------------
+                                     45 ; code
+                                     46 ;--------------------------------------------------------
+                                     47 	.area _CODE
+                                     48 ;/tmp/_gbsbuild/src/core/BankManager.c:5: void PushBank(UINT8 b) {
+                                     49 ;	---------------------------------
+                                     50 ; Function PushBank
+                                     51 ; ---------------------------------
+      000000                         52 _PushBank::
+                                     53 ;/tmp/_gbsbuild/src/core/BankManager.c:6: StackPush(bank_stack, _current_bank);
+      000000 F0r00                   54 	ldh	a, (__current_bank+0)
+      000002 F5                      55 	push	af
+      000003 33                      56 	inc	sp
+      000004 21r00r00                57 	ld	hl, #_bank_stack
+      000007 E5                      58 	push	hl
+      000008 CDr00r00                59 	call	_StackPush
+      00000B E8 03                   60 	add	sp, #3
+                                     61 ;/tmp/_gbsbuild/src/core/BankManager.c:7: SWITCH_ROM(b);
+      00000D F8 02                   62 	ldhl	sp,	#2
+      00000F 7E                      63 	ld	a, (hl)
+      000010 E0r00                   64 	ldh	(__current_bank+0),a
+      000012 11 00 20                65 	ld	de, #0x2000
+      000015 7E                      66 	ld	a, (hl)
+      000016 12                      67 	ld	(de), a
+                                     68 ;/tmp/_gbsbuild/src/core/BankManager.c:8: }
+      000017 C9                      69 	ret
+                                     70 ;/tmp/_gbsbuild/src/core/BankManager.c:10: void PopBank() {
+                                     71 ;	---------------------------------
+                                     72 ; Function PopBank
+                                     73 ; ---------------------------------
+      000018                         74 _PopBank::
+                                     75 ;/tmp/_gbsbuild/src/core/BankManager.c:11: REFRESH_BANK;
+      000018 01r00r00                76 	ld	bc, #_bank_stack+0
+      00001B 0A                      77 	ld	a, (bc)
+      00001C 6F                      78 	ld	l, a
+      00001D 26 00                   79 	ld	h, #0x00
+      00001F 09                      80 	add	hl, bc
+      000020 7E                      81 	ld	a, (hl)
+      000021 E0r00                   82 	ldh	(__current_bank+0),a
+      000023 EA 00 20                83 	ld	(#0x2000),a
+                                     84 ;/tmp/_gbsbuild/src/core/BankManager.c:12: StackPop(bank_stack);
+      000026 C5                      85 	push	bc
+      000027 CDr00r00                86 	call	_StackPop
+      00002A E8 02                   87 	add	sp, #2
+                                     88 ;/tmp/_gbsbuild/src/core/BankManager.c:13: }
+      00002C C9                      89 	ret
+                                     90 	.area _CODE
+                                     91 	.area _CABS (ABS)

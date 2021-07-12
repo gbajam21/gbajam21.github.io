@@ -1,0 +1,540 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module PointNClick
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _TriggerRunScript
+                                     12 	.globl _TriggerAtTile
+                                     13 	.globl _ActorRunScript
+                                     14 	.globl _ActorAtTile
+                                     15 	.globl _Gt16
+                                     16 	.globl _Lt16
+                                     17 	.globl _last_hit_trigger
+                                     18 	.globl _Start_PointNClick
+                                     19 	.globl _Update_PointNClick
+                                     20 ;--------------------------------------------------------
+                                     21 ; special function registers
+                                     22 ;--------------------------------------------------------
+                                     23 ;--------------------------------------------------------
+                                     24 ; ram data
+                                     25 ;--------------------------------------------------------
+                                     26 	.area _DATA
+      000000                         27 _last_hit_trigger::
+      000000                         28 	.ds 1
+                                     29 ;--------------------------------------------------------
+                                     30 ; absolute external ram data
+                                     31 ;--------------------------------------------------------
+                                     32 	.area _DABS (ABS)
+                                     33 ;--------------------------------------------------------
+                                     34 ; global & static initialisations
+                                     35 ;--------------------------------------------------------
+                                     36 	.area _HOME
+                                     37 	.area _GSINIT
+                                     38 	.area _GSFINAL
+                                     39 	.area _GSINIT
+                                     40 ;/tmp/_gbsbuild/src/states/PointNClick.c:13: UBYTE last_hit_trigger = MAX_TRIGGERS;
+      000000 21r00r00                41 	ld	hl, #_last_hit_trigger
+      000003 36 1F                   42 	ld	(hl), #0x1f
+                                     43 ;--------------------------------------------------------
+                                     44 ; Home
+                                     45 ;--------------------------------------------------------
+                                     46 	.area _HOME
+                                     47 	.area _HOME
+                                     48 ;--------------------------------------------------------
+                                     49 ; code
+                                     50 ;--------------------------------------------------------
+                                     51 	.area _CODE_5
+                                     52 ;/tmp/_gbsbuild/src/states/PointNClick.c:15: void Start_PointNClick() {
+                                     53 ;	---------------------------------
+                                     54 ; Function Start_PointNClick
+                                     55 ; ---------------------------------
+      000000                         56 _Start_PointNClick::
+                                     57 ;/tmp/_gbsbuild/src/states/PointNClick.c:16: camera_offset.x = 0;
+      000000 21r00r00                58 	ld	hl, #_camera_offset
+      000003 36 00                   59 	ld	(hl), #0x00
+                                     60 ;/tmp/_gbsbuild/src/states/PointNClick.c:17: camera_offset.y = 0;
+      000005 21r01r00                61 	ld	hl, #(_camera_offset + 0x0001)
+      000008 36 00                   62 	ld	(hl), #0x00
+                                     63 ;/tmp/_gbsbuild/src/states/PointNClick.c:18: camera_deadzone.x = POINT_N_CLICK_CAMERA_DEADZONE;
+      00000A 21r00r00                64 	ld	hl, #_camera_deadzone
+      00000D 36 18                   65 	ld	(hl), #0x18
+                                     66 ;/tmp/_gbsbuild/src/states/PointNClick.c:19: camera_deadzone.y = POINT_N_CLICK_CAMERA_DEADZONE;
+      00000F 21r01r00                67 	ld	hl, #(_camera_deadzone + 0x0001)
+      000012 36 18                   68 	ld	(hl), #0x18
+                                     69 ;/tmp/_gbsbuild/src/states/PointNClick.c:21: player.sprite_type = SPRITE_STATIC;
+      000014 21r19r00                70 	ld	hl, #(_actors + 0x0019)
+      000017 36 00                   71 	ld	(hl), #0x00
+                                     72 ;/tmp/_gbsbuild/src/states/PointNClick.c:22: player.dir.x = 0;
+      000019 21r05r00                73 	ld	hl, #(_actors + 0x0005)
+      00001C 36 00                   74 	ld	(hl), #0x00
+                                     75 ;/tmp/_gbsbuild/src/states/PointNClick.c:23: player.dir.y = 1;
+      00001E 21r06r00                76 	ld	hl, #(_actors + 0x0006)
+      000021 36 01                   77 	ld	(hl), #0x01
+                                     78 ;/tmp/_gbsbuild/src/states/PointNClick.c:24: player.rerender = TRUE;
+      000023 21r14r00                79 	ld	hl, #(_actors + 0x0014)
+      000026 36 01                   80 	ld	(hl), #0x01
+                                     81 ;/tmp/_gbsbuild/src/states/PointNClick.c:25: }
+      000028 C9                      82 	ret
+                                     83 ;/tmp/_gbsbuild/src/states/PointNClick.c:27: void Update_PointNClick() {
+                                     84 ;	---------------------------------
+                                     85 ; Function Update_PointNClick
+                                     86 ; ---------------------------------
+      000029                         87 _Update_PointNClick::
+      000029 E8 FE                   88 	add	sp, #-2
+                                     89 ;/tmp/_gbsbuild/src/states/PointNClick.c:30: tile_x = DIV_8(player.pos.x);
+      00002B 21r00r00                90 	ld	hl, #_actors
+      00002E 2A                      91 	ld	a, (hl+)
+      00002F 4F                      92 	ld	c, a
+      000030 46                      93 	ld	b, (hl)
+      000031 CB 28                   94 	sra	b
+      000033 CB 19                   95 	rr	c
+      000035 CB 28                   96 	sra	b
+      000037 CB 19                   97 	rr	c
+      000039 CB 28                   98 	sra	b
+      00003B CB 19                   99 	rr	c
+      00003D F8 00                  100 	ldhl	sp,	#0
+      00003F 71                     101 	ld	(hl), c
+                                    102 ;/tmp/_gbsbuild/src/states/PointNClick.c:31: tile_y = DIV_8(player.pos.y);
+      000040 21r02r00               103 	ld	hl, #_actors + 2
+      000043 2A                     104 	ld	a, (hl+)
+      000044 4F                     105 	ld	c, a
+      000045 46                     106 	ld	b, (hl)
+      000046 CB 28                  107 	sra	b
+      000048 CB 19                  108 	rr	c
+      00004A CB 28                  109 	sra	b
+      00004C CB 19                  110 	rr	c
+      00004E CB 28                  111 	sra	b
+      000050 CB 19                  112 	rr	c
+      000052 F8 01                  113 	ldhl	sp,	#1
+      000054 71                     114 	ld	(hl), c
+                                    115 ;/tmp/_gbsbuild/src/states/PointNClick.c:33: player.moving = FALSE;
+      000055 21r07r00               116 	ld	hl, #(_actors + 0x0007)
+      000058 36 00                  117 	ld	(hl), #0x00
+                                    118 ;/tmp/_gbsbuild/src/states/PointNClick.c:34: player.dir.x = 0;
+      00005A 21r05r00               119 	ld	hl, #(_actors + 0x0005)
+      00005D 36 00                  120 	ld	(hl), #0x00
+                                    121 ;/tmp/_gbsbuild/src/states/PointNClick.c:35: player.dir.y = 0;
+      00005F 21r06r00               122 	ld	hl, #(_actors + 0x0006)
+      000062 36 00                  123 	ld	(hl), #0x00
+                                    124 ;/tmp/_gbsbuild/src/states/PointNClick.c:38: if (INPUT_LEFT && Gt16(player.pos.x, 0)) {
+      000064 FAr00r00               125 	ld	a, (#_ui_block)
+      000067 B7                     126 	or	a, a
+      000068 20 07                  127 	jr	NZ, 00110$
+      00006A 21r00r00               128 	ld	hl, #_input_override_default
+      00006D CB 4E                  129 	bit	1, (hl)
+      00006F 20 27                  130 	jr	NZ, 00107$
+      000071                        131 00110$:
+      000071 FAr00r00               132 	ld	a, (#_joy)
+      000074 CB 4F                  133 	bit	1, a
+      000076 28 20                  134 	jr	Z, 00107$
+      000078 21r00r00               135 	ld	hl, #_actors
+      00007B 2A                     136 	ld	a, (hl+)
+      00007C 4F                     137 	ld	c, a
+      00007D 46                     138 	ld	b, (hl)
+      00007E 21 00 00               139 	ld	hl, #0x0000
+      000081 E5                     140 	push	hl
+      000082 C5                     141 	push	bc
+      000083 CDr00r00               142 	call	_Gt16
+      000086 E8 04                  143 	add	sp, #4
+      000088 7B                     144 	ld	a, e
+      000089 B7                     145 	or	a, a
+      00008A 28 0C                  146 	jr	Z, 00107$
+                                    147 ;/tmp/_gbsbuild/src/states/PointNClick.c:39: player.dir.x = -1;
+      00008C 21r05r00               148 	ld	hl, #(_actors + 0x0005)
+      00008F 36 FF                  149 	ld	(hl), #0xff
+                                    150 ;/tmp/_gbsbuild/src/states/PointNClick.c:40: player.moving = TRUE;
+      000091 21r07r00               151 	ld	hl, #(_actors + 0x0007)
+      000094 36 01                  152 	ld	(hl), #0x01
+      000096 18 3A                  153 	jr	00108$
+      000098                        154 00107$:
+                                    155 ;/tmp/_gbsbuild/src/states/PointNClick.c:41: } else if (INPUT_RIGHT && Lt16(player.pos.x, image_width - 8)) {
+      000098 FAr00r00               156 	ld	a, (#_ui_block)
+      00009B B7                     157 	or	a, a
+      00009C 20 07                  158 	jr	NZ, 00104$
+      00009E 21r00r00               159 	ld	hl, #_input_override_default
+      0000A1 CB 46                  160 	bit	0, (hl)
+      0000A3 20 2D                  161 	jr	NZ, 00108$
+      0000A5                        162 00104$:
+      0000A5 FAr00r00               163 	ld	a, (#_joy)
+      0000A8 0F                     164 	rrca
+      0000A9 30 27                  165 	jr	NC, 00108$
+      0000AB 21r00r00               166 	ld	hl, #_image_width
+      0000AE 7E                     167 	ld	a, (hl)
+      0000AF C6 F8                  168 	add	a, #0xf8
+      0000B1 4F                     169 	ld	c, a
+      0000B2 23                     170 	inc	hl
+      0000B3 7E                     171 	ld	a, (hl)
+      0000B4 CE FF                  172 	adc	a, #0xff
+      0000B6 47                     173 	ld	b, a
+      0000B7 21r00r00               174 	ld	hl, #_actors
+      0000BA 2A                     175 	ld	a, (hl+)
+      0000BB 66                     176 	ld	h, (hl)
+      0000BC 6F                     177 	ld	l, a
+      0000BD C5                     178 	push	bc
+      0000BE E5                     179 	push	hl
+      0000BF CDr00r00               180 	call	_Lt16
+      0000C2 E8 04                  181 	add	sp, #4
+      0000C4 7B                     182 	ld	a, e
+      0000C5 B7                     183 	or	a, a
+      0000C6 28 0A                  184 	jr	Z, 00108$
+                                    185 ;/tmp/_gbsbuild/src/states/PointNClick.c:42: player.dir.x = 1;
+      0000C8 21r05r00               186 	ld	hl, #(_actors + 0x0005)
+      0000CB 36 01                  187 	ld	(hl), #0x01
+                                    188 ;/tmp/_gbsbuild/src/states/PointNClick.c:43: player.moving = TRUE;
+      0000CD 21r07r00               189 	ld	hl, #(_actors + 0x0007)
+      0000D0 36 01                  190 	ld	(hl), #0x01
+      0000D2                        191 00108$:
+                                    192 ;/tmp/_gbsbuild/src/states/PointNClick.c:47: if (INPUT_UP && Gt16(player.pos.y, 8)) {
+      0000D2 FAr00r00               193 	ld	a, (#_ui_block)
+      0000D5 B7                     194 	or	a, a
+      0000D6 20 07                  195 	jr	NZ, 00121$
+      0000D8 21r00r00               196 	ld	hl, #_input_override_default
+      0000DB CB 56                  197 	bit	2, (hl)
+      0000DD 20 27                  198 	jr	NZ, 00118$
+      0000DF                        199 00121$:
+      0000DF FAr00r00               200 	ld	a, (#_joy)
+      0000E2 CB 57                  201 	bit	2, a
+      0000E4 28 20                  202 	jr	Z, 00118$
+      0000E6 21r02r00               203 	ld	hl, #(_actors + 0x0002)
+      0000E9 2A                     204 	ld	a, (hl+)
+      0000EA 4F                     205 	ld	c, a
+      0000EB 46                     206 	ld	b, (hl)
+      0000EC 21 08 00               207 	ld	hl, #0x0008
+      0000EF E5                     208 	push	hl
+      0000F0 C5                     209 	push	bc
+      0000F1 CDr00r00               210 	call	_Gt16
+      0000F4 E8 04                  211 	add	sp, #4
+      0000F6 7B                     212 	ld	a, e
+      0000F7 B7                     213 	or	a, a
+      0000F8 28 0C                  214 	jr	Z, 00118$
+                                    215 ;/tmp/_gbsbuild/src/states/PointNClick.c:48: player.dir.y = -1;
+      0000FA 21r06r00               216 	ld	hl, #(_actors + 0x0006)
+      0000FD 36 FF                  217 	ld	(hl), #0xff
+                                    218 ;/tmp/_gbsbuild/src/states/PointNClick.c:49: player.moving = TRUE;
+      0000FF 21r07r00               219 	ld	hl, #(_actors + 0x0007)
+      000102 36 01                  220 	ld	(hl), #0x01
+      000104 18 35                  221 	jr	00119$
+      000106                        222 00118$:
+                                    223 ;/tmp/_gbsbuild/src/states/PointNClick.c:50: } else if (INPUT_DOWN && Lt16(player.pos.y, image_height)) {
+      000106 FAr00r00               224 	ld	a, (#_ui_block)
+      000109 B7                     225 	or	a, a
+      00010A 20 07                  226 	jr	NZ, 00115$
+      00010C 21r00r00               227 	ld	hl, #_input_override_default
+      00010F CB 5E                  228 	bit	3, (hl)
+      000111 20 28                  229 	jr	NZ, 00119$
+      000113                        230 00115$:
+      000113 FAr00r00               231 	ld	a, (#_joy)
+      000116 CB 5F                  232 	bit	3, a
+      000118 28 21                  233 	jr	Z, 00119$
+      00011A 21r02r00               234 	ld	hl, #(_actors + 0x0002)
+      00011D 2A                     235 	ld	a, (hl+)
+      00011E 4F                     236 	ld	c, a
+      00011F 46                     237 	ld	b, (hl)
+      000120 21r00r00               238 	ld	hl, #_image_height
+      000123 2A                     239 	ld	a, (hl+)
+      000124 66                     240 	ld	h, (hl)
+      000125 6F                     241 	ld	l, a
+      000126 E5                     242 	push	hl
+      000127 C5                     243 	push	bc
+      000128 CDr00r00               244 	call	_Lt16
+      00012B E8 04                  245 	add	sp, #4
+      00012D 7B                     246 	ld	a, e
+      00012E B7                     247 	or	a, a
+      00012F 28 0A                  248 	jr	Z, 00119$
+                                    249 ;/tmp/_gbsbuild/src/states/PointNClick.c:51: player.dir.y = 1;
+      000131 21r06r00               250 	ld	hl, #(_actors + 0x0006)
+      000134 36 01                  251 	ld	(hl), #0x01
+                                    252 ;/tmp/_gbsbuild/src/states/PointNClick.c:52: player.moving = TRUE;
+      000136 21r07r00               253 	ld	hl, #(_actors + 0x0007)
+      000139 36 01                  254 	ld	(hl), #0x01
+      00013B                        255 00119$:
+                                    256 ;/tmp/_gbsbuild/src/states/PointNClick.c:56: hit_trigger = TriggerAtTile(tile_x, tile_y - 1);
+      00013B F8 01                  257 	ldhl	sp,	#1
+      00013D 7E                     258 	ld	a, (hl)
+      00013E 3D                     259 	dec	a
+      00013F F5                     260 	push	af
+      000140 33                     261 	inc	sp
+      000141 2B                     262 	dec	hl
+      000142 7E                     263 	ld	a, (hl)
+      000143 F5                     264 	push	af
+      000144 33                     265 	inc	sp
+      000145 CDr00r00               266 	call	_TriggerAtTile
+      000148 E8 02                  267 	add	sp, #2
+      00014A 4B                     268 	ld	c, e
+                                    269 ;/tmp/_gbsbuild/src/states/PointNClick.c:57: hit_actor = ActorAtTile(tile_x, tile_y, TRUE);
+      00014B C5                     270 	push	bc
+      00014C 3E 01                  271 	ld	a, #0x01
+      00014E F5                     272 	push	af
+      00014F 33                     273 	inc	sp
+      000150 F8 04                  274 	ldhl	sp,	#4
+      000152 7E                     275 	ld	a, (hl)
+      000153 F5                     276 	push	af
+      000154 33                     277 	inc	sp
+      000155 2B                     278 	dec	hl
+      000156 7E                     279 	ld	a, (hl)
+      000157 F5                     280 	push	af
+      000158 33                     281 	inc	sp
+      000159 CDr00r00               282 	call	_ActorAtTile
+      00015C E8 03                  283 	add	sp, #3
+      00015E 7B                     284 	ld	a, e
+      00015F C1                     285 	pop	bc
+      000160 47                     286 	ld	b, a
+                                    287 ;/tmp/_gbsbuild/src/states/PointNClick.c:59: is_hover_trigger = (hit_trigger != NO_TRIGGER_COLLISON) && (hit_trigger != last_hit_trigger) &&
+      000161 79                     288 	ld	a, c
+      000162 3C                     289 	inc	a
+      000163 28 1B                  290 	jr	Z, 00147$
+      000165 FAr00r00               291 	ld	a, (#_last_hit_trigger)
+      000168 91                     292 	sub	a, c
+      000169 28 15                  293 	jr	Z, 00147$
+                                    294 ;/tmp/_gbsbuild/src/states/PointNClick.c:60: (triggers[hit_trigger].events_ptr.bank != 0);
+      00016B 59                     295 	ld	e, c
+      00016C 16 00                  296 	ld	d, #0x00
+      00016E 6B                     297 	ld	l, e
+      00016F 62                     298 	ld	h, d
+      000170 29                     299 	add	hl, hl
+      000171 19                     300 	add	hl, de
+      000172 29                     301 	add	hl, hl
+      000173 19                     302 	add	hl, de
+      000174 11r00r00               303 	ld	de, #_triggers
+      000177 19                     304 	add	hl, de
+      000178 23                     305 	inc	hl
+      000179 23                     306 	inc	hl
+      00017A 23                     307 	inc	hl
+      00017B 23                     308 	inc	hl
+      00017C 7E                     309 	ld	a, (hl)
+      00017D B7                     310 	or	a, a
+      00017E 20 03                  311 	jr	NZ, 00148$
+      000180                        312 00147$:
+      000180 AF                     313 	xor	a, a
+      000181 18 02                  314 	jr	00149$
+      000183                        315 00148$:
+      000183 3E 01                  316 	ld	a, #0x01
+      000185                        317 00149$:
+      000185 F8 00                  318 	ldhl	sp,	#0
+      000187 77                     319 	ld	(hl), a
+                                    320 ;/tmp/_gbsbuild/src/states/PointNClick.c:61: is_hover_actor = (hit_actor != NO_ACTOR_COLLISON) && (hit_actor != 0) &&
+      000188 78                     321 	ld	a, b
+      000189 3C                     322 	inc	a
+      00018A 28 1D                  323 	jr	Z, 00153$
+      00018C 78                     324 	ld	a, b
+      00018D B7                     325 	or	a, a
+      00018E 28 19                  326 	jr	Z, 00153$
+                                    327 ;/tmp/_gbsbuild/src/states/PointNClick.c:62: (actors[hit_actor].events_ptr.bank != 0);
+      000190 58                     328 	ld	e, b
+      000191 16 00                  329 	ld	d, #0x00
+      000193 6B                     330 	ld	l, e
+      000194 62                     331 	ld	h, d
+      000195 29                     332 	add	hl, hl
+      000196 29                     333 	add	hl, hl
+      000197 19                     334 	add	hl, de
+      000198 29                     335 	add	hl, hl
+      000199 19                     336 	add	hl, de
+      00019A 29                     337 	add	hl, hl
+      00019B 19                     338 	add	hl, de
+      00019C 29                     339 	add	hl, hl
+      00019D 11r00r00               340 	ld	de, #_actors
+      0001A0 19                     341 	add	hl, de
+      0001A1 11 1E 00               342 	ld	de, #0x001e
+      0001A4 19                     343 	add	hl, de
+      0001A5 7E                     344 	ld	a, (hl)
+      0001A6 B7                     345 	or	a, a
+      0001A7 20 03                  346 	jr	NZ, 00154$
+      0001A9                        347 00153$:
+      0001A9 AF                     348 	xor	a, a
+      0001AA 18 02                  349 	jr	00155$
+      0001AC                        350 00154$:
+      0001AC 3E 01                  351 	ld	a, #0x01
+      0001AE                        352 00155$:
+      0001AE F8 01                  353 	ldhl	sp,	#1
+      0001B0 77                     354 	ld	(hl), a
+                                    355 ;/tmp/_gbsbuild/src/states/PointNClick.c:66: player.frame = 1;
+      0001B1 11r0Fr00               356 	ld	de, #_actors + 15
+                                    357 ;/tmp/_gbsbuild/src/states/PointNClick.c:67: player.rerender = TRUE;
+                                    358 ;/tmp/_gbsbuild/src/states/PointNClick.c:65: if ((is_hover_trigger || is_hover_actor) && player.frames_len != 1) {
+      0001B4 2B                     359 	dec	hl
+      0001B5 7E                     360 	ld	a, (hl)
+      0001B6 B7                     361 	or	a, a
+      0001B7 20 05                  362 	jr	NZ, 00127$
+      0001B9 23                     363 	inc	hl
+      0001BA 7E                     364 	ld	a, (hl)
+      0001BB B7                     365 	or	a, a
+      0001BC 28 10                  366 	jr	Z, 00124$
+      0001BE                        367 00127$:
+      0001BE FAr10r00               368 	ld	a, (#_actors + 16)
+      0001C1 3D                     369 	dec	a
+      0001C2 28 0A                  370 	jr	Z, 00124$
+                                    371 ;/tmp/_gbsbuild/src/states/PointNClick.c:66: player.frame = 1;
+      0001C4 3E 01                  372 	ld	a, #0x01
+      0001C6 12                     373 	ld	(de), a
+                                    374 ;/tmp/_gbsbuild/src/states/PointNClick.c:67: player.rerender = TRUE;
+      0001C7 21r14r00               375 	ld	hl, #(_actors + 0x0014)
+      0001CA 36 01                  376 	ld	(hl), #0x01
+      0001CC 18 07                  377 	jr	00125$
+      0001CE                        378 00124$:
+                                    379 ;/tmp/_gbsbuild/src/states/PointNClick.c:69: player.frame = 0;
+      0001CE AF                     380 	xor	a, a
+      0001CF 12                     381 	ld	(de), a
+                                    382 ;/tmp/_gbsbuild/src/states/PointNClick.c:70: player.rerender = TRUE;
+      0001D0 21r14r00               383 	ld	hl, #(_actors + 0x0014)
+      0001D3 36 01                  384 	ld	(hl), #0x01
+      0001D5                        385 00125$:
+                                    386 ;/tmp/_gbsbuild/src/states/PointNClick.c:73: if (INPUT_A_PRESSED) {
+      0001D5 FAr00r00               387 	ld	a, (#_ui_block)
+      0001D8 B7                     388 	or	a, a
+      0001D9 20 07                  389 	jr	NZ, 00137$
+      0001DB 21r00r00               390 	ld	hl, #_input_override_default
+      0001DE CB 66                  391 	bit	4, (hl)
+      0001E0 20 2E                  392 	jr	NZ, 00134$
+      0001E2                        393 00137$:
+      0001E2 FAr00r00               394 	ld	a, (#_joy)
+      0001E5 CB 67                  395 	bit	4, a
+      0001E7 28 27                  396 	jr	Z, 00134$
+      0001E9 FAr00r00               397 	ld	a, (#_last_joy)
+      0001EC CB 67                  398 	bit	4, a
+      0001EE 20 20                  399 	jr	NZ, 00134$
+                                    400 ;/tmp/_gbsbuild/src/states/PointNClick.c:74: player.moving = FALSE;
+      0001F0 21r07r00               401 	ld	hl, #(_actors + 0x0007)
+      0001F3 36 00                  402 	ld	(hl), #0x00
+                                    403 ;/tmp/_gbsbuild/src/states/PointNClick.c:76: if (is_hover_actor) {
+      0001F5 F8 01                  404 	ldhl	sp,	#1
+      0001F7 7E                     405 	ld	a, (hl)
+      0001F8 B7                     406 	or	a, a
+      0001F9 28 08                  407 	jr	Z, 00131$
+                                    408 ;/tmp/_gbsbuild/src/states/PointNClick.c:78: ActorRunScript(hit_actor);
+      0001FB C5                     409 	push	bc
+      0001FC 33                     410 	inc	sp
+      0001FD CDr00r00               411 	call	_ActorRunScript
+      000200 33                     412 	inc	sp
+      000201 18 0D                  413 	jr	00134$
+      000203                        414 00131$:
+                                    415 ;/tmp/_gbsbuild/src/states/PointNClick.c:79: } else if (is_hover_trigger) {
+      000203 F8 00                  416 	ldhl	sp,	#0
+      000205 7E                     417 	ld	a, (hl)
+      000206 B7                     418 	or	a, a
+      000207 28 07                  419 	jr	Z, 00134$
+                                    420 ;/tmp/_gbsbuild/src/states/PointNClick.c:81: TriggerRunScript(hit_trigger);
+      000209 79                     421 	ld	a, c
+      00020A F5                     422 	push	af
+      00020B 33                     423 	inc	sp
+      00020C CDr00r00               424 	call	_TriggerRunScript
+      00020F 33                     425 	inc	sp
+      000210                        426 00134$:
+                                    427 ;/tmp/_gbsbuild/src/states/PointNClick.c:86: if (player.moving) {
+      000210 FAr07r00               428 	ld	a, (#(_actors + 0x0007) + 0)
+      000213 B7                     429 	or	a, a
+      000214 CAr9Fr02               430 	jp	Z, 00145$
+                                    431 ;/tmp/_gbsbuild/src/states/PointNClick.c:87: if (player.move_speed == 0) {
+      000217 21r04r00               432 	ld	hl, #(_actors + 0x0004)
+      00021A 4E                     433 	ld	c, (hl)
+      00021B 79                     434 	ld	a, c
+      00021C B7                     435 	or	a, a
+      00021D 20 3A                  436 	jr	NZ, 00141$
+                                    437 ;/tmp/_gbsbuild/src/states/PointNClick.c:89: if (IS_FRAME_2) {
+      00021F FAr00r00               438 	ld	a, (#_game_time)
+      000222 0F                     439 	rrca
+      000223 38 7A                  440 	jr	C, 00145$
+                                    441 ;/tmp/_gbsbuild/src/states/PointNClick.c:90: player.pos.x += (WORD)player.dir.x;
+      000225 21r00r00               442 	ld	hl, #_actors
+      000228 2A                     443 	ld	a, (hl+)
+      000229 4F                     444 	ld	c, a
+      00022A 46                     445 	ld	b, (hl)
+      00022B FAr05r00               446 	ld	a, (#(_actors + 0x0005) + 0)
+      00022E 5F                     447 	ld	e, a
+      00022F 17                     448 	rla
+      000230 9F                     449 	sbc	a, a
+      000231 57                     450 	ld	d, a
+      000232 79                     451 	ld	a, c
+      000233 83                     452 	add	a, e
+      000234 4F                     453 	ld	c, a
+      000235 78                     454 	ld	a, b
+      000236 8A                     455 	adc	a, d
+      000237 47                     456 	ld	b, a
+      000238 21r00r00               457 	ld	hl, #_actors
+      00023B 79                     458 	ld	a, c
+      00023C 22                     459 	ld	(hl+), a
+      00023D 70                     460 	ld	(hl), b
+                                    461 ;/tmp/_gbsbuild/src/states/PointNClick.c:91: player.pos.y += (WORD)player.dir.y;
+      00023E 21r02r00               462 	ld	hl, #(_actors + 0x0002)
+      000241 2A                     463 	ld	a, (hl+)
+      000242 4F                     464 	ld	c, a
+      000243 46                     465 	ld	b, (hl)
+      000244 FAr06r00               466 	ld	a, (#(_actors + 0x0006) + 0)
+      000247 5F                     467 	ld	e, a
+      000248 17                     468 	rla
+      000249 9F                     469 	sbc	a, a
+      00024A 57                     470 	ld	d, a
+      00024B 79                     471 	ld	a, c
+      00024C 83                     472 	add	a, e
+      00024D 4F                     473 	ld	c, a
+      00024E 78                     474 	ld	a, b
+      00024F 8A                     475 	adc	a, d
+      000250 47                     476 	ld	b, a
+      000251 21r02r00               477 	ld	hl, #(_actors + 0x0002)
+      000254 79                     478 	ld	a, c
+      000255 22                     479 	ld	(hl+), a
+      000256 70                     480 	ld	(hl), b
+      000257 18 46                  481 	jr	00145$
+      000259                        482 00141$:
+                                    483 ;/tmp/_gbsbuild/src/states/PointNClick.c:94: player.pos.x += (WORD)(player.dir.x * player.move_speed);
+      000259 11r00r00               484 	ld	de, #_actors
+      00025C 1A                     485 	ld	a, (de)
+      00025D F8 00                  486 	ldhl	sp,	#0
+      00025F 22                     487 	ld	(hl+), a
+      000260 13                     488 	inc	de
+      000261 1A                     489 	ld	a, (de)
+      000262 77                     490 	ld	(hl), a
+      000263 FAr05r00               491 	ld	a, (#(_actors + 0x0005) + 0)
+      000266 61                     492 	ld	h, c
+      000267 E5                     493 	push	hl
+      000268 33                     494 	inc	sp
+      000269 F5                     495 	push	af
+      00026A 33                     496 	inc	sp
+      00026B CDr00r00               497 	call	__muluschar
+      00026E E8 02                  498 	add	sp, #2
+                                    499 ;c
+      000270 E1                     500 	pop	hl
+      000271 E5                     501 	push	hl
+      000272 19                     502 	add	hl, de
+      000273 4D                     503 	ld	c, l
+      000274 44                     504 	ld	b, h
+      000275 21r00r00               505 	ld	hl, #_actors
+      000278 79                     506 	ld	a, c
+      000279 22                     507 	ld	(hl+), a
+      00027A 70                     508 	ld	(hl), b
+                                    509 ;/tmp/_gbsbuild/src/states/PointNClick.c:95: player.pos.y += (WORD)(player.dir.y * player.move_speed);
+      00027B 21r02r00               510 	ld	hl, #(_actors + 0x0002)
+      00027E 2A                     511 	ld	a, (hl+)
+      00027F 4F                     512 	ld	c, a
+      000280 46                     513 	ld	b, (hl)
+      000281 FAr06r00               514 	ld	a, (#(_actors + 0x0006) + 0)
+      000284 21r04r00               515 	ld	hl, #(_actors + 0x0004)
+      000287 66                     516 	ld	h, (hl)
+      000288 C5                     517 	push	bc
+      000289 E5                     518 	push	hl
+      00028A 33                     519 	inc	sp
+      00028B F5                     520 	push	af
+      00028C 33                     521 	inc	sp
+      00028D CDr00r00               522 	call	__muluschar
+      000290 E8 02                  523 	add	sp, #2
+      000292 C1                     524 	pop	bc
+      000293 7B                     525 	ld	a, e
+      000294 81                     526 	add	a, c
+      000295 4F                     527 	ld	c, a
+      000296 7A                     528 	ld	a, d
+      000297 88                     529 	adc	a, b
+      000298 47                     530 	ld	b, a
+      000299 21r02r00               531 	ld	hl, #(_actors + 0x0002)
+      00029C 79                     532 	ld	a, c
+      00029D 22                     533 	ld	(hl+), a
+      00029E 70                     534 	ld	(hl), b
+      00029F                        535 00145$:
+                                    536 ;/tmp/_gbsbuild/src/states/PointNClick.c:98: }
+      00029F E8 02                  537 	add	sp, #2
+      0002A1 C9                     538 	ret
+                                    539 	.area _CODE_5
+                                    540 	.area _CABS (ABS)

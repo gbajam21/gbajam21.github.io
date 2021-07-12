@@ -1,0 +1,299 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module MusicManager
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _gbt_update
+                                     12 	.globl _gbt_loop
+                                     13 	.globl _gbt_stop
+                                     14 	.globl _gbt_play
+                                     15 	.globl _PopBank
+                                     16 	.globl _PushBank
+                                     17 	.globl _ReadBankedUBYTE
+                                     18 	.globl _tone_frames
+                                     19 	.globl _current_index
+                                     20 	.globl _MusicPlay
+                                     21 	.globl _MusicStop
+                                     22 	.globl _MusicUpdate
+                                     23 	.globl _SoundPlayTone
+                                     24 	.globl _SoundStopTone
+                                     25 	.globl _SoundPlayBeep
+                                     26 	.globl _SoundPlayCrash
+                                     27 ;--------------------------------------------------------
+                                     28 ; special function registers
+                                     29 ;--------------------------------------------------------
+                                     30 ;--------------------------------------------------------
+                                     31 ; ram data
+                                     32 ;--------------------------------------------------------
+                                     33 	.area _DATA
+      000000                         34 _current_index::
+      000000                         35 	.ds 1
+      000001                         36 _tone_frames::
+      000001                         37 	.ds 1
+                                     38 ;--------------------------------------------------------
+                                     39 ; absolute external ram data
+                                     40 ;--------------------------------------------------------
+                                     41 	.area _DABS (ABS)
+                                     42 ;--------------------------------------------------------
+                                     43 ; global & static initialisations
+                                     44 ;--------------------------------------------------------
+                                     45 	.area _HOME
+                                     46 	.area _GSINIT
+                                     47 	.area _GSFINAL
+                                     48 	.area _GSINIT
+                                     49 ;/tmp/_gbsbuild/src/core/MusicManager.c:10: UBYTE current_index = MAX_MUSIC;
+      000000 21r00r00                50 	ld	hl, #_current_index
+      000003 36 FF                   51 	ld	(hl), #0xff
+                                     52 ;/tmp/_gbsbuild/src/core/MusicManager.c:11: UBYTE tone_frames = 0;
+      000005 21r01r00                53 	ld	hl, #_tone_frames
+      000008 36 00                   54 	ld	(hl), #0x00
+                                     55 ;--------------------------------------------------------
+                                     56 ; Home
+                                     57 ;--------------------------------------------------------
+                                     58 	.area _HOME
+                                     59 	.area _HOME
+                                     60 ;--------------------------------------------------------
+                                     61 ; code
+                                     62 ;--------------------------------------------------------
+                                     63 	.area _CODE
+                                     64 ;/tmp/_gbsbuild/src/core/MusicManager.c:13: void MusicPlay(UBYTE index, UBYTE loop, UBYTE return_bank) {
+                                     65 ;	---------------------------------
+                                     66 ; Function MusicPlay
+                                     67 ; ---------------------------------
+      000000                         68 _MusicPlay::
+                                     69 ;/tmp/_gbsbuild/src/core/MusicManager.c:16: if (index != current_index) {
+      000000 F8 02                   70 	ldhl	sp,	#2
+      000002 7E                      71 	ld	a, (hl)
+      000003 21r00r00                72 	ld	hl, #_current_index
+      000006 96                      73 	sub	a, (hl)
+      000007 C8                      74 	ret	Z
+                                     75 ;/tmp/_gbsbuild/src/core/MusicManager.c:17: current_index = index;
+      000008 F8 02                   76 	ldhl	sp,	#2
+      00000A 4E                      77 	ld	c, (hl)
+      00000B 21r00r00                78 	ld	hl, #_current_index
+      00000E 71                      79 	ld	(hl), c
+                                     80 ;/tmp/_gbsbuild/src/core/MusicManager.c:18: music_bank = ReadBankedUBYTE(DATA_PTRS_BANK, &music_banks[index]);
+      00000F 11r00r00                81 	ld	de, #_music_banks+0
+      000012 69                      82 	ld	l, c
+      000013 26 00                   83 	ld	h, #0x00
+      000015 19                      84 	add	hl, de
+      000016 C5                      85 	push	bc
+      000017 E5                      86 	push	hl
+      000018 3E 05                   87 	ld	a, #0x05
+      00001A F5                      88 	push	af
+      00001B 33                      89 	inc	sp
+      00001C CDr00r00                90 	call	_ReadBankedUBYTE
+      00001F E8 03                   91 	add	sp, #3
+      000021 7B                      92 	ld	a, e
+      000022 C1                      93 	pop	bc
+      000023 47                      94 	ld	b, a
+                                     95 ;/tmp/_gbsbuild/src/core/MusicManager.c:20: PUSH_BANK(DATA_PTRS_BANK);
+      000024 C5                      96 	push	bc
+      000025 3E 05                   97 	ld	a, #0x05
+      000027 F5                      98 	push	af
+      000028 33                      99 	inc	sp
+      000029 CDr00r00               100 	call	_PushBank
+      00002C 33                     101 	inc	sp
+      00002D C1                     102 	pop	bc
+                                    103 ;/tmp/_gbsbuild/src/core/MusicManager.c:21: gbt_play((void*)music_tracks[index], music_bank, 7);
+      00002E 11r00r00               104 	ld	de, #_music_tracks+0
+      000031 69                     105 	ld	l, c
+      000032 26 00                  106 	ld	h, #0x00
+      000034 29                     107 	add	hl, hl
+      000035 19                     108 	add	hl, de
+      000036 2A                     109 	ld	a, (hl+)
+      000037 4F                     110 	ld	c, a
+      000038 6E                     111 	ld	l, (hl)
+      000039 3E 07                  112 	ld	a, #0x07
+      00003B F5                     113 	push	af
+      00003C 33                     114 	inc	sp
+      00003D C5                     115 	push	bc
+      00003E 45                     116 	ld	b, l
+      00003F 33                     117 	inc	sp
+      000040 C5                     118 	push	bc
+      000041 CDr00r00               119 	call	_gbt_play
+      000044 E8 04                  120 	add	sp, #4
+                                    121 ;/tmp/_gbsbuild/src/core/MusicManager.c:22: gbt_loop(loop);
+      000046 F8 03                  122 	ldhl	sp,	#3
+      000048 7E                     123 	ld	a, (hl)
+      000049 F5                     124 	push	af
+      00004A 33                     125 	inc	sp
+      00004B CDr00r00               126 	call	_gbt_loop
+      00004E 33                     127 	inc	sp
+                                    128 ;/tmp/_gbsbuild/src/core/MusicManager.c:23: POP_BANK;
+      00004F CDr00r00               129 	call	_PopBank
+                                    130 ;/tmp/_gbsbuild/src/core/MusicManager.c:24: SWITCH_ROM(return_bank);
+      000052 F8 04                  131 	ldhl	sp,	#4
+      000054 7E                     132 	ld	a, (hl)
+      000055 E0r00                  133 	ldh	(__current_bank+0),a
+      000057 11 00 20               134 	ld	de, #0x2000
+      00005A 7E                     135 	ld	a, (hl)
+      00005B 12                     136 	ld	(de), a
+                                    137 ;/tmp/_gbsbuild/src/core/MusicManager.c:26: }
+      00005C C9                     138 	ret
+                                    139 ;/tmp/_gbsbuild/src/core/MusicManager.c:28: void MusicStop(UBYTE return_bank) {
+                                    140 ;	---------------------------------
+                                    141 ; Function MusicStop
+                                    142 ; ---------------------------------
+      00005D                        143 _MusicStop::
+                                    144 ;/tmp/_gbsbuild/src/core/MusicManager.c:29: gbt_stop();
+      00005D CDr00r00               145 	call	_gbt_stop
+                                    146 ;/tmp/_gbsbuild/src/core/MusicManager.c:30: current_index = MAX_MUSIC;
+      000060 21r00r00               147 	ld	hl, #_current_index
+      000063 36 FF                  148 	ld	(hl), #0xff
+                                    149 ;/tmp/_gbsbuild/src/core/MusicManager.c:31: SWITCH_ROM(return_bank);
+      000065 F8 02                  150 	ldhl	sp,	#2
+      000067 7E                     151 	ld	a, (hl)
+      000068 E0r00                  152 	ldh	(__current_bank+0),a
+      00006A 11 00 20               153 	ld	de, #0x2000
+      00006D 7E                     154 	ld	a, (hl)
+      00006E 12                     155 	ld	(de), a
+                                    156 ;/tmp/_gbsbuild/src/core/MusicManager.c:32: }
+      00006F C9                     157 	ret
+                                    158 ;/tmp/_gbsbuild/src/core/MusicManager.c:34: void MusicUpdate() {
+                                    159 ;	---------------------------------
+                                    160 ; Function MusicUpdate
+                                    161 ; ---------------------------------
+      000070                        162 _MusicUpdate::
+                                    163 ;/tmp/_gbsbuild/src/core/MusicManager.c:35: UINT8 _bank = _current_bank;
+      000070 F0r00                  164 	ldh	a, (__current_bank+0)
+      000072 4F                     165 	ld	c, a
+                                    166 ;/tmp/_gbsbuild/src/core/MusicManager.c:36: gbt_update();
+      000073 C5                     167 	push	bc
+      000074 CDr00r00               168 	call	_gbt_update
+      000077 C1                     169 	pop	bc
+                                    170 ;/tmp/_gbsbuild/src/core/MusicManager.c:37: SWITCH_ROM(_bank);
+      000078 79                     171 	ld	a, c
+      000079 E0r00                  172 	ldh	(__current_bank+0),a
+      00007B 21 00 20               173 	ld	hl, #0x2000
+      00007E 71                     174 	ld	(hl), c
+                                    175 ;/tmp/_gbsbuild/src/core/MusicManager.c:39: if (tone_frames != 0) {
+      00007F 21r01r00               176 	ld	hl, #_tone_frames
+      000082 7E                     177 	ld	a, (hl)
+      000083 B7                     178 	or	a, a
+      000084 C8                     179 	ret	Z
+                                    180 ;/tmp/_gbsbuild/src/core/MusicManager.c:40: tone_frames--;
+                                    181 ;/tmp/_gbsbuild/src/core/MusicManager.c:41: if (tone_frames == 0) {
+      000085 35                     182 	dec	(hl)
+      000086 7E                     183 	ld	a, (hl)
+      000087 C0                     184 	ret	NZ
+                                    185 ;/tmp/_gbsbuild/src/core/MusicManager.c:42: SoundStopTone();
+                                    186 ;/tmp/_gbsbuild/src/core/MusicManager.c:45: }
+      000088 C3rB9r00               187 	jp  _SoundStopTone
+                                    188 ;/tmp/_gbsbuild/src/core/MusicManager.c:47: void SoundPlayTone(UWORD tone, UBYTE frames) {
+                                    189 ;	---------------------------------
+                                    190 ; Function SoundPlayTone
+                                    191 ; ---------------------------------
+      00008B                        192 _SoundPlayTone::
+                                    193 ;/tmp/_gbsbuild/src/core/MusicManager.c:48: tone_frames = frames;
+      00008B F8 04                  194 	ldhl	sp,	#4
+      00008D 7E                     195 	ld	a, (hl)
+      00008E EAr01r00               196 	ld	(#_tone_frames),a
+                                    197 ;/tmp/_gbsbuild/src/core/MusicManager.c:51: NR52_REG = 0x80;
+      000091 3E 80                  198 	ld	a, #0x80
+      000093 E0r00                  199 	ldh	(_NR52_REG+0),a
+                                    200 ;/tmp/_gbsbuild/src/core/MusicManager.c:54: NR10_REG = 0x00;
+      000095 3E 00                  201 	ld	a, #0x00
+      000097 E0r00                  202 	ldh	(_NR10_REG+0),a
+                                    203 ;/tmp/_gbsbuild/src/core/MusicManager.c:55: NR11_REG = (0x0U << 6U) | 0x01U;
+      000099 3E 01                  204 	ld	a, #0x01
+      00009B E0r00                  205 	ldh	(_NR11_REG+0),a
+                                    206 ;/tmp/_gbsbuild/src/core/MusicManager.c:56: NR12_REG = (0x0FU << 4U) | 0x00U;
+      00009D 3E F0                  207 	ld	a, #0xf0
+      00009F E0r00                  208 	ldh	(_NR12_REG+0),a
+                                    209 ;/tmp/_gbsbuild/src/core/MusicManager.c:57: NR13_REG = (tone & 0x00FF);
+      0000A1 F8 02                  210 	ldhl	sp,	#2
+      0000A3 7E                     211 	ld	a, (hl)
+      0000A4 E0r00                  212 	ldh	(_NR13_REG+0),a
+                                    213 ;/tmp/_gbsbuild/src/core/MusicManager.c:58: NR14_REG = 0x80 | ((tone & 0x0700) >> 8U);
+      0000A6 23                     214 	inc	hl
+      0000A7 7E                     215 	ld	a, (hl)
+      0000A8 E6 07                  216 	and	a, #0x07
+      0000AA F6 80                  217 	or	a, #0x80
+      0000AC E0r00                  218 	ldh	(_NR14_REG+0),a
+                                    219 ;/tmp/_gbsbuild/src/core/MusicManager.c:61: NR50_REG = 0x77;
+      0000AE 3E 77                  220 	ld	a, #0x77
+      0000B0 E0r00                  221 	ldh	(_NR50_REG+0),a
+                                    222 ;/tmp/_gbsbuild/src/core/MusicManager.c:64: NR51_REG |= 0x11;
+      0000B2 F0r00                  223 	ldh	a, (_NR51_REG+0)
+      0000B4 F6 11                  224 	or	a, #0x11
+      0000B6 E0r00                  225 	ldh	(_NR51_REG+0),a
+                                    226 ;/tmp/_gbsbuild/src/core/MusicManager.c:65: }
+      0000B8 C9                     227 	ret
+                                    228 ;/tmp/_gbsbuild/src/core/MusicManager.c:67: void SoundStopTone() {
+                                    229 ;	---------------------------------
+                                    230 ; Function SoundStopTone
+                                    231 ; ---------------------------------
+      0000B9                        232 _SoundStopTone::
+                                    233 ;/tmp/_gbsbuild/src/core/MusicManager.c:69: NR12_REG = 0x00;
+      0000B9 3E 00                  234 	ld	a, #0x00
+      0000BB E0r00                  235 	ldh	(_NR12_REG+0),a
+                                    236 ;/tmp/_gbsbuild/src/core/MusicManager.c:70: }
+      0000BD C9                     237 	ret
+                                    238 ;/tmp/_gbsbuild/src/core/MusicManager.c:72: void SoundPlayBeep(UBYTE pitch) {
+                                    239 ;	---------------------------------
+                                    240 ; Function SoundPlayBeep
+                                    241 ; ---------------------------------
+      0000BE                        242 _SoundPlayBeep::
+                                    243 ;/tmp/_gbsbuild/src/core/MusicManager.c:74: NR52_REG = 0x80;
+      0000BE 3E 80                  244 	ld	a, #0x80
+      0000C0 E0r00                  245 	ldh	(_NR52_REG+0),a
+                                    246 ;/tmp/_gbsbuild/src/core/MusicManager.c:77: NR41_REG = 0x01;
+      0000C2 3E 01                  247 	ld	a, #0x01
+      0000C4 E0r00                  248 	ldh	(_NR41_REG+0),a
+                                    249 ;/tmp/_gbsbuild/src/core/MusicManager.c:78: NR42_REG = (0x0FU << 4U);
+      0000C6 3E F0                  250 	ld	a, #0xf0
+      0000C8 E0r00                  251 	ldh	(_NR42_REG+0),a
+                                    252 ;/tmp/_gbsbuild/src/core/MusicManager.c:79: NR43_REG = 0x20 | 0x08 | pitch;
+      0000CA F8 02                  253 	ldhl	sp,	#2
+      0000CC 7E                     254 	ld	a, (hl)
+      0000CD F6 28                  255 	or	a, #0x28
+      0000CF E0r00                  256 	ldh	(_NR43_REG+0),a
+                                    257 ;/tmp/_gbsbuild/src/core/MusicManager.c:80: NR44_REG = 0x80 | 0x40;
+      0000D1 3E C0                  258 	ld	a, #0xc0
+      0000D3 E0r00                  259 	ldh	(_NR44_REG+0),a
+                                    260 ;/tmp/_gbsbuild/src/core/MusicManager.c:83: NR50_REG = 0x77;
+      0000D5 3E 77                  261 	ld	a, #0x77
+      0000D7 E0r00                  262 	ldh	(_NR50_REG+0),a
+                                    263 ;/tmp/_gbsbuild/src/core/MusicManager.c:86: NR51_REG |= 0x88;
+      0000D9 F0r00                  264 	ldh	a, (_NR51_REG+0)
+      0000DB F6 88                  265 	or	a, #0x88
+      0000DD E0r00                  266 	ldh	(_NR51_REG+0),a
+                                    267 ;/tmp/_gbsbuild/src/core/MusicManager.c:89: }
+      0000DF C9                     268 	ret
+                                    269 ;/tmp/_gbsbuild/src/core/MusicManager.c:91: void SoundPlayCrash() {
+                                    270 ;	---------------------------------
+                                    271 ; Function SoundPlayCrash
+                                    272 ; ---------------------------------
+      0000E0                        273 _SoundPlayCrash::
+                                    274 ;/tmp/_gbsbuild/src/core/MusicManager.c:93: NR52_REG = 0x80;
+      0000E0 3E 80                  275 	ld	a, #0x80
+      0000E2 E0r00                  276 	ldh	(_NR52_REG+0),a
+                                    277 ;/tmp/_gbsbuild/src/core/MusicManager.c:96: NR41_REG = 0x01;
+      0000E4 3E 01                  278 	ld	a, #0x01
+      0000E6 E0r00                  279 	ldh	(_NR41_REG+0),a
+                                    280 ;/tmp/_gbsbuild/src/core/MusicManager.c:97: NR42_REG = (0x0FU << 4U) | 0x02U;
+      0000E8 3E F2                  281 	ld	a, #0xf2
+      0000EA E0r00                  282 	ldh	(_NR42_REG+0),a
+                                    283 ;/tmp/_gbsbuild/src/core/MusicManager.c:98: NR43_REG = 0x13;
+      0000EC 3E 13                  284 	ld	a, #0x13
+      0000EE E0r00                  285 	ldh	(_NR43_REG+0),a
+                                    286 ;/tmp/_gbsbuild/src/core/MusicManager.c:99: NR44_REG = 0x80;
+      0000F0 3E 80                  287 	ld	a, #0x80
+      0000F2 E0r00                  288 	ldh	(_NR44_REG+0),a
+                                    289 ;/tmp/_gbsbuild/src/core/MusicManager.c:102: NR50_REG = 0x77;
+      0000F4 3E 77                  290 	ld	a, #0x77
+      0000F6 E0r00                  291 	ldh	(_NR50_REG+0),a
+                                    292 ;/tmp/_gbsbuild/src/core/MusicManager.c:105: NR51_REG |= 0x88;
+      0000F8 F0r00                  293 	ldh	a, (_NR51_REG+0)
+      0000FA F6 88                  294 	or	a, #0x88
+      0000FC E0r00                  295 	ldh	(_NR51_REG+0),a
+                                    296 ;/tmp/_gbsbuild/src/core/MusicManager.c:108: }
+      0000FE C9                     297 	ret
+                                    298 	.area _CODE
+                                    299 	.area _CABS (ABS)

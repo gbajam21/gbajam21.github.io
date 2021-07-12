@@ -1,0 +1,3126 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Projectiles_b
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_ProjectileLaunch_b
+                                     12 	.globl _ProjectileLaunch_b
+                                     13 	.globl b_WeaponAttack_b
+                                     14 	.globl _WeaponAttack_b
+                                     15 	.globl b_ProjectilesInit_b
+                                     16 	.globl _ProjectilesInit_b
+                                     17 	.globl _ScriptStartBg
+                                     18 	.globl _SpritePoolNext
+                                     19 	.globl _current_projectile
+                                     20 	.globl _projectiles
+                                     21 	.globl b_UpdateProjectiles_b
+                                     22 	.globl _UpdateProjectiles_b
+                                     23 ;--------------------------------------------------------
+                                     24 ; special function registers
+                                     25 ;--------------------------------------------------------
+                                     26 ;--------------------------------------------------------
+                                     27 ; ram data
+                                     28 ;--------------------------------------------------------
+                                     29 	.area _DATA
+      000000                         30 _projectiles::
+      000000                         31 	.ds 115
+      000073                         32 _current_projectile::
+      000073                         33 	.ds 1
+                                     34 ;--------------------------------------------------------
+                                     35 ; absolute external ram data
+                                     36 ;--------------------------------------------------------
+                                     37 	.area _DABS (ABS)
+                                     38 ;--------------------------------------------------------
+                                     39 ; global & static initialisations
+                                     40 ;--------------------------------------------------------
+                                     41 	.area _HOME
+                                     42 	.area _GSINIT
+                                     43 	.area _GSFINAL
+                                     44 	.area _GSINIT
+                                     45 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:18: UBYTE current_projectile = 0;
+      000000 21r73r00                46 	ld	hl, #_current_projectile
+      000003 36 00                   47 	ld	(hl), #0x00
+                                     48 ;--------------------------------------------------------
+                                     49 ; Home
+                                     50 ;--------------------------------------------------------
+                                     51 	.area _HOME
+                                     52 	.area _HOME
+                                     53 ;--------------------------------------------------------
+                                     54 ; code
+                                     55 ;--------------------------------------------------------
+                                     56 	.area _CODE_1
+                                     57 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:20: void ProjectilesInit_b() __banked {
+                                     58 ;	---------------------------------
+                                     59 ; Function ProjectilesInit_b
+                                     60 ; ---------------------------------
+                           000001    61 	b_ProjectilesInit_b	= 1
+      000000                         62 _ProjectilesInit_b::
+      000000 3B                      63 	dec	sp
+                                     64 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:22: for (i = 0; i != MAX_PROJECTILES; i++) {
+      000001 AF                      65 	xor	a, a
+      000002 F8 00                   66 	ldhl	sp,	#0
+      000004 77                      67 	ld	(hl), a
+      000005                         68 00102$:
+                                     69 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:23: projectiles[i].sprite_index = SpritePoolNext();
+      000005 F8 00                   70 	ldhl	sp,	#0
+      000007 4E                      71 	ld	c, (hl)
+      000008 06 00                   72 	ld	b, #0x00
+      00000A 69                      73 	ld	l, c
+      00000B 60                      74 	ld	h, b
+      00000C 29                      75 	add	hl, hl
+      00000D 29                      76 	add	hl, hl
+      00000E 09                      77 	add	hl, bc
+      00000F 29                      78 	add	hl, hl
+      000010 09                      79 	add	hl, bc
+      000011 29                      80 	add	hl, hl
+      000012 09                      81 	add	hl, bc
+      000013 7D                      82 	ld	a, l
+      000014 C6r00                   83 	add	a, #<(_projectiles)
+      000016 4F                      84 	ld	c, a
+      000017 7C                      85 	ld	a, h
+      000018 CEs00                   86 	adc	a, #>(_projectiles)
+      00001A 47                      87 	ld	b, a
+      00001B 21 12 00                88 	ld	hl, #0x0012
+      00001E 09                      89 	add	hl, bc
+      00001F 5D                      90 	ld	e, l
+      000020 54                      91 	ld	d, h
+      000021 C5                      92 	push	bc
+      000022 D5                      93 	push	de
+      000023 CDr00r00                94 	call	_SpritePoolNext
+      000026 7B                      95 	ld	a, e
+      000027 D1                      96 	pop	de
+      000028 C1                      97 	pop	bc
+      000029 12                      98 	ld	(de), a
+                                     99 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:24: projectiles[i].life_time = 0;
+      00002A 21 14 00               100 	ld	hl, #0x0014
+      00002D 09                     101 	add	hl, bc
+      00002E 36 00                  102 	ld	(hl), #0x00
+                                    103 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:22: for (i = 0; i != MAX_PROJECTILES; i++) {
+      000030 F8 00                  104 	ldhl	sp,	#0
+      000032 34                     105 	inc	(hl)
+      000033 7E                     106 	ld	a, (hl)
+      000034 D6 05                  107 	sub	a, #0x05
+      000036 20 CD                  108 	jr	NZ, 00102$
+                                    109 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:26: }
+      000038 33                     110 	inc	sp
+      000039 C9                     111 	ret
+                                    112 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:28: void WeaponAttack_b(UBYTE sprite, UBYTE palette, UBYTE actor, UBYTE offset, UBYTE col_group, UBYTE col_mask) __banked {
+                                    113 ;	---------------------------------
+                                    114 ; Function WeaponAttack_b
+                                    115 ; ---------------------------------
+                           000001   116 	b_WeaponAttack_b	= 1
+      00003A                        117 _WeaponAttack_b::
+      00003A E8 FB                  118 	add	sp, #-5
+                                    119 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:29: if (projectiles[current_projectile].life_time == 0) {
+      00003C 21r73r00               120 	ld	hl, #_current_projectile
+      00003F 4E                     121 	ld	c, (hl)
+      000040 06 00                  122 	ld	b, #0x00
+      000042 69                     123 	ld	l, c
+      000043 60                     124 	ld	h, b
+      000044 29                     125 	add	hl, hl
+      000045 29                     126 	add	hl, hl
+      000046 09                     127 	add	hl, bc
+      000047 29                     128 	add	hl, hl
+      000048 09                     129 	add	hl, bc
+      000049 29                     130 	add	hl, hl
+      00004A 09                     131 	add	hl, bc
+      00004B 01r00r00               132 	ld	bc,#_projectiles
+      00004E 09                     133 	add	hl,bc
+      00004F 4D                     134 	ld	c, l
+      000050 44                     135 	ld	b, h
+      000051 21 14 00               136 	ld	hl, #0x0014
+      000054 09                     137 	add	hl, bc
+      000055 7E                     138 	ld	a, (hl)
+      000056 B7                     139 	or	a, a
+      000057 C2r96r03               140 	jp	NZ, 00105$
+                                    141 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:30: projectiles[current_projectile].moving = FALSE;
+      00005A 21 08 00               142 	ld	hl, #0x0008
+      00005D 09                     143 	add	hl, bc
+      00005E 36 00                  144 	ld	(hl), #0x00
+                                    145 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:31: projectiles[current_projectile].dir.x = actors[actor].dir.x;
+      000060 21r73r00               146 	ld	hl, #_current_projectile
+      000063 4E                     147 	ld	c, (hl)
+      000064 06 00                  148 	ld	b, #0x00
+      000066 69                     149 	ld	l, c
+      000067 60                     150 	ld	h, b
+      000068 29                     151 	add	hl, hl
+      000069 29                     152 	add	hl, hl
+      00006A 09                     153 	add	hl, bc
+      00006B 29                     154 	add	hl, hl
+      00006C 09                     155 	add	hl, bc
+      00006D 29                     156 	add	hl, hl
+      00006E 09                     157 	add	hl, bc
+      00006F 01r00r00               158 	ld	bc,#_projectiles
+      000072 09                     159 	add	hl,bc
+      000073 01 06 00               160 	ld	bc, #0x0006
+      000076 09                     161 	add	hl,bc
+      000077 4D                     162 	ld	c, l
+      000078 44                     163 	ld	b, h
+      000079 F8 0D                  164 	ldhl	sp,	#13
+      00007B 5E                     165 	ld	e, (hl)
+      00007C 16 00                  166 	ld	d, #0x00
+      00007E 6B                     167 	ld	l, e
+      00007F 62                     168 	ld	h, d
+      000080 29                     169 	add	hl, hl
+      000081 29                     170 	add	hl, hl
+      000082 19                     171 	add	hl, de
+      000083 29                     172 	add	hl, hl
+      000084 19                     173 	add	hl, de
+      000085 29                     174 	add	hl, hl
+      000086 19                     175 	add	hl, de
+      000087 29                     176 	add	hl, hl
+      000088 E5                     177 	push	hl
+      000089 7D                     178 	ld	a, l
+      00008A F8 03                  179 	ldhl	sp,	#3
+      00008C 77                     180 	ld	(hl), a
+      00008D E1                     181 	pop	hl
+      00008E 7C                     182 	ld	a, h
+      00008F F8 02                  183 	ldhl	sp,	#2
+                                    184 ;c
+      000091 32                     185 	ld	(hl-), a
+      000092 2A                     186 	ld	a, (hl+)
+      000093 5F                     187 	ld	e, a
+      000094 56                     188 	ld	d, (hl)
+      000095 21r00r00               189 	ld	hl, #_actors
+      000098 19                     190 	add	hl, de
+      000099 E5                     191 	push	hl
+      00009A 7D                     192 	ld	a, l
+      00009B F8 05                  193 	ldhl	sp,	#5
+      00009D 77                     194 	ld	(hl), a
+      00009E E1                     195 	pop	hl
+      00009F 7C                     196 	ld	a, h
+      0000A0 F8 04                  197 	ldhl	sp,	#4
+                                    198 ;c
+      0000A2 32                     199 	ld	(hl-), a
+      0000A3 2A                     200 	ld	a, (hl+)
+      0000A4 5F                     201 	ld	e, a
+      0000A5 56                     202 	ld	d, (hl)
+      0000A6 21 05 00               203 	ld	hl, #0x0005
+      0000A9 19                     204 	add	hl, de
+      0000AA 5D                     205 	ld	e, l
+      0000AB 54                     206 	ld	d, h
+      0000AC 1A                     207 	ld	a, (de)
+      0000AD 02                     208 	ld	(bc), a
+                                    209 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:32: projectiles[current_projectile].dir.y = actors[actor].dir.y;
+      0000AE 21r73r00               210 	ld	hl, #_current_projectile
+      0000B1 4E                     211 	ld	c, (hl)
+      0000B2 06 00                  212 	ld	b, #0x00
+      0000B4 69                     213 	ld	l, c
+      0000B5 60                     214 	ld	h, b
+      0000B6 29                     215 	add	hl, hl
+      0000B7 29                     216 	add	hl, hl
+      0000B8 09                     217 	add	hl, bc
+      0000B9 29                     218 	add	hl, hl
+      0000BA 09                     219 	add	hl, bc
+      0000BB 29                     220 	add	hl, hl
+      0000BC 09                     221 	add	hl, bc
+      0000BD 01r00r00               222 	ld	bc,#_projectiles
+      0000C0 09                     223 	add	hl,bc
+      0000C1 01 07 00               224 	ld	bc, #0x0007
+      0000C4 09                     225 	add	hl,bc
+      0000C5 4D                     226 	ld	c, l
+      0000C6 44                     227 	ld	b, h
+                                    228 ;c
+      0000C7 F8 03                  229 	ldhl	sp,#3
+      0000C9 2A                     230 	ld	a, (hl+)
+      0000CA 5F                     231 	ld	e, a
+      0000CB 56                     232 	ld	d, (hl)
+      0000CC 21 06 00               233 	ld	hl, #0x0006
+      0000CF 19                     234 	add	hl, de
+      0000D0 5D                     235 	ld	e, l
+      0000D1 54                     236 	ld	d, h
+      0000D2 1A                     237 	ld	a, (de)
+      0000D3 02                     238 	ld	(bc), a
+                                    239 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:33: projectiles[current_projectile].pin_actor = actor;
+      0000D4 21r73r00               240 	ld	hl, #_current_projectile
+      0000D7 4E                     241 	ld	c, (hl)
+      0000D8 06 00                  242 	ld	b, #0x00
+      0000DA 69                     243 	ld	l, c
+      0000DB 60                     244 	ld	h, b
+      0000DC 29                     245 	add	hl, hl
+      0000DD 29                     246 	add	hl, hl
+      0000DE 09                     247 	add	hl, bc
+      0000DF 29                     248 	add	hl, hl
+      0000E0 09                     249 	add	hl, bc
+      0000E1 29                     250 	add	hl, hl
+      0000E2 09                     251 	add	hl, bc
+      0000E3 01r00r00               252 	ld	bc,#_projectiles
+      0000E6 09                     253 	add	hl,bc
+      0000E7 01 09 00               254 	ld	bc, #0x0009
+      0000EA 09                     255 	add	hl,bc
+      0000EB 4D                     256 	ld	c, l
+      0000EC 44                     257 	ld	b, h
+      0000ED F8 0D                  258 	ldhl	sp,	#13
+      0000EF 7E                     259 	ld	a, (hl)
+      0000F0 02                     260 	ld	(bc), a
+                                    261 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:34: projectiles[current_projectile].pin_offset = offset;
+      0000F1 21r73r00               262 	ld	hl, #_current_projectile
+      0000F4 4E                     263 	ld	c, (hl)
+      0000F5 06 00                  264 	ld	b, #0x00
+      0000F7 69                     265 	ld	l, c
+      0000F8 60                     266 	ld	h, b
+      0000F9 29                     267 	add	hl, hl
+      0000FA 29                     268 	add	hl, hl
+      0000FB 09                     269 	add	hl, bc
+      0000FC 29                     270 	add	hl, hl
+      0000FD 09                     271 	add	hl, bc
+      0000FE 29                     272 	add	hl, hl
+      0000FF 09                     273 	add	hl, bc
+      000100 01r00r00               274 	ld	bc,#_projectiles
+      000103 09                     275 	add	hl,bc
+      000104 01 0A 00               276 	ld	bc, #0x000a
+      000107 09                     277 	add	hl,bc
+      000108 4D                     278 	ld	c, l
+      000109 44                     279 	ld	b, h
+      00010A F8 0E                  280 	ldhl	sp,	#14
+      00010C 7E                     281 	ld	a, (hl)
+      00010D 02                     282 	ld	(bc), a
+                                    283 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:36: if (actors[projectiles[current_projectile].pin_actor].dir.y == 0) {
+      00010E 21r73r00               284 	ld	hl, #_current_projectile
+      000111 4E                     285 	ld	c, (hl)
+      000112 06 00                  286 	ld	b, #0x00
+      000114 69                     287 	ld	l, c
+      000115 60                     288 	ld	h, b
+      000116 29                     289 	add	hl, hl
+      000117 29                     290 	add	hl, hl
+      000118 09                     291 	add	hl, bc
+      000119 29                     292 	add	hl, hl
+      00011A 09                     293 	add	hl, bc
+      00011B 29                     294 	add	hl, hl
+      00011C 09                     295 	add	hl, bc
+      00011D 01r00r00               296 	ld	bc,#_projectiles
+      000120 09                     297 	add	hl,bc
+      000121 4D                     298 	ld	c, l
+      000122 44                     299 	ld	b, h
+      000123 21 09 00               300 	ld	hl, #0x0009
+      000126 09                     301 	add	hl, bc
+      000127 5E                     302 	ld	e, (hl)
+      000128 16 00                  303 	ld	d, #0x00
+      00012A 6B                     304 	ld	l, e
+      00012B 62                     305 	ld	h, d
+      00012C 29                     306 	add	hl, hl
+      00012D 29                     307 	add	hl, hl
+      00012E 19                     308 	add	hl, de
+      00012F 29                     309 	add	hl, hl
+      000130 19                     310 	add	hl, de
+      000131 29                     311 	add	hl, hl
+      000132 19                     312 	add	hl, de
+      000133 29                     313 	add	hl, hl
+      000134 E5                     314 	push	hl
+      000135 7D                     315 	ld	a, l
+      000136 F8 03                  316 	ldhl	sp,	#3
+      000138 77                     317 	ld	(hl), a
+      000139 E1                     318 	pop	hl
+      00013A 7C                     319 	ld	a, h
+      00013B F8 02                  320 	ldhl	sp,	#2
+      00013D 77                     321 	ld	(hl), a
+                                    322 ;c
+      00013E 11r00r00               323 	ld	de, #_actors
+      000141 2B                     324 	dec	hl
+      000142 2A                     325 	ld	a, (hl+)
+      000143 66                     326 	ld	h, (hl)
+      000144 6F                     327 	ld	l, a
+      000145 19                     328 	add	hl, de
+      000146 E5                     329 	push	hl
+      000147 7D                     330 	ld	a, l
+      000148 F8 05                  331 	ldhl	sp,	#5
+      00014A 77                     332 	ld	(hl), a
+      00014B E1                     333 	pop	hl
+      00014C 7C                     334 	ld	a, h
+      00014D F8 04                  335 	ldhl	sp,	#4
+                                    336 ;c
+      00014F 32                     337 	ld	(hl-), a
+      000150 2A                     338 	ld	a, (hl+)
+      000151 5F                     339 	ld	e, a
+      000152 56                     340 	ld	d, (hl)
+      000153 21 05 00               341 	ld	hl, #0x0005
+      000156 19                     342 	add	hl, de
+      000157 33                     343 	inc	sp
+      000158 33                     344 	inc	sp
+      000159 E5                     345 	push	hl
+                                    346 ;c
+      00015A F8 03                  347 	ldhl	sp,#3
+      00015C 2A                     348 	ld	a, (hl+)
+      00015D 5F                     349 	ld	e, a
+      00015E 56                     350 	ld	d, (hl)
+      00015F 21 06 00               351 	ld	hl, #0x0006
+      000162 19                     352 	add	hl, de
+      000163 5D                     353 	ld	e, l
+      000164 54                     354 	ld	d, h
+      000165 1A                     355 	ld	a, (de)
+      000166 F8 02                  356 	ldhl	sp,	#2
+                                    357 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:38: actors[projectiles[current_projectile].pin_actor].pos.x +
+      000168 22                     358 	ld	(hl+), a
+      000169 2A                     359 	ld	a, (hl+)
+      00016A 5F                     360 	ld	e, a
+      00016B 56                     361 	ld	d, (hl)
+      00016C 1A                     362 	ld	a, (de)
+      00016D 2B                     363 	dec	hl
+      00016E 22                     364 	ld	(hl+), a
+      00016F 13                     365 	inc	de
+      000170 1A                     366 	ld	a, (de)
+                                    367 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:36: if (actors[projectiles[current_projectile].pin_actor].dir.y == 0) {
+      000171 32                     368 	ld	(hl-), a
+      000172 2B                     369 	dec	hl
+      000173 7E                     370 	ld	a, (hl)
+      000174 B7                     371 	or	a, a
+      000175 20 5F                  372 	jr	NZ, 00102$
+                                    373 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:39: (offset * actors[projectiles[current_projectile].pin_actor].dir.x);
+      000177 D1                     374 	pop	de
+      000178 D5                     375 	push	de
+      000179 1A                     376 	ld	a, (de)
+      00017A C5                     377 	push	bc
+      00017B F5                     378 	push	af
+      00017C 33                     379 	inc	sp
+      00017D F8 11                  380 	ldhl	sp,	#17
+      00017F 7E                     381 	ld	a, (hl)
+      000180 F5                     382 	push	af
+      000181 33                     383 	inc	sp
+      000182 CDr00r00               384 	call	__mulsuchar
+      000185 E8 02                  385 	add	sp, #2
+      000187 C1                     386 	pop	bc
+                                    387 ;c
+      000188 F8 03                  388 	ldhl	sp,	#3
+      00018A 2A                     389 	ld	a, (hl+)
+      00018B 66                     390 	ld	h, (hl)
+      00018C 6F                     391 	ld	l, a
+      00018D 19                     392 	add	hl, de
+      00018E 5D                     393 	ld	e, l
+      00018F 54                     394 	ld	d, h
+      000190 7B                     395 	ld	a, e
+      000191 02                     396 	ld	(bc), a
+      000192 03                     397 	inc	bc
+      000193 7A                     398 	ld	a, d
+      000194 02                     399 	ld	(bc), a
+                                    400 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:40: projectiles[current_projectile].pos.y =
+      000195 21r73r00               401 	ld	hl, #_current_projectile
+      000198 4E                     402 	ld	c, (hl)
+      000199 06 00                  403 	ld	b, #0x00
+      00019B 69                     404 	ld	l, c
+      00019C 60                     405 	ld	h, b
+      00019D 29                     406 	add	hl, hl
+      00019E 29                     407 	add	hl, hl
+      00019F 09                     408 	add	hl, bc
+      0001A0 29                     409 	add	hl, hl
+      0001A1 09                     410 	add	hl, bc
+      0001A2 29                     411 	add	hl, hl
+      0001A3 09                     412 	add	hl, bc
+      0001A4 01r00r00               413 	ld	bc,#_projectiles
+      0001A7 09                     414 	add	hl,bc
+      0001A8 4D                     415 	ld	c, l
+      0001A9 44                     416 	ld	b, h
+      0001AA 03                     417 	inc	bc
+      0001AB 03                     418 	inc	bc
+                                    419 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:41: actors[projectiles[current_projectile].pin_actor].pos.y;
+      0001AC 11 09 00               420 	ld	de, #0x0009
+      0001AF 19                     421 	add	hl, de
+      0001B0 5E                     422 	ld	e, (hl)
+      0001B1 16 00                  423 	ld	d, #0x00
+      0001B3 6B                     424 	ld	l, e
+      0001B4 62                     425 	ld	h, d
+      0001B5 29                     426 	add	hl, hl
+      0001B6 29                     427 	add	hl, hl
+      0001B7 19                     428 	add	hl, de
+      0001B8 29                     429 	add	hl, hl
+      0001B9 19                     430 	add	hl, de
+      0001BA 29                     431 	add	hl, hl
+      0001BB 19                     432 	add	hl, de
+      0001BC 29                     433 	add	hl, hl
+      0001BD 11r00r00               434 	ld	de, #_actors
+      0001C0 19                     435 	add	hl, de
+      0001C1 23                     436 	inc	hl
+      0001C2 23                     437 	inc	hl
+      0001C3 5D                     438 	ld	e, l
+      0001C4 54                     439 	ld	d, h
+      0001C5 1A                     440 	ld	a, (de)
+      0001C6 F8 03                  441 	ldhl	sp,	#3
+      0001C8 22                     442 	ld	(hl+), a
+      0001C9 13                     443 	inc	de
+      0001CA 1A                     444 	ld	a, (de)
+      0001CB 77                     445 	ld	(hl), a
+      0001CC F8 03                  446 	ldhl	sp,	#3
+      0001CE 2A                     447 	ld	a, (hl+)
+      0001CF 02                     448 	ld	(bc), a
+      0001D0 03                     449 	inc	bc
+      0001D1 7E                     450 	ld	a, (hl)
+      0001D2 02                     451 	ld	(bc), a
+      0001D3 C3r56r02               452 	jp	00103$
+      0001D6                        453 00102$:
+                                    454 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:44: actors[projectiles[current_projectile].pin_actor].pos.x;
+      0001D6 F8 03                  455 	ldhl	sp,	#3
+      0001D8 2A                     456 	ld	a, (hl+)
+      0001D9 02                     457 	ld	(bc), a
+      0001DA 03                     458 	inc	bc
+      0001DB 7E                     459 	ld	a, (hl)
+      0001DC 02                     460 	ld	(bc), a
+                                    461 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:45: projectiles[current_projectile].pos.y =
+      0001DD 21r73r00               462 	ld	hl, #_current_projectile
+      0001E0 4E                     463 	ld	c, (hl)
+      0001E1 06 00                  464 	ld	b, #0x00
+      0001E3 69                     465 	ld	l, c
+      0001E4 60                     466 	ld	h, b
+      0001E5 29                     467 	add	hl, hl
+      0001E6 29                     468 	add	hl, hl
+      0001E7 09                     469 	add	hl, bc
+      0001E8 29                     470 	add	hl, hl
+      0001E9 09                     471 	add	hl, bc
+      0001EA 29                     472 	add	hl, hl
+      0001EB 09                     473 	add	hl, bc
+      0001EC 01r00r00               474 	ld	bc,#_projectiles
+      0001EF 09                     475 	add	hl,bc
+      0001F0 4D                     476 	ld	c, l
+      0001F1 44                     477 	ld	b, h
+      0001F2 03                     478 	inc	bc
+      0001F3 03                     479 	inc	bc
+                                    480 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:46: actors[projectiles[current_projectile].pin_actor].pos.y +
+      0001F4 11 09 00               481 	ld	de, #0x0009
+      0001F7 19                     482 	add	hl, de
+      0001F8 5E                     483 	ld	e, (hl)
+      0001F9 16 00                  484 	ld	d, #0x00
+      0001FB 6B                     485 	ld	l, e
+      0001FC 62                     486 	ld	h, d
+      0001FD 29                     487 	add	hl, hl
+      0001FE 29                     488 	add	hl, hl
+      0001FF 19                     489 	add	hl, de
+      000200 29                     490 	add	hl, hl
+      000201 19                     491 	add	hl, de
+      000202 29                     492 	add	hl, hl
+      000203 19                     493 	add	hl, de
+      000204 29                     494 	add	hl, hl
+      000205 E5                     495 	push	hl
+      000206 7D                     496 	ld	a, l
+      000207 F8 05                  497 	ldhl	sp,	#5
+      000209 77                     498 	ld	(hl), a
+      00020A E1                     499 	pop	hl
+      00020B 7C                     500 	ld	a, h
+      00020C F8 04                  501 	ldhl	sp,	#4
+      00020E 77                     502 	ld	(hl), a
+                                    503 ;c
+      00020F 11r00r00               504 	ld	de, #_actors
+      000212 2B                     505 	dec	hl
+      000213 2A                     506 	ld	a, (hl+)
+      000214 66                     507 	ld	h, (hl)
+      000215 6F                     508 	ld	l, a
+      000216 19                     509 	add	hl, de
+      000217 E5                     510 	push	hl
+      000218 7D                     511 	ld	a, l
+      000219 F8 03                  512 	ldhl	sp,	#3
+      00021B 77                     513 	ld	(hl), a
+      00021C E1                     514 	pop	hl
+      00021D 7C                     515 	ld	a, h
+      00021E F8 02                  516 	ldhl	sp,	#2
+      000220 32                     517 	ld	(hl-), a
+      000221 2A                     518 	ld	a, (hl+)
+      000222 66                     519 	ld	h, (hl)
+      000223 6F                     520 	ld	l, a
+      000224 23                     521 	inc	hl
+      000225 23                     522 	inc	hl
+      000226 5D                     523 	ld	e, l
+      000227 54                     524 	ld	d, h
+      000228 1A                     525 	ld	a, (de)
+      000229 F8 03                  526 	ldhl	sp,	#3
+      00022B 22                     527 	ld	(hl+), a
+      00022C 13                     528 	inc	de
+      00022D 1A                     529 	ld	a, (de)
+      00022E 77                     530 	ld	(hl), a
+                                    531 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:47: (offset * actors[projectiles[current_projectile].pin_actor].dir.y);
+                                    532 ;c
+      00022F F8 01                  533 	ldhl	sp,#1
+      000231 2A                     534 	ld	a, (hl+)
+      000232 5F                     535 	ld	e, a
+      000233 56                     536 	ld	d, (hl)
+      000234 21 06 00               537 	ld	hl, #0x0006
+      000237 19                     538 	add	hl, de
+      000238 5D                     539 	ld	e, l
+      000239 54                     540 	ld	d, h
+      00023A 1A                     541 	ld	a, (de)
+      00023B C5                     542 	push	bc
+      00023C F5                     543 	push	af
+      00023D 33                     544 	inc	sp
+      00023E F8 11                  545 	ldhl	sp,	#17
+      000240 7E                     546 	ld	a, (hl)
+      000241 F5                     547 	push	af
+      000242 33                     548 	inc	sp
+      000243 CDr00r00               549 	call	__mulsuchar
+      000246 E8 02                  550 	add	sp, #2
+      000248 C1                     551 	pop	bc
+                                    552 ;c
+      000249 F8 03                  553 	ldhl	sp,	#3
+      00024B 2A                     554 	ld	a, (hl+)
+      00024C 66                     555 	ld	h, (hl)
+      00024D 6F                     556 	ld	l, a
+      00024E 19                     557 	add	hl, de
+      00024F 5D                     558 	ld	e, l
+      000250 54                     559 	ld	d, h
+      000251 7B                     560 	ld	a, e
+      000252 02                     561 	ld	(bc), a
+      000253 03                     562 	inc	bc
+      000254 7A                     563 	ld	a, d
+      000255 02                     564 	ld	(bc), a
+      000256                        565 00103$:
+                                    566 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:50: projectiles[current_projectile].move_speed = 0;
+      000256 21r73r00               567 	ld	hl, #_current_projectile
+      000259 4E                     568 	ld	c, (hl)
+      00025A 06 00                  569 	ld	b, #0x00
+      00025C 69                     570 	ld	l, c
+      00025D 60                     571 	ld	h, b
+      00025E 29                     572 	add	hl, hl
+      00025F 29                     573 	add	hl, hl
+      000260 09                     574 	add	hl, bc
+      000261 29                     575 	add	hl, hl
+      000262 09                     576 	add	hl, bc
+      000263 29                     577 	add	hl, hl
+      000264 09                     578 	add	hl, bc
+      000265 01r00r00               579 	ld	bc,#_projectiles
+      000268 09                     580 	add	hl,bc
+      000269 01 11 00               581 	ld	bc, #0x0011
+      00026C 09                     582 	add	hl, bc
+      00026D 36 00                  583 	ld	(hl), #0x00
+                                    584 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:51: projectiles[current_projectile].life_time = 30;
+      00026F 21r73r00               585 	ld	hl, #_current_projectile
+      000272 4E                     586 	ld	c, (hl)
+      000273 06 00                  587 	ld	b, #0x00
+      000275 69                     588 	ld	l, c
+      000276 60                     589 	ld	h, b
+      000277 29                     590 	add	hl, hl
+      000278 29                     591 	add	hl, hl
+      000279 09                     592 	add	hl, bc
+      00027A 29                     593 	add	hl, hl
+      00027B 09                     594 	add	hl, bc
+      00027C 29                     595 	add	hl, hl
+      00027D 09                     596 	add	hl, bc
+      00027E 01r00r00               597 	ld	bc,#_projectiles
+      000281 09                     598 	add	hl,bc
+      000282 01 14 00               599 	ld	bc, #0x0014
+      000285 09                     600 	add	hl, bc
+      000286 36 1E                  601 	ld	(hl), #0x1e
+                                    602 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:52: projectiles[current_projectile].col_group = col_group;
+      000288 21r73r00               603 	ld	hl, #_current_projectile
+      00028B 4E                     604 	ld	c, (hl)
+      00028C 06 00                  605 	ld	b, #0x00
+      00028E 69                     606 	ld	l, c
+      00028F 60                     607 	ld	h, b
+      000290 29                     608 	add	hl, hl
+      000291 29                     609 	add	hl, hl
+      000292 09                     610 	add	hl, bc
+      000293 29                     611 	add	hl, hl
+      000294 09                     612 	add	hl, bc
+      000295 29                     613 	add	hl, hl
+      000296 09                     614 	add	hl, bc
+      000297 01r00r00               615 	ld	bc,#_projectiles
+      00029A 09                     616 	add	hl,bc
+      00029B 01 15 00               617 	ld	bc, #0x0015
+      00029E 09                     618 	add	hl,bc
+      00029F 4D                     619 	ld	c, l
+      0002A0 44                     620 	ld	b, h
+      0002A1 F8 0F                  621 	ldhl	sp,	#15
+      0002A3 7E                     622 	ld	a, (hl)
+      0002A4 02                     623 	ld	(bc), a
+                                    624 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:53: projectiles[current_projectile].col_mask = col_mask;
+      0002A5 21r73r00               625 	ld	hl, #_current_projectile
+      0002A8 4E                     626 	ld	c, (hl)
+      0002A9 06 00                  627 	ld	b, #0x00
+      0002AB 69                     628 	ld	l, c
+      0002AC 60                     629 	ld	h, b
+      0002AD 29                     630 	add	hl, hl
+      0002AE 29                     631 	add	hl, hl
+      0002AF 09                     632 	add	hl, bc
+      0002B0 29                     633 	add	hl, hl
+      0002B1 09                     634 	add	hl, bc
+      0002B2 29                     635 	add	hl, hl
+      0002B3 09                     636 	add	hl, bc
+      0002B4 01r00r00               637 	ld	bc,#_projectiles
+      0002B7 09                     638 	add	hl,bc
+      0002B8 01 16 00               639 	ld	bc, #0x0016
+      0002BB 09                     640 	add	hl,bc
+      0002BC 4D                     641 	ld	c, l
+      0002BD 44                     642 	ld	b, h
+      0002BE F8 10                  643 	ldhl	sp,	#16
+      0002C0 7E                     644 	ld	a, (hl)
+      0002C1 02                     645 	ld	(bc), a
+                                    646 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:54: projectiles[current_projectile].time = 1;
+      0002C2 21r73r00               647 	ld	hl, #_current_projectile
+      0002C5 4E                     648 	ld	c, (hl)
+      0002C6 06 00                  649 	ld	b, #0x00
+      0002C8 69                     650 	ld	l, c
+      0002C9 60                     651 	ld	h, b
+      0002CA 29                     652 	add	hl, hl
+      0002CB 29                     653 	add	hl, hl
+      0002CC 09                     654 	add	hl, bc
+      0002CD 29                     655 	add	hl, hl
+      0002CE 09                     656 	add	hl, bc
+      0002CF 29                     657 	add	hl, hl
+      0002D0 09                     658 	add	hl, bc
+      0002D1 01r00r00               659 	ld	bc,#_projectiles
+      0002D4 09                     660 	add	hl,bc
+      0002D5 01 13 00               661 	ld	bc, #0x0013
+      0002D8 09                     662 	add	hl, bc
+      0002D9 36 01                  663 	ld	(hl), #0x01
+                                    664 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:55: projectiles[current_projectile].frame = 0;
+      0002DB 21r73r00               665 	ld	hl, #_current_projectile
+      0002DE 4E                     666 	ld	c, (hl)
+      0002DF 06 00                  667 	ld	b, #0x00
+      0002E1 69                     668 	ld	l, c
+      0002E2 60                     669 	ld	h, b
+      0002E3 29                     670 	add	hl, hl
+      0002E4 29                     671 	add	hl, hl
+      0002E5 09                     672 	add	hl, bc
+      0002E6 29                     673 	add	hl, hl
+      0002E7 09                     674 	add	hl, bc
+      0002E8 29                     675 	add	hl, hl
+      0002E9 09                     676 	add	hl, bc
+      0002EA 01r00r00               677 	ld	bc,#_projectiles
+      0002ED 09                     678 	add	hl,bc
+      0002EE 01 0E 00               679 	ld	bc, #0x000e
+      0002F1 09                     680 	add	hl, bc
+      0002F2 36 00                  681 	ld	(hl), #0x00
+                                    682 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:56: projectiles[current_projectile].palette_index = palette;
+      0002F4 21r73r00               683 	ld	hl, #_current_projectile
+      0002F7 4E                     684 	ld	c, (hl)
+      0002F8 06 00                  685 	ld	b, #0x00
+      0002FA 69                     686 	ld	l, c
+      0002FB 60                     687 	ld	h, b
+      0002FC 29                     688 	add	hl, hl
+      0002FD 29                     689 	add	hl, hl
+      0002FE 09                     690 	add	hl, bc
+      0002FF 29                     691 	add	hl, hl
+      000300 09                     692 	add	hl, bc
+      000301 29                     693 	add	hl, hl
+      000302 09                     694 	add	hl, bc
+      000303 01r00r00               695 	ld	bc,#_projectiles
+      000306 09                     696 	add	hl,bc
+      000307 01 0C 00               697 	ld	bc, #0x000c
+      00030A 09                     698 	add	hl,bc
+      00030B 4D                     699 	ld	c, l
+      00030C 44                     700 	ld	b, h
+      00030D F8 0C                  701 	ldhl	sp,	#12
+      00030F 7E                     702 	ld	a, (hl)
+      000310 02                     703 	ld	(bc), a
+                                    704 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:57: projectiles[current_projectile].sprite = sprites_info[sprite].sprite_offset;
+      000311 21r73r00               705 	ld	hl, #_current_projectile
+      000314 4E                     706 	ld	c, (hl)
+      000315 06 00                  707 	ld	b, #0x00
+      000317 69                     708 	ld	l, c
+      000318 60                     709 	ld	h, b
+      000319 29                     710 	add	hl, hl
+      00031A 29                     711 	add	hl, hl
+      00031B 09                     712 	add	hl, bc
+      00031C 29                     713 	add	hl, hl
+      00031D 09                     714 	add	hl, bc
+      00031E 29                     715 	add	hl, hl
+      00031F 09                     716 	add	hl, bc
+      000320 01r00r00               717 	ld	bc,#_projectiles
+      000323 09                     718 	add	hl,bc
+      000324 01 0B 00               719 	ld	bc, #0x000b
+      000327 09                     720 	add	hl,bc
+      000328 4D                     721 	ld	c, l
+      000329 44                     722 	ld	b, h
+      00032A F8 0B                  723 	ldhl	sp,	#11
+      00032C 5E                     724 	ld	e, (hl)
+      00032D 16 00                  725 	ld	d, #0x00
+      00032F 6B                     726 	ld	l, e
+      000330 62                     727 	ld	h, d
+      000331 29                     728 	add	hl, hl
+      000332 19                     729 	add	hl, de
+      000333 E5                     730 	push	hl
+      000334 7D                     731 	ld	a, l
+      000335 F8 03                  732 	ldhl	sp,	#3
+      000337 77                     733 	ld	(hl), a
+      000338 E1                     734 	pop	hl
+      000339 7C                     735 	ld	a, h
+      00033A F8 02                  736 	ldhl	sp,	#2
+                                    737 ;c
+      00033C 32                     738 	ld	(hl-), a
+      00033D 2A                     739 	ld	a, (hl+)
+      00033E 5F                     740 	ld	e, a
+      00033F 56                     741 	ld	d, (hl)
+      000340 21r00r00               742 	ld	hl, #_sprites_info
+      000343 19                     743 	add	hl, de
+      000344 E5                     744 	push	hl
+      000345 7D                     745 	ld	a, l
+      000346 F8 05                  746 	ldhl	sp,	#5
+      000348 77                     747 	ld	(hl), a
+      000349 E1                     748 	pop	hl
+      00034A 7C                     749 	ld	a, h
+      00034B F8 04                  750 	ldhl	sp,	#4
+      00034D 32                     751 	ld	(hl-), a
+      00034E 2A                     752 	ld	a, (hl+)
+      00034F 5F                     753 	ld	e, a
+      000350 56                     754 	ld	d, (hl)
+      000351 1A                     755 	ld	a, (de)
+      000352 02                     756 	ld	(bc), a
+                                    757 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:58: projectiles[current_projectile].sprite_type = sprites_info[sprite].sprite_type;
+      000353 21r73r00               758 	ld	hl, #_current_projectile
+      000356 4E                     759 	ld	c, (hl)
+      000357 06 00                  760 	ld	b, #0x00
+      000359 69                     761 	ld	l, c
+      00035A 60                     762 	ld	h, b
+      00035B 29                     763 	add	hl, hl
+      00035C 29                     764 	add	hl, hl
+      00035D 09                     765 	add	hl, bc
+      00035E 29                     766 	add	hl, hl
+      00035F 09                     767 	add	hl, bc
+      000360 29                     768 	add	hl, hl
+      000361 09                     769 	add	hl, bc
+      000362 01r00r00               770 	ld	bc,#_projectiles
+      000365 09                     771 	add	hl,bc
+      000366 01 0D 00               772 	ld	bc, #0x000d
+      000369 09                     773 	add	hl,bc
+      00036A 4D                     774 	ld	c, l
+      00036B 44                     775 	ld	b, h
+      00036C F8 03                  776 	ldhl	sp,	#3
+      00036E 2A                     777 	ld	a, (hl+)
+      00036F 66                     778 	ld	h, (hl)
+      000370 6F                     779 	ld	l, a
+      000371 23                     780 	inc	hl
+      000372 23                     781 	inc	hl
+      000373 7E                     782 	ld	a, (hl)
+      000374 02                     783 	ld	(bc), a
+                                    784 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:59: projectiles[current_projectile].frames_len = sprites_info[sprite].frames_len;
+      000375 21r73r00               785 	ld	hl, #_current_projectile
+      000378 4E                     786 	ld	c, (hl)
+      000379 06 00                  787 	ld	b, #0x00
+      00037B 69                     788 	ld	l, c
+      00037C 60                     789 	ld	h, b
+      00037D 29                     790 	add	hl, hl
+      00037E 29                     791 	add	hl, hl
+      00037F 09                     792 	add	hl, bc
+      000380 29                     793 	add	hl, hl
+      000381 09                     794 	add	hl, bc
+      000382 29                     795 	add	hl, hl
+      000383 09                     796 	add	hl, bc
+      000384 01r00r00               797 	ld	bc,#_projectiles
+      000387 09                     798 	add	hl,bc
+      000388 01 0F 00               799 	ld	bc, #0x000f
+      00038B 09                     800 	add	hl,bc
+      00038C 4D                     801 	ld	c, l
+      00038D 44                     802 	ld	b, h
+      00038E F8 03                  803 	ldhl	sp,	#3
+      000390 2A                     804 	ld	a, (hl+)
+      000391 66                     805 	ld	h, (hl)
+      000392 6F                     806 	ld	l, a
+      000393 23                     807 	inc	hl
+      000394 7E                     808 	ld	a, (hl)
+      000395 02                     809 	ld	(bc), a
+      000396                        810 00105$:
+                                    811 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:62: current_projectile = (current_projectile + 1) % MAX_PROJECTILES;
+      000396 21r73r00               812 	ld	hl, #_current_projectile
+      000399 4E                     813 	ld	c, (hl)
+      00039A 06 00                  814 	ld	b, #0x00
+      00039C 03                     815 	inc	bc
+      00039D 21 05 00               816 	ld	hl, #0x0005
+      0003A0 E5                     817 	push	hl
+      0003A1 C5                     818 	push	bc
+      0003A2 CDr00r00               819 	call	__modsint
+      0003A5 E8 04                  820 	add	sp, #4
+      0003A7 21r73r00               821 	ld	hl, #_current_projectile
+      0003AA 73                     822 	ld	(hl), e
+                                    823 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:63: }
+      0003AB E8 05                  824 	add	sp, #5
+      0003AD C9                     825 	ret
+                                    826 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:65: void ProjectileLaunch_b(UBYTE sprite,
+                                    827 ;	---------------------------------
+                                    828 ; Function ProjectileLaunch_b
+                                    829 ; ---------------------------------
+                           000001   830 	b_ProjectileLaunch_b	= 1
+      0003AE                        831 _ProjectileLaunch_b::
+      0003AE E8 FC                  832 	add	sp, #-4
+                                    833 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:76: if (projectiles[current_projectile].life_time == 0) {
+      0003B0 21r73r00               834 	ld	hl, #_current_projectile
+      0003B3 4E                     835 	ld	c, (hl)
+      0003B4 06 00                  836 	ld	b, #0x00
+      0003B6 69                     837 	ld	l, c
+      0003B7 60                     838 	ld	h, b
+      0003B8 29                     839 	add	hl, hl
+      0003B9 29                     840 	add	hl, hl
+      0003BA 09                     841 	add	hl, bc
+      0003BB 29                     842 	add	hl, hl
+      0003BC 09                     843 	add	hl, bc
+      0003BD 29                     844 	add	hl, hl
+      0003BE 09                     845 	add	hl, bc
+      0003BF 01r00r00               846 	ld	bc,#_projectiles
+      0003C2 09                     847 	add	hl,bc
+      0003C3 4D                     848 	ld	c, l
+      0003C4 44                     849 	ld	b, h
+      0003C5 21 14 00               850 	ld	hl, #0x0014
+      0003C8 09                     851 	add	hl, bc
+      0003C9 7E                     852 	ld	a, (hl)
+      0003CA B7                     853 	or	a, a
+      0003CB C2rD7r05               854 	jp	NZ, 00102$
+                                    855 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:77: projectiles[current_projectile].pin_actor = NO_ACTOR_PINNED;
+      0003CE 21 09 00               856 	ld	hl, #0x0009
+      0003D1 09                     857 	add	hl, bc
+      0003D2 36 FF                  858 	ld	(hl), #0xff
+                                    859 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:78: projectiles[current_projectile].moving = moving;
+      0003D4 21r73r00               860 	ld	hl, #_current_projectile
+      0003D7 4E                     861 	ld	c, (hl)
+      0003D8 06 00                  862 	ld	b, #0x00
+      0003DA 69                     863 	ld	l, c
+      0003DB 60                     864 	ld	h, b
+      0003DC 29                     865 	add	hl, hl
+      0003DD 29                     866 	add	hl, hl
+      0003DE 09                     867 	add	hl, bc
+      0003DF 29                     868 	add	hl, hl
+      0003E0 09                     869 	add	hl, bc
+      0003E1 29                     870 	add	hl, hl
+      0003E2 09                     871 	add	hl, bc
+      0003E3 01r00r00               872 	ld	bc,#_projectiles
+      0003E6 09                     873 	add	hl,bc
+      0003E7 01 08 00               874 	ld	bc, #0x0008
+      0003EA 09                     875 	add	hl,bc
+      0003EB 4D                     876 	ld	c, l
+      0003EC 44                     877 	ld	b, h
+      0003ED F8 12                  878 	ldhl	sp,	#18
+      0003EF 7E                     879 	ld	a, (hl)
+      0003F0 02                     880 	ld	(bc), a
+                                    881 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:79: projectiles[current_projectile].pos.x = x;
+      0003F1 21r73r00               882 	ld	hl, #_current_projectile
+      0003F4 4E                     883 	ld	c, (hl)
+      0003F5 06 00                  884 	ld	b, #0x00
+      0003F7 69                     885 	ld	l, c
+      0003F8 60                     886 	ld	h, b
+      0003F9 29                     887 	add	hl, hl
+      0003FA 29                     888 	add	hl, hl
+      0003FB 09                     889 	add	hl, bc
+      0003FC 29                     890 	add	hl, hl
+      0003FD 09                     891 	add	hl, bc
+      0003FE 29                     892 	add	hl, hl
+      0003FF 09                     893 	add	hl, bc
+      000400 01r00r00               894 	ld	bc,#_projectiles
+      000403 09                     895 	add	hl,bc
+      000404 4D                     896 	ld	c, l
+      000405 44                     897 	ld	b, h
+      000406 F8 0C                  898 	ldhl	sp,	#12
+      000408 2A                     899 	ld	a, (hl+)
+      000409 02                     900 	ld	(bc), a
+      00040A 03                     901 	inc	bc
+      00040B 7E                     902 	ld	a, (hl)
+      00040C 02                     903 	ld	(bc), a
+                                    904 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:80: projectiles[current_projectile].pos.y = y;
+      00040D 21r73r00               905 	ld	hl, #_current_projectile
+      000410 4E                     906 	ld	c, (hl)
+      000411 06 00                  907 	ld	b, #0x00
+      000413 69                     908 	ld	l, c
+      000414 60                     909 	ld	h, b
+      000415 29                     910 	add	hl, hl
+      000416 29                     911 	add	hl, hl
+      000417 09                     912 	add	hl, bc
+      000418 29                     913 	add	hl, hl
+      000419 09                     914 	add	hl, bc
+      00041A 29                     915 	add	hl, hl
+      00041B 09                     916 	add	hl, bc
+      00041C 01r00r00               917 	ld	bc,#_projectiles
+      00041F 09                     918 	add	hl,bc
+      000420 23                     919 	inc	hl
+      000421 23                     920 	inc	hl
+      000422 4D                     921 	ld	c, l
+      000423 44                     922 	ld	b, h
+      000424 F8 0E                  923 	ldhl	sp,	#14
+      000426 2A                     924 	ld	a, (hl+)
+      000427 02                     925 	ld	(bc), a
+      000428 03                     926 	inc	bc
+      000429 7E                     927 	ld	a, (hl)
+      00042A 02                     928 	ld	(bc), a
+                                    929 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:81: projectiles[current_projectile].dir.x = dir_x;
+      00042B 21r73r00               930 	ld	hl, #_current_projectile
+      00042E 4E                     931 	ld	c, (hl)
+      00042F 06 00                  932 	ld	b, #0x00
+      000431 69                     933 	ld	l, c
+      000432 60                     934 	ld	h, b
+      000433 29                     935 	add	hl, hl
+      000434 29                     936 	add	hl, hl
+      000435 09                     937 	add	hl, bc
+      000436 29                     938 	add	hl, hl
+      000437 09                     939 	add	hl, bc
+      000438 29                     940 	add	hl, hl
+      000439 09                     941 	add	hl, bc
+      00043A 01r00r00               942 	ld	bc,#_projectiles
+      00043D 09                     943 	add	hl,bc
+      00043E 01 06 00               944 	ld	bc, #0x0006
+      000441 09                     945 	add	hl,bc
+      000442 4D                     946 	ld	c, l
+      000443 44                     947 	ld	b, h
+      000444 F8 10                  948 	ldhl	sp,	#16
+      000446 7E                     949 	ld	a, (hl)
+      000447 02                     950 	ld	(bc), a
+                                    951 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:82: projectiles[current_projectile].dir.y = dir_y;
+      000448 21r73r00               952 	ld	hl, #_current_projectile
+      00044B 4E                     953 	ld	c, (hl)
+      00044C 06 00                  954 	ld	b, #0x00
+      00044E 69                     955 	ld	l, c
+      00044F 60                     956 	ld	h, b
+      000450 29                     957 	add	hl, hl
+      000451 29                     958 	add	hl, hl
+      000452 09                     959 	add	hl, bc
+      000453 29                     960 	add	hl, hl
+      000454 09                     961 	add	hl, bc
+      000455 29                     962 	add	hl, hl
+      000456 09                     963 	add	hl, bc
+      000457 01r00r00               964 	ld	bc,#_projectiles
+      00045A 09                     965 	add	hl,bc
+      00045B 01 07 00               966 	ld	bc, #0x0007
+      00045E 09                     967 	add	hl,bc
+      00045F 4D                     968 	ld	c, l
+      000460 44                     969 	ld	b, h
+      000461 F8 11                  970 	ldhl	sp,	#17
+      000463 7E                     971 	ld	a, (hl)
+      000464 02                     972 	ld	(bc), a
+                                    973 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:83: projectiles[current_projectile].move_speed = move_speed;
+      000465 21r73r00               974 	ld	hl, #_current_projectile
+      000468 4E                     975 	ld	c, (hl)
+      000469 06 00                  976 	ld	b, #0x00
+      00046B 69                     977 	ld	l, c
+      00046C 60                     978 	ld	h, b
+      00046D 29                     979 	add	hl, hl
+      00046E 29                     980 	add	hl, hl
+      00046F 09                     981 	add	hl, bc
+      000470 29                     982 	add	hl, hl
+      000471 09                     983 	add	hl, bc
+      000472 29                     984 	add	hl, hl
+      000473 09                     985 	add	hl, bc
+      000474 01r00r00               986 	ld	bc,#_projectiles
+      000477 09                     987 	add	hl,bc
+      000478 01 11 00               988 	ld	bc, #0x0011
+      00047B 09                     989 	add	hl,bc
+      00047C 4D                     990 	ld	c, l
+      00047D 44                     991 	ld	b, h
+      00047E F8 13                  992 	ldhl	sp,	#19
+      000480 7E                     993 	ld	a, (hl)
+      000481 02                     994 	ld	(bc), a
+                                    995 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:84: projectiles[current_projectile].life_time = life_time;
+      000482 21r73r00               996 	ld	hl, #_current_projectile
+      000485 4E                     997 	ld	c, (hl)
+      000486 06 00                  998 	ld	b, #0x00
+      000488 69                     999 	ld	l, c
+      000489 60                    1000 	ld	h, b
+      00048A 29                    1001 	add	hl, hl
+      00048B 29                    1002 	add	hl, hl
+      00048C 09                    1003 	add	hl, bc
+      00048D 29                    1004 	add	hl, hl
+      00048E 09                    1005 	add	hl, bc
+      00048F 29                    1006 	add	hl, hl
+      000490 09                    1007 	add	hl, bc
+      000491 01r00r00              1008 	ld	bc,#_projectiles
+      000494 09                    1009 	add	hl,bc
+      000495 01 14 00              1010 	ld	bc, #0x0014
+      000498 09                    1011 	add	hl,bc
+      000499 4D                    1012 	ld	c, l
+      00049A 44                    1013 	ld	b, h
+      00049B F8 14                 1014 	ldhl	sp,	#20
+      00049D 7E                    1015 	ld	a, (hl)
+      00049E 02                    1016 	ld	(bc), a
+                                   1017 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:85: projectiles[current_projectile].col_group = col_group;
+      00049F 21r73r00              1018 	ld	hl, #_current_projectile
+      0004A2 4E                    1019 	ld	c, (hl)
+      0004A3 06 00                 1020 	ld	b, #0x00
+      0004A5 69                    1021 	ld	l, c
+      0004A6 60                    1022 	ld	h, b
+      0004A7 29                    1023 	add	hl, hl
+      0004A8 29                    1024 	add	hl, hl
+      0004A9 09                    1025 	add	hl, bc
+      0004AA 29                    1026 	add	hl, hl
+      0004AB 09                    1027 	add	hl, bc
+      0004AC 29                    1028 	add	hl, hl
+      0004AD 09                    1029 	add	hl, bc
+      0004AE 01r00r00              1030 	ld	bc,#_projectiles
+      0004B1 09                    1031 	add	hl,bc
+      0004B2 01 15 00              1032 	ld	bc, #0x0015
+      0004B5 09                    1033 	add	hl,bc
+      0004B6 4D                    1034 	ld	c, l
+      0004B7 44                    1035 	ld	b, h
+      0004B8 F8 15                 1036 	ldhl	sp,	#21
+      0004BA 7E                    1037 	ld	a, (hl)
+      0004BB 02                    1038 	ld	(bc), a
+                                   1039 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:86: projectiles[current_projectile].col_mask = col_mask;
+      0004BC 21r73r00              1040 	ld	hl, #_current_projectile
+      0004BF 4E                    1041 	ld	c, (hl)
+      0004C0 06 00                 1042 	ld	b, #0x00
+      0004C2 69                    1043 	ld	l, c
+      0004C3 60                    1044 	ld	h, b
+      0004C4 29                    1045 	add	hl, hl
+      0004C5 29                    1046 	add	hl, hl
+      0004C6 09                    1047 	add	hl, bc
+      0004C7 29                    1048 	add	hl, hl
+      0004C8 09                    1049 	add	hl, bc
+      0004C9 29                    1050 	add	hl, hl
+      0004CA 09                    1051 	add	hl, bc
+      0004CB 01r00r00              1052 	ld	bc,#_projectiles
+      0004CE 09                    1053 	add	hl,bc
+      0004CF 01 16 00              1054 	ld	bc, #0x0016
+      0004D2 09                    1055 	add	hl,bc
+      0004D3 4D                    1056 	ld	c, l
+      0004D4 44                    1057 	ld	b, h
+      0004D5 F8 16                 1058 	ldhl	sp,	#22
+      0004D7 7E                    1059 	ld	a, (hl)
+      0004D8 02                    1060 	ld	(bc), a
+                                   1061 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:87: projectiles[current_projectile].sprite_type = SPRITE_ACTOR_ANIMATED;
+      0004D9 21r73r00              1062 	ld	hl, #_current_projectile
+      0004DC 4E                    1063 	ld	c, (hl)
+      0004DD 06 00                 1064 	ld	b, #0x00
+      0004DF 69                    1065 	ld	l, c
+      0004E0 60                    1066 	ld	h, b
+      0004E1 29                    1067 	add	hl, hl
+      0004E2 29                    1068 	add	hl, hl
+      0004E3 09                    1069 	add	hl, bc
+      0004E4 29                    1070 	add	hl, hl
+      0004E5 09                    1071 	add	hl, bc
+      0004E6 29                    1072 	add	hl, hl
+      0004E7 09                    1073 	add	hl, bc
+      0004E8 01r00r00              1074 	ld	bc,#_projectiles
+      0004EB 09                    1075 	add	hl,bc
+      0004EC 01 0D 00              1076 	ld	bc, #0x000d
+      0004EF 09                    1077 	add	hl, bc
+      0004F0 36 02                 1078 	ld	(hl), #0x02
+                                   1079 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:88: projectiles[current_projectile].time = 1;
+      0004F2 21r73r00              1080 	ld	hl, #_current_projectile
+      0004F5 4E                    1081 	ld	c, (hl)
+      0004F6 06 00                 1082 	ld	b, #0x00
+      0004F8 69                    1083 	ld	l, c
+      0004F9 60                    1084 	ld	h, b
+      0004FA 29                    1085 	add	hl, hl
+      0004FB 29                    1086 	add	hl, hl
+      0004FC 09                    1087 	add	hl, bc
+      0004FD 29                    1088 	add	hl, hl
+      0004FE 09                    1089 	add	hl, bc
+      0004FF 29                    1090 	add	hl, hl
+      000500 09                    1091 	add	hl, bc
+      000501 01r00r00              1092 	ld	bc,#_projectiles
+      000504 09                    1093 	add	hl,bc
+      000505 01 13 00              1094 	ld	bc, #0x0013
+      000508 09                    1095 	add	hl, bc
+      000509 36 01                 1096 	ld	(hl), #0x01
+                                   1097 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:89: projectiles[current_projectile].frame = 0;
+      00050B 21r73r00              1098 	ld	hl, #_current_projectile
+      00050E 4E                    1099 	ld	c, (hl)
+      00050F 06 00                 1100 	ld	b, #0x00
+      000511 69                    1101 	ld	l, c
+      000512 60                    1102 	ld	h, b
+      000513 29                    1103 	add	hl, hl
+      000514 29                    1104 	add	hl, hl
+      000515 09                    1105 	add	hl, bc
+      000516 29                    1106 	add	hl, hl
+      000517 09                    1107 	add	hl, bc
+      000518 29                    1108 	add	hl, hl
+      000519 09                    1109 	add	hl, bc
+      00051A 01r00r00              1110 	ld	bc,#_projectiles
+      00051D 09                    1111 	add	hl,bc
+      00051E 01 0E 00              1112 	ld	bc, #0x000e
+      000521 09                    1113 	add	hl, bc
+      000522 36 00                 1114 	ld	(hl), #0x00
+                                   1115 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:90: projectiles[current_projectile].frames_len = 2;
+      000524 21r73r00              1116 	ld	hl, #_current_projectile
+      000527 4E                    1117 	ld	c, (hl)
+      000528 06 00                 1118 	ld	b, #0x00
+      00052A 69                    1119 	ld	l, c
+      00052B 60                    1120 	ld	h, b
+      00052C 29                    1121 	add	hl, hl
+      00052D 29                    1122 	add	hl, hl
+      00052E 09                    1123 	add	hl, bc
+      00052F 29                    1124 	add	hl, hl
+      000530 09                    1125 	add	hl, bc
+      000531 29                    1126 	add	hl, hl
+      000532 09                    1127 	add	hl, bc
+      000533 01r00r00              1128 	ld	bc,#_projectiles
+      000536 09                    1129 	add	hl,bc
+      000537 01 0F 00              1130 	ld	bc, #0x000f
+      00053A 09                    1131 	add	hl, bc
+      00053B 36 02                 1132 	ld	(hl), #0x02
+                                   1133 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:91: projectiles[current_projectile].palette_index = palette;
+      00053D 21r73r00              1134 	ld	hl, #_current_projectile
+      000540 4E                    1135 	ld	c, (hl)
+      000541 06 00                 1136 	ld	b, #0x00
+      000543 69                    1137 	ld	l, c
+      000544 60                    1138 	ld	h, b
+      000545 29                    1139 	add	hl, hl
+      000546 29                    1140 	add	hl, hl
+      000547 09                    1141 	add	hl, bc
+      000548 29                    1142 	add	hl, hl
+      000549 09                    1143 	add	hl, bc
+      00054A 29                    1144 	add	hl, hl
+      00054B 09                    1145 	add	hl, bc
+      00054C 01r00r00              1146 	ld	bc,#_projectiles
+      00054F 09                    1147 	add	hl,bc
+      000550 01 0C 00              1148 	ld	bc, #0x000c
+      000553 09                    1149 	add	hl,bc
+      000554 4D                    1150 	ld	c, l
+      000555 44                    1151 	ld	b, h
+      000556 F8 0B                 1152 	ldhl	sp,	#11
+      000558 7E                    1153 	ld	a, (hl)
+      000559 02                    1154 	ld	(bc), a
+                                   1155 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:92: projectiles[current_projectile].sprite = sprites_info[sprite].sprite_offset;
+      00055A 21r73r00              1156 	ld	hl, #_current_projectile
+      00055D 4E                    1157 	ld	c, (hl)
+      00055E 06 00                 1158 	ld	b, #0x00
+      000560 69                    1159 	ld	l, c
+      000561 60                    1160 	ld	h, b
+      000562 29                    1161 	add	hl, hl
+      000563 29                    1162 	add	hl, hl
+      000564 09                    1163 	add	hl, bc
+      000565 29                    1164 	add	hl, hl
+      000566 09                    1165 	add	hl, bc
+      000567 29                    1166 	add	hl, hl
+      000568 09                    1167 	add	hl, bc
+      000569 01r00r00              1168 	ld	bc,#_projectiles
+      00056C 09                    1169 	add	hl,bc
+      00056D 01 0B 00              1170 	ld	bc, #0x000b
+      000570 09                    1171 	add	hl,bc
+      000571 4D                    1172 	ld	c, l
+      000572 44                    1173 	ld	b, h
+      000573 F8 0A                 1174 	ldhl	sp,	#10
+      000575 5E                    1175 	ld	e, (hl)
+      000576 16 00                 1176 	ld	d, #0x00
+      000578 6B                    1177 	ld	l, e
+      000579 62                    1178 	ld	h, d
+      00057A 29                    1179 	add	hl, hl
+      00057B 19                    1180 	add	hl, de
+      00057C 33                    1181 	inc	sp
+      00057D 33                    1182 	inc	sp
+                                   1183 ;c
+      00057E 5D                    1184 	ld	e, l
+      00057F 54                    1185 	ld	d, h
+      000580 D5                    1186 	push	de
+      000581 21r00r00              1187 	ld	hl, #_sprites_info
+      000584 19                    1188 	add	hl, de
+      000585 E5                    1189 	push	hl
+      000586 7D                    1190 	ld	a, l
+      000587 F8 04                 1191 	ldhl	sp,	#4
+      000589 77                    1192 	ld	(hl), a
+      00058A E1                    1193 	pop	hl
+      00058B 7C                    1194 	ld	a, h
+      00058C F8 03                 1195 	ldhl	sp,	#3
+      00058E 32                    1196 	ld	(hl-), a
+      00058F 2A                    1197 	ld	a, (hl+)
+      000590 5F                    1198 	ld	e, a
+      000591 56                    1199 	ld	d, (hl)
+      000592 1A                    1200 	ld	a, (de)
+      000593 02                    1201 	ld	(bc), a
+                                   1202 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:93: projectiles[current_projectile].sprite_type = sprites_info[sprite].sprite_type;
+      000594 21r73r00              1203 	ld	hl, #_current_projectile
+      000597 4E                    1204 	ld	c, (hl)
+      000598 06 00                 1205 	ld	b, #0x00
+      00059A 69                    1206 	ld	l, c
+      00059B 60                    1207 	ld	h, b
+      00059C 29                    1208 	add	hl, hl
+      00059D 29                    1209 	add	hl, hl
+      00059E 09                    1210 	add	hl, bc
+      00059F 29                    1211 	add	hl, hl
+      0005A0 09                    1212 	add	hl, bc
+      0005A1 29                    1213 	add	hl, hl
+      0005A2 09                    1214 	add	hl, bc
+      0005A3 01r00r00              1215 	ld	bc,#_projectiles
+      0005A6 09                    1216 	add	hl,bc
+      0005A7 01 0D 00              1217 	ld	bc, #0x000d
+      0005AA 09                    1218 	add	hl,bc
+      0005AB 4D                    1219 	ld	c, l
+      0005AC 44                    1220 	ld	b, h
+      0005AD F8 02                 1221 	ldhl	sp,	#2
+      0005AF 2A                    1222 	ld	a, (hl+)
+      0005B0 66                    1223 	ld	h, (hl)
+      0005B1 6F                    1224 	ld	l, a
+      0005B2 23                    1225 	inc	hl
+      0005B3 23                    1226 	inc	hl
+      0005B4 7E                    1227 	ld	a, (hl)
+      0005B5 02                    1228 	ld	(bc), a
+                                   1229 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:94: projectiles[current_projectile].frames_len = sprites_info[sprite].frames_len;
+      0005B6 21r73r00              1230 	ld	hl, #_current_projectile
+      0005B9 4E                    1231 	ld	c, (hl)
+      0005BA 06 00                 1232 	ld	b, #0x00
+      0005BC 69                    1233 	ld	l, c
+      0005BD 60                    1234 	ld	h, b
+      0005BE 29                    1235 	add	hl, hl
+      0005BF 29                    1236 	add	hl, hl
+      0005C0 09                    1237 	add	hl, bc
+      0005C1 29                    1238 	add	hl, hl
+      0005C2 09                    1239 	add	hl, bc
+      0005C3 29                    1240 	add	hl, hl
+      0005C4 09                    1241 	add	hl, bc
+      0005C5 01r00r00              1242 	ld	bc,#_projectiles
+      0005C8 09                    1243 	add	hl,bc
+      0005C9 01 0F 00              1244 	ld	bc, #0x000f
+      0005CC 09                    1245 	add	hl,bc
+      0005CD 4D                    1246 	ld	c, l
+      0005CE 44                    1247 	ld	b, h
+      0005CF F8 02                 1248 	ldhl	sp,	#2
+      0005D1 2A                    1249 	ld	a, (hl+)
+      0005D2 66                    1250 	ld	h, (hl)
+      0005D3 6F                    1251 	ld	l, a
+      0005D4 23                    1252 	inc	hl
+      0005D5 7E                    1253 	ld	a, (hl)
+      0005D6 02                    1254 	ld	(bc), a
+      0005D7                       1255 00102$:
+                                   1256 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:97: current_projectile = (current_projectile + 1) % MAX_PROJECTILES;
+      0005D7 21r73r00              1257 	ld	hl, #_current_projectile
+      0005DA 4E                    1258 	ld	c, (hl)
+      0005DB 06 00                 1259 	ld	b, #0x00
+      0005DD 03                    1260 	inc	bc
+      0005DE 21 05 00              1261 	ld	hl, #0x0005
+      0005E1 E5                    1262 	push	hl
+      0005E2 C5                    1263 	push	bc
+      0005E3 CDr00r00              1264 	call	__modsint
+      0005E6 E8 04                 1265 	add	sp, #4
+      0005E8 21r73r00              1266 	ld	hl, #_current_projectile
+      0005EB 73                    1267 	ld	(hl), e
+                                   1268 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:98: }
+      0005EC E8 04                 1269 	add	sp, #4
+      0005EE C9                    1270 	ret
+                                   1271 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:100: void UpdateProjectiles_b() __banked {
+                                   1272 ;	---------------------------------
+                                   1273 ; Function UpdateProjectiles_b
+                                   1274 ; ---------------------------------
+                           000001  1275 	b_UpdateProjectiles_b	= 1
+      0005EF                       1276 _UpdateProjectiles_b::
+      0005EF E8 EC                 1277 	add	sp, #-20
+                                   1278 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:105: for (i = 0; i != MAX_PROJECTILES; i++) {
+      0005F1 AF                    1279 	xor	a, a
+      0005F2 F8 13                 1280 	ldhl	sp,	#19
+      0005F4 77                    1281 	ld	(hl), a
+      0005F5                       1282 00192$:
+                                   1283 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:107: if (projectiles[i].life_time != 0) {
+      0005F5 F8 13                 1284 	ldhl	sp,	#19
+      0005F7 4E                    1285 	ld	c, (hl)
+      0005F8 06 00                 1286 	ld	b, #0x00
+      0005FA 69                    1287 	ld	l, c
+      0005FB 60                    1288 	ld	h, b
+      0005FC 29                    1289 	add	hl, hl
+      0005FD 29                    1290 	add	hl, hl
+      0005FE 09                    1291 	add	hl, bc
+      0005FF 29                    1292 	add	hl, hl
+      000600 09                    1293 	add	hl, bc
+      000601 29                    1294 	add	hl, hl
+      000602 09                    1295 	add	hl, bc
+      000603 01r00r00              1296 	ld	bc,#_projectiles
+      000606 09                    1297 	add	hl,bc
+      000607 E5                    1298 	push	hl
+      000608 7D                    1299 	ld	a, l
+      000609 F8 06                 1300 	ldhl	sp,	#6
+      00060B 77                    1301 	ld	(hl), a
+      00060C E1                    1302 	pop	hl
+      00060D 7C                    1303 	ld	a, h
+      00060E F8 05                 1304 	ldhl	sp,	#5
+                                   1305 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:164: projectiles[i].life_time = 1;
+                                   1306 ;c
+      000610 32                    1307 	ld	(hl-), a
+      000611 2A                    1308 	ld	a, (hl+)
+      000612 5F                    1309 	ld	e, a
+      000613 56                    1310 	ld	d, (hl)
+      000614 21 14 00              1311 	ld	hl, #0x0014
+      000617 19                    1312 	add	hl, de
+      000618 E5                    1313 	push	hl
+      000619 7D                    1314 	ld	a, l
+      00061A F8 11                 1315 	ldhl	sp,	#17
+      00061C 77                    1316 	ld	(hl), a
+      00061D E1                    1317 	pop	hl
+      00061E 7C                    1318 	ld	a, h
+      00061F F8 10                 1319 	ldhl	sp,	#16
+                                   1320 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:107: if (projectiles[i].life_time != 0) {
+      000621 32                    1321 	ld	(hl-), a
+      000622 2A                    1322 	ld	a, (hl+)
+      000623 5F                    1323 	ld	e, a
+      000624 56                    1324 	ld	d, (hl)
+      000625 1A                    1325 	ld	a, (de)
+      000626 23                    1326 	inc	hl
+      000627 23                    1327 	inc	hl
+      000628 77                    1328 	ld	(hl), a
+                                   1329 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:152: k = projectiles[i].sprite_index;
+                                   1330 ;c
+      000629 F8 04                 1331 	ldhl	sp,#4
+      00062B 2A                    1332 	ld	a, (hl+)
+      00062C 5F                    1333 	ld	e, a
+      00062D 56                    1334 	ld	d, (hl)
+      00062E 21 12 00              1335 	ld	hl, #0x0012
+      000631 19                    1336 	add	hl, de
+      000632 E5                    1337 	push	hl
+      000633 7D                    1338 	ld	a, l
+      000634 F8 0F                 1339 	ldhl	sp,	#15
+      000636 77                    1340 	ld	(hl), a
+      000637 E1                    1341 	pop	hl
+      000638 7C                    1342 	ld	a, h
+      000639 F8 0E                 1343 	ldhl	sp,	#14
+      00063B 77                    1344 	ld	(hl), a
+                                   1345 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:107: if (projectiles[i].life_time != 0) {
+      00063C F8 12                 1346 	ldhl	sp,	#18
+      00063E 7E                    1347 	ld	a, (hl)
+      00063F B7                    1348 	or	a, a
+      000640 CArCCr0D              1349 	jp	Z, 00175$
+                                   1350 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:109: hit = NO_ACTOR_COLLISON;
+      000643 F8 0C                 1351 	ldhl	sp,	#12
+      000645 36 FF                 1352 	ld	(hl), #0xff
+                                   1353 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:110: for (j = 0; j != actors_active_size; j++) {
+      000647 F8 04                 1354 	ldhl	sp,	#4
+      000649 2A                    1355 	ld	a, (hl+)
+      00064A 5E                    1356 	ld	e, (hl)
+      00064B F8 02                 1357 	ldhl	sp,	#2
+      00064D 22                    1358 	ld	(hl+), a
+                                   1359 ;c
+      00064E 7B                    1360 	ld	a, e
+      00064F 22                    1361 	ld	(hl+), a
+      000650 2A                    1362 	ld	a, (hl+)
+      000651 5F                    1363 	ld	e, a
+      000652 56                    1364 	ld	d, (hl)
+      000653 21 16 00              1365 	ld	hl, #0x0016
+      000656 19                    1366 	add	hl, de
+      000657 4D                    1367 	ld	c, l
+      000658 44                    1368 	ld	b, h
+      000659 0A                    1369 	ld	a, (bc)
+      00065A F8 07                 1370 	ldhl	sp,	#7
+      00065C 77                    1371 	ld	(hl), a
+      00065D AF                    1372 	xor	a, a
+      00065E F8 12                 1373 	ldhl	sp,	#18
+      000660 77                    1374 	ld	(hl), a
+      000661                       1375 00191$:
+      000661 FAr00r00              1376 	ld	a, (#_actors_active_size)
+      000664 F8 12                 1377 	ldhl	sp,	#18
+      000666 96                    1378 	sub	a, (hl)
+      000667 CAr92r07              1379 	jp	Z,00112$
+                                   1380 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:111: UBYTE a = actors_active[j];
+                                   1381 ;c
+      00066A 11r00r00              1382 	ld	de, #_actors_active
+      00066D F8 12                 1383 	ldhl	sp,	#18
+      00066F 6E                    1384 	ld	l, (hl)
+      000670 26 00                 1385 	ld	h, #0x00
+      000672 19                    1386 	add	hl, de
+      000673 4D                    1387 	ld	c, l
+      000674 44                    1388 	ld	b, h
+      000675 0A                    1389 	ld	a, (bc)
+      000676 F8 11                 1390 	ldhl	sp,	#17
+      000678 77                    1391 	ld	(hl), a
+                                   1392 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:113: if (!actors[a].enabled || !actors[a].collisionsEnabled) {
+      000679 4E                    1393 	ld	c, (hl)
+      00067A 06 00                 1394 	ld	b, #0x00
+      00067C 69                    1395 	ld	l, c
+      00067D 60                    1396 	ld	h, b
+      00067E 29                    1397 	add	hl, hl
+      00067F 29                    1398 	add	hl, hl
+      000680 09                    1399 	add	hl, bc
+      000681 29                    1400 	add	hl, hl
+      000682 09                    1401 	add	hl, bc
+      000683 29                    1402 	add	hl, hl
+      000684 09                    1403 	add	hl, bc
+      000685 29                    1404 	add	hl, hl
+      000686 01r00r00              1405 	ld	bc,#_actors
+      000689 09                    1406 	add	hl,bc
+      00068A E5                    1407 	push	hl
+      00068B 7D                    1408 	ld	a, l
+      00068C F8 0A                 1409 	ldhl	sp,	#10
+      00068E 77                    1410 	ld	(hl), a
+      00068F E1                    1411 	pop	hl
+      000690 7C                    1412 	ld	a, h
+      000691 F8 09                 1413 	ldhl	sp,	#9
+                                   1414 ;c
+      000693 32                    1415 	ld	(hl-), a
+      000694 2A                    1416 	ld	a, (hl+)
+      000695 5F                    1417 	ld	e, a
+      000696 56                    1418 	ld	d, (hl)
+      000697 21 12 00              1419 	ld	hl, #0x0012
+      00069A 19                    1420 	add	hl, de
+      00069B 4D                    1421 	ld	c, l
+      00069C 44                    1422 	ld	b, h
+      00069D 0A                    1423 	ld	a, (bc)
+      00069E B7                    1424 	or	a, a
+      00069F CAr8Cr07              1425 	jp	Z, 00111$
+                                   1426 ;c
+      0006A2 F8 08                 1427 	ldhl	sp,#8
+      0006A4 2A                    1428 	ld	a, (hl+)
+      0006A5 5F                    1429 	ld	e, a
+      0006A6 56                    1430 	ld	d, (hl)
+      0006A7 21 17 00              1431 	ld	hl, #0x0017
+      0006AA 19                    1432 	add	hl, de
+      0006AB E5                    1433 	push	hl
+      0006AC 7D                    1434 	ld	a, l
+      0006AD F8 0C                 1435 	ldhl	sp,	#12
+      0006AF 77                    1436 	ld	(hl), a
+      0006B0 E1                    1437 	pop	hl
+      0006B1 7C                    1438 	ld	a, h
+      0006B2 F8 0B                 1439 	ldhl	sp,	#11
+      0006B4 32                    1440 	ld	(hl-), a
+      0006B5 2A                    1441 	ld	a, (hl+)
+      0006B6 5F                    1442 	ld	e, a
+      0006B7 56                    1443 	ld	d, (hl)
+      0006B8 1A                    1444 	ld	a, (de)
+      0006B9 B7                    1445 	or	a, a
+      0006BA CAr8Cr07              1446 	jp	Z, 00111$
+                                   1447 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:117: if (!(actors[a].collision_group & projectiles[i].col_mask)) {
+                                   1448 ;c
+      0006BD 2B                    1449 	dec	hl
+      0006BE 2B                    1450 	dec	hl
+      0006BF 2B                    1451 	dec	hl
+      0006C0 2A                    1452 	ld	a, (hl+)
+      0006C1 5F                    1453 	ld	e, a
+      0006C2 56                    1454 	ld	d, (hl)
+      0006C3 21 18 00              1455 	ld	hl, #0x0018
+      0006C6 19                    1456 	add	hl, de
+      0006C7 4D                    1457 	ld	c, l
+      0006C8 44                    1458 	ld	b, h
+      0006C9 0A                    1459 	ld	a, (bc)
+      0006CA F8 07                 1460 	ldhl	sp,	#7
+      0006CC A6                    1461 	and	a,(hl)
+      0006CD CAr8Cr07              1462 	jp	Z, 00111$
+                                   1463 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:121: if ((projectiles[i].pos.x + 12 >= actors[a].pos.x) &&
+      0006D0 F8 02                 1464 	ldhl	sp,#2
+      0006D2 2A                    1465 	ld	a, (hl+)
+      0006D3 5F                    1466 	ld	e, a
+      0006D4 56                    1467 	ld	d, (hl)
+      0006D5 1A                    1468 	ld	a, (de)
+      0006D6 F8 0A                 1469 	ldhl	sp,	#10
+      0006D8 22                    1470 	ld	(hl+), a
+      0006D9 13                    1471 	inc	de
+      0006DA 1A                    1472 	ld	a, (de)
+                                   1473 ;c
+      0006DB 32                    1474 	ld	(hl-), a
+      0006DC 2A                    1475 	ld	a, (hl+)
+      0006DD 5F                    1476 	ld	e, a
+      0006DE 56                    1477 	ld	d, (hl)
+      0006DF 21 0C 00              1478 	ld	hl, #0x000c
+      0006E2 19                    1479 	add	hl, de
+      0006E3 4D                    1480 	ld	c, l
+      0006E4 44                    1481 	ld	b, h
+      0006E5 F8 08                 1482 	ldhl	sp,#8
+      0006E7 2A                    1483 	ld	a, (hl+)
+      0006E8 5F                    1484 	ld	e, a
+      0006E9 56                    1485 	ld	d, (hl)
+      0006EA 1A                    1486 	ld	a, (de)
+      0006EB 6F                    1487 	ld	l, a
+      0006EC 13                    1488 	inc	de
+      0006ED 1A                    1489 	ld	a, (de)
+      0006EE 67                    1490 	ld	h, a
+      0006EF 5C                    1491 	ld	e, h
+      0006F0 50                    1492 	ld	d, b
+      0006F1 79                    1493 	ld	a, c
+      0006F2 95                    1494 	sub	a, l
+      0006F3 78                    1495 	ld	a, b
+      0006F4 9C                    1496 	sbc	a, h
+      0006F5 CB 7B                 1497 	bit	7, e
+      0006F7 28 07                 1498 	jr	Z, 00379$
+      0006F9 CB 7A                 1499 	bit	7, d
+      0006FB 20 08                 1500 	jr	NZ, 00380$
+      0006FD BF                    1501 	cp	a, a
+      0006FE 18 05                 1502 	jr	00380$
+      000700                       1503 00379$:
+      000700 CB 7A                 1504 	bit	7, d
+      000702 28 01                 1505 	jr	Z, 00380$
+      000704 37                    1506 	scf
+      000705                       1507 00380$:
+      000705 DAr8Cr07              1508 	jp	C, 00111$
+                                   1509 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:122: (projectiles[i].pos.x <= actors[a].pos.x + 12) &&
+      000708 01 0C 00              1510 	ld	bc, #0x000c
+      00070B 09                    1511 	add	hl,bc
+      00070C 4D                    1512 	ld	c, l
+      00070D 44                    1513 	ld	b, h
+      00070E F8 0A                 1514 	ldhl	sp,	#10
+      000710 79                    1515 	ld	a, c
+      000711 96                    1516 	sub	a, (hl)
+      000712 23                    1517 	inc	hl
+      000713 78                    1518 	ld	a, b
+      000714 9E                    1519 	sbc	a, (hl)
+      000715 78                    1520 	ld	a, b
+      000716 57                    1521 	ld	d, a
+      000717 CB 7E                 1522 	bit	7, (hl)
+      000719 28 07                 1523 	jr	Z, 00381$
+      00071B CB 7A                 1524 	bit	7, d
+      00071D 20 08                 1525 	jr	NZ, 00382$
+      00071F BF                    1526 	cp	a, a
+      000720 18 05                 1527 	jr	00382$
+      000722                       1528 00381$:
+      000722 CB 7A                 1529 	bit	7, d
+      000724 28 01                 1530 	jr	Z, 00382$
+      000726 37                    1531 	scf
+      000727                       1532 00382$:
+      000727 38 63                 1533 	jr	C, 00111$
+                                   1534 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:123: (projectiles[i].pos.y + 8 >= actors[a].pos.y) &&
+      000729 C1                    1535 	pop	bc
+      00072A E1                    1536 	pop	hl
+      00072B E5                    1537 	push	hl
+      00072C C5                    1538 	push	bc
+      00072D 23                    1539 	inc	hl
+      00072E 23                    1540 	inc	hl
+      00072F 5D                    1541 	ld	e, l
+      000730 54                    1542 	ld	d, h
+      000731 1A                    1543 	ld	a, (de)
+      000732 F8 0A                 1544 	ldhl	sp,	#10
+      000734 22                    1545 	ld	(hl+), a
+      000735 13                    1546 	inc	de
+      000736 1A                    1547 	ld	a, (de)
+      000737 77                    1548 	ld	(hl), a
+                                   1549 ;c
+      000738 F8 0A                 1550 	ldhl	sp,#10
+      00073A 2A                    1551 	ld	a, (hl+)
+      00073B 5F                    1552 	ld	e, a
+      00073C 56                    1553 	ld	d, (hl)
+      00073D 21 08 00              1554 	ld	hl, #0x0008
+      000740 19                    1555 	add	hl, de
+      000741 4D                    1556 	ld	c, l
+      000742 44                    1557 	ld	b, h
+      000743 F8 08                 1558 	ldhl	sp,	#8
+      000745 2A                    1559 	ld	a, (hl+)
+      000746 66                    1560 	ld	h, (hl)
+      000747 6F                    1561 	ld	l, a
+      000748 23                    1562 	inc	hl
+      000749 23                    1563 	inc	hl
+      00074A 2A                    1564 	ld	a, (hl+)
+      00074B 66                    1565 	ld	h, (hl)
+      00074C 6F                    1566 	ld	l, a
+      00074D 5C                    1567 	ld	e, h
+      00074E 50                    1568 	ld	d, b
+      00074F 79                    1569 	ld	a, c
+      000750 95                    1570 	sub	a, l
+      000751 78                    1571 	ld	a, b
+      000752 9C                    1572 	sbc	a, h
+      000753 CB 7B                 1573 	bit	7, e
+      000755 28 07                 1574 	jr	Z, 00383$
+      000757 CB 7A                 1575 	bit	7, d
+      000759 20 08                 1576 	jr	NZ, 00384$
+      00075B BF                    1577 	cp	a, a
+      00075C 18 05                 1578 	jr	00384$
+      00075E                       1579 00383$:
+      00075E CB 7A                 1580 	bit	7, d
+      000760 28 01                 1581 	jr	Z, 00384$
+      000762 37                    1582 	scf
+      000763                       1583 00384$:
+      000763 38 27                 1584 	jr	C, 00111$
+                                   1585 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:124: (projectiles[i].pos.y <= actors[a].pos.y + 8)) {
+      000765 01 08 00              1586 	ld	bc, #0x0008
+      000768 09                    1587 	add	hl,bc
+      000769 4D                    1588 	ld	c, l
+      00076A 44                    1589 	ld	b, h
+      00076B F8 0A                 1590 	ldhl	sp,	#10
+      00076D 79                    1591 	ld	a, c
+      00076E 96                    1592 	sub	a, (hl)
+      00076F 23                    1593 	inc	hl
+      000770 78                    1594 	ld	a, b
+      000771 9E                    1595 	sbc	a, (hl)
+      000772 78                    1596 	ld	a, b
+      000773 57                    1597 	ld	d, a
+      000774 CB 7E                 1598 	bit	7, (hl)
+      000776 28 07                 1599 	jr	Z, 00385$
+      000778 CB 7A                 1600 	bit	7, d
+      00077A 20 08                 1601 	jr	NZ, 00386$
+      00077C BF                    1602 	cp	a, a
+      00077D 18 05                 1603 	jr	00386$
+      00077F                       1604 00385$:
+      00077F CB 7A                 1605 	bit	7, d
+      000781 28 01                 1606 	jr	Z, 00386$
+      000783 37                    1607 	scf
+      000784                       1608 00386$:
+      000784 38 06                 1609 	jr	C, 00111$
+                                   1610 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:125: hit = a;
+      000786 F8 11                 1611 	ldhl	sp,	#17
+      000788 7E                    1612 	ld	a, (hl)
+      000789 F8 0C                 1613 	ldhl	sp,	#12
+      00078B 77                    1614 	ld	(hl), a
+      00078C                       1615 00111$:
+                                   1616 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:110: for (j = 0; j != actors_active_size; j++) {
+      00078C F8 12                 1617 	ldhl	sp,	#18
+      00078E 34                    1618 	inc	(hl)
+      00078F C3r61r06              1619 	jp	00191$
+      000792                       1620 00112$:
+                                   1621 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:161: if (projectiles[i].pin_actor == NO_ACTOR_PINNED) {
+                                   1622 ;c
+      000792 F8 04                 1623 	ldhl	sp,#4
+      000794 2A                    1624 	ld	a, (hl+)
+      000795 5F                    1625 	ld	e, a
+      000796 56                    1626 	ld	d, (hl)
+      000797 21 09 00              1627 	ld	hl, #0x0009
+      00079A 19                    1628 	add	hl, de
+      00079B E5                    1629 	push	hl
+      00079C 7D                    1630 	ld	a, l
+      00079D F8 13                 1631 	ldhl	sp,	#19
+      00079F 77                    1632 	ld	(hl), a
+      0007A0 E1                    1633 	pop	hl
+      0007A1 7C                    1634 	ld	a, h
+      0007A2 F8 12                 1635 	ldhl	sp,	#18
+      0007A4 77                    1636 	ld	(hl), a
+                                   1637 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:130: if (hit != NO_ACTOR_COLLISON) {
+      0007A5 F8 0C                 1638 	ldhl	sp,	#12
+      0007A7 7E                    1639 	ld	a, (hl)
+      0007A8 3C                    1640 	inc	a
+      0007A9 CAr55r08              1641 	jp	Z,00130$
+                                   1642 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:131: if (projectiles[i].pin_actor == NO_ACTOR_PINNED) {
+      0007AC F8 11                 1643 	ldhl	sp,#17
+      0007AE 2A                    1644 	ld	a, (hl+)
+      0007AF 5F                    1645 	ld	e, a
+      0007B0 56                    1646 	ld	d, (hl)
+      0007B1 1A                    1647 	ld	a, (de)
+      0007B2 3C                    1648 	inc	a
+      0007B3 20 07                 1649 	jr	NZ, 00114$
+                                   1650 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:132: projectiles[i].life_time = 0;
+      0007B5 F8 0F                 1651 	ldhl	sp,	#15
+      0007B7 2A                    1652 	ld	a, (hl+)
+      0007B8 66                    1653 	ld	h, (hl)
+      0007B9 6F                    1654 	ld	l, a
+      0007BA 36 00                 1655 	ld	(hl), #0x00
+      0007BC                       1656 00114$:
+                                   1657 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:134: if (projectiles[i].col_group == 2) {
+                                   1658 ;c
+      0007BC F8 04                 1659 	ldhl	sp,#4
+      0007BE 2A                    1660 	ld	a, (hl+)
+      0007BF 5F                    1661 	ld	e, a
+      0007C0 56                    1662 	ld	d, (hl)
+      0007C1 21 15 00              1663 	ld	hl, #0x0015
+      0007C4 19                    1664 	add	hl, de
+      0007C5 E5                    1665 	push	hl
+      0007C6 7D                    1666 	ld	a, l
+      0007C7 F8 0C                 1667 	ldhl	sp,	#12
+      0007C9 77                    1668 	ld	(hl), a
+      0007CA E1                    1669 	pop	hl
+      0007CB 7C                    1670 	ld	a, h
+      0007CC F8 0B                 1671 	ldhl	sp,	#11
+      0007CE 32                    1672 	ld	(hl-), a
+      0007CF 2A                    1673 	ld	a, (hl+)
+      0007D0 5F                    1674 	ld	e, a
+      0007D1 56                    1675 	ld	d, (hl)
+      0007D2 1A                    1676 	ld	a, (de)
+      0007D3 4F                    1677 	ld	c, a
+                                   1678 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:135: if (actors[hit].hit_1_ptr.bank) {
+      0007D4 23                    1679 	inc	hl
+      0007D5 5E                    1680 	ld	e, (hl)
+      0007D6 16 00                 1681 	ld	d, #0x00
+      0007D8 6B                    1682 	ld	l, e
+      0007D9 62                    1683 	ld	h, d
+      0007DA 29                    1684 	add	hl, hl
+      0007DB 29                    1685 	add	hl, hl
+      0007DC 19                    1686 	add	hl, de
+      0007DD 29                    1687 	add	hl, hl
+      0007DE 19                    1688 	add	hl, de
+      0007DF 29                    1689 	add	hl, hl
+      0007E0 19                    1690 	add	hl, de
+      0007E1 29                    1691 	add	hl, hl
+                                   1692 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:134: if (projectiles[i].col_group == 2) {
+      0007E2 79                    1693 	ld	a, c
+      0007E3 D6 02                 1694 	sub	a, #0x02
+      0007E5 20 22                 1695 	jr	NZ, 00127$
+                                   1696 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:135: if (actors[hit].hit_1_ptr.bank) {
+      0007E7 11r00r00              1697 	ld	de, #_actors
+      0007EA 19                    1698 	add	hl, de
+      0007EB 01 24 00              1699 	ld	bc, #0x0024
+      0007EE 09                    1700 	add	hl,bc
+      0007EF 4D                    1701 	ld	c, l
+      0007F0 44                    1702 	ld	b, h
+      0007F1 0A                    1703 	ld	a, (bc)
+      0007F2 B7                    1704 	or	a, a
+      0007F3 28 60                 1705 	jr	Z, 00130$
+                                   1706 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:136: projectiles[i].col_group = 0;
+      0007F5 F8 0A                 1707 	ldhl	sp,	#10
+      0007F7 2A                    1708 	ld	a, (hl+)
+      0007F8 66                    1709 	ld	h, (hl)
+      0007F9 6F                    1710 	ld	l, a
+      0007FA 36 00                 1711 	ld	(hl), #0x00
+                                   1712 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:137: ScriptStartBg(&actors[hit].hit_1_ptr, hit);
+      0007FC F8 0C                 1713 	ldhl	sp,	#12
+      0007FE 7E                    1714 	ld	a, (hl)
+      0007FF F5                    1715 	push	af
+      000800 33                    1716 	inc	sp
+      000801 C5                    1717 	push	bc
+      000802 CDr00r00              1718 	call	_ScriptStartBg
+      000805 E8 03                 1719 	add	sp, #3
+      000807 18 4C                 1720 	jr	00130$
+      000809                       1721 00127$:
+                                   1722 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:139: } else if (projectiles[i].col_group == 4) {
+      000809 79                    1723 	ld	a, c
+      00080A D6 04                 1724 	sub	a, #0x04
+      00080C 20 22                 1725 	jr	NZ, 00124$
+                                   1726 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:140: if (actors[hit].hit_2_ptr.bank) {
+      00080E 11r00r00              1727 	ld	de, #_actors
+      000811 19                    1728 	add	hl, de
+      000812 01 27 00              1729 	ld	bc, #0x0027
+      000815 09                    1730 	add	hl,bc
+      000816 4D                    1731 	ld	c, l
+      000817 44                    1732 	ld	b, h
+      000818 0A                    1733 	ld	a, (bc)
+      000819 B7                    1734 	or	a, a
+      00081A 28 39                 1735 	jr	Z, 00130$
+                                   1736 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:141: projectiles[i].col_group = 0;
+      00081C F8 0A                 1737 	ldhl	sp,	#10
+      00081E 2A                    1738 	ld	a, (hl+)
+      00081F 66                    1739 	ld	h, (hl)
+      000820 6F                    1740 	ld	l, a
+      000821 36 00                 1741 	ld	(hl), #0x00
+                                   1742 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:142: ScriptStartBg(&actors[hit].hit_2_ptr, hit);
+      000823 F8 0C                 1743 	ldhl	sp,	#12
+      000825 7E                    1744 	ld	a, (hl)
+      000826 F5                    1745 	push	af
+      000827 33                    1746 	inc	sp
+      000828 C5                    1747 	push	bc
+      000829 CDr00r00              1748 	call	_ScriptStartBg
+      00082C E8 03                 1749 	add	sp, #3
+      00082E 18 25                 1750 	jr	00130$
+      000830                       1751 00124$:
+                                   1752 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:144: } else if (projectiles[i].col_group == 8) {
+      000830 79                    1753 	ld	a, c
+      000831 D6 08                 1754 	sub	a, #0x08
+      000833 20 20                 1755 	jr	NZ, 00130$
+                                   1756 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:145: if (actors[hit].hit_3_ptr.bank) {
+      000835 11r00r00              1757 	ld	de, #_actors
+      000838 19                    1758 	add	hl, de
+      000839 01 2A 00              1759 	ld	bc, #0x002a
+      00083C 09                    1760 	add	hl,bc
+      00083D 4D                    1761 	ld	c, l
+      00083E 44                    1762 	ld	b, h
+      00083F 0A                    1763 	ld	a, (bc)
+      000840 B7                    1764 	or	a, a
+      000841 28 12                 1765 	jr	Z, 00130$
+                                   1766 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:146: projectiles[i].col_group = 0;
+      000843 F8 0A                 1767 	ldhl	sp,	#10
+      000845 2A                    1768 	ld	a, (hl+)
+      000846 66                    1769 	ld	h, (hl)
+      000847 6F                    1770 	ld	l, a
+      000848 36 00                 1771 	ld	(hl), #0x00
+                                   1772 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:147: ScriptStartBg(&actors[hit].hit_3_ptr, hit);
+      00084A F8 0C                 1773 	ldhl	sp,	#12
+      00084C 7E                    1774 	ld	a, (hl)
+      00084D F5                    1775 	push	af
+      00084E 33                    1776 	inc	sp
+      00084F C5                    1777 	push	bc
+      000850 CDr00r00              1778 	call	_ScriptStartBg
+      000853 E8 03                 1779 	add	sp, #3
+      000855                       1780 00130$:
+                                   1781 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:152: k = projectiles[i].sprite_index;
+      000855 F8 0D                 1782 	ldhl	sp,#13
+      000857 2A                    1783 	ld	a, (hl+)
+      000858 5F                    1784 	ld	e, a
+      000859 56                    1785 	ld	d, (hl)
+      00085A 1A                    1786 	ld	a, (de)
+      00085B F8 06                 1787 	ldhl	sp,	#6
+      00085D 77                    1788 	ld	(hl), a
+                                   1789 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:155: fo = 0;
+      00085E AF                    1790 	xor	a, a
+      00085F 23                    1791 	inc	hl
+      000860 77                    1792 	ld	(hl), a
+                                   1793 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:156: flip = FALSE;
+      000861 AF                    1794 	xor	a, a
+      000862 23                    1795 	inc	hl
+      000863 77                    1796 	ld	(hl), a
+                                   1797 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:157: if ((projectiles[i].time & 0x3) == 0) {
+                                   1798 ;c
+      000864 F8 04                 1799 	ldhl	sp,#4
+      000866 2A                    1800 	ld	a, (hl+)
+      000867 5F                    1801 	ld	e, a
+      000868 56                    1802 	ld	d, (hl)
+      000869 21 13 00              1803 	ld	hl, #0x0013
+      00086C 19                    1804 	add	hl, de
+      00086D E5                    1805 	push	hl
+      00086E 7D                    1806 	ld	a, l
+      00086F F8 0B                 1807 	ldhl	sp,	#11
+      000871 77                    1808 	ld	(hl), a
+      000872 E1                    1809 	pop	hl
+      000873 7C                    1810 	ld	a, h
+      000874 F8 0A                 1811 	ldhl	sp,	#10
+      000876 32                    1812 	ld	(hl-), a
+      000877 2A                    1813 	ld	a, (hl+)
+      000878 5F                    1814 	ld	e, a
+      000879 56                    1815 	ld	d, (hl)
+      00087A 1A                    1816 	ld	a, (de)
+      00087B F8 0E                 1817 	ldhl	sp,	#14
+      00087D 77                    1818 	ld	(hl), a
+                                   1819 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:158: projectiles[i].frame++;
+                                   1820 ;c
+      00087E F8 04                 1821 	ldhl	sp,#4
+      000880 2A                    1822 	ld	a, (hl+)
+      000881 5F                    1823 	ld	e, a
+      000882 56                    1824 	ld	d, (hl)
+      000883 21 0E 00              1825 	ld	hl, #0x000e
+      000886 19                    1826 	add	hl, de
+      000887 E5                    1827 	push	hl
+      000888 7D                    1828 	ld	a, l
+      000889 F8 0D                 1829 	ldhl	sp,	#13
+      00088B 77                    1830 	ld	(hl), a
+      00088C E1                    1831 	pop	hl
+      00088D 7C                    1832 	ld	a, h
+      00088E F8 0C                 1833 	ldhl	sp,	#12
+                                   1834 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:157: if ((projectiles[i].time & 0x3) == 0) {
+      000890 22                    1835 	ld	(hl+), a
+      000891 23                    1836 	inc	hl
+      000892 7E                    1837 	ld	a, (hl)
+      000893 E6 03                 1838 	and	a, #0x03
+      000895 20 11                 1839 	jr	NZ, 00132$
+                                   1840 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:158: projectiles[i].frame++;
+      000897 F8 0B                 1841 	ldhl	sp,#11
+      000899 2A                    1842 	ld	a, (hl+)
+      00089A 5F                    1843 	ld	e, a
+      00089B 56                    1844 	ld	d, (hl)
+      00089C 1A                    1845 	ld	a, (de)
+      00089D 23                    1846 	inc	hl
+      00089E 23                    1847 	inc	hl
+      00089F 77                    1848 	ld	(hl), a
+      0008A0 4E                    1849 	ld	c, (hl)
+      0008A1 0C                    1850 	inc	c
+      0008A2 F8 0B                 1851 	ldhl	sp,	#11
+      0008A4 2A                    1852 	ld	a, (hl+)
+      0008A5 66                    1853 	ld	h, (hl)
+      0008A6 6F                    1854 	ld	l, a
+      0008A7 71                    1855 	ld	(hl), c
+      0008A8                       1856 00132$:
+                                   1857 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:160: if (projectiles[i].frame == projectiles[i].frames_len) {
+      0008A8 F8 0B                 1858 	ldhl	sp,#11
+      0008AA 2A                    1859 	ld	a, (hl+)
+      0008AB 5F                    1860 	ld	e, a
+      0008AC 56                    1861 	ld	d, (hl)
+      0008AD 1A                    1862 	ld	a, (de)
+      0008AE 4F                    1863 	ld	c, a
+                                   1864 ;c
+      0008AF F8 04                 1865 	ldhl	sp,#4
+      0008B1 2A                    1866 	ld	a, (hl+)
+      0008B2 5F                    1867 	ld	e, a
+      0008B3 56                    1868 	ld	d, (hl)
+      0008B4 21 0F 00              1869 	ld	hl, #0x000f
+      0008B7 19                    1870 	add	hl, de
+      0008B8 5D                    1871 	ld	e, l
+      0008B9 54                    1872 	ld	d, h
+      0008BA 1A                    1873 	ld	a, (de)
+      0008BB 91                    1874 	sub	a, c
+      0008BC 20 26                 1875 	jr	NZ, 00137$
+                                   1876 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:161: if (projectiles[i].pin_actor == NO_ACTOR_PINNED) {
+      0008BE F8 11                 1877 	ldhl	sp,#17
+      0008C0 2A                    1878 	ld	a, (hl+)
+      0008C1 5F                    1879 	ld	e, a
+      0008C2 56                    1880 	ld	d, (hl)
+      0008C3 1A                    1881 	ld	a, (de)
+      0008C4 3C                    1882 	inc	a
+      0008C5 20 09                 1883 	jr	NZ, 00134$
+                                   1884 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:162: projectiles[i].frame = 0;
+      0008C7 F8 0B                 1885 	ldhl	sp,	#11
+      0008C9 2A                    1886 	ld	a, (hl+)
+      0008CA 66                    1887 	ld	h, (hl)
+      0008CB 6F                    1888 	ld	l, a
+      0008CC 36 00                 1889 	ld	(hl), #0x00
+      0008CE 18 14                 1890 	jr	00137$
+      0008D0                       1891 00134$:
+                                   1892 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:164: projectiles[i].life_time = 1;
+      0008D0 F8 0F                 1893 	ldhl	sp,	#15
+      0008D2 2A                    1894 	ld	a, (hl+)
+      0008D3 66                    1895 	ld	h, (hl)
+      0008D4 6F                    1896 	ld	l, a
+      0008D5 36 01                 1897 	ld	(hl), #0x01
+                                   1898 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:165: projectiles[i].frame--;
+      0008D7 F8 0B                 1899 	ldhl	sp,#11
+      0008D9 2A                    1900 	ld	a, (hl+)
+      0008DA 5F                    1901 	ld	e, a
+      0008DB 56                    1902 	ld	d, (hl)
+      0008DC 1A                    1903 	ld	a, (de)
+      0008DD 4F                    1904 	ld	c, a
+      0008DE 0D                    1905 	dec	c
+      0008DF 2B                    1906 	dec	hl
+      0008E0 2A                    1907 	ld	a, (hl+)
+      0008E1 66                    1908 	ld	h, (hl)
+      0008E2 6F                    1909 	ld	l, a
+      0008E3 71                    1910 	ld	(hl), c
+      0008E4                       1911 00137$:
+                                   1912 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:169: if (projectiles[i].sprite_type != SPRITE_STATIC) {
+                                   1913 ;c
+      0008E4 F8 04                 1914 	ldhl	sp,#4
+      0008E6 2A                    1915 	ld	a, (hl+)
+      0008E7 5F                    1916 	ld	e, a
+      0008E8 56                    1917 	ld	d, (hl)
+      0008E9 21 0D 00              1918 	ld	hl, #0x000d
+      0008EC 19                    1919 	add	hl, de
+      0008ED 4D                    1920 	ld	c, l
+      0008EE 44                    1921 	ld	b, h
+      0008EF 0A                    1922 	ld	a, (bc)
+      0008F0 F8 0D                 1923 	ldhl	sp,	#13
+      0008F2 77                    1924 	ld	(hl), a
+                                   1925 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:171: if (IS_NEG(projectiles[i].dir.y)) {
+                                   1926 ;c
+      0008F3 F8 04                 1927 	ldhl	sp,#4
+      0008F5 2A                    1928 	ld	a, (hl+)
+      0008F6 5F                    1929 	ld	e, a
+      0008F7 56                    1930 	ld	d, (hl)
+      0008F8 21 06 00              1931 	ld	hl, #0x0006
+      0008FB 19                    1932 	add	hl, de
+      0008FC E5                    1933 	push	hl
+      0008FD 7D                    1934 	ld	a, l
+      0008FE F8 10                 1935 	ldhl	sp,	#16
+      000900 77                    1936 	ld	(hl), a
+      000901 E1                    1937 	pop	hl
+      000902 7C                    1938 	ld	a, h
+      000903 F8 0F                 1939 	ldhl	sp,	#15
+                                   1940 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:178: if (IS_NEG(projectiles[i].dir.x)) {
+      000905 32                    1941 	ld	(hl-), a
+      000906 2A                    1942 	ld	a, (hl+)
+      000907 5F                    1943 	ld	e, a
+      000908 56                    1944 	ld	d, (hl)
+      000909 1A                    1945 	ld	a, (de)
+      00090A 23                    1946 	inc	hl
+      00090B 77                    1947 	ld	(hl), a
+                                   1948 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:169: if (projectiles[i].sprite_type != SPRITE_STATIC) {
+      00090C F8 0D                 1949 	ldhl	sp,	#13
+      00090E 7E                    1950 	ld	a, (hl)
+      00090F B7                    1951 	or	a, a
+      000910 28 40                 1952 	jr	Z, 00145$
+                                   1953 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:171: if (IS_NEG(projectiles[i].dir.y)) {
+                                   1954 ;c
+      000912 F8 04                 1955 	ldhl	sp,#4
+      000914 2A                    1956 	ld	a, (hl+)
+      000915 5F                    1957 	ld	e, a
+      000916 56                    1958 	ld	d, (hl)
+      000917 21 07 00              1959 	ld	hl, #0x0007
+      00091A 19                    1960 	add	hl, de
+      00091B E5                    1961 	push	hl
+      00091C 7D                    1962 	ld	a, l
+      00091D F8 13                 1963 	ldhl	sp,	#19
+      00091F 77                    1964 	ld	(hl), a
+      000920 E1                    1965 	pop	hl
+      000921 7C                    1966 	ld	a, h
+      000922 F8 12                 1967 	ldhl	sp,	#18
+      000924 32                    1968 	ld	(hl-), a
+      000925 2A                    1969 	ld	a, (hl+)
+      000926 5F                    1970 	ld	e, a
+      000927 56                    1971 	ld	d, (hl)
+      000928 1A                    1972 	ld	a, (de)
+      000929 47                    1973 	ld	b, a
+      00092A 58                    1974 	ld	e, b
+                                   1975 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:172: fo = 1 + (projectiles[i].sprite_type == SPRITE_ACTOR_ANIMATED);
+      00092B F8 0D                 1976 	ldhl	sp,	#13
+      00092D 7E                    1977 	ld	a, (hl)
+      00092E D6 02                 1978 	sub	a, #0x02
+      000930 3E 01                 1979 	ld	a, #0x01
+      000932 28 01                 1980 	jr	Z, 00403$
+      000934 AF                    1981 	xor	a, a
+      000935                       1982 00403$:
+      000935 4F                    1983 	ld	c, a
+                                   1984 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:171: if (IS_NEG(projectiles[i].dir.y)) {
+      000936 CB 7B                 1985 	bit	7, e
+      000938 28 07                 1986 	jr	Z, 00142$
+                                   1987 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:172: fo = 1 + (projectiles[i].sprite_type == SPRITE_ACTOR_ANIMATED);
+      00093A 79                    1988 	ld	a, c
+      00093B 3C                    1989 	inc	a
+      00093C F8 07                 1990 	ldhl	sp,	#7
+      00093E 77                    1991 	ld	(hl), a
+      00093F 18 11                 1992 	jr	00145$
+      000941                       1993 00142$:
+                                   1994 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:173: } else if (projectiles[i].dir.y == 0 && projectiles[i].dir.x != 0) {
+      000941 78                    1995 	ld	a, b
+      000942 B7                    1996 	or	a, a
+      000943 20 0D                 1997 	jr	NZ, 00145$
+      000945 F8 10                 1998 	ldhl	sp,	#16
+      000947 7E                    1999 	ld	a, (hl)
+      000948 B7                    2000 	or	a, a
+      000949 28 07                 2001 	jr	Z, 00145$
+                                   2002 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:174: fo = 2 + MUL_2(projectiles[i].sprite_type == SPRITE_ACTOR_ANIMATED);
+      00094B 79                    2003 	ld	a, c
+      00094C 87                    2004 	add	a, a
+      00094D C6 02                 2005 	add	a, #0x02
+      00094F F8 07                 2006 	ldhl	sp,	#7
+      000951 77                    2007 	ld	(hl), a
+      000952                       2008 00145$:
+                                   2009 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:178: if (IS_NEG(projectiles[i].dir.x)) {
+      000952 F8 10                 2010 	ldhl	sp,	#16
+      000954 7E                    2011 	ld	a, (hl)
+      000955 07                    2012 	rlca
+      000956 30 04                 2013 	jr	NC, 00147$
+                                   2014 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:179: flip = TRUE;
+      000958 F8 08                 2015 	ldhl	sp,	#8
+      00095A 36 01                 2016 	ld	(hl), #0x01
+      00095C                       2017 00147$:
+                                   2018 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:181: frame = MUL_4(projectiles[i].sprite + projectiles[i].frame + fo);
+                                   2019 ;c
+      00095C F8 04                 2020 	ldhl	sp,#4
+      00095E 2A                    2021 	ld	a, (hl+)
+      00095F 5F                    2022 	ld	e, a
+      000960 56                    2023 	ld	d, (hl)
+      000961 21 0B 00              2024 	ld	hl, #0x000b
+      000964 19                    2025 	add	hl, de
+      000965 4E                    2026 	ld	c, (hl)
+      000966 F8 0B                 2027 	ldhl	sp,#11
+      000968 2A                    2028 	ld	a, (hl+)
+      000969 5F                    2029 	ld	e, a
+      00096A 56                    2030 	ld	d, (hl)
+      00096B 1A                    2031 	ld	a, (de)
+      00096C 81                    2032 	add	a, c
+      00096D F8 07                 2033 	ldhl	sp,	#7
+      00096F 86                    2034 	add	a, (hl)
+      000970 87                    2035 	add	a, a
+      000971 87                    2036 	add	a, a
+      000972 F8 12                 2037 	ldhl	sp,	#18
+      000974 77                    2038 	ld	(hl), a
+                                   2039 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:186: set_sprite_prop(k, projectiles[i].palette_index | S_FLIPX);
+                                   2040 ;c
+      000975 F8 04                 2041 	ldhl	sp,#4
+      000977 2A                    2042 	ld	a, (hl+)
+      000978 5F                    2043 	ld	e, a
+      000979 56                    2044 	ld	d, (hl)
+      00097A 21 0C 00              2045 	ld	hl, #0x000c
+      00097D 19                    2046 	add	hl, de
+      00097E 5D                    2047 	ld	e, l
+      00097F 54                    2048 	ld	d, h
+      000980 1A                    2049 	ld	a, (de)
+      000981 47                    2050 	ld	b, a
+                                   2051 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:184: if (flip) {
+      000982 F8 08                 2052 	ldhl	sp,	#8
+      000984 7E                    2053 	ld	a, (hl)
+      000985 B7                    2054 	or	a, a
+      000986 28 66                 2055 	jr	Z, 00149$
+                                   2056 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:186: set_sprite_prop(k, projectiles[i].palette_index | S_FLIPX);
+      000988 78                    2057 	ld	a, b
+      000989 F6 20                 2058 	or	a, #0x20
+      00098B F8 0D                 2059 	ldhl	sp,	#13
+      00098D 77                    2060 	ld	(hl), a
+                                   2061 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1045: shadow_OAM[nb].prop=prop;
+      00098E F8 06                 2062 	ldhl	sp,	#6
+      000990 4E                    2063 	ld	c, (hl)
+      000991 AF                    2064 	xor	a, a
+      000992 CB 21                 2065 	sla	c
+      000994 8F                    2066 	adc	a, a
+      000995 CB 21                 2067 	sla	c
+      000997 8F                    2068 	adc	a, a
+      000998 F8 10                 2069 	ldhl	sp,	#16
+      00099A 71                    2070 	ld	(hl), c
+      00099B 23                    2071 	inc	hl
+      00099C 77                    2072 	ld	(hl), a
+      00099D D5                    2073 	push	de
+                                   2074 ;c
+      00099E 2B                    2075 	dec	hl
+      00099F 2A                    2076 	ld	a, (hl+)
+      0009A0 5F                    2077 	ld	e, a
+      0009A1 56                    2078 	ld	d, (hl)
+      0009A2 21r00r00              2079 	ld	hl, #_shadow_OAM
+      0009A5 19                    2080 	add	hl, de
+      0009A6 D1                    2081 	pop	de
+      0009A7 23                    2082 	inc	hl
+      0009A8 23                    2083 	inc	hl
+      0009A9 23                    2084 	inc	hl
+      0009AA 4D                    2085 	ld	c, l
+      0009AB 44                    2086 	ld	b, h
+      0009AC F8 0D                 2087 	ldhl	sp,	#13
+      0009AE 7E                    2088 	ld	a, (hl)
+      0009AF 02                    2089 	ld	(bc), a
+                                   2090 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:187: set_sprite_prop(k + 1, projectiles[i].palette_index | S_FLIPX);
+      0009B0 1A                    2091 	ld	a, (de)
+      0009B1 4F                    2092 	ld	c, a
+      0009B2 CB E9                 2093 	set	5, c
+      0009B4 F8 06                 2094 	ldhl	sp,	#6
+      0009B6 46                    2095 	ld	b, (hl)
+      0009B7 04                    2096 	inc	b
+      0009B8 58                    2097 	ld	e, b
+                                   2098 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1045: shadow_OAM[nb].prop=prop;
+      0009B9 16 00                 2099 	ld	d, #0x00
+      0009BB 6B                    2100 	ld	l, e
+      0009BC 62                    2101 	ld	h, d
+      0009BD 29                    2102 	add	hl, hl
+      0009BE 29                    2103 	add	hl, hl
+      0009BF 11r00r00              2104 	ld	de, #_shadow_OAM
+      0009C2 19                    2105 	add	hl, de
+      0009C3 23                    2106 	inc	hl
+      0009C4 23                    2107 	inc	hl
+      0009C5 23                    2108 	inc	hl
+      0009C6 71                    2109 	ld	(hl), c
+                                   2110 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:192: set_sprite_tile(k, frame + 2);
+      0009C7 F8 12                 2111 	ldhl	sp,	#18
+      0009C9 4E                    2112 	ld	c, (hl)
+      0009CA 0C                    2113 	inc	c
+      0009CB 0C                    2114 	inc	c
+                                   2115 ;/tmp/_gbstools/gbdk/include/gb/gb.h:999: shadow_OAM[nb].tile=tile;
+      0009CC 11r00r00              2116 	ld	de, #_shadow_OAM+0
+                                   2117 ;c
+      0009CF 2B                    2118 	dec	hl
+      0009D0 2B                    2119 	dec	hl
+      0009D1 2A                    2120 	ld	a, (hl+)
+      0009D2 66                    2121 	ld	h, (hl)
+      0009D3 6F                    2122 	ld	l, a
+      0009D4 19                    2123 	add	hl, de
+      0009D5 23                    2124 	inc	hl
+      0009D6 23                    2125 	inc	hl
+      0009D7 5D                    2126 	ld	e, l
+      0009D8 54                    2127 	ld	d, h
+      0009D9 79                    2128 	ld	a, c
+      0009DA 12                    2129 	ld	(de), a
+                                   2130 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:193: set_sprite_tile(k + 1, frame);
+                                   2131 ;/tmp/_gbstools/gbdk/include/gb/gb.h:999: shadow_OAM[nb].tile=tile;
+      0009DB 11r00r00              2132 	ld	de, #_shadow_OAM+0
+      0009DE AF                    2133 	xor	a, a
+      0009DF 68                    2134 	ld	l, b
+      0009E0 67                    2135 	ld	h, a
+      0009E1 29                    2136 	add	hl, hl
+      0009E2 29                    2137 	add	hl, hl
+      0009E3 19                    2138 	add	hl, de
+      0009E4 23                    2139 	inc	hl
+      0009E5 23                    2140 	inc	hl
+      0009E6 4D                    2141 	ld	c, l
+      0009E7 44                    2142 	ld	b, h
+      0009E8 F8 12                 2143 	ldhl	sp,	#18
+      0009EA 7E                    2144 	ld	a, (hl)
+      0009EB 02                    2145 	ld	(bc), a
+                                   2146 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:193: set_sprite_tile(k + 1, frame);
+      0009EC 18 5A                 2147 	jr	00150$
+      0009EE                       2148 00149$:
+                                   2149 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:196: set_sprite_prop(k, projectiles[i].palette_index);
+      0009EE F8 0D                 2150 	ldhl	sp,	#13
+      0009F0 70                    2151 	ld	(hl), b
+                                   2152 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1045: shadow_OAM[nb].prop=prop;
+      0009F1 F8 06                 2153 	ldhl	sp,	#6
+      0009F3 4E                    2154 	ld	c, (hl)
+      0009F4 AF                    2155 	xor	a, a
+      0009F5 CB 21                 2156 	sla	c
+      0009F7 8F                    2157 	adc	a, a
+      0009F8 CB 21                 2158 	sla	c
+      0009FA 8F                    2159 	adc	a, a
+      0009FB F8 10                 2160 	ldhl	sp,	#16
+      0009FD 71                    2161 	ld	(hl), c
+      0009FE 23                    2162 	inc	hl
+      0009FF 77                    2163 	ld	(hl), a
+      000A00 D5                    2164 	push	de
+                                   2165 ;c
+      000A01 2B                    2166 	dec	hl
+      000A02 2A                    2167 	ld	a, (hl+)
+      000A03 5F                    2168 	ld	e, a
+      000A04 56                    2169 	ld	d, (hl)
+      000A05 21r00r00              2170 	ld	hl, #_shadow_OAM
+      000A08 19                    2171 	add	hl, de
+      000A09 D1                    2172 	pop	de
+      000A0A 23                    2173 	inc	hl
+      000A0B 23                    2174 	inc	hl
+      000A0C 23                    2175 	inc	hl
+      000A0D 4D                    2176 	ld	c, l
+      000A0E 44                    2177 	ld	b, h
+      000A0F F8 0D                 2178 	ldhl	sp,	#13
+      000A11 7E                    2179 	ld	a, (hl)
+      000A12 02                    2180 	ld	(bc), a
+                                   2181 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:197: set_sprite_prop(k + 1, projectiles[i].palette_index);
+      000A13 1A                    2182 	ld	a, (de)
+      000A14 47                    2183 	ld	b, a
+      000A15 F8 06                 2184 	ldhl	sp,	#6
+      000A17 4E                    2185 	ld	c, (hl)
+      000A18 0C                    2186 	inc	c
+      000A19 59                    2187 	ld	e, c
+                                   2188 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1045: shadow_OAM[nb].prop=prop;
+      000A1A 16 00                 2189 	ld	d, #0x00
+      000A1C 6B                    2190 	ld	l, e
+      000A1D 62                    2191 	ld	h, d
+      000A1E 29                    2192 	add	hl, hl
+      000A1F 29                    2193 	add	hl, hl
+      000A20 11r00r00              2194 	ld	de, #_shadow_OAM
+      000A23 19                    2195 	add	hl, de
+      000A24 23                    2196 	inc	hl
+      000A25 23                    2197 	inc	hl
+      000A26 23                    2198 	inc	hl
+      000A27 70                    2199 	ld	(hl), b
+                                   2200 ;/tmp/_gbstools/gbdk/include/gb/gb.h:999: shadow_OAM[nb].tile=tile;
+      000A28 11r00r00              2201 	ld	de, #_shadow_OAM+0
+                                   2202 ;c
+      000A2B F8 10                 2203 	ldhl	sp,	#16
+      000A2D 2A                    2204 	ld	a, (hl+)
+      000A2E 66                    2205 	ld	h, (hl)
+      000A2F 6F                    2206 	ld	l, a
+      000A30 19                    2207 	add	hl, de
+      000A31 23                    2208 	inc	hl
+      000A32 23                    2209 	inc	hl
+      000A33 5D                    2210 	ld	e, l
+      000A34 54                    2211 	ld	d, h
+      000A35 F8 12                 2212 	ldhl	sp,	#18
+      000A37 7E                    2213 	ld	a, (hl)
+      000A38 12                    2214 	ld	(de), a
+                                   2215 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:203: set_sprite_tile(k + 1, frame + 2);
+      000A39 46                    2216 	ld	b, (hl)
+      000A3A 04                    2217 	inc	b
+      000A3B 04                    2218 	inc	b
+                                   2219 ;/tmp/_gbstools/gbdk/include/gb/gb.h:999: shadow_OAM[nb].tile=tile;
+      000A3C 11r00r00              2220 	ld	de, #_shadow_OAM+0
+      000A3F 69                    2221 	ld	l, c
+      000A40 26 00                 2222 	ld	h, #0x00
+      000A42 29                    2223 	add	hl, hl
+      000A43 29                    2224 	add	hl, hl
+      000A44 19                    2225 	add	hl, de
+      000A45 23                    2226 	inc	hl
+      000A46 23                    2227 	inc	hl
+      000A47 70                    2228 	ld	(hl), b
+                                   2229 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:203: set_sprite_tile(k + 1, frame + 2);
+      000A48                       2230 00150$:
+                                   2231 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:207: screen_x = 8u + projectiles[i].pos.x - scroll_x;
+      000A48 F8 04                 2232 	ldhl	sp,#4
+      000A4A 2A                    2233 	ld	a, (hl+)
+      000A4B 5F                    2234 	ld	e, a
+      000A4C 56                    2235 	ld	d, (hl)
+      000A4D 1A                    2236 	ld	a, (de)
+      000A4E 4F                    2237 	ld	c, a
+      000A4F 13                    2238 	inc	de
+      000A50 1A                    2239 	ld	a, (de)
+      000A51 47                    2240 	ld	b, a
+      000A52 21 08 00              2241 	ld	hl, #0x0008
+      000A55 09                    2242 	add	hl, bc
+      000A56 4D                    2243 	ld	c, l
+      000A57 44                    2244 	ld	b, h
+      000A58 21r01r00              2245 	ld	hl, #_scroll_x + 1
+      000A5B 2B                    2246 	dec	hl
+      000A5C 2A                    2247 	ld	a, (hl+)
+      000A5D 5F                    2248 	ld	e, a
+      000A5E 56                    2249 	ld	d, (hl)
+      000A5F 79                    2250 	ld	a, c
+      000A60 93                    2251 	sub	a, e
+      000A61 4F                    2252 	ld	c, a
+      000A62 78                    2253 	ld	a, b
+      000A63 9A                    2254 	sbc	a, d
+      000A64 47                    2255 	ld	b, a
+      000A65 F8 07                 2256 	ldhl	sp,	#7
+      000A67 79                    2257 	ld	a, c
+      000A68 22                    2258 	ld	(hl+), a
+      000A69 70                    2259 	ld	(hl), b
+                                   2260 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:208: screen_y = 8u + projectiles[i].pos.y - scroll_y;
+                                   2261 ;c
+      000A6A F8 04                 2262 	ldhl	sp,#4
+      000A6C 2A                    2263 	ld	a, (hl+)
+      000A6D 5F                    2264 	ld	e, a
+      000A6E 56                    2265 	ld	d, (hl)
+      000A6F 21 02 00              2266 	ld	hl, #0x0002
+      000A72 19                    2267 	add	hl, de
+      000A73 E5                    2268 	push	hl
+      000A74 7D                    2269 	ld	a, l
+      000A75 F8 13                 2270 	ldhl	sp,	#19
+      000A77 77                    2271 	ld	(hl), a
+      000A78 E1                    2272 	pop	hl
+      000A79 7C                    2273 	ld	a, h
+      000A7A F8 12                 2274 	ldhl	sp,	#18
+      000A7C 32                    2275 	ld	(hl-), a
+      000A7D 2A                    2276 	ld	a, (hl+)
+      000A7E 5F                    2277 	ld	e, a
+      000A7F 56                    2278 	ld	d, (hl)
+      000A80 1A                    2279 	ld	a, (de)
+      000A81 4F                    2280 	ld	c, a
+      000A82 13                    2281 	inc	de
+      000A83 1A                    2282 	ld	a, (de)
+      000A84 47                    2283 	ld	b, a
+      000A85 21 08 00              2284 	ld	hl, #0x0008
+      000A88 09                    2285 	add	hl, bc
+      000A89 4D                    2286 	ld	c, l
+      000A8A 44                    2287 	ld	b, h
+      000A8B 21r01r00              2288 	ld	hl, #_scroll_y + 1
+      000A8E 2B                    2289 	dec	hl
+      000A8F 2A                    2290 	ld	a, (hl+)
+      000A90 5F                    2291 	ld	e, a
+      000A91 56                    2292 	ld	d, (hl)
+      000A92 79                    2293 	ld	a, c
+      000A93 93                    2294 	sub	a, e
+      000A94 4F                    2295 	ld	c, a
+      000A95 78                    2296 	ld	a, b
+      000A96 9A                    2297 	sbc	a, d
+      000A97 47                    2298 	ld	b, a
+      000A98 F8 0C                 2299 	ldhl	sp,	#12
+      000A9A 79                    2300 	ld	a, c
+      000A9B 22                    2301 	ld	(hl+), a
+                                   2302 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:210: move_sprite(k, screen_x, screen_y);
+      000A9C 78                    2303 	ld	a, b
+      000A9D 32                    2304 	ld	(hl-), a
+      000A9E 46                    2305 	ld	b, (hl)
+      000A9F F8 07                 2306 	ldhl	sp,	#7
+                                   2307 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1072: OAM_item_t * itm = &shadow_OAM[nb];
+      000AA1 3A                    2308 	ld	a, (hl-)
+      000AA2 4F                    2309 	ld	c, a
+      000AA3 5E                    2310 	ld	e, (hl)
+      000AA4 16 00                 2311 	ld	d, #0x00
+      000AA6 6B                    2312 	ld	l, e
+      000AA7 62                    2313 	ld	h, d
+      000AA8 29                    2314 	add	hl, hl
+      000AA9 29                    2315 	add	hl, hl
+      000AAA 11r00r00              2316 	ld	de, #_shadow_OAM
+      000AAD 19                    2317 	add	hl, de
+                                   2318 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1073: itm->y=y, itm->x=x;
+      000AAE 78                    2319 	ld	a, b
+      000AAF 22                    2320 	ld	(hl+), a
+      000AB0 71                    2321 	ld	(hl), c
+                                   2322 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:211: move_sprite(k + 1, screen_x + 8, screen_y);
+      000AB1 F8 0C                 2323 	ldhl	sp,	#12
+      000AB3 46                    2324 	ld	b, (hl)
+      000AB4 F8 07                 2325 	ldhl	sp,	#7
+      000AB6 7E                    2326 	ld	a, (hl)
+      000AB7 C6 08                 2327 	add	a, #0x08
+      000AB9 4F                    2328 	ld	c, a
+      000ABA 2B                    2329 	dec	hl
+      000ABB 5E                    2330 	ld	e, (hl)
+      000ABC 1C                    2331 	inc	e
+                                   2332 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1072: OAM_item_t * itm = &shadow_OAM[nb];
+      000ABD 16 00                 2333 	ld	d, #0x00
+      000ABF 6B                    2334 	ld	l, e
+      000AC0 62                    2335 	ld	h, d
+      000AC1 29                    2336 	add	hl, hl
+      000AC2 29                    2337 	add	hl, hl
+      000AC3 11r00r00              2338 	ld	de, #_shadow_OAM
+      000AC6 19                    2339 	add	hl, de
+                                   2340 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1073: itm->y=y, itm->x=x;
+      000AC7 78                    2341 	ld	a, b
+      000AC8 22                    2342 	ld	(hl+), a
+      000AC9 71                    2343 	ld	(hl), c
+                                   2344 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:214: if (IS_FRAME_4) {
+      000ACA 21r00r00              2345 	ld	hl, #_game_time
+      000ACD 4E                    2346 	ld	c, (hl)
+                                   2347 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:164: projectiles[i].life_time = 1;
+                                   2348 ;c
+      000ACE F8 04                 2349 	ldhl	sp,#4
+      000AD0 2A                    2350 	ld	a, (hl+)
+      000AD1 5F                    2351 	ld	e, a
+      000AD2 56                    2352 	ld	d, (hl)
+      000AD3 21 14 00              2353 	ld	hl, #0x0014
+      000AD6 19                    2354 	add	hl, de
+      000AD7 E5                    2355 	push	hl
+      000AD8 7D                    2356 	ld	a, l
+      000AD9 F8 04                 2357 	ldhl	sp,	#4
+      000ADB 77                    2358 	ld	(hl), a
+      000ADC E1                    2359 	pop	hl
+      000ADD 7C                    2360 	ld	a, h
+      000ADE F8 03                 2361 	ldhl	sp,	#3
+      000AE0 77                    2362 	ld	(hl), a
+                                   2363 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:214: if (IS_FRAME_4) {
+      000AE1 79                    2364 	ld	a, c
+      000AE2 E6 03                 2365 	and	a, #0x03
+      000AE4 20 3F                 2366 	jr	NZ, 00156$
+                                   2367 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:215: if (((UINT16)(screen_x + 32u) >= SCREENWIDTH_PLUS_64) ||
+                                   2368 ;c
+      000AE6 F8 07                 2369 	ldhl	sp,#7
+      000AE8 2A                    2370 	ld	a, (hl+)
+      000AE9 5F                    2371 	ld	e, a
+      000AEA 56                    2372 	ld	d, (hl)
+      000AEB 21 20 00              2373 	ld	hl, #0x0020
+      000AEE 19                    2374 	add	hl, de
+      000AEF 33                    2375 	inc	sp
+      000AF0 33                    2376 	inc	sp
+      000AF1 E5                    2377 	push	hl
+      000AF2 F8 00                 2378 	ldhl	sp,	#0
+      000AF4 7E                    2379 	ld	a, (hl)
+      000AF5 D6 E0                 2380 	sub	a, #0xe0
+      000AF7 23                    2381 	inc	hl
+      000AF8 7E                    2382 	ld	a, (hl)
+      000AF9 DE 00                 2383 	sbc	a, #0x00
+      000AFB 30 13                 2384 	jr	NC, 00151$
+                                   2385 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:216: ((UINT16)(screen_y + 32u) >= SCREENHEIGHT_PLUS_64)) {
+                                   2386 ;c
+      000AFD F8 0C                 2387 	ldhl	sp,#12
+      000AFF 2A                    2388 	ld	a, (hl+)
+      000B00 5F                    2389 	ld	e, a
+      000B01 56                    2390 	ld	d, (hl)
+      000B02 21 20 00              2391 	ld	hl, #0x0020
+      000B05 19                    2392 	add	hl, de
+      000B06 4D                    2393 	ld	c, l
+      000B07 44                    2394 	ld	b, h
+      000B08 79                    2395 	ld	a, c
+      000B09 D6 D0                 2396 	sub	a, #0xd0
+      000B0B 78                    2397 	ld	a, b
+      000B0C DE 00                 2398 	sbc	a, #0x00
+      000B0E 38 08                 2399 	jr	C, 00152$
+      000B10                       2400 00151$:
+                                   2401 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:218: projectiles[i].life_time = 0;
+      000B10 C1                    2402 	pop	bc
+      000B11 E1                    2403 	pop	hl
+      000B12 E5                    2404 	push	hl
+      000B13 C5                    2405 	push	bc
+      000B14 36 00                 2406 	ld	(hl), #0x00
+      000B16 18 0D                 2407 	jr	00156$
+      000B18                       2408 00152$:
+                                   2409 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:220: projectiles[i].life_time--;
+      000B18 F8 02                 2410 	ldhl	sp,#2
+      000B1A 2A                    2411 	ld	a, (hl+)
+      000B1B 5F                    2412 	ld	e, a
+      000B1C 56                    2413 	ld	d, (hl)
+      000B1D 1A                    2414 	ld	a, (de)
+      000B1E 4F                    2415 	ld	c, a
+      000B1F 0D                    2416 	dec	c
+      000B20 2B                    2417 	dec	hl
+      000B21 2A                    2418 	ld	a, (hl+)
+      000B22 66                    2419 	ld	h, (hl)
+      000B23 6F                    2420 	ld	l, a
+      000B24 71                    2421 	ld	(hl), c
+      000B25                       2422 00156$:
+                                   2423 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:224: if (projectiles[i].pin_actor == NO_ACTOR_PINNED) {
+                                   2424 ;c
+      000B25 F8 04                 2425 	ldhl	sp,#4
+      000B27 2A                    2426 	ld	a, (hl+)
+      000B28 5F                    2427 	ld	e, a
+      000B29 56                    2428 	ld	d, (hl)
+      000B2A 21 09 00              2429 	ld	hl, #0x0009
+      000B2D 19                    2430 	add	hl, de
+      000B2E E5                    2431 	push	hl
+      000B2F 7D                    2432 	ld	a, l
+      000B30 F8 09                 2433 	ldhl	sp,	#9
+      000B32 77                    2434 	ld	(hl), a
+      000B33 E1                    2435 	pop	hl
+      000B34 7C                    2436 	ld	a, h
+      000B35 F8 08                 2437 	ldhl	sp,	#8
+      000B37 32                    2438 	ld	(hl-), a
+      000B38 2A                    2439 	ld	a, (hl+)
+      000B39 5F                    2440 	ld	e, a
+      000B3A 56                    2441 	ld	d, (hl)
+      000B3B 1A                    2442 	ld	a, (de)
+      000B3C F8 10                 2443 	ldhl	sp,	#16
+      000B3E 77                    2444 	ld	(hl), a
+                                   2445 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:171: if (IS_NEG(projectiles[i].dir.y)) {
+                                   2446 ;c
+      000B3F F8 04                 2447 	ldhl	sp,#4
+      000B41 2A                    2448 	ld	a, (hl+)
+      000B42 5F                    2449 	ld	e, a
+      000B43 56                    2450 	ld	d, (hl)
+      000B44 21 07 00              2451 	ld	hl, #0x0007
+      000B47 19                    2452 	add	hl, de
+      000B48 E5                    2453 	push	hl
+      000B49 7D                    2454 	ld	a, l
+      000B4A F8 0E                 2455 	ldhl	sp,	#14
+      000B4C 77                    2456 	ld	(hl), a
+      000B4D E1                    2457 	pop	hl
+      000B4E 7C                    2458 	ld	a, h
+      000B4F F8 0D                 2459 	ldhl	sp,	#13
+      000B51 77                    2460 	ld	(hl), a
+                                   2461 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:224: if (projectiles[i].pin_actor == NO_ACTOR_PINNED) {
+      000B52 F8 10                 2462 	ldhl	sp,	#16
+      000B54 7E                    2463 	ld	a, (hl)
+      000B55 3C                    2464 	inc	a
+      000B56 C2r3Er0C              2465 	jp	NZ,00172$
+                                   2466 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:226: if (projectiles[i].moving) {
+                                   2467 ;c
+      000B59 F8 04                 2468 	ldhl	sp,#4
+      000B5B 2A                    2469 	ld	a, (hl+)
+      000B5C 5F                    2470 	ld	e, a
+      000B5D 56                    2471 	ld	d, (hl)
+      000B5E 21 08 00              2472 	ld	hl, #0x0008
+      000B61 19                    2473 	add	hl, de
+      000B62 E5                    2474 	push	hl
+      000B63 7D                    2475 	ld	a, l
+      000B64 F8 09                 2476 	ldhl	sp,	#9
+      000B66 77                    2477 	ld	(hl), a
+      000B67 E1                    2478 	pop	hl
+      000B68 7C                    2479 	ld	a, h
+      000B69 F8 08                 2480 	ldhl	sp,	#8
+      000B6B 32                    2481 	ld	(hl-), a
+      000B6C 2A                    2482 	ld	a, (hl+)
+      000B6D 5F                    2483 	ld	e, a
+      000B6E 56                    2484 	ld	d, (hl)
+      000B6F 1A                    2485 	ld	a, (de)
+      000B70 F8 10                 2486 	ldhl	sp,	#16
+      000B72 77                    2487 	ld	(hl), a
+      000B73 7E                    2488 	ld	a, (hl)
+      000B74 B7                    2489 	or	a, a
+      000B75 CArBDr0D              2490 	jp	Z, 00173$
+                                   2491 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:227: if (projectiles[i].move_speed == 0) {
+                                   2492 ;c
+      000B78 F8 04                 2493 	ldhl	sp,#4
+      000B7A 2A                    2494 	ld	a, (hl+)
+      000B7B 5F                    2495 	ld	e, a
+      000B7C 56                    2496 	ld	d, (hl)
+      000B7D 21 11 00              2497 	ld	hl, #0x0011
+      000B80 19                    2498 	add	hl, de
+      000B81 E5                    2499 	push	hl
+      000B82 7D                    2500 	ld	a, l
+      000B83 F8 09                 2501 	ldhl	sp,	#9
+      000B85 77                    2502 	ld	(hl), a
+      000B86 E1                    2503 	pop	hl
+      000B87 7C                    2504 	ld	a, h
+      000B88 F8 08                 2505 	ldhl	sp,	#8
+      000B8A 32                    2506 	ld	(hl-), a
+      000B8B 2A                    2507 	ld	a, (hl+)
+      000B8C 5F                    2508 	ld	e, a
+      000B8D 56                    2509 	ld	d, (hl)
+      000B8E 1A                    2510 	ld	a, (de)
+      000B8F F8 10                 2511 	ldhl	sp,	#16
+      000B91 77                    2512 	ld	(hl), a
+      000B92 7E                    2513 	ld	a, (hl)
+      000B93 B7                    2514 	or	a, a
+      000B94 20 48                 2515 	jr	NZ, 00160$
+                                   2516 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:229: if (IS_FRAME_2) {
+      000B96 FAr00r00              2517 	ld	a, (#_game_time)
+      000B99 0F                    2518 	rrca
+      000B9A DArBDr0D              2519 	jp	C,00173$
+                                   2520 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:230: projectiles[i].pos.x += projectiles[i].dir.x;
+      000B9D F8 04                 2521 	ldhl	sp,#4
+      000B9F 2A                    2522 	ld	a, (hl+)
+      000BA0 5F                    2523 	ld	e, a
+      000BA1 56                    2524 	ld	d, (hl)
+      000BA2 1A                    2525 	ld	a, (de)
+      000BA3 4F                    2526 	ld	c, a
+      000BA4 13                    2527 	inc	de
+      000BA5 1A                    2528 	ld	a, (de)
+      000BA6 47                    2529 	ld	b, a
+      000BA7 F8 0E                 2530 	ldhl	sp,#14
+      000BA9 2A                    2531 	ld	a, (hl+)
+      000BAA 5F                    2532 	ld	e, a
+      000BAB 56                    2533 	ld	d, (hl)
+      000BAC 1A                    2534 	ld	a, (de)
+      000BAD 6F                    2535 	ld	l, a
+      000BAE 17                    2536 	rla
+      000BAF 9F                    2537 	sbc	a, a
+      000BB0 67                    2538 	ld	h, a
+      000BB1 09                    2539 	add	hl, bc
+      000BB2 4D                    2540 	ld	c, l
+      000BB3 44                    2541 	ld	b, h
+      000BB4 F8 04                 2542 	ldhl	sp,	#4
+      000BB6 2A                    2543 	ld	a, (hl+)
+      000BB7 66                    2544 	ld	h, (hl)
+      000BB8 6F                    2545 	ld	l, a
+      000BB9 79                    2546 	ld	a, c
+      000BBA 22                    2547 	ld	(hl+), a
+      000BBB 70                    2548 	ld	(hl), b
+                                   2549 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:231: projectiles[i].pos.y += projectiles[i].dir.y;
+      000BBC F8 11                 2550 	ldhl	sp,#17
+      000BBE 2A                    2551 	ld	a, (hl+)
+      000BBF 5F                    2552 	ld	e, a
+      000BC0 56                    2553 	ld	d, (hl)
+      000BC1 1A                    2554 	ld	a, (de)
+      000BC2 4F                    2555 	ld	c, a
+      000BC3 13                    2556 	inc	de
+      000BC4 1A                    2557 	ld	a, (de)
+      000BC5 47                    2558 	ld	b, a
+      000BC6 F8 0C                 2559 	ldhl	sp,#12
+      000BC8 2A                    2560 	ld	a, (hl+)
+      000BC9 5F                    2561 	ld	e, a
+      000BCA 56                    2562 	ld	d, (hl)
+      000BCB 1A                    2563 	ld	a, (de)
+      000BCC 6F                    2564 	ld	l, a
+      000BCD 17                    2565 	rla
+      000BCE 9F                    2566 	sbc	a, a
+      000BCF 67                    2567 	ld	h, a
+      000BD0 09                    2568 	add	hl, bc
+      000BD1 4D                    2569 	ld	c, l
+      000BD2 44                    2570 	ld	b, h
+      000BD3 F8 11                 2571 	ldhl	sp,	#17
+      000BD5 2A                    2572 	ld	a, (hl+)
+      000BD6 66                    2573 	ld	h, (hl)
+      000BD7 6F                    2574 	ld	l, a
+      000BD8 79                    2575 	ld	a, c
+      000BD9 22                    2576 	ld	(hl+), a
+      000BDA 70                    2577 	ld	(hl), b
+      000BDB C3rBDr0D              2578 	jp	00173$
+      000BDE                       2579 00160$:
+                                   2580 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:234: projectiles[i].pos.x += projectiles[i].dir.x * projectiles[i].move_speed;
+      000BDE F8 04                 2581 	ldhl	sp,#4
+      000BE0 2A                    2582 	ld	a, (hl+)
+      000BE1 5F                    2583 	ld	e, a
+      000BE2 56                    2584 	ld	d, (hl)
+      000BE3 1A                    2585 	ld	a, (de)
+      000BE4 4F                    2586 	ld	c, a
+      000BE5 13                    2587 	inc	de
+      000BE6 1A                    2588 	ld	a, (de)
+      000BE7 47                    2589 	ld	b, a
+      000BE8 F8 0E                 2590 	ldhl	sp,#14
+      000BEA 2A                    2591 	ld	a, (hl+)
+      000BEB 5F                    2592 	ld	e, a
+      000BEC 56                    2593 	ld	d, (hl)
+      000BED 1A                    2594 	ld	a, (de)
+      000BEE C5                    2595 	push	bc
+      000BEF 23                    2596 	inc	hl
+      000BF0 66                    2597 	ld	h, (hl)
+      000BF1 E5                    2598 	push	hl
+      000BF2 33                    2599 	inc	sp
+      000BF3 F5                    2600 	push	af
+      000BF4 33                    2601 	inc	sp
+      000BF5 CDr00r00              2602 	call	__muluschar
+      000BF8 E8 02                 2603 	add	sp, #2
+      000BFA C1                    2604 	pop	bc
+      000BFB 7B                    2605 	ld	a, e
+      000BFC 81                    2606 	add	a, c
+      000BFD 4F                    2607 	ld	c, a
+      000BFE 7A                    2608 	ld	a, d
+      000BFF 88                    2609 	adc	a, b
+      000C00 47                    2610 	ld	b, a
+      000C01 F8 04                 2611 	ldhl	sp,	#4
+      000C03 2A                    2612 	ld	a, (hl+)
+      000C04 66                    2613 	ld	h, (hl)
+      000C05 6F                    2614 	ld	l, a
+      000C06 79                    2615 	ld	a, c
+      000C07 22                    2616 	ld	(hl+), a
+      000C08 70                    2617 	ld	(hl), b
+                                   2618 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:235: projectiles[i].pos.y += projectiles[i].dir.y * projectiles[i].move_speed;
+      000C09 F8 11                 2619 	ldhl	sp,#17
+      000C0B 2A                    2620 	ld	a, (hl+)
+      000C0C 5F                    2621 	ld	e, a
+      000C0D 56                    2622 	ld	d, (hl)
+      000C0E 1A                    2623 	ld	a, (de)
+      000C0F 4F                    2624 	ld	c, a
+      000C10 13                    2625 	inc	de
+      000C11 1A                    2626 	ld	a, (de)
+      000C12 47                    2627 	ld	b, a
+      000C13 F8 0C                 2628 	ldhl	sp,#12
+      000C15 2A                    2629 	ld	a, (hl+)
+      000C16 5F                    2630 	ld	e, a
+      000C17 56                    2631 	ld	d, (hl)
+      000C18 1A                    2632 	ld	a, (de)
+      000C19 F8 07                 2633 	ldhl	sp,#7
+      000C1B 5E                    2634 	ld	e, (hl)
+      000C1C 23                    2635 	inc	hl
+      000C1D 56                    2636 	ld	d, (hl)
+      000C1E F5                    2637 	push	af
+      000C1F 1A                    2638 	ld	a, (de)
+      000C20 67                    2639 	ld	h, a
+      000C21 F1                    2640 	pop	af
+      000C22 C5                    2641 	push	bc
+      000C23 E5                    2642 	push	hl
+      000C24 33                    2643 	inc	sp
+      000C25 F5                    2644 	push	af
+      000C26 33                    2645 	inc	sp
+      000C27 CDr00r00              2646 	call	__muluschar
+      000C2A E8 02                 2647 	add	sp, #2
+      000C2C C1                    2648 	pop	bc
+      000C2D 7B                    2649 	ld	a, e
+      000C2E 81                    2650 	add	a, c
+      000C2F 4F                    2651 	ld	c, a
+      000C30 7A                    2652 	ld	a, d
+      000C31 88                    2653 	adc	a, b
+      000C32 47                    2654 	ld	b, a
+      000C33 F8 11                 2655 	ldhl	sp,	#17
+      000C35 2A                    2656 	ld	a, (hl+)
+      000C36 66                    2657 	ld	h, (hl)
+      000C37 6F                    2658 	ld	l, a
+      000C38 79                    2659 	ld	a, c
+      000C39 22                    2660 	ld	(hl+), a
+      000C3A 70                    2661 	ld	(hl), b
+      000C3B C3rBDr0D              2662 	jp	00173$
+      000C3E                       2663 00172$:
+                                   2664 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:240: if ((actors[projectiles[i].pin_actor].dir.x != projectiles[i].dir.x) ||
+      000C3E F8 10                 2665 	ldhl	sp,	#16
+      000C40 4E                    2666 	ld	c, (hl)
+      000C41 06 00                 2667 	ld	b, #0x00
+      000C43 69                    2668 	ld	l, c
+      000C44 60                    2669 	ld	h, b
+      000C45 29                    2670 	add	hl, hl
+      000C46 29                    2671 	add	hl, hl
+      000C47 09                    2672 	add	hl, bc
+      000C48 29                    2673 	add	hl, hl
+      000C49 09                    2674 	add	hl, bc
+      000C4A 29                    2675 	add	hl, hl
+      000C4B 09                    2676 	add	hl, bc
+      000C4C 29                    2677 	add	hl, hl
+      000C4D 7D                    2678 	ld	a, l
+      000C4E C6r00                 2679 	add	a, #<(_actors)
+      000C50 4F                    2680 	ld	c, a
+      000C51 7C                    2681 	ld	a, h
+      000C52 CEs00                 2682 	adc	a, #>(_actors)
+      000C54 47                    2683 	ld	b, a
+      000C55 21 05 00              2684 	ld	hl, #0x0005
+      000C58 09                    2685 	add	hl, bc
+      000C59 7E                    2686 	ld	a, (hl)
+      000C5A F8 10                 2687 	ldhl	sp,	#16
+      000C5C 77                    2688 	ld	(hl), a
+      000C5D F8 0E                 2689 	ldhl	sp,#14
+      000C5F 2A                    2690 	ld	a, (hl+)
+      000C60 5F                    2691 	ld	e, a
+      000C61 56                    2692 	ld	d, (hl)
+      000C62 1A                    2693 	ld	a, (de)
+      000C63 22                    2694 	ld	(hl+), a
+      000C64 3A                    2695 	ld	a, (hl-)
+      000C65 96                    2696 	sub	a, (hl)
+      000C66 20 15                 2697 	jr	NZ, 00167$
+                                   2698 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:241: (actors[projectiles[i].pin_actor].dir.y != projectiles[i].dir.y)) {
+      000C68 21 06 00              2699 	ld	hl, #0x0006
+      000C6B 09                    2700 	add	hl, bc
+      000C6C 7E                    2701 	ld	a, (hl)
+      000C6D F8 0E                 2702 	ldhl	sp,	#14
+      000C6F 77                    2703 	ld	(hl), a
+      000C70 F8 0C                 2704 	ldhl	sp,#12
+      000C72 2A                    2705 	ld	a, (hl+)
+      000C73 5F                    2706 	ld	e, a
+      000C74 56                    2707 	ld	d, (hl)
+      000C75 1A                    2708 	ld	a, (de)
+      000C76 23                    2709 	inc	hl
+      000C77 23                    2710 	inc	hl
+      000C78 32                    2711 	ld	(hl-), a
+      000C79 2A                    2712 	ld	a, (hl+)
+      000C7A 96                    2713 	sub	a, (hl)
+      000C7B 28 09                 2714 	jr	Z, 00168$
+      000C7D                       2715 00167$:
+                                   2716 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:242: projectiles[i].life_time = 0;
+      000C7D C1                    2717 	pop	bc
+      000C7E E1                    2718 	pop	hl
+      000C7F E5                    2719 	push	hl
+      000C80 C5                    2720 	push	bc
+      000C81 36 00                 2721 	ld	(hl), #0x00
+      000C83 C3rBDr0D              2722 	jp	00173$
+      000C86                       2723 00168$:
+                                   2724 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:245: projectiles[i].pos.x = actors[projectiles[i].pin_actor].pos.x +
+      000C86 59                    2725 	ld	e, c
+      000C87 50                    2726 	ld	d, b
+      000C88 1A                    2727 	ld	a, (de)
+      000C89 F8 02                 2728 	ldhl	sp,	#2
+      000C8B 22                    2729 	ld	(hl+), a
+      000C8C 13                    2730 	inc	de
+      000C8D 1A                    2731 	ld	a, (de)
+                                   2732 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:246: (projectiles[i].pin_offset * actors[projectiles[i].pin_actor].dir.x);
+                                   2733 ;c
+      000C8E 22                    2734 	ld	(hl+), a
+      000C8F 2A                    2735 	ld	a, (hl+)
+      000C90 5F                    2736 	ld	e, a
+      000C91 56                    2737 	ld	d, (hl)
+      000C92 21 0A 00              2738 	ld	hl, #0x000a
+      000C95 19                    2739 	add	hl, de
+      000C96 E5                    2740 	push	hl
+      000C97 7D                    2741 	ld	a, l
+      000C98 F8 0E                 2742 	ldhl	sp,	#14
+      000C9A 77                    2743 	ld	(hl), a
+      000C9B E1                    2744 	pop	hl
+      000C9C 7C                    2745 	ld	a, h
+      000C9D F8 0D                 2746 	ldhl	sp,	#13
+                                   2747 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:244: if (actors[projectiles[i].pin_actor].dir.y == 0) {
+      000C9F 22                    2748 	ld	(hl+), a
+      000CA0 7E                    2749 	ld	a, (hl)
+      000CA1 B7                    2750 	or	a, a
+      000CA2 20 78                 2751 	jr	NZ, 00165$
+                                   2752 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:246: (projectiles[i].pin_offset * actors[projectiles[i].pin_actor].dir.x);
+      000CA4 2B                    2753 	dec	hl
+      000CA5 2B                    2754 	dec	hl
+      000CA6 2A                    2755 	ld	a, (hl+)
+      000CA7 5F                    2756 	ld	e, a
+      000CA8 56                    2757 	ld	d, (hl)
+      000CA9 1A                    2758 	ld	a, (de)
+      000CAA F8 10                 2759 	ldhl	sp,	#16
+      000CAC 66                    2760 	ld	h, (hl)
+      000CAD E5                    2761 	push	hl
+      000CAE 33                    2762 	inc	sp
+      000CAF F5                    2763 	push	af
+      000CB0 33                    2764 	inc	sp
+      000CB1 CDr00r00              2765 	call	__mulsuchar
+      000CB4 E8 02                 2766 	add	sp, #2
+                                   2767 ;c
+      000CB6 F8 02                 2768 	ldhl	sp,	#2
+      000CB8 2A                    2769 	ld	a, (hl+)
+      000CB9 66                    2770 	ld	h, (hl)
+      000CBA 6F                    2771 	ld	l, a
+      000CBB 19                    2772 	add	hl, de
+      000CBC 4D                    2773 	ld	c, l
+      000CBD 44                    2774 	ld	b, h
+      000CBE F8 04                 2775 	ldhl	sp,	#4
+      000CC0 2A                    2776 	ld	a, (hl+)
+      000CC1 66                    2777 	ld	h, (hl)
+      000CC2 6F                    2778 	ld	l, a
+      000CC3 79                    2779 	ld	a, c
+      000CC4 22                    2780 	ld	(hl+), a
+      000CC5 70                    2781 	ld	(hl), b
+                                   2782 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:247: projectiles[i].pos.y = actors[projectiles[i].pin_actor].pos.y;
+      000CC6 F8 07                 2783 	ldhl	sp,#7
+      000CC8 2A                    2784 	ld	a, (hl+)
+      000CC9 5F                    2785 	ld	e, a
+      000CCA 56                    2786 	ld	d, (hl)
+      000CCB 1A                    2787 	ld	a, (de)
+      000CCC 4F                    2788 	ld	c, a
+      000CCD 06 00                 2789 	ld	b, #0x00
+      000CCF 69                    2790 	ld	l, c
+      000CD0 60                    2791 	ld	h, b
+      000CD1 29                    2792 	add	hl, hl
+      000CD2 29                    2793 	add	hl, hl
+      000CD3 09                    2794 	add	hl, bc
+      000CD4 29                    2795 	add	hl, hl
+      000CD5 09                    2796 	add	hl, bc
+      000CD6 29                    2797 	add	hl, hl
+      000CD7 09                    2798 	add	hl, bc
+      000CD8 29                    2799 	add	hl, hl
+      000CD9 E5                    2800 	push	hl
+      000CDA 7D                    2801 	ld	a, l
+      000CDB F8 11                 2802 	ldhl	sp,	#17
+      000CDD 77                    2803 	ld	(hl), a
+      000CDE E1                    2804 	pop	hl
+      000CDF 7C                    2805 	ld	a, h
+      000CE0 F8 10                 2806 	ldhl	sp,	#16
+                                   2807 ;c
+      000CE2 32                    2808 	ld	(hl-), a
+      000CE3 2A                    2809 	ld	a, (hl+)
+      000CE4 5F                    2810 	ld	e, a
+      000CE5 56                    2811 	ld	d, (hl)
+      000CE6 21r00r00              2812 	ld	hl, #_actors
+      000CE9 19                    2813 	add	hl, de
+      000CEA E5                    2814 	push	hl
+      000CEB 7D                    2815 	ld	a, l
+      000CEC F8 0F                 2816 	ldhl	sp,	#15
+      000CEE 77                    2817 	ld	(hl), a
+      000CEF E1                    2818 	pop	hl
+      000CF0 7C                    2819 	ld	a, h
+      000CF1 F8 0E                 2820 	ldhl	sp,	#14
+                                   2821 ;c
+      000CF3 32                    2822 	ld	(hl-), a
+      000CF4 2A                    2823 	ld	a, (hl+)
+      000CF5 5F                    2824 	ld	e, a
+      000CF6 56                    2825 	ld	d, (hl)
+      000CF7 21 02 00              2826 	ld	hl, #0x0002
+      000CFA 19                    2827 	add	hl, de
+      000CFB E5                    2828 	push	hl
+      000CFC 7D                    2829 	ld	a, l
+      000CFD F8 11                 2830 	ldhl	sp,	#17
+      000CFF 77                    2831 	ld	(hl), a
+      000D00 E1                    2832 	pop	hl
+      000D01 7C                    2833 	ld	a, h
+      000D02 F8 10                 2834 	ldhl	sp,	#16
+      000D04 32                    2835 	ld	(hl-), a
+      000D05 2A                    2836 	ld	a, (hl+)
+      000D06 5F                    2837 	ld	e, a
+      000D07 56                    2838 	ld	d, (hl)
+      000D08 1A                    2839 	ld	a, (de)
+      000D09 2B                    2840 	dec	hl
+      000D0A 22                    2841 	ld	(hl+), a
+      000D0B 13                    2842 	inc	de
+      000D0C 1A                    2843 	ld	a, (de)
+      000D0D 22                    2844 	ld	(hl+), a
+      000D0E 2A                    2845 	ld	a, (hl+)
+      000D0F 5F                    2846 	ld	e, a
+      000D10 56                    2847 	ld	d, (hl)
+      000D11 F8 0F                 2848 	ldhl	sp,	#15
+      000D13 7E                    2849 	ld	a, (hl)
+      000D14 12                    2850 	ld	(de), a
+      000D15 13                    2851 	inc	de
+      000D16 23                    2852 	inc	hl
+      000D17 7E                    2853 	ld	a, (hl)
+      000D18 12                    2854 	ld	(de), a
+      000D19 C3rBDr0D              2855 	jp	00173$
+      000D1C                       2856 00165$:
+                                   2857 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:249: projectiles[i].pos.x = actors[projectiles[i].pin_actor].pos.x;
+      000D1C F8 04                 2858 	ldhl	sp,#4
+      000D1E 2A                    2859 	ld	a, (hl+)
+      000D1F 5F                    2860 	ld	e, a
+      000D20 56                    2861 	ld	d, (hl)
+      000D21 F8 02                 2862 	ldhl	sp,	#2
+      000D23 7E                    2863 	ld	a, (hl)
+      000D24 12                    2864 	ld	(de), a
+      000D25 13                    2865 	inc	de
+      000D26 23                    2866 	inc	hl
+      000D27 7E                    2867 	ld	a, (hl)
+      000D28 12                    2868 	ld	(de), a
+                                   2869 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:250: projectiles[i].pos.y = actors[projectiles[i].pin_actor].pos.y +
+      000D29 F8 07                 2870 	ldhl	sp,#7
+      000D2B 2A                    2871 	ld	a, (hl+)
+      000D2C 5F                    2872 	ld	e, a
+      000D2D 56                    2873 	ld	d, (hl)
+      000D2E 1A                    2874 	ld	a, (de)
+      000D2F 4F                    2875 	ld	c, a
+      000D30 06 00                 2876 	ld	b, #0x00
+      000D32 69                    2877 	ld	l, c
+      000D33 60                    2878 	ld	h, b
+      000D34 29                    2879 	add	hl, hl
+      000D35 29                    2880 	add	hl, hl
+      000D36 09                    2881 	add	hl, bc
+      000D37 29                    2882 	add	hl, hl
+      000D38 09                    2883 	add	hl, bc
+      000D39 29                    2884 	add	hl, hl
+      000D3A 09                    2885 	add	hl, bc
+      000D3B 29                    2886 	add	hl, hl
+      000D3C 01r00r00              2887 	ld	bc,#_actors
+      000D3F 09                    2888 	add	hl,bc
+      000D40 E5                    2889 	push	hl
+      000D41 7D                    2890 	ld	a, l
+      000D42 F8 09                 2891 	ldhl	sp,	#9
+      000D44 77                    2892 	ld	(hl), a
+      000D45 E1                    2893 	pop	hl
+      000D46 7C                    2894 	ld	a, h
+      000D47 F8 08                 2895 	ldhl	sp,	#8
+                                   2896 ;c
+      000D49 32                    2897 	ld	(hl-), a
+      000D4A 2A                    2898 	ld	a, (hl+)
+      000D4B 5F                    2899 	ld	e, a
+      000D4C 56                    2900 	ld	d, (hl)
+      000D4D 21 02 00              2901 	ld	hl, #0x0002
+      000D50 19                    2902 	add	hl, de
+      000D51 E5                    2903 	push	hl
+      000D52 7D                    2904 	ld	a, l
+      000D53 F8 07                 2905 	ldhl	sp,	#7
+      000D55 77                    2906 	ld	(hl), a
+      000D56 E1                    2907 	pop	hl
+      000D57 7C                    2908 	ld	a, h
+      000D58 F8 06                 2909 	ldhl	sp,	#6
+      000D5A 32                    2910 	ld	(hl-), a
+      000D5B 2A                    2911 	ld	a, (hl+)
+      000D5C 5F                    2912 	ld	e, a
+      000D5D 56                    2913 	ld	d, (hl)
+      000D5E 1A                    2914 	ld	a, (de)
+      000D5F F8 0E                 2915 	ldhl	sp,	#14
+      000D61 22                    2916 	ld	(hl+), a
+      000D62 13                    2917 	inc	de
+      000D63 1A                    2918 	ld	a, (de)
+                                   2919 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:251: (projectiles[i].pin_offset * actors[projectiles[i].pin_actor].dir.y);
+      000D64 32                    2920 	ld	(hl-), a
+      000D65 2B                    2921 	dec	hl
+      000D66 2B                    2922 	dec	hl
+      000D67 2A                    2923 	ld	a, (hl+)
+      000D68 5F                    2924 	ld	e, a
+      000D69 56                    2925 	ld	d, (hl)
+      000D6A 1A                    2926 	ld	a, (de)
+      000D6B F8 10                 2927 	ldhl	sp,	#16
+      000D6D 77                    2928 	ld	(hl), a
+                                   2929 ;c
+      000D6E F8 07                 2930 	ldhl	sp,#7
+      000D70 2A                    2931 	ld	a, (hl+)
+      000D71 5F                    2932 	ld	e, a
+      000D72 56                    2933 	ld	d, (hl)
+      000D73 21 06 00              2934 	ld	hl, #0x0006
+      000D76 19                    2935 	add	hl, de
+      000D77 E5                    2936 	push	hl
+      000D78 7D                    2937 	ld	a, l
+      000D79 F8 0E                 2938 	ldhl	sp,	#14
+      000D7B 77                    2939 	ld	(hl), a
+      000D7C E1                    2940 	pop	hl
+      000D7D 7C                    2941 	ld	a, h
+      000D7E F8 0D                 2942 	ldhl	sp,	#13
+      000D80 32                    2943 	ld	(hl-), a
+      000D81 2A                    2944 	ld	a, (hl+)
+      000D82 5F                    2945 	ld	e, a
+      000D83 56                    2946 	ld	d, (hl)
+      000D84 1A                    2947 	ld	a, (de)
+      000D85 77                    2948 	ld	(hl), a
+      000D86 7E                    2949 	ld	a, (hl)
+      000D87 F5                    2950 	push	af
+      000D88 33                    2951 	inc	sp
+      000D89 F8 11                 2952 	ldhl	sp,	#17
+      000D8B 7E                    2953 	ld	a, (hl)
+      000D8C F5                    2954 	push	af
+      000D8D 33                    2955 	inc	sp
+      000D8E CDr00r00              2956 	call	__mulsuchar
+      000D91 E8 02                 2957 	add	sp, #2
+      000D93 E5                    2958 	push	hl
+      000D94 F8 09                 2959 	ldhl	sp,	#9
+      000D96 73                    2960 	ld	(hl), e
+      000D97 F8 0A                 2961 	ldhl	sp,	#10
+      000D99 72                    2962 	ld	(hl), d
+      000D9A E1                    2963 	pop	hl
+                                   2964 ;c
+      000D9B F8 07                 2965 	ldhl	sp,#7
+      000D9D 2A                    2966 	ld	a, (hl+)
+      000D9E 5F                    2967 	ld	e, a
+      000D9F 56                    2968 	ld	d, (hl)
+      000DA0 F8 0E                 2969 	ldhl	sp,	#14
+      000DA2 2A                    2970 	ld	a, (hl+)
+      000DA3 66                    2971 	ld	h, (hl)
+      000DA4 6F                    2972 	ld	l, a
+      000DA5 19                    2973 	add	hl, de
+      000DA6 E5                    2974 	push	hl
+      000DA7 7D                    2975 	ld	a, l
+      000DA8 F8 0E                 2976 	ldhl	sp,	#14
+      000DAA 77                    2977 	ld	(hl), a
+      000DAB E1                    2978 	pop	hl
+      000DAC 7C                    2979 	ld	a, h
+      000DAD F8 0D                 2980 	ldhl	sp,	#13
+      000DAF 77                    2981 	ld	(hl), a
+      000DB0 F8 11                 2982 	ldhl	sp,#17
+      000DB2 2A                    2983 	ld	a, (hl+)
+      000DB3 5F                    2984 	ld	e, a
+      000DB4 56                    2985 	ld	d, (hl)
+      000DB5 F8 0C                 2986 	ldhl	sp,	#12
+      000DB7 7E                    2987 	ld	a, (hl)
+      000DB8 12                    2988 	ld	(de), a
+      000DB9 13                    2989 	inc	de
+      000DBA 23                    2990 	inc	hl
+      000DBB 7E                    2991 	ld	a, (hl)
+      000DBC 12                    2992 	ld	(de), a
+      000DBD                       2993 00173$:
+                                   2994 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:256: projectiles[i].time++;
+      000DBD F8 09                 2995 	ldhl	sp,#9
+      000DBF 2A                    2996 	ld	a, (hl+)
+      000DC0 5F                    2997 	ld	e, a
+      000DC1 56                    2998 	ld	d, (hl)
+      000DC2 1A                    2999 	ld	a, (de)
+      000DC3 4F                    3000 	ld	c, a
+      000DC4 0C                    3001 	inc	c
+      000DC5 2B                    3002 	dec	hl
+      000DC6 2A                    3003 	ld	a, (hl+)
+      000DC7 66                    3004 	ld	h, (hl)
+      000DC8 6F                    3005 	ld	l, a
+      000DC9 71                    3006 	ld	(hl), c
+      000DCA 18 7B                 3007 	jr	00193$
+      000DCC                       3008 00175$:
+                                   3009 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:259: k = projectiles[i].sprite_index;
+      000DCC F8 0D                 3010 	ldhl	sp,#13
+      000DCE 2A                    3011 	ld	a, (hl+)
+      000DCF 5F                    3012 	ld	e, a
+      000DD0 56                    3013 	ld	d, (hl)
+      000DD1 1A                    3014 	ld	a, (de)
+      000DD2 F8 12                 3015 	ldhl	sp,	#18
+      000DD4 77                    3016 	ld	(hl), a
+                                   3017 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1072: OAM_item_t * itm = &shadow_OAM[nb];
+      000DD5 3A                    3018 	ld	a, (hl-)
+      000DD6 2B                    3019 	dec	hl
+      000DD7 77                    3020 	ld	(hl), a
+      000DD8 AF                    3021 	xor	a, a
+      000DD9 23                    3022 	inc	hl
+      000DDA 32                    3023 	ld	(hl-), a
+      000DDB 3A                    3024 	ld	a, (hl-)
+      000DDC 2B                    3025 	dec	hl
+      000DDD 77                    3026 	ld	(hl), a
+      000DDE F8 11                 3027 	ldhl	sp,	#17
+      000DE0 3A                    3028 	ld	a, (hl-)
+      000DE1 2B                    3029 	dec	hl
+      000DE2 77                    3030 	ld	(hl), a
+      000DE3 3E 02                 3031 	ld	a, #0x02
+      000DE5                       3032 00417$:
+      000DE5 F8 0E                 3033 	ldhl	sp,	#14
+      000DE7 CB 26                 3034 	sla	(hl)
+      000DE9 23                    3035 	inc	hl
+      000DEA CB 16                 3036 	rl	(hl)
+      000DEC 3D                    3037 	dec	a
+      000DED 20 F6                 3038 	jr	NZ, 00417$
+                                   3039 ;c
+      000DEF 2B                    3040 	dec	hl
+      000DF0 2A                    3041 	ld	a, (hl+)
+      000DF1 5F                    3042 	ld	e, a
+      000DF2 56                    3043 	ld	d, (hl)
+      000DF3 21r00r00              3044 	ld	hl, #_shadow_OAM
+      000DF6 19                    3045 	add	hl, de
+      000DF7 E5                    3046 	push	hl
+      000DF8 7D                    3047 	ld	a, l
+      000DF9 F8 12                 3048 	ldhl	sp,	#18
+      000DFB 77                    3049 	ld	(hl), a
+      000DFC E1                    3050 	pop	hl
+      000DFD 7C                    3051 	ld	a, h
+      000DFE F8 11                 3052 	ldhl	sp,	#17
+                                   3053 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1073: itm->y=y, itm->x=x;
+      000E00 32                    3054 	ld	(hl-), a
+      000E01 2A                    3055 	ld	a, (hl+)
+      000E02 66                    3056 	ld	h, (hl)
+      000E03 6F                    3057 	ld	l, a
+      000E04 36 00                 3058 	ld	(hl), #0x00
+      000E06 F8 10                 3059 	ldhl	sp,	#16
+      000E08 2A                    3060 	ld	a, (hl+)
+      000E09 66                    3061 	ld	h, (hl)
+      000E0A 6F                    3062 	ld	l, a
+      000E0B 23                    3063 	inc	hl
+      000E0C 36 00                 3064 	ld	(hl), #0x00
+                                   3065 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:261: move_sprite(k + 1, 0, 0);
+      000E0E F8 12                 3066 	ldhl	sp,	#18
+      000E10 34                    3067 	inc	(hl)
+                                   3068 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1072: OAM_item_t * itm = &shadow_OAM[nb];
+      000E11 3A                    3069 	ld	a, (hl-)
+      000E12 77                    3070 	ld	(hl), a
+      000E13 AF                    3071 	xor	a, a
+      000E14 23                    3072 	inc	hl
+      000E15 77                    3073 	ld	(hl), a
+      000E16 3E 02                 3074 	ld	a, #0x02
+      000E18                       3075 00418$:
+      000E18 F8 11                 3076 	ldhl	sp,	#17
+      000E1A CB 26                 3077 	sla	(hl)
+      000E1C 23                    3078 	inc	hl
+      000E1D CB 16                 3079 	rl	(hl)
+      000E1F 3D                    3080 	dec	a
+      000E20 20 F6                 3081 	jr	NZ, 00418$
+                                   3082 ;c
+      000E22 2B                    3083 	dec	hl
+      000E23 2A                    3084 	ld	a, (hl+)
+      000E24 5F                    3085 	ld	e, a
+      000E25 56                    3086 	ld	d, (hl)
+      000E26 21r00r00              3087 	ld	hl, #_shadow_OAM
+      000E29 19                    3088 	add	hl, de
+      000E2A E5                    3089 	push	hl
+      000E2B 7D                    3090 	ld	a, l
+      000E2C F8 11                 3091 	ldhl	sp,	#17
+      000E2E 77                    3092 	ld	(hl), a
+      000E2F E1                    3093 	pop	hl
+      000E30 7C                    3094 	ld	a, h
+      000E31 F8 10                 3095 	ldhl	sp,	#16
+      000E33 32                    3096 	ld	(hl-), a
+      000E34 2A                    3097 	ld	a, (hl+)
+      000E35 5E                    3098 	ld	e, (hl)
+      000E36 23                    3099 	inc	hl
+      000E37 22                    3100 	ld	(hl+), a
+                                   3101 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1073: itm->y=y, itm->x=x;
+      000E38 7B                    3102 	ld	a, e
+      000E39 32                    3103 	ld	(hl-), a
+      000E3A 2A                    3104 	ld	a, (hl+)
+      000E3B 66                    3105 	ld	h, (hl)
+      000E3C 6F                    3106 	ld	l, a
+      000E3D 36 00                 3107 	ld	(hl), #0x00
+      000E3F F8 11                 3108 	ldhl	sp,	#17
+      000E41 2A                    3109 	ld	a, (hl+)
+      000E42 66                    3110 	ld	h, (hl)
+      000E43 6F                    3111 	ld	l, a
+      000E44 23                    3112 	inc	hl
+      000E45 36 00                 3113 	ld	(hl), #0x00
+                                   3114 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:261: move_sprite(k + 1, 0, 0);
+      000E47                       3115 00193$:
+                                   3116 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:105: for (i = 0; i != MAX_PROJECTILES; i++) {
+      000E47 F8 13                 3117 	ldhl	sp,	#19
+      000E49 34                    3118 	inc	(hl)
+      000E4A 7E                    3119 	ld	a, (hl)
+      000E4B D6 05                 3120 	sub	a, #0x05
+      000E4D C2rF5r05              3121 	jp	NZ,00192$
+                                   3122 ;/tmp/_gbsbuild/src/core/Projectiles_b.c:264: }
+      000E50 E8 14                 3123 	add	sp, #20
+      000E52 C9                    3124 	ret
+                                   3125 	.area _CODE_1
+                                   3126 	.area _CABS (ABS)

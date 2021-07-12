@@ -1,0 +1,2276 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Platform
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _ActivateTriggerAt
+                                     12 	.globl _ScriptStart
+                                     13 	.globl _TileAt
+                                     14 	.globl _ActorOverlapsPlayer
+                                     15 	.globl _ActorAtTile
+                                     16 	.globl _pl_pos_y
+                                     17 	.globl _pl_pos_x
+                                     18 	.globl _pl_vel_y
+                                     19 	.globl _pl_vel_x
+                                     20 	.globl _on_ladder
+                                     21 	.globl _grounded
+                                     22 	.globl _Start_Platform
+                                     23 	.globl _Update_Platform
+                                     24 ;--------------------------------------------------------
+                                     25 ; special function registers
+                                     26 ;--------------------------------------------------------
+                                     27 ;--------------------------------------------------------
+                                     28 ; ram data
+                                     29 ;--------------------------------------------------------
+                                     30 	.area _DATA
+      000000                         31 _grounded::
+      000000                         32 	.ds 1
+      000001                         33 _on_ladder::
+      000001                         34 	.ds 1
+      000002                         35 _pl_vel_x::
+      000002                         36 	.ds 2
+      000004                         37 _pl_vel_y::
+      000004                         38 	.ds 2
+      000006                         39 _pl_pos_x::
+      000006                         40 	.ds 2
+      000008                         41 _pl_pos_y::
+      000008                         42 	.ds 2
+                                     43 ;--------------------------------------------------------
+                                     44 ; absolute external ram data
+                                     45 ;--------------------------------------------------------
+                                     46 	.area _DABS (ABS)
+                                     47 ;--------------------------------------------------------
+                                     48 ; global & static initialisations
+                                     49 ;--------------------------------------------------------
+                                     50 	.area _HOME
+                                     51 	.area _GSINIT
+                                     52 	.area _GSFINAL
+                                     53 	.area _GSINIT
+                                     54 ;/tmp/_gbsbuild/src/states/Platform.c:22: UBYTE grounded = FALSE;
+      000000 21r00r00                55 	ld	hl, #_grounded
+      000003 36 00                   56 	ld	(hl), #0x00
+                                     57 ;/tmp/_gbsbuild/src/states/Platform.c:23: UBYTE on_ladder = FALSE;
+      000005 21r01r00                58 	ld	hl, #_on_ladder
+      000008 36 00                   59 	ld	(hl), #0x00
+                                     60 ;/tmp/_gbsbuild/src/states/Platform.c:24: WORD pl_vel_x = 0;
+      00000A 21r02r00                61 	ld	hl, #_pl_vel_x
+      00000D 36 00                   62 	ld	(hl), #0x00
+      00000F 23                      63 	inc	hl
+      000010 36 00                   64 	ld	(hl), #0x00
+                                     65 ;/tmp/_gbsbuild/src/states/Platform.c:25: WORD pl_vel_y = 0;
+      000012 21r04r00                66 	ld	hl, #_pl_vel_y
+      000015 36 00                   67 	ld	(hl), #0x00
+      000017 23                      68 	inc	hl
+      000018 36 00                   69 	ld	(hl), #0x00
+                                     70 ;/tmp/_gbsbuild/src/states/Platform.c:26: WORD pl_pos_x = 16512;
+      00001A 21r06r00                71 	ld	hl, #_pl_pos_x
+      00001D 36 80                   72 	ld	(hl), #0x80
+      00001F 23                      73 	inc	hl
+      000020 36 40                   74 	ld	(hl), #0x40
+                                     75 ;/tmp/_gbsbuild/src/states/Platform.c:27: WORD pl_pos_y = 1024;
+      000022 21r08r00                76 	ld	hl, #_pl_pos_y
+      000025 36 00                   77 	ld	(hl), #0x00
+      000027 23                      78 	inc	hl
+      000028 36 04                   79 	ld	(hl), #0x04
+                                     80 ;--------------------------------------------------------
+                                     81 ; Home
+                                     82 ;--------------------------------------------------------
+                                     83 	.area _HOME
+                                     84 	.area _HOME
+                                     85 ;--------------------------------------------------------
+                                     86 ; code
+                                     87 ;--------------------------------------------------------
+                                     88 	.area _CODE_5
+                                     89 ;/tmp/_gbsbuild/src/states/Platform.c:29: void Start_Platform() {
+                                     90 ;	---------------------------------
+                                     91 ; Function Start_Platform
+                                     92 ; ---------------------------------
+      000000                         93 _Start_Platform::
+                                     94 ;/tmp/_gbsbuild/src/states/Platform.c:32: pl_pos_x = (player.pos.x + 4u) << 4;
+      000000 21r00r00                95 	ld	hl, #_actors
+      000003 2A                      96 	ld	a, (hl+)
+      000004 4F                      97 	ld	c, a
+      000005 46                      98 	ld	b, (hl)
+      000006 21 04 00                99 	ld	hl, #0x0004
+      000009 09                     100 	add	hl, bc
+      00000A 29                     101 	add	hl, hl
+      00000B 29                     102 	add	hl, hl
+      00000C 29                     103 	add	hl, hl
+      00000D 29                     104 	add	hl, hl
+      00000E 7D                     105 	ld	a, l
+      00000F EAr06r00               106 	ld	(_pl_pos_x), a
+      000012 7C                     107 	ld	a, h
+      000013 EAr07r00               108 	ld	(_pl_pos_x + 1), a
+                                    109 ;/tmp/_gbsbuild/src/states/Platform.c:33: pl_pos_y = player.pos.y << 4;
+      000016 21r02r00               110 	ld	hl, #_actors + 2
+      000019 2A                     111 	ld	a, (hl+)
+      00001A 66                     112 	ld	h, (hl)
+      00001B 6F                     113 	ld	l, a
+      00001C 29                     114 	add	hl, hl
+      00001D 29                     115 	add	hl, hl
+      00001E 29                     116 	add	hl, hl
+      00001F 29                     117 	add	hl, hl
+      000020 7D                     118 	ld	a, l
+      000021 EAr08r00               119 	ld	(_pl_pos_y), a
+      000024 7C                     120 	ld	a, h
+      000025 EAr09r00               121 	ld	(_pl_pos_y + 1), a
+                                    122 ;/tmp/_gbsbuild/src/states/Platform.c:34: pl_vel_x = 0;
+      000028 21r02r00               123 	ld	hl, #_pl_vel_x
+      00002B 3E 00                  124 	ld	a, #0x00
+      00002D 22                     125 	ld	(hl+), a
+      00002E 36 00                  126 	ld	(hl), #0x00
+                                    127 ;/tmp/_gbsbuild/src/states/Platform.c:35: pl_vel_y = 0;
+      000030 21r04r00               128 	ld	hl, #_pl_vel_y
+      000033 3E 00                  129 	ld	a, #0x00
+      000035 22                     130 	ld	(hl+), a
+      000036 36 00                  131 	ld	(hl), #0x00
+                                    132 ;/tmp/_gbsbuild/src/states/Platform.c:37: if (player.dir.x == 0) {
+                                    133 ;/tmp/_gbsbuild/src/states/Platform.c:38: player.dir.y = 0;
+                                    134 ;/tmp/_gbsbuild/src/states/Platform.c:37: if (player.dir.x == 0) {
+      000038 FAr05r00               135 	ld	a, (#(_actors + 0x0005) + 0)
+      00003B B7                     136 	or	a, a
+      00003C 20 0F                  137 	jr	NZ, 00102$
+                                    138 ;/tmp/_gbsbuild/src/states/Platform.c:38: player.dir.y = 0;
+      00003E 21r06r00               139 	ld	hl, #(_actors + 0x0006)
+      000041 36 00                  140 	ld	(hl), #0x00
+                                    141 ;/tmp/_gbsbuild/src/states/Platform.c:39: player.dir.x = 1;
+      000043 21r05r00               142 	ld	hl, #(_actors + 0x0005)
+      000046 36 01                  143 	ld	(hl), #0x01
+                                    144 ;/tmp/_gbsbuild/src/states/Platform.c:40: player.rerender = TRUE;
+      000048 21r14r00               145 	ld	hl, #(_actors + 0x0014)
+      00004B 36 01                  146 	ld	(hl), #0x01
+      00004D                        147 00102$:
+                                    148 ;/tmp/_gbsbuild/src/states/Platform.c:43: tile_x = DIV_8(player.pos.x)+1;
+      00004D 21r00r00               149 	ld	hl, #_actors
+      000050 2A                     150 	ld	a, (hl+)
+      000051 4F                     151 	ld	c, a
+      000052 46                     152 	ld	b, (hl)
+      000053 CB 28                  153 	sra	b
+      000055 CB 19                  154 	rr	c
+      000057 CB 28                  155 	sra	b
+      000059 CB 19                  156 	rr	c
+      00005B CB 28                  157 	sra	b
+      00005D CB 19                  158 	rr	c
+      00005F 0C                     159 	inc	c
+                                    160 ;/tmp/_gbsbuild/src/states/Platform.c:44: tile_y = DIV_8(player.pos.y);
+      000060 21r02r00               161 	ld	hl, #_actors + 2
+      000063 2A                     162 	ld	a, (hl+)
+      000064 66                     163 	ld	h, (hl)
+      000065 47                     164 	ld	b, a
+      000066 CB 2C                  165 	sra	h
+      000068 CB 18                  166 	rr	b
+      00006A CB 2C                  167 	sra	h
+      00006C CB 18                  168 	rr	b
+      00006E CB 2C                  169 	sra	h
+      000070 CB 18                  170 	rr	b
+                                    171 ;/tmp/_gbsbuild/src/states/Platform.c:46: grounded = FALSE;
+      000072 21r00r00               172 	ld	hl, #_grounded
+      000075 36 00                  173 	ld	(hl), #0x00
+                                    174 ;/tmp/_gbsbuild/src/states/Platform.c:48: if (TileAt(tile_x, tile_y) & TILE_PROP_LADDER) {
+      000077 C5                     175 	push	bc
+      000078 CDr00r00               176 	call	_TileAt
+      00007B E8 02                  177 	add	sp, #2
+      00007D CB 63                  178 	bit	4, e
+      00007F 28 0F                  179 	jr	Z, 00104$
+                                    180 ;/tmp/_gbsbuild/src/states/Platform.c:49: on_ladder = TRUE;
+      000081 21r01r00               181 	ld	hl, #_on_ladder
+      000084 36 01                  182 	ld	(hl), #0x01
+                                    183 ;/tmp/_gbsbuild/src/states/Platform.c:50: player.dir.x = 0;
+      000086 21r05r00               184 	ld	hl, #(_actors + 0x0005)
+      000089 36 00                  185 	ld	(hl), #0x00
+                                    186 ;/tmp/_gbsbuild/src/states/Platform.c:51: player.dir.y = -1;
+      00008B 21r06r00               187 	ld	hl, #(_actors + 0x0006)
+      00008E 36 FF                  188 	ld	(hl), #0xff
+      000090                        189 00104$:
+                                    190 ;/tmp/_gbsbuild/src/states/Platform.c:54: camera_offset.x = 0;
+      000090 21r00r00               191 	ld	hl, #_camera_offset
+      000093 36 00                  192 	ld	(hl), #0x00
+                                    193 ;/tmp/_gbsbuild/src/states/Platform.c:55: camera_offset.y = 0;
+      000095 21r01r00               194 	ld	hl, #(_camera_offset + 0x0001)
+      000098 36 00                  195 	ld	(hl), #0x00
+                                    196 ;/tmp/_gbsbuild/src/states/Platform.c:56: camera_deadzone.x = PLATFORM_CAMERA_DEADZONE_X;
+      00009A 21r00r00               197 	ld	hl, #_camera_deadzone
+      00009D 36 04                  198 	ld	(hl), #0x04
+                                    199 ;/tmp/_gbsbuild/src/states/Platform.c:57: camera_deadzone.y = PLATFORM_CAMERA_DEADZONE_Y;
+      00009F 21r01r00               200 	ld	hl, #(_camera_deadzone + 0x0001)
+      0000A2 36 10                  201 	ld	(hl), #0x10
+                                    202 ;/tmp/_gbsbuild/src/states/Platform.c:59: game_time = 0;
+      0000A4 21r00r00               203 	ld	hl, #_game_time
+      0000A7 36 00                  204 	ld	(hl), #0x00
+                                    205 ;/tmp/_gbsbuild/src/states/Platform.c:60: }
+      0000A9 C9                     206 	ret
+                                    207 ;/tmp/_gbsbuild/src/states/Platform.c:62: void Update_Platform() {
+                                    208 ;	---------------------------------
+                                    209 ; Function Update_Platform
+                                    210 ; ---------------------------------
+      0000AA                        211 _Update_Platform::
+      0000AA E8 F7                  212 	add	sp, #-9
+                                    213 ;/tmp/_gbsbuild/src/states/Platform.c:68: pl_pos_x = ((player.pos.x + 4u) << 4) + (pl_pos_x & 0xF);
+      0000AC 21r00r00               214 	ld	hl, #_actors
+      0000AF 2A                     215 	ld	a, (hl+)
+      0000B0 4F                     216 	ld	c, a
+      0000B1 46                     217 	ld	b, (hl)
+      0000B2 21 04 00               218 	ld	hl, #0x0004
+      0000B5 09                     219 	add	hl, bc
+      0000B6 29                     220 	add	hl, hl
+      0000B7 29                     221 	add	hl, hl
+      0000B8 29                     222 	add	hl, hl
+      0000B9 29                     223 	add	hl, hl
+      0000BA 4D                     224 	ld	c, l
+      0000BB 44                     225 	ld	b, h
+      0000BC 21r06r00               226 	ld	hl, #_pl_pos_x
+      0000BF 7E                     227 	ld	a, (hl)
+      0000C0 E6 0F                  228 	and	a, #0x0f
+      0000C2 16 00                  229 	ld	d, #0x00
+      0000C4 81                     230 	add	a, c
+      0000C5 77                     231 	ld	(hl), a
+      0000C6 7A                     232 	ld	a, d
+      0000C7 88                     233 	adc	a, b
+      0000C8 23                     234 	inc	hl
+      0000C9 77                     235 	ld	(hl), a
+                                    236 ;/tmp/_gbsbuild/src/states/Platform.c:69: pl_pos_y = ((player.pos.y) << 4) + (pl_pos_y & 0xF);
+      0000CA 21r02r00               237 	ld	hl, #(_actors + 0x0002)
+      0000CD 2A                     238 	ld	a, (hl+)
+      0000CE 66                     239 	ld	h, (hl)
+      0000CF 6F                     240 	ld	l, a
+      0000D0 29                     241 	add	hl, hl
+      0000D1 29                     242 	add	hl, hl
+      0000D2 29                     243 	add	hl, hl
+      0000D3 29                     244 	add	hl, hl
+      0000D4 4D                     245 	ld	c, l
+      0000D5 44                     246 	ld	b, h
+      0000D6 21r08r00               247 	ld	hl, #_pl_pos_y
+      0000D9 7E                     248 	ld	a, (hl)
+      0000DA E6 0F                  249 	and	a, #0x0f
+      0000DC 5F                     250 	ld	e, a
+      0000DD 16 00                  251 	ld	d, #0x00
+      0000DF 7B                     252 	ld	a, e
+      0000E0 81                     253 	add	a, c
+      0000E1 77                     254 	ld	(hl), a
+      0000E2 7A                     255 	ld	a, d
+      0000E3 88                     256 	adc	a, b
+      0000E4 23                     257 	inc	hl
+      0000E5 77                     258 	ld	(hl), a
+                                    259 ;/tmp/_gbsbuild/src/states/Platform.c:72: tile_x_mid = DIV_8(player.pos.x+4u);
+      0000E6 21r00r00               260 	ld	hl, #_actors
+      0000E9 2A                     261 	ld	a, (hl+)
+      0000EA 4F                     262 	ld	c, a
+      0000EB 46                     263 	ld	b, (hl)
+      0000EC 03                     264 	inc	bc
+      0000ED 03                     265 	inc	bc
+      0000EE 03                     266 	inc	bc
+      0000EF 03                     267 	inc	bc
+      0000F0 CB 38                  268 	srl	b
+      0000F2 CB 19                  269 	rr	c
+      0000F4 CB 38                  270 	srl	b
+      0000F6 CB 19                  271 	rr	c
+      0000F8 CB 38                  272 	srl	b
+      0000FA CB 19                  273 	rr	c
+      0000FC F8 00                  274 	ldhl	sp,	#0
+      0000FE 71                     275 	ld	(hl), c
+                                    276 ;/tmp/_gbsbuild/src/states/Platform.c:73: tile_y = DIV_8(player.pos.y);
+      0000FF 21r02r00               277 	ld	hl, #(_actors + 0x0002)
+      000102 2A                     278 	ld	a, (hl+)
+      000103 4F                     279 	ld	c, a
+      000104 46                     280 	ld	b, (hl)
+      000105 CB 28                  281 	sra	b
+      000107 CB 19                  282 	rr	c
+      000109 CB 28                  283 	sra	b
+      00010B CB 19                  284 	rr	c
+      00010D CB 28                  285 	sra	b
+      00010F CB 19                  286 	rr	c
+      000111 F8 08                  287 	ldhl	sp,	#8
+      000113 71                     288 	ld	(hl), c
+                                    289 ;/tmp/_gbsbuild/src/states/Platform.c:76: if (on_ladder) {
+      000114 FAr01r00               290 	ld	a, (#_on_ladder)
+      000117 B7                     291 	or	a, a
+      000118 CArC6r01               292 	jp	Z, 00170$
+                                    293 ;/tmp/_gbsbuild/src/states/Platform.c:77: player.dir.x = 0;
+      00011B 21r05r00               294 	ld	hl, #(_actors + 0x0005)
+      00011E 36 00                  295 	ld	(hl), #0x00
+                                    296 ;/tmp/_gbsbuild/src/states/Platform.c:78: player.dir.y = -1;
+      000120 01r06r00               297 	ld	bc, #_actors + 6
+      000123 3E FF                  298 	ld	a, #0xff
+      000125 02                     299 	ld	(bc), a
+                                    300 ;/tmp/_gbsbuild/src/states/Platform.c:79: pl_vel_x = 0;
+      000126 21r02r00               301 	ld	hl, #_pl_vel_x
+      000129 3E 00                  302 	ld	a, #0x00
+      00012B 22                     303 	ld	(hl+), a
+      00012C 36 00                  304 	ld	(hl), #0x00
+                                    305 ;/tmp/_gbsbuild/src/states/Platform.c:80: if (INPUT_UP) {
+      00012E 21r00r00               306 	ld	hl, #_joy
+      000131 5E                     307 	ld	e, (hl)
+      000132 FAr00r00               308 	ld	a, (#_ui_block)
+      000135 B7                     309 	or	a, a
+      000136 20 07                  310 	jr	NZ, 00119$
+      000138 21r00r00               311 	ld	hl, #_input_override_default
+      00013B CB 56                  312 	bit	2, (hl)
+      00013D 20 18                  313 	jr	NZ, 00116$
+      00013F                        314 00119$:
+      00013F CB 53                  315 	bit	2, e
+      000141 28 14                  316 	jr	Z, 00116$
+                                    317 ;/tmp/_gbsbuild/src/states/Platform.c:81: pl_vel_y = -plat_walk_vel;
+      000143 AF                     318 	xor	a, a
+      000144 21r00r00               319 	ld	hl, #_plat_walk_vel
+      000147 96                     320 	sub	a, (hl)
+      000148 EAr04r00               321 	ld	(#_pl_vel_y),a
+      00014B 3E 00                  322 	ld	a, #0x00
+      00014D 21r01r00               323 	ld	hl, #_plat_walk_vel + 1
+      000150 9E                     324 	sbc	a, (hl)
+      000151 EAr05r00               325 	ld	(#_pl_vel_y + 1),a
+      000154 C3r80r05               326 	jp	00171$
+      000157                        327 00116$:
+                                    328 ;/tmp/_gbsbuild/src/states/Platform.c:82: } else if (INPUT_DOWN) {
+      000157 FAr00r00               329 	ld	a, (#_ui_block)
+      00015A B7                     330 	or	a, a
+      00015B 20 07                  331 	jr	NZ, 00114$
+      00015D 21r00r00               332 	ld	hl, #_input_override_default
+      000160 CB 5E                  333 	bit	3, (hl)
+      000162 20 11                  334 	jr	NZ, 00111$
+      000164                        335 00114$:
+      000164 CB 5B                  336 	bit	3, e
+      000166 28 0D                  337 	jr	Z, 00111$
+                                    338 ;/tmp/_gbsbuild/src/states/Platform.c:83: pl_vel_y = plat_walk_vel;
+      000168 21r00r00               339 	ld	hl, #_plat_walk_vel
+      00016B 2A                     340 	ld	a, (hl+)
+      00016C 5E                     341 	ld	e, (hl)
+      00016D 21r04r00               342 	ld	hl, #_pl_vel_y
+      000170 22                     343 	ld	(hl+), a
+      000171 73                     344 	ld	(hl), e
+      000172 C3r80r05               345 	jp	00171$
+      000175                        346 00111$:
+                                    347 ;/tmp/_gbsbuild/src/states/Platform.c:89: player.rerender = TRUE;
+                                    348 ;/tmp/_gbsbuild/src/states/Platform.c:85: if (INPUT_LEFT) {
+      000175 FAr00r00               349 	ld	a, (#_ui_block)
+      000178 B7                     350 	or	a, a
+      000179 20 07                  351 	jr	NZ, 00109$
+      00017B 21r00r00               352 	ld	hl, #_input_override_default
+      00017E CB 4E                  353 	bit	1, (hl)
+      000180 20 17                  354 	jr	NZ, 00106$
+      000182                        355 00109$:
+      000182 CB 4B                  356 	bit	1, e
+      000184 28 13                  357 	jr	Z, 00106$
+                                    358 ;/tmp/_gbsbuild/src/states/Platform.c:86: on_ladder = FALSE;
+      000186 21r01r00               359 	ld	hl, #_on_ladder
+      000189 36 00                  360 	ld	(hl), #0x00
+                                    361 ;/tmp/_gbsbuild/src/states/Platform.c:87: player.dir.x = -1;
+      00018B 21r05r00               362 	ld	hl, #(_actors + 0x0005)
+      00018E 36 FF                  363 	ld	(hl), #0xff
+                                    364 ;/tmp/_gbsbuild/src/states/Platform.c:88: player.dir.y = 0;
+      000190 AF                     365 	xor	a, a
+      000191 02                     366 	ld	(bc), a
+                                    367 ;/tmp/_gbsbuild/src/states/Platform.c:89: player.rerender = TRUE;
+      000192 21r14r00               368 	ld	hl, #(_actors + 0x0014)
+      000195 36 01                  369 	ld	(hl), #0x01
+      000197 18 22                  370 	jr	00107$
+      000199                        371 00106$:
+                                    372 ;/tmp/_gbsbuild/src/states/Platform.c:90: } else if (INPUT_RIGHT) {
+      000199 FAr00r00               373 	ld	a, (#_ui_block)
+      00019C B7                     374 	or	a, a
+      00019D 20 07                  375 	jr	NZ, 00104$
+      00019F 21r00r00               376 	ld	hl, #_input_override_default
+      0001A2 CB 46                  377 	bit	0, (hl)
+      0001A4 20 15                  378 	jr	NZ, 00107$
+      0001A6                        379 00104$:
+      0001A6 CB 43                  380 	bit	0, e
+      0001A8 28 11                  381 	jr	Z, 00107$
+                                    382 ;/tmp/_gbsbuild/src/states/Platform.c:91: on_ladder = FALSE;
+      0001AA 21r01r00               383 	ld	hl, #_on_ladder
+      0001AD 36 00                  384 	ld	(hl), #0x00
+                                    385 ;/tmp/_gbsbuild/src/states/Platform.c:92: player.dir.x = 1;
+      0001AF 21r05r00               386 	ld	hl, #(_actors + 0x0005)
+      0001B2 36 01                  387 	ld	(hl), #0x01
+                                    388 ;/tmp/_gbsbuild/src/states/Platform.c:93: player.dir.y = 0;
+      0001B4 AF                     389 	xor	a, a
+      0001B5 02                     390 	ld	(bc), a
+                                    391 ;/tmp/_gbsbuild/src/states/Platform.c:94: player.rerender = TRUE;
+      0001B6 21r14r00               392 	ld	hl, #(_actors + 0x0014)
+      0001B9 36 01                  393 	ld	(hl), #0x01
+      0001BB                        394 00107$:
+                                    395 ;/tmp/_gbsbuild/src/states/Platform.c:96: pl_vel_y = 0;
+      0001BB 21r04r00               396 	ld	hl, #_pl_vel_y
+      0001BE 3E 00                  397 	ld	a, #0x00
+      0001C0 22                     398 	ld	(hl+), a
+      0001C1 36 00                  399 	ld	(hl), #0x00
+      0001C3 C3r80r05               400 	jp	00171$
+      0001C6                        401 00170$:
+                                    402 ;/tmp/_gbsbuild/src/states/Platform.c:99: player.dir.y = 0;
+      0001C6 01r06r00               403 	ld	bc, #_actors + 6
+      0001C9 AF                     404 	xor	a, a
+      0001CA 02                     405 	ld	(bc), a
+                                    406 ;/tmp/_gbsbuild/src/states/Platform.c:80: if (INPUT_UP) {
+      0001CB 21r00r00               407 	ld	hl, #_joy
+      0001CE 5E                     408 	ld	e, (hl)
+                                    409 ;/tmp/_gbsbuild/src/states/Platform.c:105: player.rerender = TRUE;
+                                    410 ;/tmp/_gbsbuild/src/states/Platform.c:100: if ((INPUT_UP || INPUT_DOWN) && ((TileAt(tile_x_mid, tile_y) & TILE_PROP_LADDER))) {
+      0001CF FAr00r00               411 	ld	a, (#_ui_block)
+      0001D2 B7                     412 	or	a, a
+      0001D3 20 07                  413 	jr	NZ, 00123$
+      0001D5 21r00r00               414 	ld	hl, #_input_override_default
+      0001D8 CB 56                  415 	bit	2, (hl)
+      0001DA 20 04                  416 	jr	NZ, 00126$
+      0001DC                        417 00123$:
+      0001DC CB 53                  418 	bit	2, e
+      0001DE 20 11                  419 	jr	NZ, 00127$
+      0001E0                        420 00126$:
+      0001E0 FAr00r00               421 	ld	a, (#_ui_block)
+      0001E3 B7                     422 	or	a, a
+      0001E4 20 07                  423 	jr	NZ, 00125$
+      0001E6 21r00r00               424 	ld	hl, #_input_override_default
+      0001E9 CB 5E                  425 	bit	3, (hl)
+      0001EB 20 33                  426 	jr	NZ, 00121$
+      0001ED                        427 00125$:
+      0001ED CB 5B                  428 	bit	3, e
+      0001EF 28 2F                  429 	jr	Z, 00121$
+      0001F1                        430 00127$:
+      0001F1 C5                     431 	push	bc
+      0001F2 F8 0A                  432 	ldhl	sp,	#10
+      0001F4 7E                     433 	ld	a, (hl)
+      0001F5 F5                     434 	push	af
+      0001F6 33                     435 	inc	sp
+      0001F7 F8 03                  436 	ldhl	sp,	#3
+      0001F9 7E                     437 	ld	a, (hl)
+      0001FA F5                     438 	push	af
+      0001FB 33                     439 	inc	sp
+      0001FC CDr00r00               440 	call	_TileAt
+      0001FF E8 02                  441 	add	sp, #2
+      000201 C1                     442 	pop	bc
+      000202 CB 63                  443 	bit	4, e
+      000204 28 1A                  444 	jr	Z, 00121$
+                                    445 ;/tmp/_gbsbuild/src/states/Platform.c:101: on_ladder = TRUE;
+      000206 21r01r00               446 	ld	hl, #_on_ladder
+      000209 36 01                  447 	ld	(hl), #0x01
+                                    448 ;/tmp/_gbsbuild/src/states/Platform.c:102: pl_vel_x = 0;
+      00020B 21r02r00               449 	ld	hl, #_pl_vel_x
+      00020E 3E 00                  450 	ld	a, #0x00
+      000210 22                     451 	ld	(hl+), a
+      000211 36 00                  452 	ld	(hl), #0x00
+                                    453 ;/tmp/_gbsbuild/src/states/Platform.c:103: player.dir.x = 0;
+      000213 21r05r00               454 	ld	hl, #(_actors + 0x0005)
+      000216 36 00                  455 	ld	(hl), #0x00
+                                    456 ;/tmp/_gbsbuild/src/states/Platform.c:104: player.dir.y = -1;
+      000218 3E FF                  457 	ld	a, #0xff
+      00021A 02                     458 	ld	(bc), a
+                                    459 ;/tmp/_gbsbuild/src/states/Platform.c:105: player.rerender = TRUE;
+      00021B 21r14r00               460 	ld	hl, #(_actors + 0x0014)
+      00021E 36 01                  461 	ld	(hl), #0x01
+      000220                        462 00121$:
+                                    463 ;/tmp/_gbsbuild/src/states/Platform.c:80: if (INPUT_UP) {
+      000220 21r00r00               464 	ld	hl, #_joy
+      000223 4E                     465 	ld	c, (hl)
+                                    466 ;/tmp/_gbsbuild/src/states/Platform.c:108: if (INPUT_LEFT) {
+      000224 FAr00r00               467 	ld	a, (#_ui_block)
+      000227 B7                     468 	or	a, a
+      000228 20 08                  469 	jr	NZ, 00168$
+      00022A 21r00r00               470 	ld	hl, #_input_override_default
+      00022D CB 4E                  471 	bit	1, (hl)
+      00022F C2r8Fr03               472 	jp	NZ,00165$
+      000232                        473 00168$:
+      000232 CB 49                  474 	bit	1, c
+      000234 CAr8Fr03               475 	jp	Z,00165$
+                                    476 ;/tmp/_gbsbuild/src/states/Platform.c:109: player.dir.x = -1;
+      000237 21r05r00               477 	ld	hl, #(_actors + 0x0005)
+      00023A 36 FF                  478 	ld	(hl), #0xff
+                                    479 ;/tmp/_gbsbuild/src/states/Platform.c:80: if (INPUT_UP) {
+      00023C FAr00r00               480 	ld	a, (#_joy)
+      00023F F8 06                  481 	ldhl	sp,	#6
+      000241 77                     482 	ld	(hl), a
+                                    483 ;/tmp/_gbsbuild/src/states/Platform.c:112: pl_vel_x = CLAMP(pl_vel_x, -plat_run_vel, -plat_min_vel);
+      000242 11 00 00               484 	ld	de, #0x0000
+      000245 21r00r00               485 	ld	hl, #_plat_min_vel
+      000248 2A                     486 	ld	a, (hl+)
+      000249 66                     487 	ld	h, (hl)
+      00024A 6F                     488 	ld	l, a
+      00024B 7B                     489 	ld	a, e
+      00024C 95                     490 	sub	a, l
+      00024D 5F                     491 	ld	e, a
+      00024E 7A                     492 	ld	a, d
+      00024F 9C                     493 	sbc	a, h
+      000250 F8 05                  494 	ldhl	sp,	#5
+      000252 32                     495 	ld	(hl-), a
+      000253 73                     496 	ld	(hl), e
+                                    497 ;/tmp/_gbsbuild/src/states/Platform.c:110: if (INPUT_A) {
+      000254 FAr00r00               498 	ld	a, (#_ui_block)
+      000257 B7                     499 	or	a, a
+      000258 20 08                  500 	jr	NZ, 00132$
+      00025A 21r00r00               501 	ld	hl, #_input_override_default
+      00025D CB 66                  502 	bit	4, (hl)
+      00025F C2rEBr02               503 	jp	NZ,00129$
+      000262                        504 00132$:
+      000262 F8 06                  505 	ldhl	sp,	#6
+      000264 CB 66                  506 	bit	4, (hl)
+      000266 CArEBr02               507 	jp	Z,00129$
+                                    508 ;/tmp/_gbsbuild/src/states/Platform.c:111: pl_vel_x -= plat_run_acc;
+      000269 FAr02r00               509 	ld	a, (#_pl_vel_x)
+      00026C 21r00r00               510 	ld	hl, #_plat_run_acc
+      00026F 96                     511 	sub	a, (hl)
+      000270 21r02r00               512 	ld	hl, #_pl_vel_x
+      000273 22                     513 	ld	(hl+), a
+      000274 7E                     514 	ld	a, (hl)
+      000275 21r01r00               515 	ld	hl, #_plat_run_acc + 1
+      000278 9E                     516 	sbc	a, (hl)
+      000279 EAr03r00               517 	ld	(#_pl_vel_x + 1),a
+                                    518 ;/tmp/_gbsbuild/src/states/Platform.c:112: pl_vel_x = CLAMP(pl_vel_x, -plat_run_vel, -plat_min_vel);
+      00027C 11 00 00               519 	ld	de, #0x0000
+      00027F 21r00r00               520 	ld	hl, #_plat_run_vel
+      000282 2A                     521 	ld	a, (hl+)
+      000283 66                     522 	ld	h, (hl)
+      000284 6F                     523 	ld	l, a
+      000285 7B                     524 	ld	a, e
+      000286 95                     525 	sub	a, l
+      000287 5F                     526 	ld	e, a
+      000288 7A                     527 	ld	a, d
+      000289 9C                     528 	sbc	a, h
+      00028A F8 08                  529 	ldhl	sp,	#8
+      00028C 32                     530 	ld	(hl-), a
+      00028D 73                     531 	ld	(hl), e
+      00028E 11r02r00               532 	ld	de, #_pl_vel_x
+      000291 1A                     533 	ld	a, (de)
+      000292 96                     534 	sub	a, (hl)
+      000293 23                     535 	inc	hl
+      000294 13                     536 	inc	de
+      000295 1A                     537 	ld	a, (de)
+      000296 9E                     538 	sbc	a, (hl)
+      000297 1A                     539 	ld	a, (de)
+      000298 57                     540 	ld	d, a
+      000299 CB 7E                  541 	bit	7, (hl)
+      00029B 28 07                  542 	jr	Z, 00758$
+      00029D CB 7A                  543 	bit	7, d
+      00029F 20 08                  544 	jr	NZ, 00759$
+      0002A1 BF                     545 	cp	a, a
+      0002A2 18 05                  546 	jr	00759$
+      0002A4                        547 00758$:
+      0002A4 CB 7A                  548 	bit	7, d
+      0002A6 28 01                  549 	jr	Z, 00759$
+      0002A8 37                     550 	scf
+      0002A9                        551 00759$:
+      0002A9 38 34                  552 	jr	C, 00261$
+      0002AB F8 04                  553 	ldhl	sp,	#4
+      0002AD 5D                     554 	ld	e, l
+      0002AE 54                     555 	ld	d, h
+      0002AF 21r02r00               556 	ld	hl, #_pl_vel_x
+      0002B2 1A                     557 	ld	a, (de)
+      0002B3 96                     558 	sub	a, (hl)
+      0002B4 23                     559 	inc	hl
+      0002B5 13                     560 	inc	de
+      0002B6 1A                     561 	ld	a, (de)
+      0002B7 9E                     562 	sbc	a, (hl)
+      0002B8 1A                     563 	ld	a, (de)
+      0002B9 57                     564 	ld	d, a
+      0002BA CB 7E                  565 	bit	7, (hl)
+      0002BC 28 07                  566 	jr	Z, 00760$
+      0002BE CB 7A                  567 	bit	7, d
+      0002C0 20 08                  568 	jr	NZ, 00761$
+      0002C2 BF                     569 	cp	a, a
+      0002C3 18 05                  570 	jr	00761$
+      0002C5                        571 00760$:
+      0002C5 CB 7A                  572 	bit	7, d
+      0002C7 28 01                  573 	jr	Z, 00761$
+      0002C9 37                     574 	scf
+      0002CA                        575 00761$:
+      0002CA 30 0A                  576 	jr	NC, 00262$
+      0002CC F8 04                  577 	ldhl	sp,	#4
+      0002CE 2A                     578 	ld	a, (hl+)
+      0002CF 5E                     579 	ld	e, (hl)
+      0002D0 23                     580 	inc	hl
+      0002D1 23                     581 	inc	hl
+      0002D2 22                     582 	ld	(hl+), a
+      0002D3 73                     583 	ld	(hl), e
+      0002D4 18 09                  584 	jr	00263$
+      0002D6                        585 00262$:
+      0002D6 21r02r00               586 	ld	hl, #_pl_vel_x
+      0002D9 2A                     587 	ld	a, (hl+)
+      0002DA 5E                     588 	ld	e, (hl)
+      0002DB F8 07                  589 	ldhl	sp,	#7
+      0002DD 22                     590 	ld	(hl+), a
+      0002DE 73                     591 	ld	(hl), e
+      0002DF                        592 00263$:
+      0002DF                        593 00261$:
+      0002DF F8 07                  594 	ldhl	sp,	#7
+      0002E1 2A                     595 	ld	a, (hl+)
+      0002E2 5E                     596 	ld	e, (hl)
+      0002E3 21r02r00               597 	ld	hl, #_pl_vel_x
+      0002E6 22                     598 	ld	(hl+), a
+      0002E7 73                     599 	ld	(hl), e
+      0002E8 C3r6Ar03               600 	jp	00130$
+      0002EB                        601 00129$:
+                                    602 ;/tmp/_gbsbuild/src/states/Platform.c:114: pl_vel_x -= plat_walk_acc;
+      0002EB FAr02r00               603 	ld	a, (#_pl_vel_x)
+      0002EE 21r00r00               604 	ld	hl, #_plat_walk_acc
+      0002F1 96                     605 	sub	a, (hl)
+      0002F2 21r02r00               606 	ld	hl, #_pl_vel_x
+      0002F5 22                     607 	ld	(hl+), a
+      0002F6 7E                     608 	ld	a, (hl)
+      0002F7 21r01r00               609 	ld	hl, #_plat_walk_acc + 1
+      0002FA 9E                     610 	sbc	a, (hl)
+      0002FB EAr03r00               611 	ld	(#_pl_vel_x + 1),a
+                                    612 ;/tmp/_gbsbuild/src/states/Platform.c:115: pl_vel_x = CLAMP(pl_vel_x, -plat_walk_vel, -plat_min_vel);
+      0002FE 11 00 00               613 	ld	de, #0x0000
+      000301 21r00r00               614 	ld	hl, #_plat_walk_vel
+      000304 2A                     615 	ld	a, (hl+)
+      000305 66                     616 	ld	h, (hl)
+      000306 6F                     617 	ld	l, a
+      000307 7B                     618 	ld	a, e
+      000308 95                     619 	sub	a, l
+      000309 5F                     620 	ld	e, a
+      00030A 7A                     621 	ld	a, d
+      00030B 9C                     622 	sbc	a, h
+      00030C F8 08                  623 	ldhl	sp,	#8
+      00030E 32                     624 	ld	(hl-), a
+      00030F 73                     625 	ld	(hl), e
+      000310 11r02r00               626 	ld	de, #_pl_vel_x
+      000313 1A                     627 	ld	a, (de)
+      000314 96                     628 	sub	a, (hl)
+      000315 23                     629 	inc	hl
+      000316 13                     630 	inc	de
+      000317 1A                     631 	ld	a, (de)
+      000318 9E                     632 	sbc	a, (hl)
+      000319 1A                     633 	ld	a, (de)
+      00031A 57                     634 	ld	d, a
+      00031B CB 7E                  635 	bit	7, (hl)
+      00031D 28 07                  636 	jr	Z, 00762$
+      00031F CB 7A                  637 	bit	7, d
+      000321 20 08                  638 	jr	NZ, 00763$
+      000323 BF                     639 	cp	a, a
+      000324 18 05                  640 	jr	00763$
+      000326                        641 00762$:
+      000326 CB 7A                  642 	bit	7, d
+      000328 28 01                  643 	jr	Z, 00763$
+      00032A 37                     644 	scf
+      00032B                        645 00763$:
+      00032B 38 34                  646 	jr	C, 00265$
+      00032D F8 04                  647 	ldhl	sp,	#4
+      00032F 5D                     648 	ld	e, l
+      000330 54                     649 	ld	d, h
+      000331 21r02r00               650 	ld	hl, #_pl_vel_x
+      000334 1A                     651 	ld	a, (de)
+      000335 96                     652 	sub	a, (hl)
+      000336 23                     653 	inc	hl
+      000337 13                     654 	inc	de
+      000338 1A                     655 	ld	a, (de)
+      000339 9E                     656 	sbc	a, (hl)
+      00033A 1A                     657 	ld	a, (de)
+      00033B 57                     658 	ld	d, a
+      00033C CB 7E                  659 	bit	7, (hl)
+      00033E 28 07                  660 	jr	Z, 00764$
+      000340 CB 7A                  661 	bit	7, d
+      000342 20 08                  662 	jr	NZ, 00765$
+      000344 BF                     663 	cp	a, a
+      000345 18 05                  664 	jr	00765$
+      000347                        665 00764$:
+      000347 CB 7A                  666 	bit	7, d
+      000349 28 01                  667 	jr	Z, 00765$
+      00034B 37                     668 	scf
+      00034C                        669 00765$:
+      00034C 30 0A                  670 	jr	NC, 00266$
+      00034E F8 04                  671 	ldhl	sp,	#4
+      000350 2A                     672 	ld	a, (hl+)
+      000351 5E                     673 	ld	e, (hl)
+      000352 23                     674 	inc	hl
+      000353 23                     675 	inc	hl
+      000354 22                     676 	ld	(hl+), a
+      000355 73                     677 	ld	(hl), e
+      000356 18 09                  678 	jr	00267$
+      000358                        679 00266$:
+      000358 21r02r00               680 	ld	hl, #_pl_vel_x
+      00035B 2A                     681 	ld	a, (hl+)
+      00035C 5E                     682 	ld	e, (hl)
+      00035D F8 07                  683 	ldhl	sp,	#7
+      00035F 22                     684 	ld	(hl+), a
+      000360 73                     685 	ld	(hl), e
+      000361                        686 00267$:
+      000361                        687 00265$:
+      000361 F8 07                  688 	ldhl	sp,	#7
+      000363 2A                     689 	ld	a, (hl+)
+      000364 5E                     690 	ld	e, (hl)
+      000365 21r02r00               691 	ld	hl, #_pl_vel_x
+      000368 22                     692 	ld	(hl+), a
+      000369 73                     693 	ld	(hl), e
+      00036A                        694 00130$:
+                                    695 ;/tmp/_gbsbuild/src/states/Platform.c:117: if (INPUT_LEFT_PRESSED) { // update player facing direction if button pressed this frame
+      00036A FAr00r00               696 	ld	a, (#_ui_block)
+      00036D B7                     697 	or	a, a
+      00036E 20 08                  698 	jr	NZ, 00137$
+      000370 21r00r00               699 	ld	hl, #_input_override_default
+      000373 CB 4E                  700 	bit	1, (hl)
+      000375 C2r80r05               701 	jp	NZ,00171$
+      000378                        702 00137$:
+      000378 F8 06                  703 	ldhl	sp,	#6
+      00037A CB 4E                  704 	bit	1, (hl)
+      00037C CAr80r05               705 	jp	Z,00171$
+      00037F FAr00r00               706 	ld	a, (#_last_joy)
+      000382 CB 4F                  707 	bit	1, a
+      000384 C2r80r05               708 	jp	NZ,00171$
+                                    709 ;/tmp/_gbsbuild/src/states/Platform.c:118: player.rerender = TRUE;
+      000387 21r14r00               710 	ld	hl, #(_actors + 0x0014)
+      00038A 36 01                  711 	ld	(hl), #0x01
+      00038C C3r80r05               712 	jp	00171$
+      00038F                        713 00165$:
+                                    714 ;/tmp/_gbsbuild/src/states/Platform.c:120: } else if (INPUT_RIGHT) {
+      00038F FAr00r00               715 	ld	a, (#_ui_block)
+      000392 B7                     716 	or	a, a
+      000393 20 08                  717 	jr	NZ, 00163$
+      000395 21r00r00               718 	ld	hl, #_input_override_default
+      000398 CB 46                  719 	bit	0, (hl)
+      00039A C2rC9r04               720 	jp	NZ,00160$
+      00039D                        721 00163$:
+      00039D CB 41                  722 	bit	0, c
+      00039F CArC9r04               723 	jp	Z,00160$
+                                    724 ;/tmp/_gbsbuild/src/states/Platform.c:121: player.dir.x = 1;
+      0003A2 21r05r00               725 	ld	hl, #(_actors + 0x0005)
+      0003A5 36 01                  726 	ld	(hl), #0x01
+                                    727 ;/tmp/_gbsbuild/src/states/Platform.c:80: if (INPUT_UP) {
+      0003A7 FAr00r00               728 	ld	a, (#_joy)
+      0003AA F8 06                  729 	ldhl	sp,	#6
+      0003AC 77                     730 	ld	(hl), a
+                                    731 ;/tmp/_gbsbuild/src/states/Platform.c:124: pl_vel_x = CLAMP(pl_vel_x, plat_min_vel, plat_run_vel);
+      0003AD 21r01r00               732 	ld	hl, #_plat_min_vel + 1
+      0003B0 2B                     733 	dec	hl
+      0003B1 2A                     734 	ld	a, (hl+)
+      0003B2 4F                     735 	ld	c, a
+      0003B3 46                     736 	ld	b, (hl)
+                                    737 ;/tmp/_gbsbuild/src/states/Platform.c:122: if (INPUT_A) {
+      0003B4 FAr00r00               738 	ld	a, (#_ui_block)
+      0003B7 B7                     739 	or	a, a
+      0003B8 20 07                  740 	jr	NZ, 00142$
+      0003BA 21r00r00               741 	ld	hl, #_input_override_default
+      0003BD CB 66                  742 	bit	4, (hl)
+      0003BF 20 72                  743 	jr	NZ, 00139$
+      0003C1                        744 00142$:
+      0003C1 F8 06                  745 	ldhl	sp,	#6
+      0003C3 CB 66                  746 	bit	4, (hl)
+      0003C5 28 6C                  747 	jr	Z, 00139$
+                                    748 ;/tmp/_gbsbuild/src/states/Platform.c:123: pl_vel_x += plat_run_acc;
+      0003C7 FAr02r00               749 	ld	a, (#_pl_vel_x)
+      0003CA 21r00r00               750 	ld	hl, #_plat_run_acc
+      0003CD 86                     751 	add	a, (hl)
+      0003CE 21r02r00               752 	ld	hl, #_pl_vel_x
+      0003D1 22                     753 	ld	(hl+), a
+      0003D2 7E                     754 	ld	a, (hl)
+      0003D3 21r01r00               755 	ld	hl, #_plat_run_acc + 1
+      0003D6 8E                     756 	adc	a, (hl)
+      0003D7 EAr03r00               757 	ld	(#_pl_vel_x + 1),a
+                                    758 ;/tmp/_gbsbuild/src/states/Platform.c:124: pl_vel_x = CLAMP(pl_vel_x, plat_min_vel, plat_run_vel);
+      0003DA 11r02r00               759 	ld	de, #_pl_vel_x
+      0003DD 21r00r00               760 	ld	hl, #_plat_min_vel
+      0003E0 1A                     761 	ld	a, (de)
+      0003E1 96                     762 	sub	a, (hl)
+      0003E2 23                     763 	inc	hl
+      0003E3 13                     764 	inc	de
+      0003E4 1A                     765 	ld	a, (de)
+      0003E5 9E                     766 	sbc	a, (hl)
+      0003E6 1A                     767 	ld	a, (de)
+      0003E7 57                     768 	ld	d, a
+      0003E8 CB 7E                  769 	bit	7, (hl)
+      0003EA 28 07                  770 	jr	Z, 00777$
+      0003EC CB 7A                  771 	bit	7, d
+      0003EE 20 08                  772 	jr	NZ, 00778$
+      0003F0 BF                     773 	cp	a, a
+      0003F1 18 05                  774 	jr	00778$
+      0003F3                        775 00777$:
+      0003F3 CB 7A                  776 	bit	7, d
+      0003F5 28 01                  777 	jr	Z, 00778$
+      0003F7 37                     778 	scf
+      0003F8                        779 00778$:
+      0003F8 38 31                  780 	jr	C, 00269$
+      0003FA 11r00r00               781 	ld	de, #_plat_run_vel
+      0003FD 21r02r00               782 	ld	hl, #_pl_vel_x
+      000400 1A                     783 	ld	a, (de)
+      000401 96                     784 	sub	a, (hl)
+      000402 23                     785 	inc	hl
+      000403 13                     786 	inc	de
+      000404 1A                     787 	ld	a, (de)
+      000405 9E                     788 	sbc	a, (hl)
+      000406 1A                     789 	ld	a, (de)
+      000407 57                     790 	ld	d, a
+      000408 CB 7E                  791 	bit	7, (hl)
+      00040A 28 07                  792 	jr	Z, 00779$
+      00040C CB 7A                  793 	bit	7, d
+      00040E 20 08                  794 	jr	NZ, 00780$
+      000410 BF                     795 	cp	a, a
+      000411 18 05                  796 	jr	00780$
+      000413                        797 00779$:
+      000413 CB 7A                  798 	bit	7, d
+      000415 28 01                  799 	jr	Z, 00780$
+      000417 37                     800 	scf
+      000418                        801 00780$:
+      000418 30 08                  802 	jr	NC, 00270$
+      00041A 21r00r00               803 	ld	hl, #_plat_run_vel
+      00041D 2A                     804 	ld	a, (hl+)
+      00041E 47                     805 	ld	b, a
+      00041F 4E                     806 	ld	c, (hl)
+      000420 18 06                  807 	jr	00271$
+      000422                        808 00270$:
+      000422 21r02r00               809 	ld	hl, #_pl_vel_x
+      000425 2A                     810 	ld	a, (hl+)
+      000426 47                     811 	ld	b, a
+      000427 4E                     812 	ld	c, (hl)
+      000428                        813 00271$:
+      000428 78                     814 	ld	a, b
+      000429 41                     815 	ld	b, c
+      00042A 4F                     816 	ld	c, a
+      00042B                        817 00269$:
+      00042B 21r02r00               818 	ld	hl, #_pl_vel_x
+      00042E 79                     819 	ld	a, c
+      00042F 22                     820 	ld	(hl+), a
+      000430 70                     821 	ld	(hl), b
+      000431 18 72                  822 	jr	00140$
+      000433                        823 00139$:
+                                    824 ;/tmp/_gbsbuild/src/states/Platform.c:126: pl_vel_x += plat_walk_acc;
+      000433 FAr02r00               825 	ld	a, (#_pl_vel_x)
+      000436 21r00r00               826 	ld	hl, #_plat_walk_acc
+      000439 86                     827 	add	a, (hl)
+      00043A 21r02r00               828 	ld	hl, #_pl_vel_x
+      00043D 22                     829 	ld	(hl+), a
+      00043E 7E                     830 	ld	a, (hl)
+      00043F 21r01r00               831 	ld	hl, #_plat_walk_acc + 1
+      000442 8E                     832 	adc	a, (hl)
+      000443 EAr03r00               833 	ld	(#_pl_vel_x + 1),a
+                                    834 ;/tmp/_gbsbuild/src/states/Platform.c:127: pl_vel_x = CLAMP(pl_vel_x, plat_min_vel, plat_walk_vel);
+      000446 11r02r00               835 	ld	de, #_pl_vel_x
+      000449 21r00r00               836 	ld	hl, #_plat_min_vel
+      00044C 1A                     837 	ld	a, (de)
+      00044D 96                     838 	sub	a, (hl)
+      00044E 23                     839 	inc	hl
+      00044F 13                     840 	inc	de
+      000450 1A                     841 	ld	a, (de)
+      000451 9E                     842 	sbc	a, (hl)
+      000452 1A                     843 	ld	a, (de)
+      000453 57                     844 	ld	d, a
+      000454 CB 7E                  845 	bit	7, (hl)
+      000456 28 07                  846 	jr	Z, 00781$
+      000458 CB 7A                  847 	bit	7, d
+      00045A 20 08                  848 	jr	NZ, 00782$
+      00045C BF                     849 	cp	a, a
+      00045D 18 05                  850 	jr	00782$
+      00045F                        851 00781$:
+      00045F CB 7A                  852 	bit	7, d
+      000461 28 01                  853 	jr	Z, 00782$
+      000463 37                     854 	scf
+      000464                        855 00782$:
+      000464 38 39                  856 	jr	C, 00273$
+      000466 11r00r00               857 	ld	de, #_plat_walk_vel
+      000469 21r02r00               858 	ld	hl, #_pl_vel_x
+      00046C 1A                     859 	ld	a, (de)
+      00046D 96                     860 	sub	a, (hl)
+      00046E 23                     861 	inc	hl
+      00046F 13                     862 	inc	de
+      000470 1A                     863 	ld	a, (de)
+      000471 9E                     864 	sbc	a, (hl)
+      000472 1A                     865 	ld	a, (de)
+      000473 57                     866 	ld	d, a
+      000474 CB 7E                  867 	bit	7, (hl)
+      000476 28 07                  868 	jr	Z, 00783$
+      000478 CB 7A                  869 	bit	7, d
+      00047A 20 08                  870 	jr	NZ, 00784$
+      00047C BF                     871 	cp	a, a
+      00047D 18 05                  872 	jr	00784$
+      00047F                        873 00783$:
+      00047F CB 7A                  874 	bit	7, d
+      000481 28 01                  875 	jr	Z, 00784$
+      000483 37                     876 	scf
+      000484                        877 00784$:
+      000484 30 0B                  878 	jr	NC, 00274$
+      000486 21r00r00               879 	ld	hl, #_plat_walk_vel
+      000489 2A                     880 	ld	a, (hl+)
+      00048A 5E                     881 	ld	e, (hl)
+      00048B F8 07                  882 	ldhl	sp,	#7
+      00048D 22                     883 	ld	(hl+), a
+      00048E 73                     884 	ld	(hl), e
+      00048F 18 09                  885 	jr	00275$
+      000491                        886 00274$:
+      000491 21r02r00               887 	ld	hl, #_pl_vel_x
+      000494 2A                     888 	ld	a, (hl+)
+      000495 5E                     889 	ld	e, (hl)
+      000496 F8 07                  890 	ldhl	sp,	#7
+      000498 22                     891 	ld	(hl+), a
+      000499 73                     892 	ld	(hl), e
+      00049A                        893 00275$:
+      00049A F8 07                  894 	ldhl	sp,#7
+      00049C 2A                     895 	ld	a, (hl+)
+      00049D 4F                     896 	ld	c, a
+      00049E 46                     897 	ld	b, (hl)
+      00049F                        898 00273$:
+      00049F 21r02r00               899 	ld	hl, #_pl_vel_x
+      0004A2 79                     900 	ld	a, c
+      0004A3 22                     901 	ld	(hl+), a
+      0004A4 70                     902 	ld	(hl), b
+      0004A5                        903 00140$:
+                                    904 ;/tmp/_gbsbuild/src/states/Platform.c:129: if (INPUT_RIGHT_PRESSED) { // update player facing direction if button pressed this frame
+      0004A5 FAr00r00               905 	ld	a, (#_ui_block)
+      0004A8 B7                     906 	or	a, a
+      0004A9 20 08                  907 	jr	NZ, 00147$
+      0004AB 21r00r00               908 	ld	hl, #_input_override_default
+      0004AE CB 46                  909 	bit	0, (hl)
+      0004B0 C2r80r05               910 	jp	NZ,00171$
+      0004B3                        911 00147$:
+      0004B3 F8 06                  912 	ldhl	sp,	#6
+      0004B5 CB 46                  913 	bit	0, (hl)
+      0004B7 CAr80r05               914 	jp	Z,00171$
+      0004BA FAr00r00               915 	ld	a, (#_last_joy)
+      0004BD 0F                     916 	rrca
+      0004BE DAr80r05               917 	jp	C,00171$
+                                    918 ;/tmp/_gbsbuild/src/states/Platform.c:130: player.rerender = TRUE;
+      0004C1 21r14r00               919 	ld	hl, #(_actors + 0x0014)
+      0004C4 36 01                  920 	ld	(hl), #0x01
+      0004C6 C3r80r05               921 	jp	00171$
+      0004C9                        922 00160$:
+                                    923 ;/tmp/_gbsbuild/src/states/Platform.c:132: } else if (grounded) {
+      0004C9 FAr00r00               924 	ld	a, (#_grounded)
+      0004CC B7                     925 	or	a, a
+      0004CD CAr80r05               926 	jp	Z, 00171$
+                                    927 ;/tmp/_gbsbuild/src/states/Platform.c:133: if (pl_vel_x < 0) {
+      0004D0 21r02r00               928 	ld	hl, #_pl_vel_x
+      0004D3 7E                     929 	ld	a, (hl)
+      0004D4 D6 00                  930 	sub	a, #0x00
+      0004D6 23                     931 	inc	hl
+      0004D7 7E                     932 	ld	a, (hl)
+      0004D8 DE 00                  933 	sbc	a, #0x00
+      0004DA 56                     934 	ld	d, (hl)
+      0004DB 3E 00                  935 	ld	a, #0x00
+      0004DD CB 7F                  936 	bit	7,a
+      0004DF 28 07                  937 	jr	Z, 00790$
+      0004E1 CB 7A                  938 	bit	7, d
+      0004E3 20 08                  939 	jr	NZ, 00791$
+      0004E5 BF                     940 	cp	a, a
+      0004E6 18 05                  941 	jr	00791$
+      0004E8                        942 00790$:
+      0004E8 CB 7A                  943 	bit	7, d
+      0004EA 28 01                  944 	jr	Z, 00791$
+      0004EC 37                     945 	scf
+      0004ED                        946 00791$:
+      0004ED 30 3A                  947 	jr	NC, 00155$
+                                    948 ;/tmp/_gbsbuild/src/states/Platform.c:134: pl_vel_x += plat_dec;
+      0004EF FAr02r00               949 	ld	a, (#_pl_vel_x)
+      0004F2 21r00r00               950 	ld	hl, #_plat_dec
+      0004F5 86                     951 	add	a, (hl)
+      0004F6 21r02r00               952 	ld	hl, #_pl_vel_x
+      0004F9 22                     953 	ld	(hl+), a
+      0004FA 7E                     954 	ld	a, (hl)
+      0004FB 21r01r00               955 	ld	hl, #_plat_dec + 1
+      0004FE 8E                     956 	adc	a, (hl)
+      0004FF 21r03r00               957 	ld	hl, #_pl_vel_x + 1
+                                    958 ;/tmp/_gbsbuild/src/states/Platform.c:135: if (pl_vel_x > 0) {
+      000502 32                     959 	ld	(hl-), a
+      000503 3E 00                  960 	ld	a, #0x00
+      000505 96                     961 	sub	a, (hl)
+      000506 23                     962 	inc	hl
+      000507 3E 00                  963 	ld	a, #0x00
+      000509 9E                     964 	sbc	a, (hl)
+      00050A 3E 00                  965 	ld	a, #0x00
+      00050C 57                     966 	ld	d, a
+      00050D CB 7E                  967 	bit	7, (hl)
+      00050F 28 07                  968 	jr	Z, 00792$
+      000511 CB 7A                  969 	bit	7, d
+      000513 20 08                  970 	jr	NZ, 00793$
+      000515 BF                     971 	cp	a, a
+      000516 18 05                  972 	jr	00793$
+      000518                        973 00792$:
+      000518 CB 7A                  974 	bit	7, d
+      00051A 28 01                  975 	jr	Z, 00793$
+      00051C 37                     976 	scf
+      00051D                        977 00793$:
+      00051D 30 61                  978 	jr	NC, 00171$
+                                    979 ;/tmp/_gbsbuild/src/states/Platform.c:136: pl_vel_x = 0;
+      00051F 21r02r00               980 	ld	hl, #_pl_vel_x
+      000522 3E 00                  981 	ld	a, #0x00
+      000524 22                     982 	ld	(hl+), a
+      000525 36 00                  983 	ld	(hl), #0x00
+      000527 18 57                  984 	jr	00171$
+      000529                        985 00155$:
+                                    986 ;/tmp/_gbsbuild/src/states/Platform.c:138: } else if (pl_vel_x > 0) {
+      000529 21r02r00               987 	ld	hl, #_pl_vel_x
+      00052C 3E 00                  988 	ld	a, #0x00
+      00052E 96                     989 	sub	a, (hl)
+      00052F 23                     990 	inc	hl
+      000530 3E 00                  991 	ld	a, #0x00
+      000532 9E                     992 	sbc	a, (hl)
+      000533 3E 00                  993 	ld	a, #0x00
+      000535 57                     994 	ld	d, a
+      000536 CB 7E                  995 	bit	7, (hl)
+      000538 28 07                  996 	jr	Z, 00794$
+      00053A CB 7A                  997 	bit	7, d
+      00053C 20 08                  998 	jr	NZ, 00795$
+      00053E BF                     999 	cp	a, a
+      00053F 18 05                 1000 	jr	00795$
+      000541                       1001 00794$:
+      000541 CB 7A                 1002 	bit	7, d
+      000543 28 01                 1003 	jr	Z, 00795$
+      000545 37                    1004 	scf
+      000546                       1005 00795$:
+      000546 30 38                 1006 	jr	NC, 00171$
+                                   1007 ;/tmp/_gbsbuild/src/states/Platform.c:139: pl_vel_x -= plat_dec;
+      000548 FAr02r00              1008 	ld	a, (#_pl_vel_x)
+      00054B 21r00r00              1009 	ld	hl, #_plat_dec
+      00054E 96                    1010 	sub	a, (hl)
+      00054F 21r02r00              1011 	ld	hl, #_pl_vel_x
+      000552 22                    1012 	ld	(hl+), a
+      000553 7E                    1013 	ld	a, (hl)
+      000554 21r01r00              1014 	ld	hl, #_plat_dec + 1
+      000557 9E                    1015 	sbc	a, (hl)
+      000558 21r03r00              1016 	ld	hl, #_pl_vel_x + 1
+                                   1017 ;/tmp/_gbsbuild/src/states/Platform.c:140: if (pl_vel_x < 0) {
+      00055B 32                    1018 	ld	(hl-), a
+      00055C 7E                    1019 	ld	a, (hl)
+      00055D D6 00                 1020 	sub	a, #0x00
+      00055F 23                    1021 	inc	hl
+      000560 7E                    1022 	ld	a, (hl)
+      000561 DE 00                 1023 	sbc	a, #0x00
+      000563 56                    1024 	ld	d, (hl)
+      000564 3E 00                 1025 	ld	a, #0x00
+      000566 CB 7F                 1026 	bit	7,a
+      000568 28 07                 1027 	jr	Z, 00796$
+      00056A CB 7A                 1028 	bit	7, d
+      00056C 20 08                 1029 	jr	NZ, 00797$
+      00056E BF                    1030 	cp	a, a
+      00056F 18 05                 1031 	jr	00797$
+      000571                       1032 00796$:
+      000571 CB 7A                 1033 	bit	7, d
+      000573 28 01                 1034 	jr	Z, 00797$
+      000575 37                    1035 	scf
+      000576                       1036 00797$:
+      000576 30 08                 1037 	jr	NC, 00171$
+                                   1038 ;/tmp/_gbsbuild/src/states/Platform.c:141: pl_vel_x = 0;
+      000578 21r02r00              1039 	ld	hl, #_pl_vel_x
+      00057B 3E 00                 1040 	ld	a, #0x00
+      00057D 22                    1041 	ld	(hl+), a
+      00057E 36 00                 1042 	ld	(hl), #0x00
+      000580                       1043 00171$:
+                                   1044 ;/tmp/_gbsbuild/src/states/Platform.c:147: pl_pos_x += pl_vel_x >> 8;
+      000580 21r03r00              1045 	ld	hl, #_pl_vel_x + 1
+      000583 4E                    1046 	ld	c, (hl)
+      000584 79                    1047 	ld	a, c
+      000585 07                    1048 	rlca
+      000586 9F                    1049 	sbc	a, a
+      000587 47                    1050 	ld	b, a
+      000588 21r06r00              1051 	ld	hl, #_pl_pos_x
+      00058B 7E                    1052 	ld	a, (hl)
+      00058C 81                    1053 	add	a, c
+      00058D 22                    1054 	ld	(hl+), a
+      00058E 7E                    1055 	ld	a, (hl)
+      00058F 88                    1056 	adc	a, b
+                                   1057 ;/tmp/_gbsbuild/src/states/Platform.c:148: tile_x = pl_pos_x >> 7;
+      000590 32                    1058 	ld	(hl-), a
+      000591 2A                    1059 	ld	a, (hl+)
+      000592 4F                    1060 	ld	c, a
+      000593 46                    1061 	ld	b, (hl)
+      000594 CB 28                 1062 	sra	b
+      000596 CB 19                 1063 	rr	c
+      000598 CB 28                 1064 	sra	b
+      00059A CB 19                 1065 	rr	c
+      00059C CB 28                 1066 	sra	b
+      00059E CB 19                 1067 	rr	c
+      0005A0 CB 28                 1068 	sra	b
+      0005A2 CB 19                 1069 	rr	c
+      0005A4 CB 28                 1070 	sra	b
+      0005A6 CB 19                 1071 	rr	c
+      0005A8 CB 28                 1072 	sra	b
+      0005AA CB 19                 1073 	rr	c
+      0005AC CB 28                 1074 	sra	b
+      0005AE CB 19                 1075 	rr	c
+      0005B0 F8 01                 1076 	ldhl	sp,	#1
+      0005B2 71                    1077 	ld	(hl), c
+                                   1078 ;/tmp/_gbsbuild/src/states/Platform.c:149: tile_y = pl_pos_y >> 7;
+      0005B3 21r08r00              1079 	ld	hl, #_pl_pos_y
+      0005B6 2A                    1080 	ld	a, (hl+)
+      0005B7 47                    1081 	ld	b, a
+      0005B8 4E                    1082 	ld	c, (hl)
+      0005B9 CB 29                 1083 	sra	c
+      0005BB CB 18                 1084 	rr	b
+      0005BD CB 29                 1085 	sra	c
+      0005BF CB 18                 1086 	rr	b
+      0005C1 CB 29                 1087 	sra	c
+      0005C3 CB 18                 1088 	rr	b
+      0005C5 CB 29                 1089 	sra	c
+      0005C7 CB 18                 1090 	rr	b
+      0005C9 CB 29                 1091 	sra	c
+      0005CB CB 18                 1092 	rr	b
+      0005CD CB 29                 1093 	sra	c
+      0005CF CB 18                 1094 	rr	b
+      0005D1 CB 29                 1095 	sra	c
+      0005D3 CB 18                 1096 	rr	b
+                                   1097 ;/tmp/_gbsbuild/src/states/Platform.c:153: hit_actor = ActorAtTile(tile_x + 2, tile_y, TRUE);
+      0005D5 F8 01                 1098 	ldhl	sp,	#1
+      0005D7 4E                    1099 	ld	c, (hl)
+                                   1100 ;/tmp/_gbsbuild/src/states/Platform.c:151: if (grounded && INPUT_A_PRESSED) {
+      0005D8 FAr00r00              1101 	ld	a, (#_grounded)
+      0005DB B7                    1102 	or	a, a
+      0005DC 28 68                 1103 	jr	Z, 00179$
+      0005DE FAr00r00              1104 	ld	a, (#_ui_block)
+      0005E1 B7                    1105 	or	a, a
+      0005E2 20 07                 1106 	jr	NZ, 00182$
+      0005E4 21r00r00              1107 	ld	hl, #_input_override_default
+      0005E7 CB 66                 1108 	bit	4, (hl)
+      0005E9 20 5B                 1109 	jr	NZ, 00179$
+      0005EB                       1110 00182$:
+      0005EB FAr00r00              1111 	ld	a, (#_joy)
+      0005EE CB 67                 1112 	bit	4, a
+      0005F0 28 54                 1113 	jr	Z, 00179$
+      0005F2 21r00r00              1114 	ld	hl, #_last_joy
+      0005F5 CB 66                 1115 	bit	4, (hl)
+      0005F7 20 4D                 1116 	jr	NZ, 00179$
+                                   1117 ;/tmp/_gbsbuild/src/states/Platform.c:152: if (player.dir.x == 1) {
+      0005F9 FAr05r00              1118 	ld	a, (#(_actors + 0x0005) + 0)
+      0005FC 3D                    1119 	dec	a
+      0005FD 20 13                 1120 	jr	NZ, 00173$
+                                   1121 ;/tmp/_gbsbuild/src/states/Platform.c:153: hit_actor = ActorAtTile(tile_x + 2, tile_y, TRUE);
+      0005FF 79                    1122 	ld	a, c
+      000600 3C                    1123 	inc	a
+      000601 3C                    1124 	inc	a
+      000602 C5                    1125 	push	bc
+      000603 26 01                 1126 	ld	h, #0x01
+      000605 68                    1127 	ld	l, b
+      000606 E5                    1128 	push	hl
+      000607 F5                    1129 	push	af
+      000608 33                    1130 	inc	sp
+      000609 CDr00r00              1131 	call	_ActorAtTile
+      00060C E8 03                 1132 	add	sp, #3
+      00060E 7B                    1133 	ld	a, e
+      00060F C1                    1134 	pop	bc
+      000610 18 10                 1135 	jr	00174$
+      000612                       1136 00173$:
+                                   1137 ;/tmp/_gbsbuild/src/states/Platform.c:155: hit_actor = ActorAtTile(tile_x - 1, tile_y, TRUE);
+      000612 79                    1138 	ld	a, c
+      000613 3D                    1139 	dec	a
+      000614 C5                    1140 	push	bc
+      000615 26 01                 1141 	ld	h, #0x01
+      000617 68                    1142 	ld	l, b
+      000618 E5                    1143 	push	hl
+      000619 F5                    1144 	push	af
+      00061A 33                    1145 	inc	sp
+      00061B CDr00r00              1146 	call	_ActorAtTile
+      00061E E8 03                 1147 	add	sp, #3
+      000620 7B                    1148 	ld	a, e
+      000621 C1                    1149 	pop	bc
+      000622                       1150 00174$:
+                                   1151 ;/tmp/_gbsbuild/src/states/Platform.c:157: if (hit_actor && (hit_actor != NO_ACTOR_COLLISON)) {
+      000622 B7                    1152 	or	a, a
+      000623 28 21                 1153 	jr	Z, 00179$
+      000625 FE FF                 1154 	cp	a, #0xff
+      000627 28 1D                 1155 	jr	Z, 00179$
+                                   1156 ;/tmp/_gbsbuild/src/states/Platform.c:158: ScriptStart(&actors[hit_actor].events_ptr);
+      000629 5F                    1157 	ld	e, a
+      00062A 16 00                 1158 	ld	d, #0x00
+      00062C 6B                    1159 	ld	l, e
+      00062D 62                    1160 	ld	h, d
+      00062E 29                    1161 	add	hl, hl
+      00062F 29                    1162 	add	hl, hl
+      000630 19                    1163 	add	hl, de
+      000631 29                    1164 	add	hl, hl
+      000632 19                    1165 	add	hl, de
+      000633 29                    1166 	add	hl, hl
+      000634 19                    1167 	add	hl, de
+      000635 29                    1168 	add	hl, hl
+      000636 11r00r00              1169 	ld	de, #_actors
+      000639 19                    1170 	add	hl, de
+      00063A 11 1E 00              1171 	ld	de, #0x001e
+      00063D 19                    1172 	add	hl, de
+      00063E C5                    1173 	push	bc
+      00063F E5                    1174 	push	hl
+      000640 CDr00r00              1175 	call	_ScriptStart
+      000643 E8 02                 1176 	add	sp, #2
+      000645 C1                    1177 	pop	bc
+      000646                       1178 00179$:
+                                   1179 ;/tmp/_gbsbuild/src/states/Platform.c:163: if (INPUT_B_PRESSED && grounded) {
+      000646 FAr00r00              1180 	ld	a, (#_ui_block)
+      000649 B7                    1181 	or	a, a
+      00064A 20 08                 1182 	jr	NZ, 00193$
+      00064C 21r00r00              1183 	ld	hl, #_input_override_default
+      00064F CB 6E                 1184 	bit	5, (hl)
+      000651 C2rE1r06              1185 	jp	NZ,00190$
+      000654                       1186 00193$:
+      000654 FAr00r00              1187 	ld	a, (#_joy)
+      000657 CB 6F                 1188 	bit	5, a
+      000659 CArE1r06              1189 	jp	Z,00190$
+      00065C FAr00r00              1190 	ld	a, (#_last_joy)
+      00065F CB 6F                 1191 	bit	5, a
+      000661 C2rE1r06              1192 	jp	NZ,00190$
+      000664 FAr00r00              1193 	ld	a, (#_grounded)
+      000667 B7                    1194 	or	a, a
+      000668 28 77                 1195 	jr	Z, 00190$
+                                   1196 ;/tmp/_gbsbuild/src/states/Platform.c:164: if (!( (((pl_pos_x >> 4) & 0x7) != 7 &&
+      00066A 21r07r00              1197 	ld	hl, #_pl_pos_x + 1
+      00066D 2B                    1198 	dec	hl
+      00066E 2A                    1199 	ld	a, (hl+)
+      00066F 5F                    1200 	ld	e, a
+      000670 56                    1201 	ld	d, (hl)
+      000671 CB 2A                 1202 	sra	d
+      000673 CB 1B                 1203 	rr	e
+      000675 CB 2A                 1204 	sra	d
+      000677 CB 1B                 1205 	rr	e
+      000679 CB 2A                 1206 	sra	d
+      00067B CB 1B                 1207 	rr	e
+      00067D CB 2A                 1208 	sra	d
+      00067F CB 1B                 1209 	rr	e
+      000681 7B                    1210 	ld	a, e
+      000682 E6 07                 1211 	and	a, #0x07
+      000684 5F                    1212 	ld	e, a
+      000685 16 00                 1213 	ld	d, #0x00
+                                   1214 ;/tmp/_gbsbuild/src/states/Platform.c:165: TileAt(tile_x, tile_y - 1) & COLLISION_BOTTOM) ||  // Left Edge
+      000687 05                    1215 	dec	b
+                                   1216 ;/tmp/_gbsbuild/src/states/Platform.c:164: if (!( (((pl_pos_x >> 4) & 0x7) != 7 &&
+      000688 7B                    1217 	ld	a, e
+      000689 D6 07                 1218 	sub	a, #0x07
+      00068B B2                    1219 	or	a, d
+      00068C 28 12                 1220 	jr	Z, 00188$
+                                   1221 ;/tmp/_gbsbuild/src/states/Platform.c:165: TileAt(tile_x, tile_y - 1) & COLLISION_BOTTOM) ||  // Left Edge
+      00068E C5                    1222 	push	bc
+      00068F C5                    1223 	push	bc
+      000690 33                    1224 	inc	sp
+      000691 F8 04                 1225 	ldhl	sp,	#4
+      000693 7E                    1226 	ld	a, (hl)
+      000694 F5                    1227 	push	af
+      000695 33                    1228 	inc	sp
+      000696 CDr00r00              1229 	call	_TileAt
+      000699 E8 02                 1230 	add	sp, #2
+      00069B C1                    1231 	pop	bc
+      00069C CB 4B                 1232 	bit	1, e
+      00069E 20 41                 1233 	jr	NZ, 00190$
+      0006A0                       1234 00188$:
+                                   1235 ;/tmp/_gbsbuild/src/states/Platform.c:166: (((pl_pos_x >> 4) & 0x7) != 0 &&
+      0006A0 21r07r00              1236 	ld	hl, #_pl_pos_x + 1
+      0006A3 2B                    1237 	dec	hl
+      0006A4 2A                    1238 	ld	a, (hl+)
+      0006A5 5F                    1239 	ld	e, a
+      0006A6 56                    1240 	ld	d, (hl)
+      0006A7 CB 2A                 1241 	sra	d
+      0006A9 CB 1B                 1242 	rr	e
+      0006AB CB 2A                 1243 	sra	d
+      0006AD CB 1B                 1244 	rr	e
+      0006AF CB 2A                 1245 	sra	d
+      0006B1 CB 1B                 1246 	rr	e
+      0006B3 CB 2A                 1247 	sra	d
+      0006B5 CB 1B                 1248 	rr	e
+      0006B7 7B                    1249 	ld	a, e
+      0006B8 E6 07                 1250 	and	a, #0x07
+      0006BA 28 0F                 1251 	jr	Z, 00184$
+                                   1252 ;/tmp/_gbsbuild/src/states/Platform.c:167: TileAt(tile_x + 1, tile_y - 1) & COLLISION_BOTTOM))) {  // Right edge
+      0006BC 79                    1253 	ld	a, c
+      0006BD 3C                    1254 	inc	a
+      0006BE C5                    1255 	push	bc
+      0006BF 33                    1256 	inc	sp
+      0006C0 F5                    1257 	push	af
+      0006C1 33                    1258 	inc	sp
+      0006C2 CDr00r00              1259 	call	_TileAt
+      0006C5 E8 02                 1260 	add	sp, #2
+      0006C7 CB 4B                 1261 	bit	1, e
+      0006C9 20 16                 1262 	jr	NZ, 00190$
+      0006CB                       1263 00184$:
+                                   1264 ;/tmp/_gbsbuild/src/states/Platform.c:168: pl_vel_y = -plat_jump_vel;
+      0006CB AF                    1265 	xor	a, a
+      0006CC 21r00r00              1266 	ld	hl, #_plat_jump_vel
+      0006CF 96                    1267 	sub	a, (hl)
+      0006D0 EAr04r00              1268 	ld	(#_pl_vel_y),a
+      0006D3 3E 00                 1269 	ld	a, #0x00
+      0006D5 21r01r00              1270 	ld	hl, #_plat_jump_vel + 1
+      0006D8 9E                    1271 	sbc	a, (hl)
+      0006D9 EAr05r00              1272 	ld	(#_pl_vel_y + 1),a
+                                   1273 ;/tmp/_gbsbuild/src/states/Platform.c:169: grounded = FALSE;
+      0006DC 21r00r00              1274 	ld	hl, #_grounded
+      0006DF 36 00                 1275 	ld	(hl), #0x00
+      0006E1                       1276 00190$:
+                                   1277 ;/tmp/_gbsbuild/src/states/Platform.c:173: if (!on_ladder) {
+      0006E1 FAr01r00              1278 	ld	a, (#_on_ladder)
+      0006E4 B7                    1279 	or	a, a
+      0006E5 20 5B                 1280 	jr	NZ, 00202$
+                                   1281 ;/tmp/_gbsbuild/src/states/Platform.c:175: if (INPUT_B && pl_vel_y < 0) {
+      0006E7 FAr00r00              1282 	ld	a, (#_ui_block)
+      0006EA B7                    1283 	or	a, a
+      0006EB 20 07                 1284 	jr	NZ, 00199$
+      0006ED 21r00r00              1285 	ld	hl, #_input_override_default
+      0006F0 CB 6E                 1286 	bit	5, (hl)
+      0006F2 20 3B                 1287 	jr	NZ, 00196$
+      0006F4                       1288 00199$:
+      0006F4 FAr00r00              1289 	ld	a, (#_joy)
+      0006F7 CB 6F                 1290 	bit	5, a
+      0006F9 28 34                 1291 	jr	Z, 00196$
+      0006FB 21r04r00              1292 	ld	hl, #_pl_vel_y
+      0006FE 7E                    1293 	ld	a, (hl)
+      0006FF D6 00                 1294 	sub	a, #0x00
+      000701 23                    1295 	inc	hl
+      000702 7E                    1296 	ld	a, (hl)
+      000703 DE 00                 1297 	sbc	a, #0x00
+      000705 56                    1298 	ld	d, (hl)
+      000706 3E 00                 1299 	ld	a, #0x00
+      000708 CB 7F                 1300 	bit	7,a
+      00070A 28 07                 1301 	jr	Z, 00820$
+      00070C CB 7A                 1302 	bit	7, d
+      00070E 20 08                 1303 	jr	NZ, 00821$
+      000710 BF                    1304 	cp	a, a
+      000711 18 05                 1305 	jr	00821$
+      000713                       1306 00820$:
+      000713 CB 7A                 1307 	bit	7, d
+      000715 28 01                 1308 	jr	Z, 00821$
+      000717 37                    1309 	scf
+      000718                       1310 00821$:
+      000718 30 15                 1311 	jr	NC, 00196$
+                                   1312 ;/tmp/_gbsbuild/src/states/Platform.c:176: pl_vel_y += plat_hold_grav;
+      00071A FAr04r00              1313 	ld	a, (#_pl_vel_y)
+      00071D 21r00r00              1314 	ld	hl, #_plat_hold_grav
+      000720 86                    1315 	add	a, (hl)
+      000721 21r04r00              1316 	ld	hl, #_pl_vel_y
+      000724 22                    1317 	ld	(hl+), a
+      000725 7E                    1318 	ld	a, (hl)
+      000726 21r01r00              1319 	ld	hl, #_plat_hold_grav + 1
+      000729 8E                    1320 	adc	a, (hl)
+      00072A EAr05r00              1321 	ld	(#_pl_vel_y + 1),a
+      00072D 18 13                 1322 	jr	00202$
+      00072F                       1323 00196$:
+                                   1324 ;/tmp/_gbsbuild/src/states/Platform.c:178: pl_vel_y += plat_grav;
+      00072F FAr04r00              1325 	ld	a, (#_pl_vel_y)
+      000732 21r00r00              1326 	ld	hl, #_plat_grav
+      000735 86                    1327 	add	a, (hl)
+      000736 21r04r00              1328 	ld	hl, #_pl_vel_y
+      000739 22                    1329 	ld	(hl+), a
+      00073A 7E                    1330 	ld	a, (hl)
+      00073B 21r01r00              1331 	ld	hl, #_plat_grav + 1
+      00073E 8E                    1332 	adc	a, (hl)
+      00073F EAr05r00              1333 	ld	(#_pl_vel_y + 1),a
+      000742                       1334 00202$:
+                                   1335 ;/tmp/_gbsbuild/src/states/Platform.c:182: pl_vel_y = MIN(pl_vel_y, plat_max_fall_vel);
+      000742 11r04r00              1336 	ld	de, #_pl_vel_y
+      000745 21r00r00              1337 	ld	hl, #_plat_max_fall_vel
+      000748 1A                    1338 	ld	a, (de)
+      000749 96                    1339 	sub	a, (hl)
+      00074A 23                    1340 	inc	hl
+      00074B 13                    1341 	inc	de
+      00074C 1A                    1342 	ld	a, (de)
+      00074D 9E                    1343 	sbc	a, (hl)
+      00074E 1A                    1344 	ld	a, (de)
+      00074F 57                    1345 	ld	d, a
+      000750 CB 7E                 1346 	bit	7, (hl)
+      000752 28 07                 1347 	jr	Z, 00822$
+      000754 CB 7A                 1348 	bit	7, d
+      000756 20 08                 1349 	jr	NZ, 00823$
+      000758 BF                    1350 	cp	a, a
+      000759 18 05                 1351 	jr	00823$
+      00075B                       1352 00822$:
+      00075B CB 7A                 1353 	bit	7, d
+      00075D 28 01                 1354 	jr	Z, 00823$
+      00075F 37                    1355 	scf
+      000760                       1356 00823$:
+      000760 30 09                 1357 	jr	NC, 00276$
+      000762 21r05r00              1358 	ld	hl, #_pl_vel_y + 1
+      000765 2B                    1359 	dec	hl
+      000766 2A                    1360 	ld	a, (hl+)
+      000767 4F                    1361 	ld	c, a
+      000768 46                    1362 	ld	b, (hl)
+      000769 18 07                 1363 	jr	00277$
+      00076B                       1364 00276$:
+      00076B 21r01r00              1365 	ld	hl, #_plat_max_fall_vel + 1
+      00076E 2B                    1366 	dec	hl
+      00076F 2A                    1367 	ld	a, (hl+)
+      000770 4F                    1368 	ld	c, a
+      000771 46                    1369 	ld	b, (hl)
+      000772                       1370 00277$:
+      000772 21r04r00              1371 	ld	hl, #_pl_vel_y
+      000775 79                    1372 	ld	a, c
+      000776 22                    1373 	ld	(hl+), a
+      000777 70                    1374 	ld	(hl), b
+                                   1375 ;/tmp/_gbsbuild/src/states/Platform.c:183: pl_pos_y += pl_vel_y >> 8;
+      000778 4E                    1376 	ld	c, (hl)
+      000779 79                    1377 	ld	a, c
+      00077A 07                    1378 	rlca
+      00077B 9F                    1379 	sbc	a, a
+      00077C 47                    1380 	ld	b, a
+      00077D 21r08r00              1381 	ld	hl, #_pl_pos_y
+      000780 7E                    1382 	ld	a, (hl)
+      000781 81                    1383 	add	a, c
+      000782 22                    1384 	ld	(hl+), a
+      000783 7E                    1385 	ld	a, (hl)
+      000784 88                    1386 	adc	a, b
+                                   1387 ;/tmp/_gbsbuild/src/states/Platform.c:184: tile_y = pl_pos_y >> 7;
+      000785 32                    1388 	ld	(hl-), a
+      000786 2A                    1389 	ld	a, (hl+)
+      000787 4F                    1390 	ld	c, a
+      000788 46                    1391 	ld	b, (hl)
+      000789 CB 28                 1392 	sra	b
+      00078B CB 19                 1393 	rr	c
+      00078D CB 28                 1394 	sra	b
+      00078F CB 19                 1395 	rr	c
+      000791 CB 28                 1396 	sra	b
+      000793 CB 19                 1397 	rr	c
+      000795 CB 28                 1398 	sra	b
+      000797 CB 19                 1399 	rr	c
+      000799 CB 28                 1400 	sra	b
+      00079B CB 19                 1401 	rr	c
+      00079D CB 28                 1402 	sra	b
+      00079F CB 19                 1403 	rr	c
+      0007A1 CB 28                 1404 	sra	b
+      0007A3 CB 19                 1405 	rr	c
+      0007A5 F8 02                 1406 	ldhl	sp,	#2
+      0007A7 71                    1407 	ld	(hl), c
+                                   1408 ;/tmp/_gbsbuild/src/states/Platform.c:185: tile_y_ceil = (pl_pos_y - 7u) >> 7;
+      0007A8 21r09r00              1409 	ld	hl, #_pl_pos_y + 1
+      0007AB 2B                    1410 	dec	hl
+      0007AC 2A                    1411 	ld	a, (hl+)
+      0007AD 4F                    1412 	ld	c, a
+      0007AE 46                    1413 	ld	b, (hl)
+      0007AF 79                    1414 	ld	a, c
+      0007B0 C6 F9                 1415 	add	a, #0xf9
+      0007B2 4F                    1416 	ld	c, a
+      0007B3 78                    1417 	ld	a, b
+      0007B4 CE FF                 1418 	adc	a, #0xff
+      0007B6 47                    1419 	ld	b, a
+      0007B7 CB 38                 1420 	srl	b
+      0007B9 CB 19                 1421 	rr	c
+      0007BB CB 38                 1422 	srl	b
+      0007BD CB 19                 1423 	rr	c
+      0007BF CB 38                 1424 	srl	b
+      0007C1 CB 19                 1425 	rr	c
+      0007C3 CB 38                 1426 	srl	b
+      0007C5 CB 19                 1427 	rr	c
+      0007C7 CB 38                 1428 	srl	b
+      0007C9 CB 19                 1429 	rr	c
+      0007CB CB 38                 1430 	srl	b
+      0007CD CB 19                 1431 	rr	c
+      0007CF CB 38                 1432 	srl	b
+      0007D1 CB 19                 1433 	rr	c
+                                   1434 ;/tmp/_gbsbuild/src/states/Platform.c:188: if (pl_vel_x < 0) {
+      0007D3 21r02r00              1435 	ld	hl, #_pl_vel_x
+      0007D6 7E                    1436 	ld	a, (hl)
+      0007D7 D6 00                 1437 	sub	a, #0x00
+      0007D9 23                    1438 	inc	hl
+      0007DA 7E                    1439 	ld	a, (hl)
+      0007DB DE 00                 1440 	sbc	a, #0x00
+      0007DD 56                    1441 	ld	d, (hl)
+      0007DE 3E 00                 1442 	ld	a, #0x00
+      0007E0 CB 7F                 1443 	bit	7,a
+      0007E2 28 07                 1444 	jr	Z, 00824$
+      0007E4 CB 7A                 1445 	bit	7, d
+      0007E6 20 08                 1446 	jr	NZ, 00825$
+      0007E8 BF                    1447 	cp	a, a
+      0007E9 18 05                 1448 	jr	00825$
+      0007EB                       1449 00824$:
+      0007EB CB 7A                 1450 	bit	7, d
+      0007ED 28 01                 1451 	jr	Z, 00825$
+      0007EF 37                    1452 	scf
+      0007F0                       1453 00825$:
+      0007F0 30 6C                 1454 	jr	NC, 00207$
+                                   1455 ;/tmp/_gbsbuild/src/states/Platform.c:189: if (TileAt(tile_x, tile_y) & COLLISION_RIGHT || 
+      0007F2 C5                    1456 	push	bc
+      0007F3 F8 04                 1457 	ldhl	sp,	#4
+      0007F5 7E                    1458 	ld	a, (hl)
+      0007F6 F5                    1459 	push	af
+      0007F7 33                    1460 	inc	sp
+      0007F8 2B                    1461 	dec	hl
+      0007F9 7E                    1462 	ld	a, (hl)
+      0007FA F5                    1463 	push	af
+      0007FB 33                    1464 	inc	sp
+      0007FC CDr00r00              1465 	call	_TileAt
+      0007FF E8 02                 1466 	add	sp, #2
+      000801 C1                    1467 	pop	bc
+      000802 CB 5B                 1468 	bit	3, e
+      000804 20 13                 1469 	jr	NZ, 00203$
+                                   1470 ;/tmp/_gbsbuild/src/states/Platform.c:190: TileAt(tile_x, tile_y_ceil) & COLLISION_RIGHT) {
+      000806 C5                    1471 	push	bc
+      000807 79                    1472 	ld	a, c
+      000808 F5                    1473 	push	af
+      000809 33                    1474 	inc	sp
+      00080A F8 04                 1475 	ldhl	sp,	#4
+      00080C 7E                    1476 	ld	a, (hl)
+      00080D F5                    1477 	push	af
+      00080E 33                    1478 	inc	sp
+      00080F CDr00r00              1479 	call	_TileAt
+      000812 E8 02                 1480 	add	sp, #2
+      000814 C1                    1481 	pop	bc
+      000815 CB 5B                 1482 	bit	3, e
+      000817 28 45                 1483 	jr	Z, 00207$
+      000819                       1484 00203$:
+                                   1485 ;/tmp/_gbsbuild/src/states/Platform.c:191: pl_vel_x = 0;
+      000819 21r02r00              1486 	ld	hl, #_pl_vel_x
+      00081C 3E 00                 1487 	ld	a, #0x00
+      00081E 22                    1488 	ld	(hl+), a
+      00081F 36 00                 1489 	ld	(hl), #0x00
+                                   1490 ;/tmp/_gbsbuild/src/states/Platform.c:192: pl_pos_x = ((tile_x + 1) * 8) << 4;
+      000821 F8 01                 1491 	ldhl	sp,	#1
+      000823 5E                    1492 	ld	e, (hl)
+      000824 16 00                 1493 	ld	d, #0x00
+      000826 13                    1494 	inc	de
+      000827 7A                    1495 	ld	a, d
+      000828 6B                    1496 	ld	l, e
+      000829 67                    1497 	ld	h, a
+      00082A 29                    1498 	add	hl, hl
+      00082B 29                    1499 	add	hl, hl
+      00082C 29                    1500 	add	hl, hl
+      00082D 29                    1501 	add	hl, hl
+      00082E 29                    1502 	add	hl, hl
+      00082F 29                    1503 	add	hl, hl
+      000830 29                    1504 	add	hl, hl
+      000831 7D                    1505 	ld	a, l
+      000832 EAr06r00              1506 	ld	(_pl_pos_x), a
+      000835 7C                    1507 	ld	a, h
+      000836 EAr07r00              1508 	ld	(_pl_pos_x + 1), a
+                                   1509 ;/tmp/_gbsbuild/src/states/Platform.c:193: tile_x = pl_pos_x >> 7;
+      000839 21r06r00              1510 	ld	hl, #_pl_pos_x
+      00083C 2A                    1511 	ld	a, (hl+)
+      00083D 47                    1512 	ld	b, a
+      00083E 5E                    1513 	ld	e, (hl)
+      00083F CB 2B                 1514 	sra	e
+      000841 CB 18                 1515 	rr	b
+      000843 CB 2B                 1516 	sra	e
+      000845 CB 18                 1517 	rr	b
+      000847 CB 2B                 1518 	sra	e
+      000849 CB 18                 1519 	rr	b
+      00084B CB 2B                 1520 	sra	e
+      00084D CB 18                 1521 	rr	b
+      00084F CB 2B                 1522 	sra	e
+      000851 CB 18                 1523 	rr	b
+      000853 CB 2B                 1524 	sra	e
+      000855 CB 18                 1525 	rr	b
+      000857 CB 2B                 1526 	sra	e
+      000859 CB 18                 1527 	rr	b
+      00085B F8 01                 1528 	ldhl	sp,	#1
+      00085D 70                    1529 	ld	(hl), b
+      00085E                       1530 00207$:
+                                   1531 ;/tmp/_gbsbuild/src/states/Platform.c:198: if (pl_vel_x > 0) {
+      00085E 21r02r00              1532 	ld	hl, #_pl_vel_x
+      000861 3E 00                 1533 	ld	a, #0x00
+      000863 96                    1534 	sub	a, (hl)
+      000864 23                    1535 	inc	hl
+      000865 3E 00                 1536 	ld	a, #0x00
+      000867 9E                    1537 	sbc	a, (hl)
+      000868 3E 00                 1538 	ld	a, #0x00
+      00086A 57                    1539 	ld	d, a
+      00086B CB 7E                 1540 	bit	7, (hl)
+      00086D 28 07                 1541 	jr	Z, 00829$
+      00086F CB 7A                 1542 	bit	7, d
+      000871 20 08                 1543 	jr	NZ, 00830$
+      000873 BF                    1544 	cp	a, a
+      000874 18 05                 1545 	jr	00830$
+      000876                       1546 00829$:
+      000876 CB 7A                 1547 	bit	7, d
+      000878 28 01                 1548 	jr	Z, 00830$
+      00087A 37                    1549 	scf
+      00087B                       1550 00830$:
+      00087B 30 66                 1551 	jr	NC, 00212$
+                                   1552 ;/tmp/_gbsbuild/src/states/Platform.c:199: if (TileAt(tile_x + 1, tile_y) & COLLISION_LEFT ||
+      00087D F8 01                 1553 	ldhl	sp,	#1
+      00087F 46                    1554 	ld	b, (hl)
+      000880 04                    1555 	inc	b
+      000881 C5                    1556 	push	bc
+      000882 23                    1557 	inc	hl
+      000883 7E                    1558 	ld	a, (hl)
+      000884 F5                    1559 	push	af
+      000885 33                    1560 	inc	sp
+      000886 C5                    1561 	push	bc
+      000887 33                    1562 	inc	sp
+      000888 CDr00r00              1563 	call	_TileAt
+      00088B E8 02                 1564 	add	sp, #2
+      00088D C1                    1565 	pop	bc
+      00088E CB 53                 1566 	bit	2, e
+      000890 20 0E                 1567 	jr	NZ, 00208$
+                                   1568 ;/tmp/_gbsbuild/src/states/Platform.c:200: TileAt(tile_x + 1, tile_y_ceil) & COLLISION_LEFT) {
+      000892 79                    1569 	ld	a, c
+      000893 F5                    1570 	push	af
+      000894 33                    1571 	inc	sp
+      000895 C5                    1572 	push	bc
+      000896 33                    1573 	inc	sp
+      000897 CDr00r00              1574 	call	_TileAt
+      00089A E8 02                 1575 	add	sp, #2
+      00089C CB 53                 1576 	bit	2, e
+      00089E 28 43                 1577 	jr	Z, 00212$
+      0008A0                       1578 00208$:
+                                   1579 ;/tmp/_gbsbuild/src/states/Platform.c:201: pl_vel_x = 0;
+      0008A0 21r02r00              1580 	ld	hl, #_pl_vel_x
+      0008A3 3E 00                 1581 	ld	a, #0x00
+      0008A5 22                    1582 	ld	(hl+), a
+      0008A6 36 00                 1583 	ld	(hl), #0x00
+                                   1584 ;/tmp/_gbsbuild/src/states/Platform.c:202: pl_pos_x = (tile_x * 8) << 4;
+      0008A8 F8 01                 1585 	ldhl	sp,	#1
+      0008AA 4E                    1586 	ld	c, (hl)
+      0008AB AF                    1587 	xor	a, a
+      0008AC 69                    1588 	ld	l, c
+      0008AD 67                    1589 	ld	h, a
+      0008AE 29                    1590 	add	hl, hl
+      0008AF 29                    1591 	add	hl, hl
+      0008B0 29                    1592 	add	hl, hl
+      0008B1 29                    1593 	add	hl, hl
+      0008B2 29                    1594 	add	hl, hl
+      0008B3 29                    1595 	add	hl, hl
+      0008B4 29                    1596 	add	hl, hl
+      0008B5 7D                    1597 	ld	a, l
+      0008B6 EAr06r00              1598 	ld	(_pl_pos_x), a
+      0008B9 7C                    1599 	ld	a, h
+      0008BA EAr07r00              1600 	ld	(_pl_pos_x + 1), a
+                                   1601 ;/tmp/_gbsbuild/src/states/Platform.c:203: tile_x = pl_pos_x >> 7;
+      0008BD 21r07r00              1602 	ld	hl, #_pl_pos_x + 1
+      0008C0 2B                    1603 	dec	hl
+      0008C1 2A                    1604 	ld	a, (hl+)
+      0008C2 4F                    1605 	ld	c, a
+      0008C3 46                    1606 	ld	b, (hl)
+      0008C4 CB 28                 1607 	sra	b
+      0008C6 CB 19                 1608 	rr	c
+      0008C8 CB 28                 1609 	sra	b
+      0008CA CB 19                 1610 	rr	c
+      0008CC CB 28                 1611 	sra	b
+      0008CE CB 19                 1612 	rr	c
+      0008D0 CB 28                 1613 	sra	b
+      0008D2 CB 19                 1614 	rr	c
+      0008D4 CB 28                 1615 	sra	b
+      0008D6 CB 19                 1616 	rr	c
+      0008D8 CB 28                 1617 	sra	b
+      0008DA CB 19                 1618 	rr	c
+      0008DC CB 28                 1619 	sra	b
+      0008DE CB 19                 1620 	rr	c
+      0008E0 F8 01                 1621 	ldhl	sp,	#1
+      0008E2 71                    1622 	ld	(hl), c
+      0008E3                       1623 00212$:
+                                   1624 ;/tmp/_gbsbuild/src/states/Platform.c:165: TileAt(tile_x, tile_y - 1) & COLLISION_BOTTOM) ||  // Left Edge
+      0008E3 F8 02                 1625 	ldhl	sp,	#2
+      0008E5 2A                    1626 	ld	a, (hl+)
+                                   1627 ;/tmp/_gbsbuild/src/states/Platform.c:228: pl_pos_y = (tile_y * 8) << 4;
+      0008E6 32                    1628 	ld	(hl-), a
+      0008E7 2A                    1629 	ld	a, (hl+)
+      0008E8 23                    1630 	inc	hl
+      0008E9 77                    1631 	ld	(hl), a
+      0008EA AF                    1632 	xor	a, a
+      0008EB 23                    1633 	inc	hl
+                                   1634 ;/tmp/_gbsbuild/src/states/Platform.c:223: tile_below = TileAt(tile_x_mid, tile_y + 1);
+      0008EC 32                    1635 	ld	(hl-), a
+      0008ED 2B                    1636 	dec	hl
+      0008EE 7E                    1637 	ld	a, (hl)
+      0008EF 3C                    1638 	inc	a
+      0008F0 F8 06                 1639 	ldhl	sp,	#6
+                                   1640 ;/tmp/_gbsbuild/src/states/Platform.c:228: pl_pos_y = (tile_y * 8) << 4;
+      0008F2 32                    1641 	ld	(hl-), a
+      0008F3 2B                    1642 	dec	hl
+      0008F4 7E                    1643 	ld	a, (hl)
+      0008F5 F8 07                 1644 	ldhl	sp,	#7
+      0008F7 32                    1645 	ld	(hl-), a
+      0008F8 2B                    1646 	dec	hl
+      0008F9 7E                    1647 	ld	a, (hl)
+      0008FA F8 08                 1648 	ldhl	sp,	#8
+      0008FC 77                    1649 	ld	(hl), a
+      0008FD 3E 03                 1650 	ld	a, #0x03
+      0008FF                       1651 00834$:
+      0008FF F8 07                 1652 	ldhl	sp,	#7
+      000901 CB 26                 1653 	sla	(hl)
+      000903 23                    1654 	inc	hl
+      000904 CB 16                 1655 	rl	(hl)
+      000906 3D                    1656 	dec	a
+      000907 20 F6                 1657 	jr	NZ, 00834$
+      000909 3E 04                 1658 	ld	a, #0x04
+      00090B                       1659 00835$:
+      00090B F8 07                 1660 	ldhl	sp,	#7
+      00090D CB 26                 1661 	sla	(hl)
+      00090F 23                    1662 	inc	hl
+      000910 CB 16                 1663 	rl	(hl)
+      000912 3D                    1664 	dec	a
+      000913 20 F6                 1665 	jr	NZ, 00835$
+                                   1666 ;/tmp/_gbsbuild/src/states/Platform.c:207: if (on_ladder) {
+      000915 FAr01r00              1667 	ld	a, (#_on_ladder)
+      000918 B7                    1668 	or	a, a
+      000919 CArC5r09              1669 	jp	Z, 00238$
+                                   1670 ;/tmp/_gbsbuild/src/states/Platform.c:210: if (!(TileAt(tile_x_mid, tile_y) & TILE_PROP_LADDER)) {
+      00091C F8 02                 1671 	ldhl	sp,	#2
+      00091E 7E                    1672 	ld	a, (hl)
+      00091F F5                    1673 	push	af
+      000920 33                    1674 	inc	sp
+      000921 2B                    1675 	dec	hl
+      000922 2B                    1676 	dec	hl
+      000923 7E                    1677 	ld	a, (hl)
+      000924 F5                    1678 	push	af
+      000925 33                    1679 	inc	sp
+      000926 CDr00r00              1680 	call	_TileAt
+      000929 E8 02                 1681 	add	sp, #2
+      00092B CB 63                 1682 	bit	4, e
+      00092D 20 43                 1683 	jr	NZ, 00219$
+                                   1684 ;/tmp/_gbsbuild/src/states/Platform.c:211: if (INPUT_DOWN) {
+      00092F FAr00r00              1685 	ld	a, (#_ui_block)
+      000932 B7                    1686 	or	a, a
+      000933 20 07                 1687 	jr	NZ, 00217$
+      000935 21r00r00              1688 	ld	hl, #_input_override_default
+      000938 CB 5E                 1689 	bit	3, (hl)
+      00093A 20 1D                 1690 	jr	NZ, 00214$
+      00093C                       1691 00217$:
+      00093C FAr00r00              1692 	ld	a, (#_joy)
+      00093F CB 5F                 1693 	bit	3, a
+      000941 28 16                 1694 	jr	Z, 00214$
+                                   1695 ;/tmp/_gbsbuild/src/states/Platform.c:212: on_ladder = FALSE;
+      000943 21r01r00              1696 	ld	hl, #_on_ladder
+      000946 36 00                 1697 	ld	(hl), #0x00
+                                   1698 ;/tmp/_gbsbuild/src/states/Platform.c:213: player.dir.x = 1;
+      000948 21r05r00              1699 	ld	hl, #(_actors + 0x0005)
+      00094B 36 01                 1700 	ld	(hl), #0x01
+                                   1701 ;/tmp/_gbsbuild/src/states/Platform.c:214: player.dir.y = 0;
+      00094D 21r06r00              1702 	ld	hl, #(_actors + 0x0006)
+      000950 36 00                 1703 	ld	(hl), #0x00
+                                   1704 ;/tmp/_gbsbuild/src/states/Platform.c:215: player.rerender = TRUE;
+      000952 21r14r00              1705 	ld	hl, #(_actors + 0x0014)
+      000955 36 01                 1706 	ld	(hl), #0x01
+      000957 18 19                 1707 	jr	00219$
+      000959                       1708 00214$:
+                                   1709 ;/tmp/_gbsbuild/src/states/Platform.c:217: pl_pos_y -= pl_vel_y >> 8;
+      000959 21r05r00              1710 	ld	hl, #_pl_vel_y + 1
+      00095C 4E                    1711 	ld	c, (hl)
+      00095D 79                    1712 	ld	a, c
+      00095E 07                    1713 	rlca
+      00095F 9F                    1714 	sbc	a, a
+      000960 47                    1715 	ld	b, a
+      000961 21r08r00              1716 	ld	hl, #_pl_pos_y
+      000964 7E                    1717 	ld	a, (hl)
+      000965 91                    1718 	sub	a, c
+      000966 22                    1719 	ld	(hl+), a
+      000967 7E                    1720 	ld	a, (hl)
+      000968 98                    1721 	sbc	a, b
+      000969 77                    1722 	ld	(hl), a
+                                   1723 ;/tmp/_gbsbuild/src/states/Platform.c:218: pl_vel_y = 0;
+      00096A 21r04r00              1724 	ld	hl, #_pl_vel_y
+      00096D 3E 00                 1725 	ld	a, #0x00
+      00096F 22                    1726 	ld	(hl+), a
+      000970 36 00                 1727 	ld	(hl), #0x00
+      000972                       1728 00219$:
+                                   1729 ;/tmp/_gbsbuild/src/states/Platform.c:223: tile_below = TileAt(tile_x_mid, tile_y + 1);
+      000972 F8 06                 1730 	ldhl	sp,	#6
+      000974 7E                    1731 	ld	a, (hl)
+      000975 F5                    1732 	push	af
+      000976 33                    1733 	inc	sp
+      000977 F8 01                 1734 	ldhl	sp,	#1
+      000979 7E                    1735 	ld	a, (hl)
+      00097A F5                    1736 	push	af
+      00097B 33                    1737 	inc	sp
+      00097C CDr00r00              1738 	call	_TileAt
+      00097F E8 02                 1739 	add	sp, #2
+      000981 4B                    1740 	ld	c, e
+                                   1741 ;/tmp/_gbsbuild/src/states/Platform.c:224: if (pl_vel_y >= 0) {
+      000982 21r04r00              1742 	ld	hl, #_pl_vel_y
+      000985 7E                    1743 	ld	a, (hl)
+      000986 D6 00                 1744 	sub	a, #0x00
+      000988 23                    1745 	inc	hl
+      000989 7E                    1746 	ld	a, (hl)
+      00098A DE 00                 1747 	sbc	a, #0x00
+      00098C 56                    1748 	ld	d, (hl)
+      00098D 3E 00                 1749 	ld	a, #0x00
+      00098F CB 7F                 1750 	bit	7,a
+      000991 28 07                 1751 	jr	Z, 00841$
+      000993 CB 7A                 1752 	bit	7, d
+      000995 20 08                 1753 	jr	NZ, 00842$
+      000997 BF                    1754 	cp	a, a
+      000998 18 05                 1755 	jr	00842$
+      00099A                       1756 00841$:
+      00099A CB 7A                 1757 	bit	7, d
+      00099C 28 01                 1758 	jr	Z, 00842$
+      00099E 37                    1759 	scf
+      00099F                       1760 00842$:
+      00099F DArDEr0A              1761 	jp	C, 00239$
+                                   1762 ;/tmp/_gbsbuild/src/states/Platform.c:225: if ((tile_below & COLLISION_TOP) && !(tile_below & TILE_PROP_LADDER)) {
+      0009A2 CB 41                 1763 	bit	0, c
+      0009A4 CArDEr0A              1764 	jp	Z,00239$
+      0009A7 CB 61                 1765 	bit	4, c
+      0009A9 C2rDEr0A              1766 	jp	NZ,00239$
+                                   1767 ;/tmp/_gbsbuild/src/states/Platform.c:226: grounded = TRUE;
+      0009AC 21r00r00              1768 	ld	hl, #_grounded
+      0009AF 36 01                 1769 	ld	(hl), #0x01
+                                   1770 ;/tmp/_gbsbuild/src/states/Platform.c:227: pl_vel_y = 0;
+      0009B1 21r04r00              1771 	ld	hl, #_pl_vel_y
+      0009B4 3E 00                 1772 	ld	a, #0x00
+      0009B6 22                    1773 	ld	(hl+), a
+      0009B7 36 00                 1774 	ld	(hl), #0x00
+                                   1775 ;/tmp/_gbsbuild/src/states/Platform.c:228: pl_pos_y = (tile_y * 8) << 4;
+      0009B9 F8 07                 1776 	ldhl	sp,	#7
+      0009BB 2A                    1777 	ld	a, (hl+)
+      0009BC 5E                    1778 	ld	e, (hl)
+      0009BD 21r08r00              1779 	ld	hl, #_pl_pos_y
+      0009C0 22                    1780 	ld	(hl+), a
+      0009C1 73                    1781 	ld	(hl), e
+      0009C2 C3rDEr0A              1782 	jp	00239$
+      0009C5                       1783 00238$:
+                                   1784 ;/tmp/_gbsbuild/src/states/Platform.c:153: hit_actor = ActorAtTile(tile_x + 2, tile_y, TRUE);
+      0009C5 F8 01                 1785 	ldhl	sp,	#1
+      0009C7 4E                    1786 	ld	c, (hl)
+                                   1787 ;/tmp/_gbsbuild/src/states/Platform.c:167: TileAt(tile_x + 1, tile_y - 1) & COLLISION_BOTTOM))) {  // Right edge
+      0009C8 0C                    1788 	inc	c
+                                   1789 ;/tmp/_gbsbuild/src/states/Platform.c:234: if (pl_vel_y >= 0 && (TileAt(tile_x, tile_y + 1) & COLLISION_TOP ||  // Left Edge
+      0009C9 21r04r00              1790 	ld	hl, #_pl_vel_y
+      0009CC 7E                    1791 	ld	a, (hl)
+      0009CD D6 00                 1792 	sub	a, #0x00
+      0009CF 23                    1793 	inc	hl
+      0009D0 7E                    1794 	ld	a, (hl)
+      0009D1 DE 00                 1795 	sbc	a, #0x00
+      0009D3 56                    1796 	ld	d, (hl)
+      0009D4 3E 00                 1797 	ld	a, #0x00
+      0009D6 CB 7F                 1798 	bit	7,a
+      0009D8 28 07                 1799 	jr	Z, 00846$
+      0009DA CB 7A                 1800 	bit	7, d
+      0009DC 20 08                 1801 	jr	NZ, 00847$
+      0009DE BF                    1802 	cp	a, a
+      0009DF 18 05                 1803 	jr	00847$
+      0009E1                       1804 00846$:
+      0009E1 CB 7A                 1805 	bit	7, d
+      0009E3 28 01                 1806 	jr	Z, 00847$
+      0009E5 37                    1807 	scf
+      0009E6                       1808 00847$:
+      0009E6 38 58                 1809 	jr	C, 00232$
+      0009E8 C5                    1810 	push	bc
+      0009E9 F8 08                 1811 	ldhl	sp,	#8
+      0009EB 7E                    1812 	ld	a, (hl)
+      0009EC F5                    1813 	push	af
+      0009ED 33                    1814 	inc	sp
+      0009EE F8 04                 1815 	ldhl	sp,	#4
+      0009F0 7E                    1816 	ld	a, (hl)
+      0009F1 F5                    1817 	push	af
+      0009F2 33                    1818 	inc	sp
+      0009F3 CDr00r00              1819 	call	_TileAt
+      0009F6 E8 02                 1820 	add	sp, #2
+      0009F8 7B                    1821 	ld	a, e
+      0009F9 C1                    1822 	pop	bc
+      0009FA 0F                    1823 	rrca
+      0009FB 38 2A                 1824 	jr	C, 00231$
+                                   1825 ;/tmp/_gbsbuild/src/states/Platform.c:235: (((pl_pos_x >> 4) & 0x7) != 0 &&
+      0009FD 21r06r00              1826 	ld	hl, #_pl_pos_x
+      000A00 2A                    1827 	ld	a, (hl+)
+      000A01 47                    1828 	ld	b, a
+      000A02 5E                    1829 	ld	e, (hl)
+      000A03 CB 2B                 1830 	sra	e
+      000A05 CB 18                 1831 	rr	b
+      000A07 CB 2B                 1832 	sra	e
+      000A09 CB 18                 1833 	rr	b
+      000A0B CB 2B                 1834 	sra	e
+      000A0D CB 18                 1835 	rr	b
+      000A0F CB 2B                 1836 	sra	e
+      000A11 CB 18                 1837 	rr	b
+      000A13 78                    1838 	ld	a, b
+      000A14 E6 07                 1839 	and	a, #0x07
+      000A16 28 28                 1840 	jr	Z, 00232$
+                                   1841 ;/tmp/_gbsbuild/src/states/Platform.c:236: TileAt(tile_x + 1, tile_y + 1) & COLLISION_TOP))  // Right edge
+      000A18 C5                    1842 	push	bc
+      000A19 F8 08                 1843 	ldhl	sp,	#8
+      000A1B 46                    1844 	ld	b, (hl)
+      000A1C C5                    1845 	push	bc
+      000A1D CDr00r00              1846 	call	_TileAt
+      000A20 E8 02                 1847 	add	sp, #2
+      000A22 7B                    1848 	ld	a, e
+      000A23 C1                    1849 	pop	bc
+      000A24 0F                    1850 	rrca
+      000A25 30 19                 1851 	jr	NC, 00232$
+      000A27                       1852 00231$:
+                                   1853 ;/tmp/_gbsbuild/src/states/Platform.c:238: grounded = TRUE;
+      000A27 21r00r00              1854 	ld	hl, #_grounded
+      000A2A 36 01                 1855 	ld	(hl), #0x01
+                                   1856 ;/tmp/_gbsbuild/src/states/Platform.c:239: pl_vel_y = 0;
+      000A2C 21r04r00              1857 	ld	hl, #_pl_vel_y
+      000A2F 3E 00                 1858 	ld	a, #0x00
+      000A31 22                    1859 	ld	(hl+), a
+      000A32 36 00                 1860 	ld	(hl), #0x00
+                                   1861 ;/tmp/_gbsbuild/src/states/Platform.c:240: pl_pos_y = (tile_y * 8) << 4;
+      000A34 F8 07                 1862 	ldhl	sp,	#7
+      000A36 2A                    1863 	ld	a, (hl+)
+      000A37 5E                    1864 	ld	e, (hl)
+      000A38 21r08r00              1865 	ld	hl, #_pl_pos_y
+      000A3B 22                    1866 	ld	(hl+), a
+      000A3C 73                    1867 	ld	(hl), e
+      000A3D C3rDEr0A              1868 	jp	00239$
+      000A40                       1869 00232$:
+                                   1870 ;/tmp/_gbsbuild/src/states/Platform.c:242: grounded = FALSE;
+      000A40 21r00r00              1871 	ld	hl, #_grounded
+      000A43 36 00                 1872 	ld	(hl), #0x00
+                                   1873 ;/tmp/_gbsbuild/src/states/Platform.c:245: if (pl_vel_y < 0) {
+      000A45 21r04r00              1874 	ld	hl, #_pl_vel_y
+      000A48 7E                    1875 	ld	a, (hl)
+      000A49 D6 00                 1876 	sub	a, #0x00
+      000A4B 23                    1877 	inc	hl
+      000A4C 7E                    1878 	ld	a, (hl)
+      000A4D DE 00                 1879 	sbc	a, #0x00
+      000A4F 56                    1880 	ld	d, (hl)
+      000A50 3E 00                 1881 	ld	a, #0x00
+      000A52 CB 7F                 1882 	bit	7,a
+      000A54 28 07                 1883 	jr	Z, 00852$
+      000A56 CB 7A                 1884 	bit	7, d
+      000A58 20 08                 1885 	jr	NZ, 00853$
+      000A5A BF                    1886 	cp	a, a
+      000A5B 18 05                 1887 	jr	00853$
+      000A5D                       1888 00852$:
+      000A5D CB 7A                 1889 	bit	7, d
+      000A5F 28 01                 1890 	jr	Z, 00853$
+      000A61 37                    1891 	scf
+      000A62                       1892 00853$:
+      000A62 30 7A                 1893 	jr	NC, 00239$
+                                   1894 ;/tmp/_gbsbuild/src/states/Platform.c:246: if (TileAt(tile_x, tile_y - 1) & COLLISION_BOTTOM ||  // Left Edge
+      000A64 F8 03                 1895 	ldhl	sp,	#3
+      000A66 46                    1896 	ld	b, (hl)
+      000A67 05                    1897 	dec	b
+      000A68 C5                    1898 	push	bc
+      000A69 C5                    1899 	push	bc
+      000A6A 33                    1900 	inc	sp
+      000A6B 2B                    1901 	dec	hl
+      000A6C 2B                    1902 	dec	hl
+      000A6D 7E                    1903 	ld	a, (hl)
+      000A6E F5                    1904 	push	af
+      000A6F 33                    1905 	inc	sp
+      000A70 CDr00r00              1906 	call	_TileAt
+      000A73 E8 02                 1907 	add	sp, #2
+      000A75 C1                    1908 	pop	bc
+      000A76 CB 4B                 1909 	bit	1, e
+      000A78 20 26                 1910 	jr	NZ, 00225$
+                                   1911 ;/tmp/_gbsbuild/src/states/Platform.c:247: (((pl_pos_x >> 4) & 0x7) != 0 &&
+      000A7A 21r07r00              1912 	ld	hl, #_pl_pos_x + 1
+      000A7D 2B                    1913 	dec	hl
+      000A7E 2A                    1914 	ld	a, (hl+)
+      000A7F 5F                    1915 	ld	e, a
+      000A80 56                    1916 	ld	d, (hl)
+      000A81 CB 2A                 1917 	sra	d
+      000A83 CB 1B                 1918 	rr	e
+      000A85 CB 2A                 1919 	sra	d
+      000A87 CB 1B                 1920 	rr	e
+      000A89 CB 2A                 1921 	sra	d
+      000A8B CB 1B                 1922 	rr	e
+      000A8D CB 2A                 1923 	sra	d
+      000A8F CB 1B                 1924 	rr	e
+      000A91 7B                    1925 	ld	a, e
+      000A92 E6 07                 1926 	and	a, #0x07
+      000A94 28 48                 1927 	jr	Z, 00239$
+                                   1928 ;/tmp/_gbsbuild/src/states/Platform.c:248: TileAt(tile_x + 1, tile_y - 1) & COLLISION_BOTTOM)  // Right edge
+      000A96 C5                    1929 	push	bc
+      000A97 CDr00r00              1930 	call	_TileAt
+      000A9A E8 02                 1931 	add	sp, #2
+      000A9C CB 4B                 1932 	bit	1, e
+      000A9E 28 3E                 1933 	jr	Z, 00239$
+      000AA0                       1934 00225$:
+                                   1935 ;/tmp/_gbsbuild/src/states/Platform.c:250: pl_vel_y = 0;
+      000AA0 21r04r00              1936 	ld	hl, #_pl_vel_y
+      000AA3 3E 00                 1937 	ld	a, #0x00
+      000AA5 22                    1938 	ld	(hl+), a
+      000AA6 36 00                 1939 	ld	(hl), #0x00
+                                   1940 ;/tmp/_gbsbuild/src/states/Platform.c:251: pl_pos_y = (((tile_y + 1) * 8) << 4);
+                                   1941 ;c
+      000AA8 F8 04                 1942 	ldhl	sp,#4
+      000AAA 2A                    1943 	ld	a, (hl+)
+      000AAB 5F                    1944 	ld	e, a
+      000AAC 56                    1945 	ld	d, (hl)
+      000AAD 6B                    1946 	ld	l, e
+      000AAE 62                    1947 	ld	h, d
+      000AAF 23                    1948 	inc	hl
+      000AB0 E5                    1949 	push	hl
+      000AB1 7D                    1950 	ld	a, l
+      000AB2 F8 09                 1951 	ldhl	sp,	#9
+      000AB4 77                    1952 	ld	(hl), a
+      000AB5 E1                    1953 	pop	hl
+      000AB6 7C                    1954 	ld	a, h
+      000AB7 F8 08                 1955 	ldhl	sp,	#8
+      000AB9 77                    1956 	ld	(hl), a
+      000ABA 3E 03                 1957 	ld	a, #0x03
+      000ABC                       1958 00858$:
+      000ABC F8 07                 1959 	ldhl	sp,	#7
+      000ABE CB 26                 1960 	sla	(hl)
+      000AC0 23                    1961 	inc	hl
+      000AC1 CB 16                 1962 	rl	(hl)
+      000AC3 3D                    1963 	dec	a
+      000AC4 20 F6                 1964 	jr	NZ, 00858$
+      000AC6 2B                    1965 	dec	hl
+      000AC7 7E                    1966 	ld	a, (hl)
+      000AC8 EAr08r00              1967 	ld	(#_pl_pos_y),a
+      000ACB F8 08                 1968 	ldhl	sp,	#8
+      000ACD 7E                    1969 	ld	a, (hl)
+      000ACE EAr09r00              1970 	ld	(#_pl_pos_y + 1),a
+      000AD1 3E 04                 1971 	ld	a, #0x04
+      000AD3                       1972 00859$:
+      000AD3 21r08r00              1973 	ld	hl, #_pl_pos_y
+      000AD6 CB 26                 1974 	sla	(hl)
+      000AD8 23                    1975 	inc	hl
+      000AD9 CB 16                 1976 	rl	(hl)
+      000ADB 3D                    1977 	dec	a
+      000ADC 20 F5                 1978 	jr	NZ, 00859$
+      000ADE                       1979 00239$:
+                                   1980 ;/tmp/_gbsbuild/src/states/Platform.c:258: player.pos.x = (pl_pos_x >> 4) - 4u;
+      000ADE 21r07r00              1981 	ld	hl, #_pl_pos_x + 1
+      000AE1 2B                    1982 	dec	hl
+      000AE2 2A                    1983 	ld	a, (hl+)
+      000AE3 4F                    1984 	ld	c, a
+      000AE4 46                    1985 	ld	b, (hl)
+      000AE5 CB 28                 1986 	sra	b
+      000AE7 CB 19                 1987 	rr	c
+      000AE9 CB 28                 1988 	sra	b
+      000AEB CB 19                 1989 	rr	c
+      000AED CB 28                 1990 	sra	b
+      000AEF CB 19                 1991 	rr	c
+      000AF1 CB 28                 1992 	sra	b
+      000AF3 CB 19                 1993 	rr	c
+      000AF5 79                    1994 	ld	a, c
+      000AF6 C6 FC                 1995 	add	a, #0xfc
+      000AF8 4F                    1996 	ld	c, a
+      000AF9 78                    1997 	ld	a, b
+      000AFA CE FF                 1998 	adc	a, #0xff
+      000AFC 47                    1999 	ld	b, a
+      000AFD 21r00r00              2000 	ld	hl, #_actors
+      000B00 79                    2001 	ld	a, c
+      000B01 22                    2002 	ld	(hl+), a
+      000B02 70                    2003 	ld	(hl), b
+                                   2004 ;/tmp/_gbsbuild/src/states/Platform.c:259: player.pos.y = pl_pos_y >> 4;
+      000B03 21r09r00              2005 	ld	hl, #_pl_pos_y + 1
+      000B06 2B                    2006 	dec	hl
+      000B07 2A                    2007 	ld	a, (hl+)
+      000B08 4F                    2008 	ld	c, a
+      000B09 46                    2009 	ld	b, (hl)
+      000B0A CB 28                 2010 	sra	b
+      000B0C CB 19                 2011 	rr	c
+      000B0E CB 28                 2012 	sra	b
+      000B10 CB 19                 2013 	rr	c
+      000B12 CB 28                 2014 	sra	b
+      000B14 CB 19                 2015 	rr	c
+      000B16 CB 28                 2016 	sra	b
+      000B18 CB 19                 2017 	rr	c
+      000B1A 21r02r00              2018 	ld	hl, #(_actors + 0x0002)
+      000B1D 79                    2019 	ld	a, c
+      000B1E 22                    2020 	ld	(hl+), a
+      000B1F 70                    2021 	ld	(hl), b
+                                   2022 ;/tmp/_gbsbuild/src/states/Platform.c:262: if (player.pos.x < 0) {
+      000B20 11r00r00              2023 	ld	de, #_actors
+      000B23 1A                    2024 	ld	a, (de)
+      000B24 F8 07                 2025 	ldhl	sp,	#7
+      000B26 22                    2026 	ld	(hl+), a
+      000B27 13                    2027 	inc	de
+      000B28 1A                    2028 	ld	a, (de)
+      000B29 32                    2029 	ld	(hl-), a
+      000B2A 7E                    2030 	ld	a, (hl)
+      000B2B D6 00                 2031 	sub	a, #0x00
+      000B2D 23                    2032 	inc	hl
+      000B2E 7E                    2033 	ld	a, (hl)
+      000B2F DE 00                 2034 	sbc	a, #0x00
+      000B31 56                    2035 	ld	d, (hl)
+      000B32 3E 00                 2036 	ld	a, #0x00
+      000B34 CB 7F                 2037 	bit	7,a
+      000B36 28 07                 2038 	jr	Z, 00860$
+      000B38 CB 7A                 2039 	bit	7, d
+      000B3A 20 08                 2040 	jr	NZ, 00861$
+      000B3C BF                    2041 	cp	a, a
+      000B3D 18 05                 2042 	jr	00861$
+      000B3F                       2043 00860$:
+      000B3F CB 7A                 2044 	bit	7, d
+      000B41 28 01                 2045 	jr	Z, 00861$
+      000B43 37                    2046 	scf
+      000B44                       2047 00861$:
+      000B44 30 18                 2048 	jr	NC, 00243$
+                                   2049 ;/tmp/_gbsbuild/src/states/Platform.c:263: player.pos.x = 0;
+      000B46 21r00r00              2050 	ld	hl, #_actors
+      000B49 AF                    2051 	xor	a, a
+      000B4A 22                    2052 	ld	(hl+), a
+      000B4B 77                    2053 	ld	(hl), a
+                                   2054 ;/tmp/_gbsbuild/src/states/Platform.c:264: pl_pos_x = 0;
+      000B4C 21r06r00              2055 	ld	hl, #_pl_pos_x
+      000B4F 3E 00                 2056 	ld	a, #0x00
+      000B51 22                    2057 	ld	(hl+), a
+      000B52 36 00                 2058 	ld	(hl), #0x00
+                                   2059 ;/tmp/_gbsbuild/src/states/Platform.c:265: pl_vel_x = 0;
+      000B54 21r02r00              2060 	ld	hl, #_pl_vel_x
+      000B57 3E 00                 2061 	ld	a, #0x00
+      000B59 22                    2062 	ld	(hl+), a
+      000B5A 36 00                 2063 	ld	(hl), #0x00
+      000B5C 18 2D                 2064 	jr	00244$
+      000B5E                       2065 00243$:
+                                   2066 ;/tmp/_gbsbuild/src/states/Platform.c:266: } else if (player.pos.x > image_width - 16) {
+      000B5E 21r00r00              2067 	ld	hl, #_image_width
+      000B61 7E                    2068 	ld	a, (hl)
+      000B62 C6 F0                 2069 	add	a, #0xf0
+      000B64 4F                    2070 	ld	c, a
+      000B65 23                    2071 	inc	hl
+      000B66 7E                    2072 	ld	a, (hl)
+      000B67 CE FF                 2073 	adc	a, #0xff
+      000B69 47                    2074 	ld	b, a
+      000B6A F8 07                 2075 	ldhl	sp,#7
+      000B6C 2A                    2076 	ld	a, (hl+)
+      000B6D 5F                    2077 	ld	e, a
+      000B6E 56                    2078 	ld	d, (hl)
+      000B6F 79                    2079 	ld	a, c
+      000B70 93                    2080 	sub	a, e
+      000B71 78                    2081 	ld	a, b
+      000B72 9A                    2082 	sbc	a, d
+      000B73 30 16                 2083 	jr	NC, 00244$
+                                   2084 ;/tmp/_gbsbuild/src/states/Platform.c:267: player.pos.x = image_width - 16;
+      000B75 21r00r00              2085 	ld	hl, #_actors
+      000B78 79                    2086 	ld	a, c
+      000B79 22                    2087 	ld	(hl+), a
+      000B7A 70                    2088 	ld	(hl), b
+                                   2089 ;/tmp/_gbsbuild/src/states/Platform.c:268: pl_pos_x = 0;
+      000B7B 21r06r00              2090 	ld	hl, #_pl_pos_x
+      000B7E 3E 00                 2091 	ld	a, #0x00
+      000B80 22                    2092 	ld	(hl+), a
+      000B81 36 00                 2093 	ld	(hl), #0x00
+                                   2094 ;/tmp/_gbsbuild/src/states/Platform.c:269: pl_vel_x = 0;
+      000B83 21r02r00              2095 	ld	hl, #_pl_vel_x
+      000B86 3E 00                 2096 	ld	a, #0x00
+      000B88 22                    2097 	ld	(hl+), a
+      000B89 36 00                 2098 	ld	(hl), #0x00
+      000B8B                       2099 00244$:
+                                   2100 ;/tmp/_gbsbuild/src/states/Platform.c:69: pl_pos_y = ((player.pos.y) << 4) + (pl_pos_y & 0xF);
+      000B8B 21r02r00              2101 	ld	hl, #(_actors + 0x0002)
+      000B8E 2A                    2102 	ld	a, (hl+)
+      000B8F 4F                    2103 	ld	c, a
+      000B90 46                    2104 	ld	b, (hl)
+                                   2105 ;/tmp/_gbsbuild/src/states/Platform.c:272: if (player.pos.y < 0) {
+      000B91 CB 78                 2106 	bit	7, b
+      000B93 28 18                 2107 	jr	Z, 00248$
+                                   2108 ;/tmp/_gbsbuild/src/states/Platform.c:273: player.pos.y = 0;
+      000B95 21r02r00              2109 	ld	hl, #(_actors + 0x0002)
+      000B98 AF                    2110 	xor	a, a
+      000B99 22                    2111 	ld	(hl+), a
+      000B9A 77                    2112 	ld	(hl), a
+                                   2113 ;/tmp/_gbsbuild/src/states/Platform.c:274: pl_pos_y = 0;
+      000B9B 21r08r00              2114 	ld	hl, #_pl_pos_y
+      000B9E 3E 00                 2115 	ld	a, #0x00
+      000BA0 22                    2116 	ld	(hl+), a
+      000BA1 36 00                 2117 	ld	(hl), #0x00
+                                   2118 ;/tmp/_gbsbuild/src/states/Platform.c:275: pl_vel_y = 0;
+      000BA3 21r04r00              2119 	ld	hl, #_pl_vel_y
+      000BA6 3E 00                 2120 	ld	a, #0x00
+      000BA8 22                    2121 	ld	(hl+), a
+      000BA9 36 00                 2122 	ld	(hl), #0x00
+      000BAB 18 3A                 2123 	jr	00249$
+      000BAD                       2124 00248$:
+                                   2125 ;/tmp/_gbsbuild/src/states/Platform.c:276: } else if (player.pos.y > image_height - 8) {
+      000BAD 21r01r00              2126 	ld	hl, #_image_height + 1
+      000BB0 2B                    2127 	dec	hl
+      000BB1 2A                    2128 	ld	a, (hl+)
+      000BB2 5F                    2129 	ld	e, a
+      000BB3 56                    2130 	ld	d, (hl)
+      000BB4 21 08 00              2131 	ld	hl, #0x0008
+      000BB7 7B                    2132 	ld	a, e
+      000BB8 95                    2133 	sub	a, l
+      000BB9 5F                    2134 	ld	e, a
+      000BBA 7A                    2135 	ld	a, d
+      000BBB 9C                    2136 	sbc	a, h
+      000BBC F8 08                 2137 	ldhl	sp,	#8
+      000BBE 32                    2138 	ld	(hl-), a
+      000BBF 73                    2139 	ld	(hl), e
+      000BC0 7E                    2140 	ld	a, (hl)
+      000BC1 91                    2141 	sub	a, c
+      000BC2 23                    2142 	inc	hl
+      000BC3 7E                    2143 	ld	a, (hl)
+      000BC4 98                    2144 	sbc	a, b
+      000BC5 30 20                 2145 	jr	NC, 00249$
+                                   2146 ;/tmp/_gbsbuild/src/states/Platform.c:277: player.pos.y = image_height - 8;
+      000BC7 11r02r00              2147 	ld	de, #(_actors + 0x0002)
+      000BCA F8 07                 2148 	ldhl	sp,	#7
+      000BCC 7E                    2149 	ld	a, (hl)
+      000BCD 12                    2150 	ld	(de), a
+      000BCE 13                    2151 	inc	de
+      000BCF 23                    2152 	inc	hl
+      000BD0 7E                    2153 	ld	a, (hl)
+      000BD1 12                    2154 	ld	(de), a
+                                   2155 ;/tmp/_gbsbuild/src/states/Platform.c:278: pl_pos_y = 0;
+      000BD2 21r08r00              2156 	ld	hl, #_pl_pos_y
+      000BD5 3E 00                 2157 	ld	a, #0x00
+      000BD7 22                    2158 	ld	(hl+), a
+      000BD8 36 00                 2159 	ld	(hl), #0x00
+                                   2160 ;/tmp/_gbsbuild/src/states/Platform.c:279: pl_vel_y = 0;
+      000BDA 21r04r00              2161 	ld	hl, #_pl_vel_y
+      000BDD 3E 00                 2162 	ld	a, #0x00
+      000BDF 22                    2163 	ld	(hl+), a
+      000BE0 36 00                 2164 	ld	(hl), #0x00
+                                   2165 ;/tmp/_gbsbuild/src/states/Platform.c:280: grounded = TRUE;
+      000BE2 21r00r00              2166 	ld	hl, #_grounded
+      000BE5 36 01                 2167 	ld	(hl), #0x01
+      000BE7                       2168 00249$:
+                                   2169 ;/tmp/_gbsbuild/src/states/Platform.c:283: player.animate = (grounded && pl_vel_x != 0) || (on_ladder && pl_vel_y != 0);
+      000BE7 FAr00r00              2170 	ld	a, (#_grounded)
+      000BEA B7                    2171 	or	a, a
+      000BEB 28 07                 2172 	jr	Z, 00283$
+      000BED 21r03r00              2173 	ld	hl, #_pl_vel_x + 1
+      000BF0 3A                    2174 	ld	a, (hl-)
+      000BF1 B6                    2175 	or	a, (hl)
+      000BF2 20 10                 2176 	jr	NZ, 00279$
+      000BF4                       2177 00283$:
+      000BF4 FAr01r00              2178 	ld	a, (#_on_ladder)
+      000BF7 B7                    2179 	or	a, a
+      000BF8 28 07                 2180 	jr	Z, 00278$
+      000BFA 21r05r00              2181 	ld	hl, #_pl_vel_y + 1
+      000BFD 3A                    2182 	ld	a, (hl-)
+      000BFE B6                    2183 	or	a, (hl)
+      000BFF 20 03                 2184 	jr	NZ, 00279$
+      000C01                       2185 00278$:
+      000C01 AF                    2186 	xor	a, a
+      000C02 18 02                 2187 	jr	00280$
+      000C04                       2188 00279$:
+      000C04 3E 01                 2189 	ld	a, #0x01
+      000C06                       2190 00280$:
+      000C06 EAr11r00              2191 	ld	(#(_actors + 0x0011)),a
+                                   2192 ;/tmp/_gbsbuild/src/states/Platform.c:286: if (ActivateTriggerAt(tile_x, tile_y, INPUT_UP_PRESSED)) {
+      000C09 FAr00r00              2193 	ld	a, (#_ui_block)
+      000C0C B7                    2194 	or	a, a
+      000C0D 20 07                 2195 	jr	NZ, 00291$
+      000C0F 21r00r00              2196 	ld	hl, #_input_override_default
+      000C12 CB 56                 2197 	bit	2, (hl)
+      000C14 20 10                 2198 	jr	NZ, 00287$
+      000C16                       2199 00291$:
+      000C16 FAr00r00              2200 	ld	a, (#_joy)
+      000C19 CB 57                 2201 	bit	2, a
+      000C1B 28 09                 2202 	jr	Z, 00287$
+      000C1D 21r00r00              2203 	ld	hl, #_last_joy
+      000C20 4E                    2204 	ld	c, (hl)
+      000C21 AF                    2205 	xor	a, a
+      000C22 CB 51                 2206 	bit	2, c
+      000C24 28 03                 2207 	jr	Z, 00288$
+      000C26                       2208 00287$:
+      000C26 AF                    2209 	xor	a, a
+      000C27 18 02                 2210 	jr	00289$
+      000C29                       2211 00288$:
+      000C29 3E 01                 2212 	ld	a, #0x01
+      000C2B                       2213 00289$:
+      000C2B F5                    2214 	push	af
+      000C2C 33                    2215 	inc	sp
+      000C2D F8 03                 2216 	ldhl	sp,	#3
+      000C2F 7E                    2217 	ld	a, (hl)
+      000C30 F5                    2218 	push	af
+      000C31 33                    2219 	inc	sp
+      000C32 2B                    2220 	dec	hl
+      000C33 7E                    2221 	ld	a, (hl)
+      000C34 F5                    2222 	push	af
+      000C35 33                    2223 	inc	sp
+      000C36 CDr00r00              2224 	call	_ActivateTriggerAt
+      000C39 E8 03                 2225 	add	sp, #3
+      000C3B 7B                    2226 	ld	a, e
+      000C3C B7                    2227 	or	a, a
+                                   2228 ;/tmp/_gbsbuild/src/states/Platform.c:288: return;
+      000C3D 20 33                 2229 	jr	NZ, 00258$
+                                   2230 ;/tmp/_gbsbuild/src/states/Platform.c:292: hit_actor = ActorOverlapsPlayer(FALSE);
+      000C3F AF                    2231 	xor	a, a
+      000C40 F5                    2232 	push	af
+      000C41 33                    2233 	inc	sp
+      000C42 CDr00r00              2234 	call	_ActorOverlapsPlayer
+      000C45 33                    2235 	inc	sp
+      000C46 4B                    2236 	ld	c, e
+                                   2237 ;/tmp/_gbsbuild/src/states/Platform.c:293: if (hit_actor && hit_actor != NO_ACTOR_COLLISON && player_iframes == 0) {
+      000C47 79                    2238 	ld	a, c
+      000C48 B7                    2239 	or	a, a
+      000C49 28 27                 2240 	jr	Z, 00258$
+      000C4B 79                    2241 	ld	a, c
+      000C4C 3C                    2242 	inc	a
+      000C4D 28 23                 2243 	jr	Z, 00258$
+      000C4F FAr00r00              2244 	ld	a, (#_player_iframes)
+                                   2245 ;/tmp/_gbsbuild/src/states/Platform.c:294: if (actors[hit_actor].collision_group) {
+      000C52 B7                    2246 	or	a,a
+      000C53 20 1D                 2247 	jr	NZ, 00258$
+      000C55 47                    2248 	ld	b,a
+      000C56 69                    2249 	ld	l, c
+      000C57 60                    2250 	ld	h, b
+      000C58 29                    2251 	add	hl, hl
+      000C59 29                    2252 	add	hl, hl
+      000C5A 09                    2253 	add	hl, bc
+      000C5B 29                    2254 	add	hl, hl
+      000C5C 09                    2255 	add	hl, bc
+      000C5D 29                    2256 	add	hl, hl
+      000C5E 09                    2257 	add	hl, bc
+      000C5F 29                    2258 	add	hl, hl
+      000C60 11r00r00              2259 	ld	de, #_actors
+      000C63 19                    2260 	add	hl, de
+      000C64 11 18 00              2261 	ld	de, #0x0018
+      000C67 19                    2262 	add	hl, de
+      000C68 7E                    2263 	ld	a, (hl)
+      000C69 B7                    2264 	or	a, a
+      000C6A 28 06                 2265 	jr	Z, 00258$
+                                   2266 ;/tmp/_gbsbuild/src/states/Platform.c:295: player.hit_actor = 0;
+      000C6C 21r1Ar00              2267 	ld	hl, #_actors + 26
+      000C6F 36 00                 2268 	ld	(hl), #0x00
+                                   2269 ;/tmp/_gbsbuild/src/states/Platform.c:296: player.hit_actor = hit_actor;
+      000C71 71                    2270 	ld	(hl), c
+      000C72                       2271 00258$:
+                                   2272 ;/tmp/_gbsbuild/src/states/Platform.c:299: }
+      000C72 E8 09                 2273 	add	sp, #9
+      000C74 C9                    2274 	ret
+                                   2275 	.area _CODE_5
+                                   2276 	.area _CABS (ABS)

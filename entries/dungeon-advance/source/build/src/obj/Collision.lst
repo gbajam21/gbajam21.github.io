@@ -1,0 +1,299 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Collision
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _PopBank
+                                     12 	.globl _PushBank
+                                     13 	.globl _TileAt
+                                     14 	.globl _TileAt2x1
+                                     15 	.globl _TileAt2x2
+                                     16 ;--------------------------------------------------------
+                                     17 ; special function registers
+                                     18 ;--------------------------------------------------------
+                                     19 ;--------------------------------------------------------
+                                     20 ; ram data
+                                     21 ;--------------------------------------------------------
+                                     22 	.area _DATA
+                                     23 ;--------------------------------------------------------
+                                     24 ; absolute external ram data
+                                     25 ;--------------------------------------------------------
+                                     26 	.area _DABS (ABS)
+                                     27 ;--------------------------------------------------------
+                                     28 ; global & static initialisations
+                                     29 ;--------------------------------------------------------
+                                     30 	.area _HOME
+                                     31 	.area _GSINIT
+                                     32 	.area _GSFINAL
+                                     33 	.area _GSINIT
+                                     34 ;--------------------------------------------------------
+                                     35 ; Home
+                                     36 ;--------------------------------------------------------
+                                     37 	.area _HOME
+                                     38 	.area _HOME
+                                     39 ;--------------------------------------------------------
+                                     40 ; code
+                                     41 ;--------------------------------------------------------
+                                     42 	.area _CODE
+                                     43 ;/tmp/_gbsbuild/src/core/Collision.c:8: UBYTE TileAt(UBYTE tx, UBYTE ty) {
+                                     44 ;	---------------------------------
+                                     45 ; Function TileAt
+                                     46 ; ---------------------------------
+      000000                         47 _TileAt::
+                                     48 ;/tmp/_gbsbuild/src/core/Collision.c:13: if (tx == MAX_UINT8 || tx == image_tile_width || ty == image_tile_height || ty == MAX_UINT8) {
+      000000 F8 02                   49 	ldhl	sp,	#2
+      000002 7E                      50 	ld	a, (hl)
+      000003 3C                      51 	inc	a
+      000004 28 18                   52 	jr	Z, 00101$
+      000006 F8 02                   53 	ldhl	sp,	#2
+      000008 7E                      54 	ld	a, (hl)
+      000009 21r00r00                55 	ld	hl, #_image_tile_width
+      00000C 96                      56 	sub	a, (hl)
+      00000D 28 0F                   57 	jr	Z, 00101$
+      00000F F8 03                   58 	ldhl	sp,	#3
+      000011 7E                      59 	ld	a, (hl)
+      000012 21r00r00                60 	ld	hl, #_image_tile_height
+      000015 96                      61 	sub	a, (hl)
+      000016 28 06                   62 	jr	Z, 00101$
+      000018 F8 03                   63 	ldhl	sp,	#3
+      00001A 7E                      64 	ld	a, (hl)
+      00001B 3C                      65 	inc	a
+      00001C 20 03                   66 	jr	NZ, 00102$
+      00001E                         67 00101$:
+                                     68 ;/tmp/_gbsbuild/src/core/Collision.c:14: return COLLISION_ALL;
+      00001E 1E 0F                   69 	ld	e, #0x0f
+      000020 C9                      70 	ret
+      000021                         71 00102$:
+                                     72 ;/tmp/_gbsbuild/src/core/Collision.c:17: y_offset = ty * (UINT16)image_tile_width;
+      000021 21r00r00                73 	ld	hl, #_image_tile_width
+      000024 4E                      74 	ld	c, (hl)
+      000025 06 00                   75 	ld	b, #0x00
+      000027 F8 03                   76 	ldhl	sp,	#3
+      000029 5E                      77 	ld	e, (hl)
+      00002A 16 00                   78 	ld	d, #0x00
+      00002C C5                      79 	push	bc
+      00002D D5                      80 	push	de
+      00002E CDr00r00                81 	call	__mulint
+      000031 E8 04                   82 	add	sp, #4
+                                     83 ;/tmp/_gbsbuild/src/core/Collision.c:19: PUSH_BANK(collision_bank);
+      000033 D5                      84 	push	de
+      000034 FAr00r00                85 	ld	a, (#_collision_bank)
+      000037 F5                      86 	push	af
+      000038 33                      87 	inc	sp
+      000039 CDr00r00                88 	call	_PushBank
+      00003C 33                      89 	inc	sp
+      00003D D1                      90 	pop	de
+                                     91 ;/tmp/_gbsbuild/src/core/Collision.c:20: tile = (UBYTE) * (collision_ptr + y_offset + tx);
+      00003E 7B                      92 	ld	a, e
+      00003F 21r00r00                93 	ld	hl, #_collision_ptr
+      000042 86                      94 	add	a, (hl)
+      000043 4F                      95 	ld	c, a
+      000044 7A                      96 	ld	a, d
+      000045 23                      97 	inc	hl
+      000046 8E                      98 	adc	a, (hl)
+      000047 47                      99 	ld	b, a
+      000048 F8 02                  100 	ldhl	sp,	#2
+      00004A 6E                     101 	ld	l, (hl)
+      00004B 26 00                  102 	ld	h, #0x00
+      00004D 09                     103 	add	hl, bc
+      00004E 4D                     104 	ld	c, l
+      00004F 44                     105 	ld	b, h
+      000050 0A                     106 	ld	a, (bc)
+      000051 5F                     107 	ld	e, a
+                                    108 ;/tmp/_gbsbuild/src/core/Collision.c:21: POP_BANK;
+      000052 D5                     109 	push	de
+      000053 CDr00r00               110 	call	_PopBank
+      000056 D1                     111 	pop	de
+                                    112 ;/tmp/_gbsbuild/src/core/Collision.c:22: return tile;
+                                    113 ;/tmp/_gbsbuild/src/core/Collision.c:23: }
+      000057 C9                     114 	ret
+                                    115 ;/tmp/_gbsbuild/src/core/Collision.c:25: UBYTE TileAt2x1(UBYTE tx, UBYTE ty) {
+                                    116 ;	---------------------------------
+                                    117 ; Function TileAt2x1
+                                    118 ; ---------------------------------
+      000058                        119 _TileAt2x1::
+                                    120 ;/tmp/_gbsbuild/src/core/Collision.c:30: if (tx == MAX_UINT8 || tx == image_tile_width || ty == image_tile_height || ty == MAX_UINT8) {
+      000058 F8 02                  121 	ldhl	sp,	#2
+      00005A 7E                     122 	ld	a, (hl)
+      00005B 3C                     123 	inc	a
+      00005C 28 18                  124 	jr	Z, 00101$
+      00005E F8 02                  125 	ldhl	sp,	#2
+      000060 7E                     126 	ld	a, (hl)
+      000061 21r00r00               127 	ld	hl, #_image_tile_width
+      000064 96                     128 	sub	a, (hl)
+      000065 28 0F                  129 	jr	Z, 00101$
+      000067 F8 03                  130 	ldhl	sp,	#3
+      000069 7E                     131 	ld	a, (hl)
+      00006A 21r00r00               132 	ld	hl, #_image_tile_height
+      00006D 96                     133 	sub	a, (hl)
+      00006E 28 06                  134 	jr	Z, 00101$
+      000070 F8 03                  135 	ldhl	sp,	#3
+      000072 7E                     136 	ld	a, (hl)
+      000073 3C                     137 	inc	a
+      000074 20 03                  138 	jr	NZ, 00102$
+      000076                        139 00101$:
+                                    140 ;/tmp/_gbsbuild/src/core/Collision.c:31: return COLLISION_ALL;
+      000076 1E 0F                  141 	ld	e, #0x0f
+      000078 C9                     142 	ret
+      000079                        143 00102$:
+                                    144 ;/tmp/_gbsbuild/src/core/Collision.c:35: collision_ptr_tmp = ty * (UINT16)image_tile_width + tx + collision_ptr;
+      000079 21r00r00               145 	ld	hl, #_image_tile_width
+      00007C 4E                     146 	ld	c, (hl)
+      00007D 06 00                  147 	ld	b, #0x00
+      00007F F8 03                  148 	ldhl	sp,	#3
+      000081 5E                     149 	ld	e, (hl)
+      000082 16 00                  150 	ld	d, #0x00
+      000084 C5                     151 	push	bc
+      000085 D5                     152 	push	de
+      000086 CDr00r00               153 	call	__mulint
+      000089 E8 04                  154 	add	sp, #4
+      00008B F8 02                  155 	ldhl	sp,	#2
+      00008D 4E                     156 	ld	c, (hl)
+      00008E 06 00                  157 	ld	b, #0x00
+      000090 79                     158 	ld	a, c
+      000091 83                     159 	add	a, e
+      000092 4F                     160 	ld	c, a
+      000093 78                     161 	ld	a, b
+      000094 8A                     162 	adc	a, d
+      000095 47                     163 	ld	b, a
+      000096 79                     164 	ld	a, c
+      000097 21r00r00               165 	ld	hl, #_collision_ptr
+      00009A 86                     166 	add	a, (hl)
+      00009B 4F                     167 	ld	c, a
+      00009C 78                     168 	ld	a, b
+      00009D 23                     169 	inc	hl
+      00009E 8E                     170 	adc	a, (hl)
+      00009F 47                     171 	ld	b, a
+                                    172 ;/tmp/_gbsbuild/src/core/Collision.c:37: PUSH_BANK(collision_bank);
+      0000A0 C5                     173 	push	bc
+      0000A1 FAr00r00               174 	ld	a, (#_collision_bank)
+      0000A4 F5                     175 	push	af
+      0000A5 33                     176 	inc	sp
+      0000A6 CDr00r00               177 	call	_PushBank
+      0000A9 33                     178 	inc	sp
+      0000AA C1                     179 	pop	bc
+                                    180 ;/tmp/_gbsbuild/src/core/Collision.c:38: tile = (UBYTE) * collision_ptr_tmp | (UBYTE) *(collision_ptr_tmp + 1U);
+      0000AB 0A                     181 	ld	a, (bc)
+      0000AC 5F                     182 	ld	e, a
+      0000AD 03                     183 	inc	bc
+      0000AE 0A                     184 	ld	a, (bc)
+      0000AF B3                     185 	or	a, e
+      0000B0 5F                     186 	ld	e, a
+                                    187 ;/tmp/_gbsbuild/src/core/Collision.c:39: POP_BANK;
+      0000B1 D5                     188 	push	de
+      0000B2 CDr00r00               189 	call	_PopBank
+      0000B5 D1                     190 	pop	de
+                                    191 ;/tmp/_gbsbuild/src/core/Collision.c:40: return tile;
+                                    192 ;/tmp/_gbsbuild/src/core/Collision.c:41: }
+      0000B6 C9                     193 	ret
+                                    194 ;/tmp/_gbsbuild/src/core/Collision.c:43: UBYTE TileAt2x2(UBYTE tx, UBYTE ty) {
+                                    195 ;	---------------------------------
+                                    196 ; Function TileAt2x2
+                                    197 ; ---------------------------------
+      0000B7                        198 _TileAt2x2::
+                                    199 ;/tmp/_gbsbuild/src/core/Collision.c:48: if (tx == MAX_UINT8 || tx == image_tile_width || ty == image_tile_height || ty == MAX_UINT8) {
+      0000B7 F8 02                  200 	ldhl	sp,	#2
+      0000B9 7E                     201 	ld	a, (hl)
+      0000BA 3C                     202 	inc	a
+      0000BB 28 18                  203 	jr	Z, 00101$
+      0000BD F8 02                  204 	ldhl	sp,	#2
+      0000BF 7E                     205 	ld	a, (hl)
+      0000C0 21r00r00               206 	ld	hl, #_image_tile_width
+      0000C3 96                     207 	sub	a, (hl)
+      0000C4 28 0F                  208 	jr	Z, 00101$
+      0000C6 F8 03                  209 	ldhl	sp,	#3
+      0000C8 7E                     210 	ld	a, (hl)
+      0000C9 21r00r00               211 	ld	hl, #_image_tile_height
+      0000CC 96                     212 	sub	a, (hl)
+      0000CD 28 06                  213 	jr	Z, 00101$
+      0000CF F8 03                  214 	ldhl	sp,	#3
+      0000D1 7E                     215 	ld	a, (hl)
+      0000D2 3C                     216 	inc	a
+      0000D3 20 03                  217 	jr	NZ, 00102$
+      0000D5                        218 00101$:
+                                    219 ;/tmp/_gbsbuild/src/core/Collision.c:49: return COLLISION_ALL;
+      0000D5 1E 0F                  220 	ld	e, #0x0f
+      0000D7 C9                     221 	ret
+      0000D8                        222 00102$:
+                                    223 ;/tmp/_gbsbuild/src/core/Collision.c:53: collision_ptr_tmp = ty * (UINT16)image_tile_width + tx + collision_ptr;
+      0000D8 21r00r00               224 	ld	hl, #_image_tile_width
+      0000DB 5E                     225 	ld	e, (hl)
+      0000DC 16 00                  226 	ld	d, #0x00
+      0000DE F8 03                  227 	ldhl	sp,	#3
+      0000E0 4E                     228 	ld	c, (hl)
+      0000E1 06 00                  229 	ld	b, #0x00
+      0000E3 D5                     230 	push	de
+      0000E4 C5                     231 	push	bc
+      0000E5 CDr00r00               232 	call	__mulint
+      0000E8 E8 04                  233 	add	sp, #4
+      0000EA F8 02                  234 	ldhl	sp,	#2
+      0000EC 4E                     235 	ld	c, (hl)
+      0000ED 06 00                  236 	ld	b, #0x00
+      0000EF 79                     237 	ld	a, c
+      0000F0 83                     238 	add	a, e
+      0000F1 4F                     239 	ld	c, a
+      0000F2 78                     240 	ld	a, b
+      0000F3 8A                     241 	adc	a, d
+      0000F4 47                     242 	ld	b, a
+      0000F5 79                     243 	ld	a, c
+      0000F6 21r00r00               244 	ld	hl, #_collision_ptr
+      0000F9 86                     245 	add	a, (hl)
+      0000FA 4F                     246 	ld	c, a
+      0000FB 78                     247 	ld	a, b
+      0000FC 23                     248 	inc	hl
+      0000FD 8E                     249 	adc	a, (hl)
+      0000FE 47                     250 	ld	b, a
+                                    251 ;/tmp/_gbsbuild/src/core/Collision.c:55: PUSH_BANK(collision_bank);
+      0000FF C5                     252 	push	bc
+      000100 FAr00r00               253 	ld	a, (#_collision_bank)
+      000103 F5                     254 	push	af
+      000104 33                     255 	inc	sp
+      000105 CDr00r00               256 	call	_PushBank
+      000108 33                     257 	inc	sp
+      000109 C1                     258 	pop	bc
+                                    259 ;/tmp/_gbsbuild/src/core/Collision.c:56: tile = (UBYTE) * (collision_ptr_tmp);
+      00010A 0A                     260 	ld	a, (bc)
+                                    261 ;/tmp/_gbsbuild/src/core/Collision.c:57: if (!tile) {
+      00010B 5F                     262 	ld	e, a
+      00010C B7                     263 	or	a, a
+      00010D 20 18                  264 	jr	NZ, 00111$
+                                    265 ;/tmp/_gbsbuild/src/core/Collision.c:58: tile = (UBYTE) * (collision_ptr_tmp + 1U);
+      00010F 69                     266 	ld	l, c
+      000110 60                     267 	ld	h, b
+      000111 23                     268 	inc	hl
+      000112 5E                     269 	ld	e, (hl)
+                                    270 ;/tmp/_gbsbuild/src/core/Collision.c:59: if (!tile) {
+      000113 7B                     271 	ld	a, e
+      000114 B7                     272 	or	a, a
+      000115 20 10                  273 	jr	NZ, 00111$
+                                    274 ;/tmp/_gbsbuild/src/core/Collision.c:61: collision_ptr_tmp = collision_ptr_tmp + (UINT16)image_tile_width;
+      000117 21r00r00               275 	ld	hl, #_image_tile_width
+      00011A 5E                     276 	ld	e, (hl)
+      00011B 16 00                  277 	ld	d, #0x00
+      00011D 6B                     278 	ld	l, e
+      00011E 62                     279 	ld	h, d
+      00011F 09                     280 	add	hl, bc
+                                    281 ;/tmp/_gbsbuild/src/core/Collision.c:62: tile = (UBYTE) * (collision_ptr_tmp);
+      000120 5E                     282 	ld	e, (hl)
+                                    283 ;/tmp/_gbsbuild/src/core/Collision.c:63: if (!tile) {
+      000121 7B                     284 	ld	a, e
+      000122 B7                     285 	or	a, a
+      000123 20 02                  286 	jr	NZ, 00111$
+                                    287 ;/tmp/_gbsbuild/src/core/Collision.c:64: tile = (UBYTE) * (collision_ptr_tmp + 1U);
+      000125 23                     288 	inc	hl
+      000126 5E                     289 	ld	e, (hl)
+      000127                        290 00111$:
+                                    291 ;/tmp/_gbsbuild/src/core/Collision.c:68: POP_BANK;
+      000127 D5                     292 	push	de
+      000128 CDr00r00               293 	call	_PopBank
+      00012B D1                     294 	pop	de
+                                    295 ;/tmp/_gbsbuild/src/core/Collision.c:69: return tile;
+                                    296 ;/tmp/_gbsbuild/src/core/Collision.c:70: }
+      00012C C9                     297 	ret
+                                    298 	.area _CODE
+                                    299 	.area _CABS (ABS)

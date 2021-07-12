@@ -1,0 +1,44 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+  6 _RefreshScroll_b                                               000000 GR
+    _RenderScreen                                                  ****** GX
+    _ScrollUpdateColumnR                                           ****** GX
+    _ScrollUpdateColumnWithDelay                                   ****** GX
+    _ScrollUpdateRowR                                              ****** GX
+    _ScrollUpdateRowWithDelay                                      ****** GX
+    _draw_scroll_x                                                 ****** GX
+    _draw_scroll_y                                                 ****** GX
+    _game_time                                                     ****** GX
+    _pending_h_i                                                   ****** GX
+    _pending_w_i                                                   ****** GX
+    _scroll_offset_x                                               ****** GX
+    _scroll_offset_y                                               ****** GX
+    _scroll_target                                                 ****** GX
+    _scroll_x                                                      ****** GX
+    _scroll_x_max                                                  ****** GX
+    _scroll_y                                                      ****** GX
+    _scroll_y_max                                                  ****** GX
+    b_RefreshScroll_b                                           =  000001 G
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size      0   flags    0
+   1 _DATA                                      size      0   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size      0   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CODE_1                                    size    22D   flags    0
+   7 _CABS                                      size      0   flags    8
+

@@ -1,0 +1,99 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Sprite
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_SpritePoolNext_b
+                                     12 	.globl _SpritePoolNext_b
+                                     13 	.globl b_SpritePoolReturn_b
+                                     14 	.globl _SpritePoolReturn_b
+                                     15 	.globl b_SpritePoolReset_b
+                                     16 	.globl _SpritePoolReset_b
+                                     17 	.globl _hide_sprites
+                                     18 	.globl _sprite_pool
+                                     19 	.globl _sprites_info
+                                     20 	.globl _SpritePoolReset
+                                     21 	.globl _SpritePoolReturn
+                                     22 	.globl _SpritePoolNext
+                                     23 ;--------------------------------------------------------
+                                     24 ; special function registers
+                                     25 ;--------------------------------------------------------
+                                     26 ;--------------------------------------------------------
+                                     27 ; ram data
+                                     28 ;--------------------------------------------------------
+                                     29 	.area _DATA
+      000000                         30 _sprites_info::
+      000000                         31 	.ds 75
+      00004B                         32 _sprite_pool::
+      00004B                         33 	.ds 20
+      00005F                         34 _hide_sprites::
+      00005F                         35 	.ds 1
+                                     36 ;--------------------------------------------------------
+                                     37 ; absolute external ram data
+                                     38 ;--------------------------------------------------------
+                                     39 	.area _DABS (ABS)
+                                     40 ;--------------------------------------------------------
+                                     41 ; global & static initialisations
+                                     42 ;--------------------------------------------------------
+                                     43 	.area _HOME
+                                     44 	.area _GSINIT
+                                     45 	.area _GSFINAL
+                                     46 	.area _GSINIT
+                                     47 ;/tmp/_gbsbuild/src/core/Sprite.c:7: DECLARE_STACK(sprite_pool, MAX_SPRITES);
+      000000 21r4Br00                48 	ld	hl, #_sprite_pool
+      000003 36 00                   49 	ld	(hl), #0x00
+                                     50 ;/tmp/_gbsbuild/src/core/Sprite.c:8: UBYTE hide_sprites = FALSE;
+      000005 21r5Fr00                51 	ld	hl, #_hide_sprites
+      000008 36 00                   52 	ld	(hl), #0x00
+                                     53 ;--------------------------------------------------------
+                                     54 ; Home
+                                     55 ;--------------------------------------------------------
+                                     56 	.area _HOME
+                                     57 	.area _HOME
+                                     58 ;--------------------------------------------------------
+                                     59 ; code
+                                     60 ;--------------------------------------------------------
+                                     61 	.area _CODE
+                                     62 ;/tmp/_gbsbuild/src/core/Sprite.c:14: void SpritePoolReset() {
+                                     63 ;	---------------------------------
+                                     64 ; Function SpritePoolReset
+                                     65 ; ---------------------------------
+      000000                         66 _SpritePoolReset::
+                                     67 ;/tmp/_gbsbuild/src/core/Sprite.c:15: SpritePoolReset_b();
+      000000 1Er00                   68 	ld	e, #b_SpritePoolReset_b
+      000002 21r00r00                69 	ld	hl, #_SpritePoolReset_b
+                                     70 ;/tmp/_gbsbuild/src/core/Sprite.c:16: }
+      000005 C3r00r00                71 	jp  ___sdcc_bcall_ehl
+                                     72 ;/tmp/_gbsbuild/src/core/Sprite.c:18: void SpritePoolReturn(UINT8 i) {
+                                     73 ;	---------------------------------
+                                     74 ; Function SpritePoolReturn
+                                     75 ; ---------------------------------
+      000008                         76 _SpritePoolReturn::
+                                     77 ;/tmp/_gbsbuild/src/core/Sprite.c:19: SpritePoolReturn_b(i);
+      000008 F8 02                   78 	ldhl	sp,	#2
+      00000A 7E                      79 	ld	a, (hl)
+      00000B F5                      80 	push	af
+      00000C 33                      81 	inc	sp
+      00000D 1Er00                   82 	ld	e, #b_SpritePoolReturn_b
+      00000F 21r00r00                83 	ld	hl, #_SpritePoolReturn_b
+      000012 CDr00r00                84 	call	___sdcc_bcall_ehl
+      000015 33                      85 	inc	sp
+                                     86 ;/tmp/_gbsbuild/src/core/Sprite.c:20: }
+      000016 C9                      87 	ret
+                                     88 ;/tmp/_gbsbuild/src/core/Sprite.c:22: UINT8 SpritePoolNext() {
+                                     89 ;	---------------------------------
+                                     90 ; Function SpritePoolNext
+                                     91 ; ---------------------------------
+      000017                         92 _SpritePoolNext::
+                                     93 ;/tmp/_gbsbuild/src/core/Sprite.c:23: return SpritePoolNext_b();
+      000017 1Er00                   94 	ld	e, #b_SpritePoolNext_b
+      000019 21r00r00                95 	ld	hl, #_SpritePoolNext_b
+                                     96 ;/tmp/_gbsbuild/src/core/Sprite.c:24: }
+      00001C C3r00r00                97 	jp  ___sdcc_bcall_ehl
+                                     98 	.area _CODE
+                                     99 	.area _CABS (ABS)

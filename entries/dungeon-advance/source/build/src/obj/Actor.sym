@@ -1,0 +1,87 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+  0 _ActivateActor                                                 000039 GR
+    _ActivateActor_b                                               ****** GX
+  0 _ActorAt1x2Tile                                                0000E4 GR
+    _ActorAt1x2Tile_b                                              ****** GX
+  0 _ActorAt1x3Tile                                                0000FC GR
+    _ActorAt1x3Tile_b                                              ****** GX
+  0 _ActorAt2x3Tile                                                00012C GR
+    _ActorAt2x3Tile_b                                              ****** GX
+  0 _ActorAt3x1Tile                                                000114 GR
+    _ActorAt3x1Tile_b                                              ****** GX
+  0 _ActorAt3x3Tile                                                000144 GR
+    _ActorAt3x3Tile_b                                              ****** GX
+  0 _ActorAtTile                                                   0000CC GR
+    _ActorAtTile_b                                                 ****** GX
+  0 _ActorInFrontOfActor                                           00017F GR
+    _ActorInFrontOfActor_b                                         ****** GX
+  0 _ActorInFrontOfPlayer                                          00016B GR
+    _ActorInFrontOfPlayer_b                                        ****** GX
+  0 _ActorOverlapsPlayer                                           00015C GR
+    _ActorOverlapsPlayer_b                                         ****** GX
+  0 _ActorRunCollisionScripts                                      0001DE GR
+    _ActorRunCollisionScripts_b                                    ****** GX
+  0 _ActorRunScript                                                0001B2 GR
+  0 _ActorsInit                                                    000000 GR
+  0 _CheckCollisionInDirection                                     00018E GR
+    _CheckCollisionInDirection_b                                   ****** GX
+  0 _DeactivateActiveActor                                         000057 GR
+  0 _DeactivateActor                                               000048 GR
+    _DeactivateActor_b                                             ****** GX
+  0 _InitPlayer                                                    0001AA GR
+    _InitPlayer_b                                                  ****** GX
+    _ScriptCtxPoolReturn                                           ****** GX
+    _ScriptStart                                                   ****** GX
+    _SpritePoolReturn                                              ****** GX
+    ___sdcc_bcall_ehl                                              ****** GX
+  1 _actor_move_settings                                           0005DC GR
+  1 _actor_ptrs                                                    000592 GR
+  1 _actors                                                        000000 GR
+  1 _actors_active                                                 0005D0 GR
+  1 _actors_active_size                                            0005DB GR
+  1 _map_next_dir                                                  0005E1 GR
+  1 _map_next_pos                                                  0005DD GR
+  1 _map_next_sprite                                               0005E3 GR
+  1 _player_iframes                                                0005E5 GR
+    _script_main_ctx_actor                                         ****** GX
+    b_ActivateActor_b                                              ****** GX
+    b_ActorAt1x2Tile_b                                             ****** GX
+    b_ActorAt1x3Tile_b                                             ****** GX
+    b_ActorAt2x3Tile_b                                             ****** GX
+    b_ActorAt3x1Tile_b                                             ****** GX
+    b_ActorAt3x3Tile_b                                             ****** GX
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    b_ActorAtTile_b                                                ****** GX
+    b_ActorInFrontOfActor_b                                        ****** GX
+    b_ActorInFrontOfPlayer_b                                       ****** GX
+    b_ActorOverlapsPlayer_b                                        ****** GX
+    b_ActorRunCollisionScripts_b                                   ****** GX
+    b_CheckCollisionInDirection_b                                  ****** GX
+    b_DeactivateActor_b                                            ****** GX
+    b_InitPlayer_b                                                 ****** GX
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 3.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size    1E6   flags    0
+   1 _DATA                                      size    5E6   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size     17   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CABS                                      size      0   flags    8
+

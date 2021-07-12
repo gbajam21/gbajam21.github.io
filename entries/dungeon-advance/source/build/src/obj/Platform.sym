@@ -1,0 +1,59 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+    _ActivateTriggerAt                                             ****** GX
+    _ActorAtTile                                                   ****** GX
+    _ActorOverlapsPlayer                                           ****** GX
+    _ScriptStart                                                   ****** GX
+  6 _Start_Platform                                                000000 GR
+    _TileAt                                                        ****** GX
+  6 _Update_Platform                                               0000AA GR
+    _actors                                                        ****** GX
+    _camera_deadzone                                               ****** GX
+    _camera_offset                                                 ****** GX
+    _game_time                                                     ****** GX
+  1 _grounded                                                      000000 GR
+    _image_height                                                  ****** GX
+    _image_width                                                   ****** GX
+    _input_override_default                                        ****** GX
+    _joy                                                           ****** GX
+    _last_joy                                                      ****** GX
+  1 _on_ladder                                                     000001 GR
+  1 _pl_pos_x                                                      000006 GR
+  1 _pl_pos_y                                                      000008 GR
+  1 _pl_vel_x                                                      000002 GR
+  1 _pl_vel_y                                                      000004 GR
+    _plat_dec                                                      ****** GX
+    _plat_grav                                                     ****** GX
+    _plat_hold_grav                                                ****** GX
+    _plat_jump_vel                                                 ****** GX
+    _plat_max_fall_vel                                             ****** GX
+    _plat_min_vel                                                  ****** GX
+    _plat_run_acc                                                  ****** GX
+    _plat_run_vel                                                  ****** GX
+    _plat_walk_acc                                                 ****** GX
+    _plat_walk_vel                                                 ****** GX
+    _player_iframes                                                ****** GX
+    _ui_block                                                      ****** GX
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size      0   flags    0
+   1 _DATA                                      size      A   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size     2A   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CODE_5                                    size    C75   flags    0
+   7 _CABS                                      size      0   flags    8
+

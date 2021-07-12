@@ -1,0 +1,169 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Trigger
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_TriggerAtTile_b
+                                     12 	.globl _TriggerAtTile_b
+                                     13 	.globl _ScriptStart
+                                     14 	.globl _last_trigger_ty
+                                     15 	.globl _last_trigger_tx
+                                     16 	.globl _triggers_len
+                                     17 	.globl _triggers_active_size
+                                     18 	.globl _triggers_active
+                                     19 	.globl _triggers
+                                     20 	.globl _TriggerAtTile
+                                     21 	.globl _TriggerRunScript
+                                     22 	.globl _ActivateTriggerAt
+                                     23 ;--------------------------------------------------------
+                                     24 ; special function registers
+                                     25 ;--------------------------------------------------------
+                                     26 ;--------------------------------------------------------
+                                     27 ; ram data
+                                     28 ;--------------------------------------------------------
+                                     29 	.area _DATA
+      000000                         30 _triggers::
+      000000                         31 	.ds 217
+      0000D9                         32 _triggers_active::
+      0000D9                         33 	.ds 11
+      0000E4                         34 _triggers_active_size::
+      0000E4                         35 	.ds 1
+      0000E5                         36 _triggers_len::
+      0000E5                         37 	.ds 1
+      0000E6                         38 _last_trigger_tx::
+      0000E6                         39 	.ds 1
+      0000E7                         40 _last_trigger_ty::
+      0000E7                         41 	.ds 1
+                                     42 ;--------------------------------------------------------
+                                     43 ; absolute external ram data
+                                     44 ;--------------------------------------------------------
+                                     45 	.area _DABS (ABS)
+                                     46 ;--------------------------------------------------------
+                                     47 ; global & static initialisations
+                                     48 ;--------------------------------------------------------
+                                     49 	.area _HOME
+                                     50 	.area _GSINIT
+                                     51 	.area _GSFINAL
+                                     52 	.area _GSINIT
+                                     53 ;--------------------------------------------------------
+                                     54 ; Home
+                                     55 ;--------------------------------------------------------
+                                     56 	.area _HOME
+                                     57 	.area _HOME
+                                     58 ;--------------------------------------------------------
+                                     59 ; code
+                                     60 ;--------------------------------------------------------
+                                     61 	.area _CODE
+                                     62 ;/tmp/_gbsbuild/src/core/Trigger.c:16: UBYTE TriggerAtTile(UBYTE tx_a, UBYTE ty_a) {
+                                     63 ;	---------------------------------
+                                     64 ; Function TriggerAtTile
+                                     65 ; ---------------------------------
+      000000                         66 _TriggerAtTile::
+                                     67 ;/tmp/_gbsbuild/src/core/Trigger.c:17: return TriggerAtTile_b(tx_a, ty_a);
+      000000 F8 03                   68 	ldhl	sp,	#3
+      000002 7E                      69 	ld	a, (hl)
+      000003 F5                      70 	push	af
+      000004 33                      71 	inc	sp
+      000005 2B                      72 	dec	hl
+      000006 7E                      73 	ld	a, (hl)
+      000007 F5                      74 	push	af
+      000008 33                      75 	inc	sp
+      000009 1Er00                   76 	ld	e, #b_TriggerAtTile_b
+      00000B 21r00r00                77 	ld	hl, #_TriggerAtTile_b
+      00000E CDr00r00                78 	call	___sdcc_bcall_ehl
+      000011 E8 02                   79 	add	sp, #2
+                                     80 ;/tmp/_gbsbuild/src/core/Trigger.c:18: }
+      000013 C9                      81 	ret
+                                     82 ;/tmp/_gbsbuild/src/core/Trigger.c:20: void TriggerRunScript(UBYTE i) {
+                                     83 ;	---------------------------------
+                                     84 ; Function TriggerRunScript
+                                     85 ; ---------------------------------
+      000014                         86 _TriggerRunScript::
+                                     87 ;/tmp/_gbsbuild/src/core/Trigger.c:21: ScriptStart(&triggers[i].events_ptr);
+      000014 F8 02                   88 	ldhl	sp,	#2
+      000016 4E                      89 	ld	c, (hl)
+      000017 06 00                   90 	ld	b, #0x00
+      000019 69                      91 	ld	l, c
+      00001A 60                      92 	ld	h, b
+      00001B 29                      93 	add	hl, hl
+      00001C 09                      94 	add	hl, bc
+      00001D 29                      95 	add	hl, hl
+      00001E 09                      96 	add	hl, bc
+      00001F 01r00r00                97 	ld	bc,#_triggers
+      000022 09                      98 	add	hl,bc
+      000023 01 04 00                99 	ld	bc, #0x0004
+      000026 09                     100 	add	hl, bc
+      000027 E5                     101 	push	hl
+      000028 CDr00r00               102 	call	_ScriptStart
+      00002B E8 02                  103 	add	sp, #2
+                                    104 ;/tmp/_gbsbuild/src/core/Trigger.c:22: }
+      00002D C9                     105 	ret
+                                    106 ;/tmp/_gbsbuild/src/core/Trigger.c:24: UBYTE ActivateTriggerAt(UBYTE tx, UBYTE ty, UBYTE force) {
+                                    107 ;	---------------------------------
+                                    108 ; Function ActivateTriggerAt
+                                    109 ; ---------------------------------
+      00002E                        110 _ActivateTriggerAt::
+                                    111 ;/tmp/_gbsbuild/src/core/Trigger.c:28: if (!force && ((tx == last_trigger_tx) && (ty == last_trigger_ty))) {
+      00002E F8 04                  112 	ldhl	sp,	#4
+      000030 7E                     113 	ld	a, (hl)
+      000031 B7                     114 	or	a, a
+      000032 20 14                  115 	jr	NZ, 00102$
+      000034 2B                     116 	dec	hl
+      000035 2B                     117 	dec	hl
+      000036 7E                     118 	ld	a, (hl)
+      000037 21rE6r00               119 	ld	hl, #_last_trigger_tx
+      00003A 96                     120 	sub	a, (hl)
+      00003B 20 0B                  121 	jr	NZ, 00102$
+      00003D F8 03                  122 	ldhl	sp,	#3
+      00003F 7E                     123 	ld	a, (hl)
+      000040 21rE7r00               124 	ld	hl, #_last_trigger_ty
+                                    125 ;/tmp/_gbsbuild/src/core/Trigger.c:29: return FALSE;
+      000043 96                     126 	sub	a,(hl)
+      000044 20 02                  127 	jr	NZ, 00102$
+      000046 5F                     128 	ld	e,a
+      000047 C9                     129 	ret
+      000048                        130 00102$:
+                                    131 ;/tmp/_gbsbuild/src/core/Trigger.c:32: hit_trigger = TriggerAtTile(tx, ty);
+      000048 F8 03                  132 	ldhl	sp,	#3
+      00004A 7E                     133 	ld	a, (hl)
+      00004B F5                     134 	push	af
+      00004C 33                     135 	inc	sp
+      00004D 2B                     136 	dec	hl
+      00004E 7E                     137 	ld	a, (hl)
+      00004F F5                     138 	push	af
+      000050 33                     139 	inc	sp
+      000051 CDr00r00               140 	call	_TriggerAtTile
+      000054 E8 02                  141 	add	sp, #2
+                                    142 ;/tmp/_gbsbuild/src/core/Trigger.c:33: last_trigger_tx = tx;
+      000056 F8 02                  143 	ldhl	sp,	#2
+      000058 7E                     144 	ld	a, (hl)
+      000059 EArE6r00               145 	ld	(#_last_trigger_tx),a
+                                    146 ;/tmp/_gbsbuild/src/core/Trigger.c:34: last_trigger_ty = ty;
+      00005C F8 03                  147 	ldhl	sp,	#3
+      00005E 7E                     148 	ld	a, (hl)
+      00005F EArE7r00               149 	ld	(#_last_trigger_ty),a
+                                    150 ;/tmp/_gbsbuild/src/core/Trigger.c:36: if (hit_trigger != NO_TRIGGER_COLLISON) {
+      000062 7B                     151 	ld	a, e
+      000063 3C                     152 	inc	a
+      000064 28 0A                  153 	jr	Z, 00106$
+                                    154 ;/tmp/_gbsbuild/src/core/Trigger.c:37: TriggerRunScript(hit_trigger);
+      000066 7B                     155 	ld	a, e
+      000067 F5                     156 	push	af
+      000068 33                     157 	inc	sp
+      000069 CDr14r00               158 	call	_TriggerRunScript
+      00006C 33                     159 	inc	sp
+                                    160 ;/tmp/_gbsbuild/src/core/Trigger.c:38: return TRUE;
+      00006D 1E 01                  161 	ld	e, #0x01
+      00006F C9                     162 	ret
+      000070                        163 00106$:
+                                    164 ;/tmp/_gbsbuild/src/core/Trigger.c:41: return FALSE;
+      000070 1E 00                  165 	ld	e, #0x00
+                                    166 ;/tmp/_gbsbuild/src/core/Trigger.c:42: }
+      000072 C9                     167 	ret
+                                    168 	.area _CODE
+                                    169 	.area _CABS (ABS)

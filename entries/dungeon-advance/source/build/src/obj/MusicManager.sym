@@ -1,0 +1,55 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+  0 _MusicPlay                                                     000000 GR
+  0 _MusicStop                                                     00005D GR
+  0 _MusicUpdate                                                   000070 GR
+    _NR10_REG                                                      ****** GX
+    _NR11_REG                                                      ****** GX
+    _NR12_REG                                                      ****** GX
+    _NR13_REG                                                      ****** GX
+    _NR14_REG                                                      ****** GX
+    _NR41_REG                                                      ****** GX
+    _NR42_REG                                                      ****** GX
+    _NR43_REG                                                      ****** GX
+    _NR44_REG                                                      ****** GX
+    _NR50_REG                                                      ****** GX
+    _NR51_REG                                                      ****** GX
+    _NR52_REG                                                      ****** GX
+    _PopBank                                                       ****** GX
+    _PushBank                                                      ****** GX
+    _ReadBankedUBYTE                                               ****** GX
+  0 _SoundPlayBeep                                                 0000BE GR
+  0 _SoundPlayCrash                                                0000E0 GR
+  0 _SoundPlayTone                                                 00008B GR
+  0 _SoundStopTone                                                 0000B9 GR
+    __current_bank                                                 ****** GX
+  1 _current_index                                                 000000 GR
+    _gbt_loop                                                      ****** GX
+    _gbt_play                                                      ****** GX
+    _gbt_stop                                                      ****** GX
+    _gbt_update                                                    ****** GX
+    _music_banks                                                   ****** GX
+    _music_tracks                                                  ****** GX
+  1 _tone_frames                                                   000001 GR
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size     FF   flags    0
+   1 _DATA                                      size      2   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size      A   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CABS                                      size      0   flags    8
+

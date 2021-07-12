@@ -1,0 +1,86 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+    _ActivateActor                                                 ****** GX
+    _BkgPalette                                                    ****** GX
+    _InitPlayer                                                    ****** GX
+    _InitScroll                                                    ****** GX
+  0 _LoadImage                                                     00003D GR
+  0 _LoadImageAttr                                                 0000D3 GR
+  0 _LoadPalette                                                   000100 GR
+  0 _LoadPlayerSpritePalette                                       00026C GR
+  0 _LoadScene                                                     000302 GR
+  0 _LoadSprite                                                    0002AA GR
+  0 _LoadSpritePalette                                             00022E GR
+  0 _LoadTiles                                                     000000 GR
+  0 _LoadUIPalette                                                 0001F0 GR
+    _PopBank                                                       ****** GX
+    _ProjectilesInit                                               ****** GX
+    _PushBank                                                      ****** GX
+    _RemoveInputScripts                                            ****** GX
+    _ScriptCtxPoolReset                                            ****** GX
+    _SprPalette                                                    ****** GX
+    _SpritePoolReset                                               ****** GX
+    _UIReset                                                       ****** GX
+    _actors                                                        ****** GX
+    _actors_active                                                 ****** GX
+    _actors_active_size                                            ****** GX
+  1 _actors_len                                                    000013 GR
+    _background_attr_bank_ptrs                                     ****** GX
+    _background_bank_ptrs                                          ****** GX
+  1 _bank_ptr                                                      000000 GR
+  1 _collision_bank                                                000005 GR
+    _collision_bank_ptrs                                           ****** GX
+  1 _collision_ptr                                                 00000A GR
+  1 _image_attr_bank                                               000004 GR
+  1 _image_attr_ptr                                                000008 GR
+  1 _image_bank                                                    000003 GR
+  1 _image_height                                                  000010 GR
+  1 _image_ptr                                                     000006 GR
+  1 _image_tile_height                                             00000D GR
+  1 _image_tile_width                                              00000C GR
+  1 _image_width                                                   00000E GR
+    _last_trigger_tx                                               ****** GX
+    _last_trigger_ty                                               ****** GX
+    _memcpy                                                        ****** GX
+    _palette_bank_ptrs                                             ****** GX
+    _palette_update_mask                                           ****** GX
+    _scene_bank_ptrs                                               ****** GX
+  1 _scene_events_start_ptr                                        000015 GR
+  1 _scene_type                                                    000014 GR
+    _scroll_x_max                                                  ****** GX
+    _scroll_y_max                                                  ****** GX
+    _set_bkg_data                                                  ****** GX
+    _set_sprite_data                                               ****** GX
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    _sprite_bank_ptrs                                              ****** GX
+    _sprites_info                                                  ****** GX
+  1 _sprites_len                                                   000012 GR
+    _tileset_bank_ptrs                                             ****** GX
+    _triggers                                                      ****** GX
+    _triggers_len                                                  ****** GX
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 3.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size    98B   flags    0
+   1 _DATA                                      size     18   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size      5   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CABS                                      size      0   flags    8
+

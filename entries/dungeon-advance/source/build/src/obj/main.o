@@ -1,0 +1,54 @@
+XL3
+H 7 areas 11 global symbols
+M main
+O -mgbz80
+S _Start_PointNClick Ref000000
+S _Update_Adventure Ref000000
+S _Start_Platform Ref000000
+S _core_start Ref000000
+S _Start_TopDown Ref000000
+S _Start_Shmup Ref000000
+S .__.ABS. Def000000
+S _Update_PointNClick Ref000000
+S _Update_Platform Ref000000
+S _Update_TopDown Ref000000
+S _Update_Shmup Ref000000
+S _BGB_profiler_message Ref000000
+S _Start_Adventure Ref000000
+A _CODE size 25 flags 0 addr 0
+S _main Def000000
+S _startFuncs Def000007
+S _updateFuncs Def000013
+S _stateBanks Def00001F
+A _DATA size 2 flags 0 addr 0
+A _DABS size 0 flags 8 addr 0
+A _HOME size 0 flags 0 addr 0
+A _GSINIT size 8 flags 0 addr 0
+A _GSFINAL size 0 flags 0 addr 0
+A _CABS size 0 flags 8 addr 0
+T 00 00 00
+R 00 00 01 00
+T 00 00 00
+R 00 00 01 00
+T 00 00 00 21 00 00 36 00 00 00 23 36 00 00 00
+R 00 00 04 00 00 04 01 00 0B 07 0B 00 8B 0C 0B 00
+T 00 00 00
+R 00 00 00 00
+T 00 00 00 CD 00 00 11 00 00 C9
+R 00 00 00 00 02 04 03 00
+T 07 00 00
+R 00 00 00 00
+T 07 00 00 00 00 00 00 00 00 00 00
+R 00 00 00 00 02 05 04 00 02 07 02 00 02 09 0C 00
+T 0F 00 00 00 00 00 00
+R 00 00 00 00 02 03 05 00 02 05 00 00
+T 13 00 00
+R 00 00 00 00
+T 13 00 00 00 00 00 00 00 00 00 00
+R 00 00 00 00 02 05 09 00 02 07 08 00 02 09 01 00
+T 1B 00 00 00 00 00 00
+R 00 00 00 00 02 03 0A 00 02 05 07 00
+T 1F 00 00
+R 00 00 00 00
+T 1F 00 00 00 05 05 05 05 05
+R 00 00 00 00

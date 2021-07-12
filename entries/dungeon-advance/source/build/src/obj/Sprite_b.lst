@@ -1,0 +1,239 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Sprite_b
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_SpritePoolNext_b
+                                     12 	.globl _SpritePoolNext_b
+                                     13 	.globl b_SpritePoolReturn_b
+                                     14 	.globl _SpritePoolReturn_b
+                                     15 	.globl b_SpritePoolReset_b
+                                     16 	.globl _SpritePoolReset_b
+                                     17 	.globl _StackPop
+                                     18 	.globl _StackPush
+                                     19 	.globl _sprite_active_pool_size
+                                     20 	.globl _sprite_active_pool
+                                     21 ;--------------------------------------------------------
+                                     22 ; special function registers
+                                     23 ;--------------------------------------------------------
+                                     24 ;--------------------------------------------------------
+                                     25 ; ram data
+                                     26 ;--------------------------------------------------------
+                                     27 	.area _DATA
+      000000                         28 _sprite_active_pool::
+      000000                         29 	.ds 19
+      000013                         30 _sprite_active_pool_size::
+      000013                         31 	.ds 1
+                                     32 ;--------------------------------------------------------
+                                     33 ; absolute external ram data
+                                     34 ;--------------------------------------------------------
+                                     35 	.area _DABS (ABS)
+                                     36 ;--------------------------------------------------------
+                                     37 ; global & static initialisations
+                                     38 ;--------------------------------------------------------
+                                     39 	.area _HOME
+                                     40 	.area _GSINIT
+                                     41 	.area _GSFINAL
+                                     42 	.area _GSINIT
+                                     43 ;/tmp/_gbsbuild/src/core/Sprite_b.c:7: UBYTE sprite_active_pool_size = 0;
+      000000 21r13r00                44 	ld	hl, #_sprite_active_pool_size
+      000003 36 00                   45 	ld	(hl), #0x00
+                                     46 ;--------------------------------------------------------
+                                     47 ; Home
+                                     48 ;--------------------------------------------------------
+                                     49 	.area _HOME
+                                     50 	.area _HOME
+                                     51 ;--------------------------------------------------------
+                                     52 ; code
+                                     53 ;--------------------------------------------------------
+                                     54 	.area _CODE_1
+                                     55 ;/tmp/_gbsbuild/src/core/Sprite_b.c:9: void SpritePoolReset_b() __banked {
+                                     56 ;	---------------------------------
+                                     57 ; Function SpritePoolReset_b
+                                     58 ; ---------------------------------
+                           000001    59 	b_SpritePoolReset_b	= 1
+      000000                         60 _SpritePoolReset_b::
+                                     61 ;/tmp/_gbsbuild/src/core/Sprite_b.c:11: sprite_pool[0] = 0;
+      000000 21r00r00                62 	ld	hl, #_sprite_pool
+      000003 36 00                   63 	ld	(hl), #0x00
+                                     64 ;/tmp/_gbsbuild/src/core/Sprite_b.c:12: for (i = 0; i != MAX_SPRITES; i++) {
+      000005 06 00                   65 	ld	b, #0x00
+      000007                         66 00104$:
+                                     67 ;/tmp/_gbsbuild/src/core/Sprite_b.c:15: k = (MAX_SPRITES - i) << 1;
+      000007 48                      68 	ld	c, b
+      000008 3E 13                   69 	ld	a, #0x13
+      00000A 91                      70 	sub	a, c
+      00000B 87                      71 	add	a, a
+      00000C 4F                      72 	ld	c, a
+                                     73 ;/tmp/_gbsbuild/src/core/Sprite_b.c:16: StackPush(sprite_pool, k);
+      00000D C5                      74 	push	bc
+      00000E 79                      75 	ld	a, c
+      00000F F5                      76 	push	af
+      000010 33                      77 	inc	sp
+      000011 21r00r00                78 	ld	hl, #_sprite_pool
+      000014 E5                      79 	push	hl
+      000015 CDr00r00                80 	call	_StackPush
+      000018 E8 03                   81 	add	sp, #3
+      00001A C1                      82 	pop	bc
+                                     83 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1072: OAM_item_t * itm = &shadow_OAM[nb];
+      00001B 11r00r00                84 	ld	de, #_shadow_OAM+0
+      00001E 69                      85 	ld	l, c
+      00001F 26 00                   86 	ld	h, #0x00
+      000021 29                      87 	add	hl, hl
+      000022 29                      88 	add	hl, hl
+      000023 19                      89 	add	hl, de
+                                     90 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1073: itm->y=y, itm->x=x;
+      000024 3E 00                   91 	ld	a, #0x00
+      000026 22                      92 	ld	(hl+), a
+      000027 36 00                   93 	ld	(hl), #0x00
+                                     94 ;/tmp/_gbsbuild/src/core/Sprite_b.c:18: move_sprite(k + 1, 0, 0);
+      000029 0C                      95 	inc	c
+                                     96 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1072: OAM_item_t * itm = &shadow_OAM[nb];
+      00002A 11r00r00                97 	ld	de, #_shadow_OAM+0
+      00002D 69                      98 	ld	l, c
+      00002E 26 00                   99 	ld	h, #0x00
+      000030 29                     100 	add	hl, hl
+      000031 29                     101 	add	hl, hl
+      000032 19                     102 	add	hl, de
+                                    103 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1073: itm->y=y, itm->x=x;
+      000033 3E 00                  104 	ld	a, #0x00
+      000035 22                     105 	ld	(hl+), a
+      000036 36 00                  106 	ld	(hl), #0x00
+                                    107 ;/tmp/_gbsbuild/src/core/Sprite_b.c:12: for (i = 0; i != MAX_SPRITES; i++) {
+      000038 04                     108 	inc	b
+      000039 78                     109 	ld	a, b
+      00003A D6 13                  110 	sub	a, #0x13
+      00003C 20 C9                  111 	jr	NZ, 00104$
+                                    112 ;/tmp/_gbsbuild/src/core/Sprite_b.c:20: sprite_active_pool[0] = 0;
+      00003E 21r00r00               113 	ld	hl, #_sprite_active_pool
+      000041 36 00                  114 	ld	(hl), #0x00
+                                    115 ;/tmp/_gbsbuild/src/core/Sprite_b.c:21: sprite_active_pool_size = 0;
+      000043 21r13r00               116 	ld	hl, #_sprite_active_pool_size
+      000046 36 00                  117 	ld	(hl), #0x00
+                                    118 ;/tmp/_gbsbuild/src/core/Sprite_b.c:22: }
+      000048 C9                     119 	ret
+                                    120 ;/tmp/_gbsbuild/src/core/Sprite_b.c:24: void SpritePoolReturn_b(UINT8 i) __banked {
+                                    121 ;	---------------------------------
+                                    122 ; Function SpritePoolReturn_b
+                                    123 ; ---------------------------------
+                           000001   124 	b_SpritePoolReturn_b	= 1
+      000049                        125 _SpritePoolReturn_b::
+                                    126 ;/tmp/_gbsbuild/src/core/Sprite_b.c:26: UBYTE a = 0;
+      000049 0E 00                  127 	ld	c, #0x00
+                                    128 ;/tmp/_gbsbuild/src/core/Sprite_b.c:28: StackPush(sprite_pool, i);
+      00004B C5                     129 	push	bc
+      00004C F8 08                  130 	ldhl	sp,	#8
+      00004E 7E                     131 	ld	a, (hl)
+      00004F F5                     132 	push	af
+      000050 33                     133 	inc	sp
+      000051 21r00r00               134 	ld	hl, #_sprite_pool
+      000054 E5                     135 	push	hl
+      000055 CDr00r00               136 	call	_StackPush
+      000058 E8 03                  137 	add	sp, #3
+      00005A C1                     138 	pop	bc
+                                    139 ;/tmp/_gbsbuild/src/core/Sprite_b.c:31: for (j = 0; j != sprite_active_pool_size; j++) {
+      00005B 06 00                  140 	ld	b, #0x00
+      00005D 1E 00                  141 	ld	e, #0x00
+      00005F                        142 00109$:
+      00005F FAr13r00               143 	ld	a, (#_sprite_active_pool_size)
+      000062 93                     144 	sub	a, e
+      000063 28 14                  145 	jr	Z, 00103$
+                                    146 ;/tmp/_gbsbuild/src/core/Sprite_b.c:32: if (sprite_active_pool[j] == i) {
+      000065 21r00r00               147 	ld	hl, #_sprite_active_pool
+      000068 16 00                  148 	ld	d, #0x00
+      00006A 19                     149 	add	hl, de
+      00006B 56                     150 	ld	d, (hl)
+      00006C F8 06                  151 	ldhl	sp,	#6
+      00006E 7E                     152 	ld	a, (hl)
+      00006F 92                     153 	sub	a, d
+      000070 20 03                  154 	jr	NZ, 00110$
+                                    155 ;/tmp/_gbsbuild/src/core/Sprite_b.c:33: a = j;
+      000072 48                     156 	ld	c, b
+                                    157 ;/tmp/_gbsbuild/src/core/Sprite_b.c:34: break;
+      000073 18 04                  158 	jr	00103$
+      000075                        159 00110$:
+                                    160 ;/tmp/_gbsbuild/src/core/Sprite_b.c:31: for (j = 0; j != sprite_active_pool_size; j++) {
+      000075 1C                     161 	inc	e
+      000076 43                     162 	ld	b, e
+      000077 18 E6                  163 	jr	00109$
+      000079                        164 00103$:
+                                    165 ;/tmp/_gbsbuild/src/core/Sprite_b.c:39: if (a) {
+      000079 79                     166 	ld	a, c
+      00007A B7                     167 	or	a, a
+      00007B C8                     168 	ret	Z
+                                    169 ;/tmp/_gbsbuild/src/core/Sprite_b.c:41: sprite_active_pool[a] = sprite_active_pool[--sprite_active_pool_size];
+      00007C 3Er00                  170 	ld	a, #<(_sprite_active_pool)
+      00007E 81                     171 	add	a, c
+      00007F 4F                     172 	ld	c, a
+      000080 3Es00                  173 	ld	a, #>(_sprite_active_pool)
+      000082 CE 00                  174 	adc	a, #0x00
+      000084 47                     175 	ld	b, a
+      000085 21r13r00               176 	ld	hl, #_sprite_active_pool_size
+      000088 35                     177 	dec	(hl)
+      000089 3Er00                  178 	ld	a, #<(_sprite_active_pool)
+      00008B 86                     179 	add	a, (hl)
+      00008C 5F                     180 	ld	e, a
+      00008D 3Es00                  181 	ld	a, #>(_sprite_active_pool)
+      00008F CE 00                  182 	adc	a, #0x00
+      000091 57                     183 	ld	d, a
+      000092 1A                     184 	ld	a, (de)
+      000093 02                     185 	ld	(bc), a
+                                    186 ;/tmp/_gbsbuild/src/core/Sprite_b.c:43: move_sprite(i, 0, 0);
+      000094 F8 06                  187 	ldhl	sp,	#6
+      000096 4E                     188 	ld	c, (hl)
+                                    189 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1072: OAM_item_t * itm = &shadow_OAM[nb];
+      000097 69                     190 	ld	l, c
+      000098 26 00                  191 	ld	h, #0x00
+      00009A 29                     192 	add	hl, hl
+      00009B 29                     193 	add	hl, hl
+      00009C 11r00r00               194 	ld	de, #_shadow_OAM
+      00009F 19                     195 	add	hl, de
+                                    196 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1073: itm->y=y, itm->x=x;
+      0000A0 3E 00                  197 	ld	a, #0x00
+      0000A2 22                     198 	ld	(hl+), a
+      0000A3 36 00                  199 	ld	(hl), #0x00
+                                    200 ;/tmp/_gbsbuild/src/core/Sprite_b.c:44: move_sprite(i + 1, 0, 0);
+      0000A5 0C                     201 	inc	c
+                                    202 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1072: OAM_item_t * itm = &shadow_OAM[nb];
+      0000A6 26 00                  203 	ld	h, #0x00
+      0000A8 69                     204 	ld	l, c
+      0000A9 29                     205 	add	hl, hl
+      0000AA 29                     206 	add	hl, hl
+      0000AB 11r00r00               207 	ld	de, #_shadow_OAM
+      0000AE 19                     208 	add	hl, de
+                                    209 ;/tmp/_gbstools/gbdk/include/gb/gb.h:1073: itm->y=y, itm->x=x;
+      0000AF 3E 00                  210 	ld	a, #0x00
+      0000B1 22                     211 	ld	(hl+), a
+      0000B2 36 00                  212 	ld	(hl), #0x00
+                                    213 ;/tmp/_gbsbuild/src/core/Sprite_b.c:44: move_sprite(i + 1, 0, 0);
+                                    214 ;/tmp/_gbsbuild/src/core/Sprite_b.c:46: }
+      0000B4 C9                     215 	ret
+                                    216 ;/tmp/_gbsbuild/src/core/Sprite_b.c:48: UINT8 SpritePoolNext_b() __banked {
+                                    217 ;	---------------------------------
+                                    218 ; Function SpritePoolNext_b
+                                    219 ; ---------------------------------
+                           000001   220 	b_SpritePoolNext_b	= 1
+      0000B5                        221 _SpritePoolNext_b::
+                                    222 ;/tmp/_gbsbuild/src/core/Sprite_b.c:49: UINT8 next = StackPop(sprite_pool);
+      0000B5 21r00r00               223 	ld	hl, #_sprite_pool
+      0000B8 E5                     224 	push	hl
+      0000B9 CDr00r00               225 	call	_StackPop
+      0000BC E8 02                  226 	add	sp, #2
+                                    227 ;/tmp/_gbsbuild/src/core/Sprite_b.c:50: sprite_active_pool[sprite_active_pool_size++] = next;
+      0000BE 21r13r00               228 	ld	hl, #_sprite_active_pool_size
+      0000C1 4E                     229 	ld	c, (hl)
+      0000C2 34                     230 	inc	(hl)
+      0000C3 21r00r00               231 	ld	hl, #_sprite_active_pool
+      0000C6 06 00                  232 	ld	b, #0x00
+      0000C8 09                     233 	add	hl, bc
+      0000C9 73                     234 	ld	(hl), e
+                                    235 ;/tmp/_gbsbuild/src/core/Sprite_b.c:52: return next;
+                                    236 ;/tmp/_gbsbuild/src/core/Sprite_b.c:53: }
+      0000CA C9                     237 	ret
+                                    238 	.area _CODE_1
+                                    239 	.area _CABS (ABS)

@@ -1,0 +1,44 @@
+XL3
+H 7 areas 7 global symbols
+M Palette
+O -mgbz80
+S .__.ABS. Def000000
+A _CODE size 0 flags 0 addr 0
+A _DATA size 102 flags 0 addr 0
+S _BkgPalette Def000042
+S _palette_dirty Def000000
+S _BkgPaletteBuffer Def0000C2
+S _SprPalette Def000002
+S _palette_update_mask Def000001
+S _SprPaletteBuffer Def000082
+A _DABS size 0 flags 8 addr 0
+A _HOME size 0 flags 0 addr 0
+A _GSINIT size A flags 0 addr 0
+A _GSFINAL size 0 flags 0 addr 0
+A _CABS size 0 flags 8 addr 0
+T 00 00 00
+R 00 00 01 00
+T 00 00 00
+R 00 00 01 00
+T 01 00 00
+R 00 00 01 00
+T 01 00 00
+R 00 00 01 00
+T 02 00 00
+R 00 00 01 00
+T 02 00 00
+R 00 00 01 00
+T 42 00 00
+R 00 00 01 00
+T 42 00 00
+R 00 00 01 00
+T 82 00 00
+R 00 00 01 00
+T 82 00 00
+R 00 00 01 00
+T C2 00 00
+R 00 00 01 00
+T C2 00 00
+R 00 00 01 00
+T 00 00 00 21 00 00 36 00 21 01 00 36 3F
+R 00 00 04 00 00 04 01 00 00 09 01 00

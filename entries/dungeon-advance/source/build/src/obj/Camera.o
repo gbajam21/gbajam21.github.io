@@ -1,0 +1,44 @@
+XL3
+H 7 areas 7 global symbols
+M Camera
+O -mgbz80
+S .__.ABS. Def000000
+A _CODE size 0 flags 0 addr 0
+A _DATA size E flags 0 addr 0
+S _camera_dest Def000004
+S _camera_settings Def00000B
+S _camera_offset Def000008
+S _camera_deadzone Def00000C
+S _camera_speed Def00000A
+S _camera_pos Def000000
+A _DABS size 0 flags 8 addr 0
+A _HOME size 0 flags 0 addr 0
+A _GSINIT size 5 flags 0 addr 0
+A _GSFINAL size 0 flags 0 addr 0
+A _CABS size 0 flags 8 addr 0
+T 00 00 00
+R 00 00 01 00
+T 00 00 00
+R 00 00 01 00
+T 04 00 00
+R 00 00 01 00
+T 04 00 00
+R 00 00 01 00
+T 08 00 00
+R 00 00 01 00
+T 08 00 00
+R 00 00 01 00
+T 0A 00 00
+R 00 00 01 00
+T 0A 00 00
+R 00 00 01 00
+T 0B 00 00
+R 00 00 01 00
+T 0B 00 00
+R 00 00 01 00
+T 0C 00 00
+R 00 00 01 00
+T 0C 00 00
+R 00 00 01 00
+T 00 00 00 21 0B 00 36 10
+R 00 00 04 00 00 04 01 00

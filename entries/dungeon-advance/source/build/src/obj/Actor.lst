@@ -1,0 +1,600 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Actor
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl b_ActorRunCollisionScripts_b
+                                     12 	.globl _ActorRunCollisionScripts_b
+                                     13 	.globl b_ActorOverlapsPlayer_b
+                                     14 	.globl _ActorOverlapsPlayer_b
+                                     15 	.globl b_ActorAt3x3Tile_b
+                                     16 	.globl _ActorAt3x3Tile_b
+                                     17 	.globl b_ActorAt2x3Tile_b
+                                     18 	.globl _ActorAt2x3Tile_b
+                                     19 	.globl b_ActorAt3x1Tile_b
+                                     20 	.globl _ActorAt3x1Tile_b
+                                     21 	.globl b_ActorAt1x3Tile_b
+                                     22 	.globl _ActorAt1x3Tile_b
+                                     23 	.globl b_ActorAt1x2Tile_b
+                                     24 	.globl _ActorAt1x2Tile_b
+                                     25 	.globl b_ActorAtTile_b
+                                     26 	.globl _ActorAtTile_b
+                                     27 	.globl b_InitPlayer_b
+                                     28 	.globl _InitPlayer_b
+                                     29 	.globl b_CheckCollisionInDirection_b
+                                     30 	.globl _CheckCollisionInDirection_b
+                                     31 	.globl b_ActorInFrontOfActor_b
+                                     32 	.globl _ActorInFrontOfActor_b
+                                     33 	.globl b_ActorInFrontOfPlayer_b
+                                     34 	.globl _ActorInFrontOfPlayer_b
+                                     35 	.globl b_DeactivateActor_b
+                                     36 	.globl _DeactivateActor_b
+                                     37 	.globl b_ActivateActor_b
+                                     38 	.globl _ActivateActor_b
+                                     39 	.globl _ScriptCtxPoolReturn
+                                     40 	.globl _ScriptStart
+                                     41 	.globl _SpritePoolReturn
+                                     42 	.globl _player_iframes
+                                     43 	.globl _map_next_sprite
+                                     44 	.globl _map_next_dir
+                                     45 	.globl _map_next_pos
+                                     46 	.globl _actor_move_settings
+                                     47 	.globl _actors_active_size
+                                     48 	.globl _actors_active
+                                     49 	.globl _actor_ptrs
+                                     50 	.globl _actors
+                                     51 	.globl _ActorsInit
+                                     52 	.globl _ActivateActor
+                                     53 	.globl _DeactivateActor
+                                     54 	.globl _DeactivateActiveActor
+                                     55 	.globl _ActorAtTile
+                                     56 	.globl _ActorAt1x2Tile
+                                     57 	.globl _ActorAt1x3Tile
+                                     58 	.globl _ActorAt3x1Tile
+                                     59 	.globl _ActorAt2x3Tile
+                                     60 	.globl _ActorAt3x3Tile
+                                     61 	.globl _ActorOverlapsPlayer
+                                     62 	.globl _ActorInFrontOfPlayer
+                                     63 	.globl _ActorInFrontOfActor
+                                     64 	.globl _CheckCollisionInDirection
+                                     65 	.globl _InitPlayer
+                                     66 	.globl _ActorRunScript
+                                     67 	.globl _ActorRunCollisionScripts
+                                     68 ;--------------------------------------------------------
+                                     69 ; special function registers
+                                     70 ;--------------------------------------------------------
+                                     71 ;--------------------------------------------------------
+                                     72 ; ram data
+                                     73 ;--------------------------------------------------------
+                                     74 	.area _DATA
+      000000                         75 _actors::
+      000000                         76 	.ds 1426
+      000592                         77 _actor_ptrs::
+      000592                         78 	.ds 62
+      0005D0                         79 _actors_active::
+      0005D0                         80 	.ds 11
+      0005DB                         81 _actors_active_size::
+      0005DB                         82 	.ds 1
+      0005DC                         83 _actor_move_settings::
+      0005DC                         84 	.ds 1
+      0005DD                         85 _map_next_pos::
+      0005DD                         86 	.ds 4
+      0005E1                         87 _map_next_dir::
+      0005E1                         88 	.ds 2
+      0005E3                         89 _map_next_sprite::
+      0005E3                         90 	.ds 2
+      0005E5                         91 _player_iframes::
+      0005E5                         92 	.ds 1
+                                     93 ;--------------------------------------------------------
+                                     94 ; absolute external ram data
+                                     95 ;--------------------------------------------------------
+                                     96 	.area _DABS (ABS)
+                                     97 ;--------------------------------------------------------
+                                     98 ; global & static initialisations
+                                     99 ;--------------------------------------------------------
+                                    100 	.area _HOME
+                                    101 	.area _GSINIT
+                                    102 	.area _GSFINAL
+                                    103 	.area _GSINIT
+                                    104 ;/tmp/_gbsbuild/src/core/Actor.c:29: UBYTE actors_active_size = 0;
+      000000 21rDBr05               105 	ld	hl, #_actors_active_size
+      000003 36 00                  106 	ld	(hl), #0x00
+                                    107 ;/tmp/_gbsbuild/src/core/Actor.c:30: UBYTE actor_move_settings = 0;
+      000005 21rDCr05               108 	ld	hl, #_actor_move_settings
+      000008 36 00                  109 	ld	(hl), #0x00
+                                    110 ;/tmp/_gbsbuild/src/core/Actor.c:34: UWORD map_next_sprite = 0;
+      00000A 21rE3r05               111 	ld	hl, #_map_next_sprite
+      00000D 36 00                  112 	ld	(hl), #0x00
+      00000F 23                     113 	inc	hl
+      000010 36 00                  114 	ld	(hl), #0x00
+                                    115 ;/tmp/_gbsbuild/src/core/Actor.c:35: UBYTE player_iframes = 0;
+      000012 21rE5r05               116 	ld	hl, #_player_iframes
+      000015 36 00                  117 	ld	(hl), #0x00
+                                    118 ;--------------------------------------------------------
+                                    119 ; Home
+                                    120 ;--------------------------------------------------------
+                                    121 	.area _HOME
+                                    122 	.area _HOME
+                                    123 ;--------------------------------------------------------
+                                    124 ; code
+                                    125 ;--------------------------------------------------------
+                                    126 	.area _CODE
+                                    127 ;/tmp/_gbsbuild/src/core/Actor.c:37: void ActorsInit() {
+                                    128 ;	---------------------------------
+                                    129 ; Function ActorsInit
+                                    130 ; ---------------------------------
+      000000                        131 _ActorsInit::
+      000000 3B                     132 	dec	sp
+                                    133 ;/tmp/_gbsbuild/src/core/Actor.c:39: for (i = 0; i != MAX_ACTORS; i++) {
+      000001 AF                     134 	xor	a, a
+      000002 F8 00                  135 	ldhl	sp,	#0
+      000004 77                     136 	ld	(hl), a
+      000005                        137 00102$:
+                                    138 ;/tmp/_gbsbuild/src/core/Actor.c:40: actor_ptrs[i] = &actors[i];
+      000005 F8 00                  139 	ldhl	sp,	#0
+      000007 4E                     140 	ld	c, (hl)
+      000008 06 00                  141 	ld	b, #0x00
+      00000A 69                     142 	ld	l, c
+      00000B 60                     143 	ld	h, b
+      00000C 29                     144 	add	hl, hl
+      00000D 7D                     145 	ld	a, l
+      00000E C6r92                  146 	add	a, #<(_actor_ptrs)
+      000010 4F                     147 	ld	c, a
+      000011 7C                     148 	ld	a, h
+      000012 CEs05                  149 	adc	a, #>(_actor_ptrs)
+      000014 47                     150 	ld	b, a
+      000015 F8 00                  151 	ldhl	sp,	#0
+      000017 5E                     152 	ld	e, (hl)
+      000018 16 00                  153 	ld	d, #0x00
+      00001A 6B                     154 	ld	l, e
+      00001B 62                     155 	ld	h, d
+      00001C 29                     156 	add	hl, hl
+      00001D 29                     157 	add	hl, hl
+      00001E 19                     158 	add	hl, de
+      00001F 29                     159 	add	hl, hl
+      000020 19                     160 	add	hl, de
+      000021 29                     161 	add	hl, hl
+      000022 19                     162 	add	hl, de
+      000023 29                     163 	add	hl, hl
+      000024 11r00r00               164 	ld	de, #_actors
+      000027 19                     165 	add	hl, de
+      000028 5D                     166 	ld	e, l
+      000029 54                     167 	ld	d, h
+      00002A 7B                     168 	ld	a, e
+      00002B 02                     169 	ld	(bc), a
+      00002C 03                     170 	inc	bc
+      00002D 7A                     171 	ld	a, d
+      00002E 02                     172 	ld	(bc), a
+                                    173 ;/tmp/_gbsbuild/src/core/Actor.c:39: for (i = 0; i != MAX_ACTORS; i++) {
+      00002F F8 00                  174 	ldhl	sp,	#0
+      000031 34                     175 	inc	(hl)
+      000032 7E                     176 	ld	a, (hl)
+      000033 D6 1F                  177 	sub	a, #0x1f
+      000035 20 CE                  178 	jr	NZ, 00102$
+                                    179 ;/tmp/_gbsbuild/src/core/Actor.c:42: }
+      000037 33                     180 	inc	sp
+      000038 C9                     181 	ret
+                                    182 ;/tmp/_gbsbuild/src/core/Actor.c:44: void ActivateActor(UBYTE i) {
+                                    183 ;	---------------------------------
+                                    184 ; Function ActivateActor
+                                    185 ; ---------------------------------
+      000039                        186 _ActivateActor::
+                                    187 ;/tmp/_gbsbuild/src/core/Actor.c:45: ActivateActor_b(i);
+      000039 F8 02                  188 	ldhl	sp,	#2
+      00003B 7E                     189 	ld	a, (hl)
+      00003C F5                     190 	push	af
+      00003D 33                     191 	inc	sp
+      00003E 1Er00                  192 	ld	e, #b_ActivateActor_b
+      000040 21r00r00               193 	ld	hl, #_ActivateActor_b
+      000043 CDr00r00               194 	call	___sdcc_bcall_ehl
+      000046 33                     195 	inc	sp
+                                    196 ;/tmp/_gbsbuild/src/core/Actor.c:46: }
+      000047 C9                     197 	ret
+                                    198 ;/tmp/_gbsbuild/src/core/Actor.c:48: void DeactivateActor(UBYTE i) {
+                                    199 ;	---------------------------------
+                                    200 ; Function DeactivateActor
+                                    201 ; ---------------------------------
+      000048                        202 _DeactivateActor::
+                                    203 ;/tmp/_gbsbuild/src/core/Actor.c:49: DeactivateActor_b(i);
+      000048 F8 02                  204 	ldhl	sp,	#2
+      00004A 7E                     205 	ld	a, (hl)
+      00004B F5                     206 	push	af
+      00004C 33                     207 	inc	sp
+      00004D 1Er00                  208 	ld	e, #b_DeactivateActor_b
+      00004F 21r00r00               209 	ld	hl, #_DeactivateActor_b
+      000052 CDr00r00               210 	call	___sdcc_bcall_ehl
+      000055 33                     211 	inc	sp
+                                    212 ;/tmp/_gbsbuild/src/core/Actor.c:50: }
+      000056 C9                     213 	ret
+                                    214 ;/tmp/_gbsbuild/src/core/Actor.c:52: void DeactivateActiveActor(UBYTE i) {
+                                    215 ;	---------------------------------
+                                    216 ; Function DeactivateActiveActor
+                                    217 ; ---------------------------------
+      000057                        218 _DeactivateActiveActor::
+      000057 E8 FD                  219 	add	sp, #-3
+                                    220 ;/tmp/_gbsbuild/src/core/Actor.c:53: if(UBYTE_LESS_THAN(i, actors_active_size)) {
+      000059 F8 05                  221 	ldhl	sp,	#5
+      00005B 4E                     222 	ld	c, (hl)
+      00005C 21rDBr05               223 	ld	hl, #_actors_active_size
+      00005F 5E                     224 	ld	e, (hl)
+      000060 79                     225 	ld	a, c
+      000061 93                     226 	sub	a, e
+      000062 CB 7F                  227 	bit	7,a
+      000064 28 63                  228 	jr	Z, 00107$
+                                    229 ;/tmp/_gbsbuild/src/core/Actor.c:54: UBYTE a = actors_active[i];
+                                    230 ;c
+      000066 11rD0r05               231 	ld	de, #_actors_active
+      000069 F8 05                  232 	ldhl	sp,	#5
+      00006B 6E                     233 	ld	l, (hl)
+      00006C 26 00                  234 	ld	h, #0x00
+      00006E 19                     235 	add	hl, de
+      00006F 33                     236 	inc	sp
+      000070 33                     237 	inc	sp
+      000071 5D                     238 	ld	e, l
+      000072 54                     239 	ld	d, h
+      000073 D5                     240 	push	de
+      000074 1A                     241 	ld	a, (de)
+      000075 F8 02                  242 	ldhl	sp,	#2
+                                    243 ;/tmp/_gbsbuild/src/core/Actor.c:55: if (a == 0) {
+      000077 77                     244 	ld	(hl), a
+      000078 B7                     245 	or	a, a
+                                    246 ;/tmp/_gbsbuild/src/core/Actor.c:57: return;
+      000079 28 4E                  247 	jr	Z, 00107$
+                                    248 ;/tmp/_gbsbuild/src/core/Actor.c:59: SpritePoolReturn(actors[a].sprite_index);
+      00007B 01r00r00               249 	ld	bc, #_actors+0
+      00007E F8 02                  250 	ldhl	sp,	#2
+      000080 5E                     251 	ld	e, (hl)
+      000081 16 00                  252 	ld	d, #0x00
+      000083 6B                     253 	ld	l, e
+      000084 62                     254 	ld	h, d
+      000085 29                     255 	add	hl, hl
+      000086 29                     256 	add	hl, hl
+      000087 19                     257 	add	hl, de
+      000088 29                     258 	add	hl, hl
+      000089 19                     259 	add	hl, de
+      00008A 29                     260 	add	hl, hl
+      00008B 19                     261 	add	hl, de
+      00008C 29                     262 	add	hl, hl
+      00008D 09                     263 	add	hl, bc
+      00008E 4D                     264 	ld	c, l
+      00008F 44                     265 	ld	b, h
+      000090 21 09 00               266 	ld	hl, #0x0009
+      000093 09                     267 	add	hl, bc
+      000094 5D                     268 	ld	e, l
+      000095 54                     269 	ld	d, h
+      000096 1A                     270 	ld	a, (de)
+      000097 C5                     271 	push	bc
+      000098 D5                     272 	push	de
+      000099 F5                     273 	push	af
+      00009A 33                     274 	inc	sp
+      00009B CDr00r00               275 	call	_SpritePoolReturn
+      00009E 33                     276 	inc	sp
+      00009F D1                     277 	pop	de
+      0000A0 C1                     278 	pop	bc
+                                    279 ;/tmp/_gbsbuild/src/core/Actor.c:60: actors[a].sprite_index = 0;
+      0000A1 AF                     280 	xor	a, a
+      0000A2 12                     281 	ld	(de), a
+                                    282 ;/tmp/_gbsbuild/src/core/Actor.c:61: if (actors[a].movement_ctx) {
+      0000A3 21 2D 00               283 	ld	hl, #0x002d
+      0000A6 09                     284 	add	hl, bc
+      0000A7 7E                     285 	ld	a, (hl)
+      0000A8 B7                     286 	or	a, a
+      0000A9 28 0C                  287 	jr	Z, 00104$
+                                    288 ;/tmp/_gbsbuild/src/core/Actor.c:62: ScriptCtxPoolReturn(actors[a].movement_ctx, a);
+      0000AB F8 02                  289 	ldhl	sp,	#2
+      0000AD 66                     290 	ld	h, (hl)
+      0000AE E5                     291 	push	hl
+      0000AF 33                     292 	inc	sp
+      0000B0 F5                     293 	push	af
+      0000B1 33                     294 	inc	sp
+      0000B2 CDr00r00               295 	call	_ScriptCtxPoolReturn
+      0000B5 E8 02                  296 	add	sp, #2
+      0000B7                        297 00104$:
+                                    298 ;/tmp/_gbsbuild/src/core/Actor.c:64: actors_active[i] = actors_active[--actors_active_size];     
+      0000B7 21rDBr05               299 	ld	hl, #_actors_active_size
+      0000BA 35                     300 	dec	(hl)
+      0000BB 3ErD0                  301 	ld	a, #<(_actors_active)
+      0000BD 86                     302 	add	a, (hl)
+      0000BE 4F                     303 	ld	c, a
+      0000BF 3Es05                  304 	ld	a, #>(_actors_active)
+      0000C1 CE 00                  305 	adc	a, #0x00
+      0000C3 47                     306 	ld	b, a
+      0000C4 0A                     307 	ld	a, (bc)
+      0000C5 4F                     308 	ld	c, a
+      0000C6 E1                     309 	pop	hl
+      0000C7 E5                     310 	push	hl
+      0000C8 71                     311 	ld	(hl), c
+      0000C9                        312 00107$:
+                                    313 ;/tmp/_gbsbuild/src/core/Actor.c:66: }
+      0000C9 E8 03                  314 	add	sp, #3
+      0000CB C9                     315 	ret
+                                    316 ;/tmp/_gbsbuild/src/core/Actor.c:68: UBYTE ActorAtTile(UBYTE tx, UBYTE ty, UBYTE inc_noclip) {
+                                    317 ;	---------------------------------
+                                    318 ; Function ActorAtTile
+                                    319 ; ---------------------------------
+      0000CC                        320 _ActorAtTile::
+                                    321 ;/tmp/_gbsbuild/src/core/Actor.c:69: return ActorAtTile_b(tx, ty, inc_noclip);
+      0000CC F8 04                  322 	ldhl	sp,	#4
+      0000CE 7E                     323 	ld	a, (hl)
+      0000CF F5                     324 	push	af
+      0000D0 33                     325 	inc	sp
+      0000D1 2B                     326 	dec	hl
+      0000D2 7E                     327 	ld	a, (hl)
+      0000D3 F5                     328 	push	af
+      0000D4 33                     329 	inc	sp
+      0000D5 2B                     330 	dec	hl
+      0000D6 7E                     331 	ld	a, (hl)
+      0000D7 F5                     332 	push	af
+      0000D8 33                     333 	inc	sp
+      0000D9 1Er00                  334 	ld	e, #b_ActorAtTile_b
+      0000DB 21r00r00               335 	ld	hl, #_ActorAtTile_b
+      0000DE CDr00r00               336 	call	___sdcc_bcall_ehl
+      0000E1 E8 03                  337 	add	sp, #3
+                                    338 ;/tmp/_gbsbuild/src/core/Actor.c:70: }
+      0000E3 C9                     339 	ret
+                                    340 ;/tmp/_gbsbuild/src/core/Actor.c:72: UBYTE ActorAt1x2Tile(UBYTE tx, UBYTE ty, UBYTE inc_noclip) {
+                                    341 ;	---------------------------------
+                                    342 ; Function ActorAt1x2Tile
+                                    343 ; ---------------------------------
+      0000E4                        344 _ActorAt1x2Tile::
+                                    345 ;/tmp/_gbsbuild/src/core/Actor.c:73: return ActorAt1x2Tile_b(tx, ty, inc_noclip);
+      0000E4 F8 04                  346 	ldhl	sp,	#4
+      0000E6 7E                     347 	ld	a, (hl)
+      0000E7 F5                     348 	push	af
+      0000E8 33                     349 	inc	sp
+      0000E9 2B                     350 	dec	hl
+      0000EA 7E                     351 	ld	a, (hl)
+      0000EB F5                     352 	push	af
+      0000EC 33                     353 	inc	sp
+      0000ED 2B                     354 	dec	hl
+      0000EE 7E                     355 	ld	a, (hl)
+      0000EF F5                     356 	push	af
+      0000F0 33                     357 	inc	sp
+      0000F1 1Er00                  358 	ld	e, #b_ActorAt1x2Tile_b
+      0000F3 21r00r00               359 	ld	hl, #_ActorAt1x2Tile_b
+      0000F6 CDr00r00               360 	call	___sdcc_bcall_ehl
+      0000F9 E8 03                  361 	add	sp, #3
+                                    362 ;/tmp/_gbsbuild/src/core/Actor.c:74: }
+      0000FB C9                     363 	ret
+                                    364 ;/tmp/_gbsbuild/src/core/Actor.c:76: UBYTE ActorAt1x3Tile(UBYTE tx, UBYTE ty, UBYTE inc_noclip) {
+                                    365 ;	---------------------------------
+                                    366 ; Function ActorAt1x3Tile
+                                    367 ; ---------------------------------
+      0000FC                        368 _ActorAt1x3Tile::
+                                    369 ;/tmp/_gbsbuild/src/core/Actor.c:77: return ActorAt1x3Tile_b(tx, ty, inc_noclip);
+      0000FC F8 04                  370 	ldhl	sp,	#4
+      0000FE 7E                     371 	ld	a, (hl)
+      0000FF F5                     372 	push	af
+      000100 33                     373 	inc	sp
+      000101 2B                     374 	dec	hl
+      000102 7E                     375 	ld	a, (hl)
+      000103 F5                     376 	push	af
+      000104 33                     377 	inc	sp
+      000105 2B                     378 	dec	hl
+      000106 7E                     379 	ld	a, (hl)
+      000107 F5                     380 	push	af
+      000108 33                     381 	inc	sp
+      000109 1Er00                  382 	ld	e, #b_ActorAt1x3Tile_b
+      00010B 21r00r00               383 	ld	hl, #_ActorAt1x3Tile_b
+      00010E CDr00r00               384 	call	___sdcc_bcall_ehl
+      000111 E8 03                  385 	add	sp, #3
+                                    386 ;/tmp/_gbsbuild/src/core/Actor.c:78: }
+      000113 C9                     387 	ret
+                                    388 ;/tmp/_gbsbuild/src/core/Actor.c:80: UBYTE ActorAt3x1Tile(UBYTE tx, UBYTE ty, UBYTE inc_noclip) {
+                                    389 ;	---------------------------------
+                                    390 ; Function ActorAt3x1Tile
+                                    391 ; ---------------------------------
+      000114                        392 _ActorAt3x1Tile::
+                                    393 ;/tmp/_gbsbuild/src/core/Actor.c:81: return ActorAt3x1Tile_b(tx, ty, inc_noclip);
+      000114 F8 04                  394 	ldhl	sp,	#4
+      000116 7E                     395 	ld	a, (hl)
+      000117 F5                     396 	push	af
+      000118 33                     397 	inc	sp
+      000119 2B                     398 	dec	hl
+      00011A 7E                     399 	ld	a, (hl)
+      00011B F5                     400 	push	af
+      00011C 33                     401 	inc	sp
+      00011D 2B                     402 	dec	hl
+      00011E 7E                     403 	ld	a, (hl)
+      00011F F5                     404 	push	af
+      000120 33                     405 	inc	sp
+      000121 1Er00                  406 	ld	e, #b_ActorAt3x1Tile_b
+      000123 21r00r00               407 	ld	hl, #_ActorAt3x1Tile_b
+      000126 CDr00r00               408 	call	___sdcc_bcall_ehl
+      000129 E8 03                  409 	add	sp, #3
+                                    410 ;/tmp/_gbsbuild/src/core/Actor.c:82: }
+      00012B C9                     411 	ret
+                                    412 ;/tmp/_gbsbuild/src/core/Actor.c:84: UBYTE ActorAt2x3Tile(UBYTE tx, UBYTE ty, UBYTE inc_noclip) {
+                                    413 ;	---------------------------------
+                                    414 ; Function ActorAt2x3Tile
+                                    415 ; ---------------------------------
+      00012C                        416 _ActorAt2x3Tile::
+                                    417 ;/tmp/_gbsbuild/src/core/Actor.c:85: return ActorAt2x3Tile_b(tx, ty, inc_noclip);
+      00012C F8 04                  418 	ldhl	sp,	#4
+      00012E 7E                     419 	ld	a, (hl)
+      00012F F5                     420 	push	af
+      000130 33                     421 	inc	sp
+      000131 2B                     422 	dec	hl
+      000132 7E                     423 	ld	a, (hl)
+      000133 F5                     424 	push	af
+      000134 33                     425 	inc	sp
+      000135 2B                     426 	dec	hl
+      000136 7E                     427 	ld	a, (hl)
+      000137 F5                     428 	push	af
+      000138 33                     429 	inc	sp
+      000139 1Er00                  430 	ld	e, #b_ActorAt2x3Tile_b
+      00013B 21r00r00               431 	ld	hl, #_ActorAt2x3Tile_b
+      00013E CDr00r00               432 	call	___sdcc_bcall_ehl
+      000141 E8 03                  433 	add	sp, #3
+                                    434 ;/tmp/_gbsbuild/src/core/Actor.c:86: }
+      000143 C9                     435 	ret
+                                    436 ;/tmp/_gbsbuild/src/core/Actor.c:88: UBYTE ActorAt3x3Tile(UBYTE tx, UBYTE ty, UBYTE inc_noclip) {
+                                    437 ;	---------------------------------
+                                    438 ; Function ActorAt3x3Tile
+                                    439 ; ---------------------------------
+      000144                        440 _ActorAt3x3Tile::
+                                    441 ;/tmp/_gbsbuild/src/core/Actor.c:89: return ActorAt3x3Tile_b(tx, ty, inc_noclip);
+      000144 F8 04                  442 	ldhl	sp,	#4
+      000146 7E                     443 	ld	a, (hl)
+      000147 F5                     444 	push	af
+      000148 33                     445 	inc	sp
+      000149 2B                     446 	dec	hl
+      00014A 7E                     447 	ld	a, (hl)
+      00014B F5                     448 	push	af
+      00014C 33                     449 	inc	sp
+      00014D 2B                     450 	dec	hl
+      00014E 7E                     451 	ld	a, (hl)
+      00014F F5                     452 	push	af
+      000150 33                     453 	inc	sp
+      000151 1Er00                  454 	ld	e, #b_ActorAt3x3Tile_b
+      000153 21r00r00               455 	ld	hl, #_ActorAt3x3Tile_b
+      000156 CDr00r00               456 	call	___sdcc_bcall_ehl
+      000159 E8 03                  457 	add	sp, #3
+                                    458 ;/tmp/_gbsbuild/src/core/Actor.c:90: }
+      00015B C9                     459 	ret
+                                    460 ;/tmp/_gbsbuild/src/core/Actor.c:92: UBYTE ActorOverlapsPlayer(UBYTE inc_noclip) {
+                                    461 ;	---------------------------------
+                                    462 ; Function ActorOverlapsPlayer
+                                    463 ; ---------------------------------
+      00015C                        464 _ActorOverlapsPlayer::
+                                    465 ;/tmp/_gbsbuild/src/core/Actor.c:93: return ActorOverlapsPlayer_b(inc_noclip);
+      00015C F8 02                  466 	ldhl	sp,	#2
+      00015E 7E                     467 	ld	a, (hl)
+      00015F F5                     468 	push	af
+      000160 33                     469 	inc	sp
+      000161 1Er00                  470 	ld	e, #b_ActorOverlapsPlayer_b
+      000163 21r00r00               471 	ld	hl, #_ActorOverlapsPlayer_b
+      000166 CDr00r00               472 	call	___sdcc_bcall_ehl
+      000169 33                     473 	inc	sp
+                                    474 ;/tmp/_gbsbuild/src/core/Actor.c:94: }
+      00016A C9                     475 	ret
+                                    476 ;/tmp/_gbsbuild/src/core/Actor.c:96: UBYTE ActorInFrontOfPlayer(UBYTE grid_size, UBYTE inc_noclip) {
+                                    477 ;	---------------------------------
+                                    478 ; Function ActorInFrontOfPlayer
+                                    479 ; ---------------------------------
+      00016B                        480 _ActorInFrontOfPlayer::
+                                    481 ;/tmp/_gbsbuild/src/core/Actor.c:97: return ActorInFrontOfPlayer_b(grid_size, inc_noclip);
+      00016B F8 03                  482 	ldhl	sp,	#3
+      00016D 7E                     483 	ld	a, (hl)
+      00016E F5                     484 	push	af
+      00016F 33                     485 	inc	sp
+      000170 2B                     486 	dec	hl
+      000171 7E                     487 	ld	a, (hl)
+      000172 F5                     488 	push	af
+      000173 33                     489 	inc	sp
+      000174 1Er00                  490 	ld	e, #b_ActorInFrontOfPlayer_b
+      000176 21r00r00               491 	ld	hl, #_ActorInFrontOfPlayer_b
+      000179 CDr00r00               492 	call	___sdcc_bcall_ehl
+      00017C E8 02                  493 	add	sp, #2
+                                    494 ;/tmp/_gbsbuild/src/core/Actor.c:98: }
+      00017E C9                     495 	ret
+                                    496 ;/tmp/_gbsbuild/src/core/Actor.c:100: UBYTE ActorInFrontOfActor(UBYTE i) {
+                                    497 ;	---------------------------------
+                                    498 ; Function ActorInFrontOfActor
+                                    499 ; ---------------------------------
+      00017F                        500 _ActorInFrontOfActor::
+                                    501 ;/tmp/_gbsbuild/src/core/Actor.c:101: return ActorInFrontOfActor_b(i);
+      00017F F8 02                  502 	ldhl	sp,	#2
+      000181 7E                     503 	ld	a, (hl)
+      000182 F5                     504 	push	af
+      000183 33                     505 	inc	sp
+      000184 1Er00                  506 	ld	e, #b_ActorInFrontOfActor_b
+      000186 21r00r00               507 	ld	hl, #_ActorInFrontOfActor_b
+      000189 CDr00r00               508 	call	___sdcc_bcall_ehl
+      00018C 33                     509 	inc	sp
+                                    510 ;/tmp/_gbsbuild/src/core/Actor.c:102: }
+      00018D C9                     511 	ret
+                                    512 ;/tmp/_gbsbuild/src/core/Actor.c:104: UBYTE CheckCollisionInDirection(UBYTE start_x, UBYTE start_y, UBYTE end_tile, COL_CHECK_DIR check_dir) {
+                                    513 ;	---------------------------------
+                                    514 ; Function CheckCollisionInDirection
+                                    515 ; ---------------------------------
+      00018E                        516 _CheckCollisionInDirection::
+                                    517 ;/tmp/_gbsbuild/src/core/Actor.c:105: return CheckCollisionInDirection_b(start_x, start_y, end_tile, check_dir);
+      00018E F8 05                  518 	ldhl	sp,	#5
+      000190 7E                     519 	ld	a, (hl)
+      000191 F5                     520 	push	af
+      000192 33                     521 	inc	sp
+      000193 2B                     522 	dec	hl
+      000194 7E                     523 	ld	a, (hl)
+      000195 F5                     524 	push	af
+      000196 33                     525 	inc	sp
+      000197 2B                     526 	dec	hl
+      000198 7E                     527 	ld	a, (hl)
+      000199 F5                     528 	push	af
+      00019A 33                     529 	inc	sp
+      00019B 2B                     530 	dec	hl
+      00019C 7E                     531 	ld	a, (hl)
+      00019D F5                     532 	push	af
+      00019E 33                     533 	inc	sp
+      00019F 1Er00                  534 	ld	e, #b_CheckCollisionInDirection_b
+      0001A1 21r00r00               535 	ld	hl, #_CheckCollisionInDirection_b
+      0001A4 CDr00r00               536 	call	___sdcc_bcall_ehl
+      0001A7 E8 04                  537 	add	sp, #4
+                                    538 ;/tmp/_gbsbuild/src/core/Actor.c:106: }
+      0001A9 C9                     539 	ret
+                                    540 ;/tmp/_gbsbuild/src/core/Actor.c:108: void InitPlayer() {
+                                    541 ;	---------------------------------
+                                    542 ; Function InitPlayer
+                                    543 ; ---------------------------------
+      0001AA                        544 _InitPlayer::
+                                    545 ;/tmp/_gbsbuild/src/core/Actor.c:109: InitPlayer_b();
+      0001AA 1Er00                  546 	ld	e, #b_InitPlayer_b
+      0001AC 21r00r00               547 	ld	hl, #_InitPlayer_b
+                                    548 ;/tmp/_gbsbuild/src/core/Actor.c:110: }
+      0001AF C3r00r00               549 	jp  ___sdcc_bcall_ehl
+                                    550 ;/tmp/_gbsbuild/src/core/Actor.c:112: void ActorRunScript(UBYTE i) {
+                                    551 ;	---------------------------------
+                                    552 ; Function ActorRunScript
+                                    553 ; ---------------------------------
+      0001B2                        554 _ActorRunScript::
+                                    555 ;/tmp/_gbsbuild/src/core/Actor.c:113: script_main_ctx_actor = i;
+      0001B2 F8 02                  556 	ldhl	sp,	#2
+      0001B4 4E                     557 	ld	c, (hl)
+      0001B5 21r00r00               558 	ld	hl, #_script_main_ctx_actor
+      0001B8 71                     559 	ld	(hl), c
+                                    560 ;/tmp/_gbsbuild/src/core/Actor.c:114: actors[i].moving = FALSE;
+      0001B9 06 00                  561 	ld	b, #0x00
+      0001BB 69                     562 	ld	l, c
+      0001BC 60                     563 	ld	h, b
+      0001BD 29                     564 	add	hl, hl
+      0001BE 29                     565 	add	hl, hl
+      0001BF 09                     566 	add	hl, bc
+      0001C0 29                     567 	add	hl, hl
+      0001C1 09                     568 	add	hl, bc
+      0001C2 29                     569 	add	hl, hl
+      0001C3 09                     570 	add	hl, bc
+      0001C4 29                     571 	add	hl, hl
+      0001C5 3Er00                  572 	ld	a, #<(_actors)
+      0001C7 85                     573 	add	a, l
+      0001C8 4F                     574 	ld	c, a
+      0001C9 3Es00                  575 	ld	a, #>(_actors)
+      0001CB 8C                     576 	adc	a, h
+      0001CC 47                     577 	ld	b, a
+      0001CD 21 07 00               578 	ld	hl, #0x0007
+      0001D0 09                     579 	add	hl, bc
+      0001D1 36 00                  580 	ld	(hl), #0x00
+                                    581 ;/tmp/_gbsbuild/src/core/Actor.c:115: ScriptStart(&actors[i].events_ptr);
+      0001D3 21 1E 00               582 	ld	hl, #0x001e
+      0001D6 09                     583 	add	hl, bc
+      0001D7 E5                     584 	push	hl
+      0001D8 CDr00r00               585 	call	_ScriptStart
+      0001DB E8 02                  586 	add	sp, #2
+                                    587 ;/tmp/_gbsbuild/src/core/Actor.c:116: }
+      0001DD C9                     588 	ret
+                                    589 ;/tmp/_gbsbuild/src/core/Actor.c:118: void ActorRunCollisionScripts() {
+                                    590 ;	---------------------------------
+                                    591 ; Function ActorRunCollisionScripts
+                                    592 ; ---------------------------------
+      0001DE                        593 _ActorRunCollisionScripts::
+                                    594 ;/tmp/_gbsbuild/src/core/Actor.c:119: ActorRunCollisionScripts_b();
+      0001DE 1Er00                  595 	ld	e, #b_ActorRunCollisionScripts_b
+      0001E0 21r00r00               596 	ld	hl, #_ActorRunCollisionScripts_b
+                                    597 ;/tmp/_gbsbuild/src/core/Actor.c:120: }
+      0001E3 C3r00r00               598 	jp  ___sdcc_bcall_ehl
+                                    599 	.area _CODE
+                                    600 	.area _CABS (ABS)

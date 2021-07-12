@@ -1,0 +1,85 @@
+XL3
+H 7 areas 16 global symbols
+M FadeManager
+O -mgbz80
+S _FadeIn_b Ref000000
+S _FadeOut_b Ref000000
+S b_FadeUpdate_b Ref000000
+S b_ApplyPaletteChange_b Ref000000
+S .__.ABS. Def000000
+S b_FadeIn_b Ref000000
+S b_FadeOut_b Ref000000
+S ___sdcc_bcall_ehl Ref000000
+S _FadeUpdate_b Ref000000
+S _ApplyPaletteChange_b Ref000000
+A _CODE size 43 flags 0 addr 0
+S _FadeIn Def00000E
+S _FadeOut Def000016
+S _fade_speeds Def000007
+S _FadeInit Def000000
+S _IsFading Def00003E
+S _FadeSetSpeed Def00002E
+S _FadeUpdate Def00001E
+S _ApplyPaletteChange Def000026
+A _DATA size 4 flags 0 addr 0
+S _fade_black Def000002
+S _fade_frames_per_step Def000001
+S _fade_running Def000000
+S _fade_timer Def000003
+A _DABS size 0 flags 8 addr 0
+A _HOME size 0 flags 0 addr 0
+A _GSINIT size A flags 0 addr 0
+A _GSFINAL size 0 flags 0 addr 0
+A _CABS size 0 flags 8 addr 0
+T 00 00 00
+R 00 00 01 00
+T 00 00 00
+R 00 00 01 00
+T 01 00 00
+R 00 00 01 00
+T 01 00 00
+R 00 00 01 00
+T 02 00 00
+R 00 00 01 00
+T 02 00 00
+R 00 00 01 00
+T 03 00 00
+R 00 00 01 00
+T 03 00 00
+R 00 00 01 00
+T 00 00 00 21 02 00 36 00 21 03 00 36 00
+R 00 00 04 00 00 04 01 00 00 09 01 00
+T 00 00 00
+R 00 00 00 00
+T 00 00 00 FA 09 00 EA 01 00 C9
+R 00 00 00 00 00 04 00 00 00 07 01 00
+T 07 00 00
+R 00 00 00 00
+T 07 00 00 00 01 03 07 0F 1F 3F
+R 00 00 00 00
+T 0E 00 00
+R 00 00 00 00
+T 0E 00 00 1E 00 00 00 21 00 00 C3 00 00
+R 00 00 00 00 0B 04 05 00 02 08 00 00 02 0B 07 00
+T 16 00 00
+R 00 00 00 00
+T 16 00 00 1E 00 00 00 21 00 00 C3 00 00
+R 00 00 00 00 0B 04 06 00 02 08 01 00 02 0B 07 00
+T 1E 00 00
+R 00 00 00 00
+T 1E 00 00 1E 00 00 00 21 00 00 C3 00 00
+R 00 00 00 00 0B 04 02 00 02 08 08 00 02 0B 07 00
+T 26 00 00
+R 00 00 00 00
+T 26 00 00 1E 00 00 00 21 00 00 C3 00 00
+R 00 00 00 00 0B 04 03 00 02 08 09 00 02 0B 07 00
+T 2E 00 00
+R 00 00 00 00
+T 2E 00 00 01 07 00 F8 02 6E 26 00 09 4D 44 0A EA
+R 00 00 00 00 00 04 00 00
+T 3B 00 00 01 00 C9
+R 00 00 00 00 00 03 01 00
+T 3E 00 00
+R 00 00 00 00
+T 3E 00 00 21 00 00 5E C9
+R 00 00 00 00 00 04 01 00

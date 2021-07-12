@@ -1,0 +1,659 @@
+                                      1 ;-------------------------------------------------------------------------------
+                                      2 ;
+                                      3 ; GBT Player v2.2.1 rulz
+                                      4 ;
+                                      5 ; SPDX-License-Identifier: MIT
+                                      6 ;
+                                      7 ; Copyright (c) 2009-2020, Antonio Niño Díaz <antonio_nd@outlook.com>
+                                      8 ;
+                                      9 ;-------------------------------------------------------------------------------
+                                     10 
+                           00FF10    11 	.NR10 = 0xFF10
+                           00FF11    12 	.NR11 = 0xFF11
+                           00FF12    13 	.NR12 = 0xFF12
+                           00FF13    14 	.NR13 = 0xFF13
+                           00FF14    15 	.NR14 = 0xFF14
+                           00FF16    16 	.NR21 = 0xFF16
+                           00FF17    17 	.NR22 = 0xFF17
+                           00FF18    18 	.NR23 = 0xFF18
+                           00FF19    19 	.NR24 = 0xFF19
+                           00FF1A    20 	.NR30 = 0xFF1A
+                           00FF1B    21 	.NR31 = 0xFF1B
+                           00FF1C    22 	.NR32 = 0xFF1C
+                           00FF1D    23 	.NR33 = 0xFF1D
+                           00FF1E    24 	.NR34 = 0xFF1E
+                           00FF20    25 	.NR41 = 0xFF20
+                           00FF21    26 	.NR42 = 0xFF21
+                           00FF22    27 	.NR43 = 0xFF22
+                           00FF23    28 	.NR44 = 0xFF23
+                           00FF24    29 	.NR50 = 0xFF24
+                           00FF25    30 	.NR51 = 0xFF25
+                           00FF26    31 	.NR52 = 0xFF26
+                                     32 
+                                     33 ;-------------------------------------------------------------------------------
+                                     34 
+                                     35 	.area	_DATA
+                                     36 
+                                     37 ;-------------------------------------------------------------------------------
+      000000                         38 .start_gbt_vars:
+                                     39 
+      000000                         40 gbt_playing::
+      000000                         41 	.ds	1
+                                     42 
+      000001                         43 gbt_song:: ; pointer to the pointer array
+      000001                         44 	.ds	2
+      000003                         45 gbt_bank:: ; bank with the data
+      000003                         46 	.ds 1
+      000004                         47 gbt_speed:: ; playing speed
+      000004                         48 	.ds 1
+                                     49 
+                                     50 ; Up to 12 bytes per step are copied here to be handled in bank 1
+      000005                         51 gbt_temp_play_data::
+      000005                         52 	.ds 12
+                                     53 
+      000011                         54 gbt_loop_enabled::
+      000011                         55 	.ds 1
+      000012                         56 gbt_ticks_elapsed::
+      000012                         57 	.ds	1
+      000013                         58 gbt_current_step::
+      000013                         59 	.ds	1
+      000014                         60 gbt_current_pattern::
+      000014                         61 	.ds	1
+      000015                         62 gbt_current_step_data_ptr:: ; pointer to next step data
+      000015                         63 	.ds 2
+                                     64 
+      000017                         65 gbt_channels_enabled::
+      000017                         66 	.ds	1
+                                     67 
+      000018                         68 gbt_pan:: ; Ch 1-4
+      000018                         69 	.ds	4*1
+      00001C                         70 gbt_vol:: ; Ch 1-4
+      00001C                         71 	.ds	4*1
+      000020                         72 gbt_instr:: ; Ch 1-4
+      000020                         73 	.ds	4*1
+      000024                         74 gbt_freq:: ; Ch 1-3
+      000024                         75 	.ds	3*2
+                                     76 
+      00002A                         77 gbt_channel3_loaded_instrument:: ; current loaded instrument ($FF if none)
+      00002A                         78 	.ds	1
+                                     79 
+                                     80 ; Arpeggio -> Ch 1-3
+      00002B                         81 gbt_arpeggio_freq_index::
+      00002B                         82 	.ds 3*3 ; { base index, base index + x, base index + y } * 3
+      000034                         83 gbt_arpeggio_enabled::
+      000034                         84 	.ds 3*1 ; if 0, disabled, if 1, arp, if 2, sweep
+      000037                         85 gbt_arpeggio_tick::
+      000037                         86 	.ds	3*1
+                                     87 
+                                     88 ; Porta Pitch Sweep -> Ch 1-3
+      00003A                         89 gbt_sweep::
+      00003A                         90 	.ds 3*1 ; bit 7 is subtract mode, bit 0-6 is how much.
+                                     91 
+                                     92 ; Cut note
+      00003D                         93 gbt_cut_note_tick::
+      00003D                         94 	.ds	4*1 ; If tick == gbt_cut_note_tick, stop note.
+                                     95 
+                                     96 ; Last step of last pattern this is set to 1
+      000041                         97 gbt_have_to_stop_next_step::
+      000041                         98 	.ds 1
+                                     99 
+      000042                        100 gbt_update_pattern_pointers::
+      000042                        101 	.ds 1 ; set to 1 by jump effects
+                                    102 
+      000043                        103 .end_gbt_vars:
+                                    104 
+                                    105 ;-------------------------------------------------------------------------------
+                                    106 
+                                    107 	.area _GSINIT	
+                                    108 
+                                    109 ;-------------------------------------------------------------------------------
+                                    110 
+      000000 21 00 00               111 	ld	HL, #.start_gbt_vars
+      000003 0E 43                  112 	ld	C, #(.end_gbt_vars - .start_gbt_vars)
+      000005 EF                     113 	rst	0x28
+                                    114 	
+                                    115 ;-------------------------------------------------------------------------------
+                                    116 
+                                    117 	.area	_CODE
+                                    118 
+                                    119 ;-------------------------------------------------------------------------------
+                                    120 
+      000000                        121 gbt_get_pattern_ptr: ; a = pattern number
+                                    122 
+                                    123 	; loads a pointer to pattern a into gbt_current_step_data_ptr
+                                    124 
+      000000 5F                     125 	ld	e,a
+      000001 16 00                  126 	ld	d,#0
+                                    127 
+      000003 FA 03 00               128 	ld	a,(gbt_bank)
+      000006 EA 00 20               129 	ld	(#0x2000),a ; MBC1, MBC3, MBC5 - Set bank
+                                    130 
+      000009 21 01 00               131 	ld	hl,#gbt_song
+      00000C 2A                     132 	ld	a,(hl+)
+      00000D 6E                     133 	ld	l,(hl)
+      00000E 67                     134 	ld	h,a
+                                    135 
+                                    136 	; hl = pointer to list of pointers
+                                    137 	; de = pattern number
+                                    138 
+      00000F 19                     139 	add	hl,de
+      000010 19                     140 	add	hl,de
+                                    141 
+                                    142 	; hl = pointer to pattern a pointer
+                                    143 
+      000011 2A                     144 	ld	a,(hl+)
+      000012 66                     145 	ld	h,(hl)
+      000013 6F                     146 	ld	l,a
+                                    147 
+                                    148 	; hl = pointer to pattern a data
+                                    149 
+      000014 7D                     150 	ld	a,l
+      000015 EA 15 00               151 	ld	(gbt_current_step_data_ptr),a
+      000018 7C                     152 	ld	a,h
+      000019 EA 16 00               153 	ld	(gbt_current_step_data_ptr+1),a
+                                    154 
+      00001C C9                     155 	ret
+                                    156 
+                                    157 ;-------------------------------------------------------------------------------
+                                    158 
+      00001D                        159 gbt_get_pattern_ptr_banked:: ; a = pattern number
+                                    160 
+                                    161 	; loads a pointer to pattern a into gbt_current_step_data_ptr
+                                    162 
+      00001D 4F                     163 	ld	c,a
+      00001E 06 00                  164 	ld	b,#0
+                                    165 
+      000020 FA 03 00               166 	ld	a,(gbt_bank)
+      000023 EA 00 20               167 	ld	(#0x2000),a ; MBC1, MBC3, MBC5 - Set bank
+                                    168 
+      000026 21 01 00               169 	ld	hl,#gbt_song
+      000029 2A                     170 	ld	a,(hl+)
+      00002A 6E                     171 	ld	l,(hl)
+      00002B 67                     172 	ld	h,a
+                                    173 
+                                    174 	; hl = pointer to list of pointers
+                                    175 	; de = pattern number
+                                    176 
+      00002C 09                     177 	add	hl,bc
+      00002D 09                     178 	add	hl,bc
+                                    179 
+                                    180 	; hl = pointer to pattern a pointer
+                                    181 
+      00002E 2A                     182 	ld	a,(hl+)
+      00002F 46                     183 	ld	b,(hl)
+      000030 B0                     184 	or	a,b
+      000031 20 03                  185 	jr	nz,dont_loop$
+      000033 EA 14 00               186 	ld	(gbt_current_pattern), a ; a = 0
+      000036                        187 dont_loop$:
+      000036 3E 01                  188 	ld	a,#0x01
+      000038 EA 00 20               189 	ld	(#0x2000),a ; MBC1, MBC3, MBC5 - Set bank
+                                    190 
+      00003B C9                     191 	ret
+                                    192 
+                                    193 ;-------------------------------------------------------------------------------
+                                    194 
+      00003C                        195 _gbt_play::
+                                    196 
+      00003C C5                     197 	push	bc
+                                    198 
+      00003D F8 04                  199 	lda	hl,4(sp)
+      00003F 5E                     200 	ld	e,(hl)
+      000040 23                     201 	inc	hl
+      000041 56                     202 	ld	d,(hl)
+      000042 23                     203 	inc	hl
+      000043 4E                     204 	ld	c,(hl)
+      000044 23                     205 	inc hl
+      000045 46                     206 	ld	b,(hl)
+                                    207 
+                                    208 	; de = data
+                                    209 	; b = speed , c = bank
+                                    210 
+      000046 21 01 00               211 	ld	hl,#gbt_song
+      000049 72                     212 	ld	(hl),d
+      00004A 23                     213 	inc	hl
+      00004B 73                     214 	ld	(hl),e
+                                    215 
+      00004C 79                     216 	ld	a,c
+      00004D EA 03 00               217 	ld	(gbt_bank),a
+      000050 78                     218 	ld	a,b
+      000051 EA 04 00               219 	ld	(gbt_speed),a
+                                    220 
+      000054 3E 00                  221 	ld	a,#0
+      000056 CD 00 00               222 	call	gbt_get_pattern_ptr
+                                    223 
+      000059 AF                     224 	xor	a,a
+      00005A EA 13 00               225 	ld	(gbt_current_step),a
+      00005D EA 14 00               226 	ld	(gbt_current_pattern),a
+      000060 EA 12 00               227 	ld	(gbt_ticks_elapsed),a
+      000063 EA 11 00               228 	ld	(gbt_loop_enabled),a
+      000066 EA 41 00               229 	ld	(gbt_have_to_stop_next_step),a
+      000069 EA 42 00               230 	ld	(gbt_update_pattern_pointers),a
+                                    231 
+      00006C 3E FF                  232 	ld	a,#0xFF
+      00006E EA 2A 00               233 	ld	(gbt_channel3_loaded_instrument),a
+                                    234 
+      000071 3E 0F                  235 	ld	a,#0x0F
+      000073 EA 17 00               236 	ld	(gbt_channels_enabled),a
+                                    237 
+      000076 21 18 00               238 	ld	hl,#gbt_pan
+      000079 3E 11                  239 	ld	a,#0x11 ; L and R
+      00007B 22                     240 	ld	(hl+),a
+      00007C CB 27                  241 	sla	a
+      00007E 22                     242 	ld	(hl+),a
+      00007F CB 27                  243 	sla	a
+      000081 22                     244 	ld	(hl+),a
+      000082 CB 27                  245 	sla	a
+      000084 77                     246 	ld	(hl),a
+                                    247 
+      000085 21 1C 00               248 	ld	hl,#gbt_vol
+      000088 3E F0                  249 	ld	a,#0xF0 ; 100%
+      00008A 22                     250 	ld	(hl+),a
+      00008B 22                     251 	ld	(hl+),a
+      00008C 3E 20                  252 	ld	a,#0x20 ; 100%
+      00008E 22                     253 	ld	(hl+),a
+      00008F 3E F0                  254 	ld	a,#0xF0 ; 100%
+      000091 22                     255 	ld	(hl+),a
+                                    256 
+      000092 3E 00                  257 	ld	a,#0
+                                    258 
+      000094 21 20 00               259 	ld	hl,#gbt_instr
+      000097 22                     260 	ld	(hl+),a
+      000098 22                     261 	ld	(hl+),a
+      000099 22                     262 	ld	(hl+),a
+      00009A 22                     263 	ld	(hl+),a
+                                    264 
+      00009B 21 24 00               265 	ld	hl,#gbt_freq
+      00009E 22                     266 	ld	(hl+),a
+      00009F 22                     267 	ld	(hl+),a
+      0000A0 22                     268 	ld	(hl+),a
+      0000A1 22                     269 	ld	(hl+),a
+      0000A2 22                     270 	ld	(hl+),a
+      0000A3 22                     271 	ld	(hl+),a
+                                    272 
+      0000A4 EA 34 00               273 	ld	(gbt_arpeggio_enabled+0),a
+      0000A7 EA 35 00               274 	ld	(gbt_arpeggio_enabled+1),a
+      0000AA EA 36 00               275 	ld	(gbt_arpeggio_enabled+2),a
+                                    276 
+      0000AD 3E FF                  277 	ld	a,#0xFF
+      0000AF EA 3D 00               278 	ld	(gbt_cut_note_tick+0),a
+      0000B2 EA 3E 00               279 	ld	(gbt_cut_note_tick+1),a
+      0000B5 EA 3F 00               280 	ld	(gbt_cut_note_tick+2),a
+      0000B8 EA 40 00               281 	ld	(gbt_cut_note_tick+3),a
+                                    282 
+      0000BB 3E 80                  283 	ld	a,#0x80
+      0000BD E0 26                  284 	ldh	(#.NR52),a
+      0000BF 3E 00                  285 	ld	a,#0x00
+      0000C1 E0 25                  286 	ldh	(#.NR51),a
+      0000C3 3E 00                  287 	ld	a,#0x00 ; 0%
+      0000C5 E0 24                  288 	ldh	(#.NR50),a
+                                    289 
+      0000C7 AF                     290 	xor	a,a
+      0000C8 E0 10                  291 	ldh	(#.NR10),a
+      0000CA E0 11                  292 	ldh	(#.NR11),a
+      0000CC E0 12                  293 	ldh	(#.NR12),a
+      0000CE E0 13                  294 	ldh	(#.NR13),a
+      0000D0 E0 14                  295 	ldh	(#.NR14),a
+      0000D2 E0 16                  296 	ldh	(#.NR21),a
+      0000D4 E0 17                  297 	ldh	(#.NR22),a
+      0000D6 E0 18                  298 	ldh	(#.NR23),a
+      0000D8 E0 19                  299 	ldh	(#.NR24),a
+      0000DA E0 1A                  300 	ldh	(#.NR30),a
+      0000DC E0 1B                  301 	ldh	(#.NR31),a
+      0000DE E0 1C                  302 	ldh	(#.NR32),a
+      0000E0 E0 1D                  303 	ldh	(#.NR33),a
+      0000E2 E0 1E                  304 	ldh	(#.NR34),a
+      0000E4 E0 20                  305 	ldh	(#.NR41),a
+      0000E6 E0 21                  306 	ldh	(#.NR42),a
+      0000E8 E0 22                  307 	ldh	(#.NR43),a
+      0000EA E0 23                  308 	ldh	(#.NR44),a
+                                    309 
+      0000EC 3E 77                  310 	ld	a,#0x77 ; 100%
+      0000EE E0 24                  311 	ldh	(#.NR50),a
+                                    312 
+      0000F0 3E 01                  313 	ld	a,#0x01
+      0000F2 EA 00 00               314 	ld	(gbt_playing),a
+                                    315 
+      0000F5 C1                     316 	pop	bc
+      0000F6 C9                     317 	ret
+                                    318 
+                                    319 ;-------------------------------------------------------------------------------
+                                    320 
+      0000F7                        321 _gbt_pause::
+      0000F7 F8 02                  322 	lda	hl,2(sp)
+      0000F9 7E                     323 	ld	a,(hl)
+      0000FA EA 00 00               324 	ld	(gbt_playing),a
+      0000FD B7                     325 	or	a
+      0000FE 20 03                  326 	jr	nz,.gbt_pause_unmute
+      000100 E0 24                  327 	ldh	(#.NR50),a ; Mute sound: set L & R sound levels to Off
+      000102 C9                     328 	ret
+                                    329 
+      000103                        330 .gbt_pause_unmute: ; Unmute sound if playback is resumed
+      000103 3E 77                  331 	ld	a,#0x77
+      000105 E0 24                  332 	ldh	(#.NR50),a ; Restore L & R sound levels to 100%
+      000107 C9                     333 	ret
+                                    334 
+                                    335 ;-------------------------------------------------------------------------------
+                                    336 
+      000108                        337 _gbt_loop::
+      000108 F8 02                  338 	lda	hl,2(sp)
+      00010A 7E                     339 	ld	a,(hl)
+      00010B EA 11 00               340 	ld	(gbt_loop_enabled),a
+      00010E C9                     341 	ret
+                                    342 
+                                    343 ;-------------------------------------------------------------------------------
+                                    344 
+      00010F                        345 _gbt_stop::
+      00010F AF                     346 	xor	a
+      000110 EA 00 00               347 	ld	(gbt_playing),a
+      000113 E0 24                  348 	ldh	(#.NR50),a
+      000115 E0 25                  349 	ldh	(#.NR51),a
+      000117 E0 26                  350 	ldh	(#.NR52),a
+      000119 C9                     351 	ret
+                                    352 
+                                    353 ;-------------------------------------------------------------------------------
+                                    354 
+      00011A                        355 _gbt_enable_channels::
+      00011A F8 02                  356 	lda	hl,2(sp)
+      00011C 7E                     357 	ld	a,(hl)
+      00011D EA 17 00               358 	ld	(gbt_channels_enabled),a
+      000120 C9                     359 	ret
+                                    360 
+                                    361 ;-------------------------------------------------------------------------------
+                                    362 
+      000121                        363 _gbt_update::
+                                    364 
+      000121 C5                     365 	push	bc
+                                    366 
+                                    367 	; gbt_update has some "ret z" and things like that
+                                    368 	; We call it from here to make it easier to mantain both
+                                    369 	; RGBDS and GBDK versions.
+      000122 CD 27 01               370 	call	gbt_update
+                                    371 
+      000125 C1                     372 	pop	bc
+                                    373 
+      000126 C9                     374 	ret
+                                    375 
+                                    376 ;-------------------------------------------------------------------------------
+                                    377 
+      000127                        378 gbt_update:
+                                    379 
+      000127 FA 00 00               380 	ld	a,(gbt_playing)
+      00012A B7                     381 	or	a,a
+      00012B C8                     382 	ret	z ; If not playing, return
+                                    383 
+                                    384 	; Handle tick counter
+                                    385 
+      00012C 21 12 00               386 	ld	hl,#gbt_ticks_elapsed
+      00012F FA 04 00               387 	ld	a,(gbt_speed) ; a = total ticks
+      000132 46                     388 	ld	b,(hl) ; b = ticks elapsed
+      000133 04                     389 	inc	b
+      000134 70                     390 	ld	(hl),b
+      000135 B8                     391 	cp	a,b
+      000136 28 09                  392 	jr	z,.dontexit
+                                    393 
+                                    394 	; Tick != Speed, update effects and exit
+      000138 3E 01                  395 	ld	a,#0x01
+      00013A EA 00 20               396 	ld	(#0x2000),a ; MBC1, MBC3, MBC5 - Set bank 1
+      00013D CD 00 00               397 	call	gbt_update_effects_bank1 ; Call update function in bank 1
+                                    398 
+      000140 C9                     399 	ret
+                                    400 
+      000141                        401 .dontexit:
+      000141 36 00                  402 	ld	(hl),#0x00 ; reset tick counter
+                                    403 
+                                    404 	; Clear tick-based effects
+                                    405 	; ------------------------
+                                    406 
+      000143 AF                     407 	xor	a,a
+      000144 21 34 00               408 	ld	hl,#gbt_arpeggio_enabled ; Disable arpeggio
+      000147 22                     409 	ld	(hl+),a
+      000148 22                     410 	ld	(hl+),a
+      000149 77                     411 	ld	(hl),a
+      00014A 3D                     412 	dec	a ; a = 0xFF
+      00014B 21 3D 00               413 	ld	hl,#gbt_cut_note_tick ; Disable cut note
+      00014E 22                     414 	ld	(hl+),a
+      00014F 22                     415 	ld	(hl+),a
+      000150 22                     416 	ld	(hl+),a
+      000151 77                     417 	ld	(hl),a
+                                    418 
+                                    419 	; Update effects
+                                    420 	; --------------
+                                    421 
+      000152 3E 01                  422 	ld	a,#0x01
+      000154 EA 00 20               423 	ld	(#0x2000),a ; MBC1, MBC3, MBC5 - Set bank 1
+      000157 CD 00 00               424 	call	gbt_update_effects_bank1 ; Call update function in bank 1
+                                    425 
+                                    426 	; Check if last step
+                                    427 	; ------------------
+                                    428 
+      00015A FA 41 00               429 	ld	a,(gbt_have_to_stop_next_step)
+      00015D B7                     430 	or	a,a
+      00015E 28 09                  431 	jr	z,.dont_stop
+                                    432 
+      000160 CD 0F 01               433 	call	_gbt_stop
+      000163 3E 00                  434 	ld	a,#0
+      000165 EA 41 00               435 	ld	(gbt_have_to_stop_next_step),a
+      000168 C9                     436 	ret
+                                    437 
+      000169                        438 .dont_stop:
+                                    439 
+                                    440 	; Get this step data
+                                    441 	; ------------------
+                                    442 
+                                    443 	; Change to bank with song data
+                                    444 
+      000169 FA 03 00               445 	ld	a,(gbt_bank)
+      00016C EA 00 20               446 	ld	(#0x2000),a ; MBC1, MBC3, MBC5
+                                    447 
+                                    448 	; Get step data
+                                    449 
+      00016F FA 15 00               450 	ld	a,(gbt_current_step_data_ptr)
+      000172 6F                     451 	ld	l,a
+      000173 FA 16 00               452 	ld	a,(gbt_current_step_data_ptr+1)
+      000176 67                     453 	ld	h,a ; hl = pointer to data
+                                    454 
+      000177 11 05 00               455 	ld	de,#gbt_temp_play_data
+                                    456 
+      00017A 06 04                  457 	ld	b,#4
+      00017C                        458 .copy_loop:	; copy as bytes as needed for this step
+                                    459 
+      00017C 2A                     460 	ld	a,(hl+)
+      00017D 12                     461 	ld	(de),a
+      00017E 13                     462 	inc	de
+      00017F CB 7F                  463 	bit	7,a
+      000181 20 06                  464 	jr	nz,.more_bytes
+      000183 CB 77                  465 	bit	6,a
+      000185 28 0C                  466 	jr	z,.no_more_bytes_this_channel
+                                    467 
+      000187 18 07                  468 	jr	.one_more_byte
+                                    469 
+      000189                        470 .more_bytes:
+                                    471 
+      000189 2A                     472 	ld	a,(hl+)
+      00018A 12                     473 	ld	(de),a
+      00018B 13                     474 	inc	de
+      00018C CB 7F                  475 	bit	7,a
+      00018E 28 03                  476 	jr	z,.no_more_bytes_this_channel
+                                    477 
+      000190                        478 .one_more_byte:
+                                    479 
+      000190 2A                     480 	ld	a,(hl+)
+      000191 12                     481 	ld	(de),a
+      000192 13                     482 	inc	de
+                                    483 
+      000193                        484 .no_more_bytes_this_channel:
+      000193 05                     485 	dec	b
+      000194 20 E6                  486 	jr	nz,.copy_loop
+                                    487 
+      000196 7D                     488 	ld	a,l
+      000197 EA 15 00               489 	ld	(gbt_current_step_data_ptr),a
+      00019A 7C                     490 	ld	a,h
+      00019B EA 16 00               491 	ld	(gbt_current_step_data_ptr+1),a ; save pointer to data
+                                    492 
+                                    493 	; Increment step/pattern
+                                    494 	; ----------------------
+                                    495 
+                                    496 	; Increment step
+                                    497 
+      00019E FA 13 00               498 	ld	a,(gbt_current_step)
+      0001A1 3C                     499 	inc	a
+      0001A2 EA 13 00               500 	ld	(gbt_current_step),a
+      0001A5 FE 40                  501 	cp	a,#64
+      0001A7 20 2E                  502 	jr	nz,.dont_increment_pattern
+                                    503 
+                                    504 	; Increment pattern
+                                    505 
+      0001A9 3E 00                  506 	ld	a,#0
+      0001AB EA 13 00               507 	ld	(gbt_current_step),a ; Step 0
+                                    508 
+      0001AE FA 14 00               509 	ld	a,(gbt_current_pattern)
+      0001B1 3C                     510 	inc	a
+      0001B2 EA 14 00               511 	ld	(gbt_current_pattern),a
+                                    512 
+      0001B5 CD 00 00               513 	call	gbt_get_pattern_ptr
+                                    514 
+      0001B8 FA 15 00               515 	ld	a,(gbt_current_step_data_ptr)
+      0001BB 47                     516 	ld	b,a
+      0001BC FA 16 00               517 	ld	a,(gbt_current_step_data_ptr+1)
+      0001BF B0                     518 	or	a,b
+      0001C0 20 15                  519 	jr	nz,.not_ended ; if pointer is 0, song has ended
+                                    520 
+      0001C2 FA 11 00               521 	ld	a,(gbt_loop_enabled)
+      0001C5 A7                     522 	and	a,a
+                                    523 
+      0001C6 28 0A                  524 	jr	z,.loop_disabled
+                                    525 
+                                    526 	; If loop is enabled, jump to pattern 0
+                                    527 
+      0001C8 3E 00                  528 	ld	a,#0
+      0001CA EA 14 00               529 	ld	(gbt_current_pattern),a
+                                    530 
+      0001CD CD 00 00               531 	call	gbt_get_pattern_ptr
+                                    532 
+      0001D0 18 05                  533 	jr	.end_handling_steps_pattern
+                                    534 
+      0001D2                        535 .loop_disabled:
+                                    536 
+                                    537 	; If loop is disabled, stop song
+                                    538 	; Stop it next step, if not this step won't be played
+                                    539 
+      0001D2 3E 01                  540 	ld	a,#1
+      0001D4 EA 41 00               541 	ld	(gbt_have_to_stop_next_step),a
+                                    542 
+      0001D7                        543 .not_ended:
+                                    544 
+      0001D7                        545 .dont_increment_pattern:
+                                    546 
+      0001D7                        547 .end_handling_steps_pattern:
+                                    548 
+      0001D7 3E 01                  549 	ld	a,#0x01
+      0001D9 EA 00 20               550 	ld	(#0x2000),a ; MBC1, MBC3, MBC5 - Set bank 1
+      0001DC CD 00 00               551 	call	gbt_update_bank1 ; Call update function in bank 1
+                                    552 
+                                    553 	; Check if any effect has changed the pattern or step
+                                    554 
+      0001DF FA 42 00               555 	ld	a,(gbt_update_pattern_pointers)
+      0001E2 A7                     556 	and	a,a
+      0001E3 C8                     557 	ret	z
+                                    558 	; if any effect has changed the pattern or step, update
+                                    559 
+      0001E4 AF                     560 	xor	a,a
+      0001E5 EA 42 00               561 	ld	(gbt_update_pattern_pointers),a ; clear update flag
+                                    562 
+      0001E8 EA 41 00               563 	ld	(gbt_have_to_stop_next_step),a ; clear stop flag
+                                    564 
+      0001EB FA 14 00               565 	ld	a,(gbt_current_pattern)
+      0001EE CD 00 00               566 	call	gbt_get_pattern_ptr ; set ptr to start of the pattern
+                                    567 
+                                    568 	; Search the step
+                                    569 
+                                    570 	; Change to bank with song data
+                                    571 
+      0001F1 FA 03 00               572 	ld	a,(gbt_bank)
+      0001F4 EA 00 20               573 	ld	(#0x2000),a ; MBC1, MBC3, MBC5
+                                    574 
+      0001F7 FA 15 00               575 	ld	a,(gbt_current_step_data_ptr)
+      0001FA 6F                     576 	ld	l,a
+      0001FB FA 16 00               577 	ld	a,(gbt_current_step_data_ptr+1)
+      0001FE 67                     578 	ld	h,a ; hl = pointer to data
+                                    579 
+      0001FF FA 13 00               580 	ld	a,(gbt_current_step)
+      000202 A7                     581 	and	a,a
+      000203 C8                     582 	ret	z ; if changing to step 0, exit
+                                    583 
+      000204 CB 27                  584 	sla	a
+      000206 CB 27                  585 	sla	a
+      000208 47                     586 	ld	b,a ; b = iterations = step * 4 (number of channels)
+      000209                        587 .next_channel:
+                                    588 
+      000209 2A                     589 	ld	a,(hl+)
+      00020A CB 7F                  590 	bit	7,a
+      00020C 20 06                  591 	jr	nz,.next_channel_more_bytes
+      00020E CB 77                  592 	bit	6,a
+      000210 28 08                  593 	jr	z,.next_channel_no_more_bytes_this_channel
+                                    594 
+      000212 18 05                  595 	jr	.next_channel_one_more_byte
+                                    596 
+      000214                        597 .next_channel_more_bytes:
+                                    598 
+      000214 2A                     599 	ld	a,(hl+)
+      000215 CB 7F                  600 	bit	7,a
+      000217 28 01                  601 	jr	z,.next_channel_no_more_bytes_this_channel
+                                    602 
+      000219                        603 .next_channel_one_more_byte:
+                                    604 
+      000219 2A                     605 	ld	a,(hl+)
+                                    606 
+      00021A                        607 .next_channel_no_more_bytes_this_channel:
+      00021A 05                     608 	dec	b
+      00021B 20 EC                  609 	jr	nz,.next_channel
+                                    610 
+      00021D 7D                     611 	ld	a,l
+      00021E EA 15 00               612 	ld	(gbt_current_step_data_ptr),a
+      000221 7C                     613 	ld	a,h
+      000222 EA 16 00               614 	ld	(gbt_current_step_data_ptr+1),a ; save pointer to data
+                                    615 
+      000225 C9                     616 	ret
+                                    617 
+                                    618 ;-------------------------------------------------------------------------------
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .NR10   =  00FF10     |     .NR11   =  00FF11     |     .NR12   =  00FF12 
+    .NR13   =  00FF13     |     .NR14   =  00FF14     |     .NR21   =  00FF16 
+    .NR22   =  00FF17     |     .NR23   =  00FF18     |     .NR24   =  00FF19 
+    .NR30   =  00FF1A     |     .NR31   =  00FF1B     |     .NR32   =  00FF1C 
+    .NR33   =  00FF1D     |     .NR34   =  00FF1E     |     .NR41   =  00FF20 
+    .NR42   =  00FF21     |     .NR43   =  00FF22     |     .NR44   =  00FF23 
+    .NR50   =  00FF24     |     .NR51   =  00FF25     |     .NR52   =  00FF26 
+    .__.$$$.=  002710 L   |     .__.ABS.=  000000 G   |     .__.CPU.=  000000 L
+    .__.H$L.=  000000 L   |   0 .copy_lo   00017C R   |   0 .dont_in   0001D7 R
+  0 .dont_st   000169 R   |   0 .dontexi   000141 R   |   1 .end_gbt   000043 R
+  0 .end_han   0001D7 R   |   0 .gbt_pau   000103 R   |   0 .loop_di   0001D2 R
+  0 .more_by   000189 R   |   0 .next_ch   000209 R   |   0 .next_ch   000214 R
+  0 .next_ch   00021A R   |   0 .next_ch   000219 R   |   0 .no_more   000193 R
+  0 .not_end   0001D7 R   |   0 .one_mor   000190 R   |   1 .start_g   000000 R
+  0 _gbt_ena   00011A GR  |   0 _gbt_loo   000108 GR  |   0 _gbt_pau   0000F7 GR
+  0 _gbt_pla   00003C GR  |   0 _gbt_sto   00010F GR  |   0 _gbt_upd   000121 GR
+  0 dont_loo   000036 R   |   1 gbt_arpe   000034 GR  |   1 gbt_arpe   00002B GR
+  1 gbt_arpe   000037 GR  |   1 gbt_bank   000003 GR  |   1 gbt_chan   00002A GR
+  1 gbt_chan   000017 GR  |   1 gbt_curr   000014 GR  |   1 gbt_curr   000013 GR
+  1 gbt_curr   000015 GR  |   1 gbt_cut_   00003D GR  |   1 gbt_freq   000024 GR
+  0 gbt_get_   000000 R   |   0 gbt_get_   00001D GR  |   1 gbt_have   000041 GR
+  1 gbt_inst   000020 GR  |   1 gbt_loop   000011 GR  |   1 gbt_pan    000018 GR
+  1 gbt_play   000000 GR  |   1 gbt_song   000001 GR  |   1 gbt_spee   000004 GR
+  1 gbt_swee   00003A GR  |   1 gbt_temp   000005 GR  |   1 gbt_tick   000012 GR
+  0 gbt_upda   000127 R   |     gbt_upda   ****** GX  |     gbt_upda   ****** GX
+  1 gbt_upda   000042 GR  |   1 gbt_vol    00001C GR
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE      size    226   flags    0
+   1 _DATA      size     43   flags    0
+   2 _GSINIT    size      6   flags    0
+

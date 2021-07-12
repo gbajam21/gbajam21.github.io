@@ -1,0 +1,274 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+    _ActivateActor                                                 ****** GX
+    _ApplyPaletteChange                                            ****** GX
+    _CheckCollisionInDirection                                     ****** GX
+    _DeactivateActor                                               ****** GX
+    _FadeIn                                                        ****** GX
+    _FadeOut                                                       ****** GX
+    _FadeSetSpeed                                                  ****** GX
+    _FadeUpdate                                                    ****** GX
+    _Gt16                                                          ****** GX
+    _IsFading                                                      ****** GX
+    _LCDC_REG                                                      ****** GX
+    _LoadPalette                                                   ****** GX
+    _LoadSprite                                                    ****** GX
+    _LoadSpritePalette                                             ****** GX
+    _LoadUIPalette                                                 ****** GX
+    _Lt16                                                          ****** GX
+    _MusicPlay                                                     ****** GX
+    _MusicStop                                                     ****** GX
+    _ProjectileLaunch                                              ****** GX
+  1 _RAMPtr                                                        000000 GR
+    _ScriptCtxPoolReturn                                           ****** GX
+  6 _ScriptHelper_CalcDest                                         000F0F GR
+  6 _ScriptHelper_ClampCamDest                                     000C26 GR
+    _ScriptStartBg                                                 ****** GX
+  6 _ScriptTimerUpdate_b                                           000000 GR
+  6 _ScriptUpdate_AwaitFade                                        00070C GR
+  6 _ScriptUpdate_AwaitInputPres                                   000720 GR
+  6 _ScriptUpdate_AwaitUIAtDest                                    00071D GR
+  6 _ScriptUpdate_AwaitUIClosed                                    00071A GR
+  6 _ScriptUpdate_CamShake                                         0008E1 GR
+  6 _ScriptUpdate_Emote                                            00074C GR
+  6 _ScriptUpdate_MoveActor                                        0001BF GR
+  6 _ScriptUpdate_MoveActorDiag                                    000475 GR
+  6 _ScriptUpdate_MoveCamera                                       0007FB GR
+  6 _ScriptUpdate_Wait                                             00073D GR
+  6 _Script_ActorActivate_b                                        000B3B GR
+  6 _Script_ActorGetPos_b                                          001E32 GR
+  6 _Script_ActorHide_b                                            001262 GR
+  6 _Script_ActorInvoke_b                                          002671 GR
+  6 _Script_ActorMoveRel_b                                         001FDD GR
+  6 _Script_ActorMoveToVal_b                                       001F26 GR
+  6 _Script_ActorMoveTo_b                                          000E6F GR
+  6 _Script_ActorPush_b                                            0017AB GR
+  6 _Script_ActorSetAnimSpeed_b                                    00262D GR
+  6 _Script_ActorSetAnimate_b                                      002E36 GR
+  6 _Script_ActorSetCollisions_b                                   001285 GR
+  6 _Script_ActorSetDir_b                                          000A77 GR
+  6 _Script_ActorSetEmote_b                                        0012A4 GR
+  6 _Script_ActorSetFlip_b                                         002B36 GR
+  6 _Script_ActorSetFrameToVal_b                                   002ABA GR
+  6 _Script_ActorSetFrame_b                                        002A4B GR
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+  6 _Script_ActorSetMoveSpeed_b                                    0025C4 GR
+  6 _Script_ActorSetPosRel_b                                       00221C GR
+  6 _Script_ActorSetPosToVal_b                                     001E97 GR
+  6 _Script_ActorSetPos_b                                          000E1E GR
+  6 _Script_ActorSetSprite_b                                       001602 GR
+  6 _Script_ActorShow_b                                            00123F GR
+  6 _Script_ActorStopUpdate_b                                      002DDB GR
+  6 _Script_AwaitInput_b                                           001383 GR
+  6 _Script_CameraLock_b                                           000BC0 GR
+  6 _Script_CameraMoveTo_b                                         000B4F GR
+  6 _Script_CameraShake_b                                          0012FD GR
+  6 _Script_Choice_b                                               00154E GR
+  6 _Script_ClearData_b                                            001BC3 GR
+  6 _Script_ClearFlag_b                                            000A63 GR
+  6 _Script_CopyVal_b                                              0024F3 GR
+  6 _Script_DecFlag_b                                              0013E2 GR
+  6 _Script_End_b                                                  000938 GR
+  6 _Script_EngFieldSetVar_b                                       002EC4 GR
+  6 _Script_EngFieldSetWordVar_b                                   002EF1 GR
+  6 _Script_EngFieldSetWord_b                                      002E96 GR
+  6 _Script_EngFieldSet_b                                          002E78 GR
+  6 _Script_EngFieldStoreWord_b                                    002F71 GR
+  6 _Script_EngFieldStore_b                                        002F44 GR
+  6 _Script_FadeIn_b                                               000D71 GR
+  6 _Script_FadeOut_b                                              000D5C GR
+  6 _Script_Goto_b                                                 000969 GR
+  6 _Script_HideOverlay_b                                          001339 GR
+  6 _Script_HideSprites_b                                          001233 GR
+  6 _Script_IfActorDirection_b                                     001C13 GR
+  6 _Script_IfActorPos_b                                           0018F6 GR
+  6 _Script_IfActorRelActor_b                                      001C85 GR
+  6 _Script_IfColorSupported_b                                     002E55 GR
+  6 _Script_IfFlag_b                                               000986 GR
+  6 _Script_IfInput_b                                              001527 GR
+  6 _Script_IfSavedData_b                                          001BD9 GR
+  6 _Script_IfValueCompare_b                                       00250A GR
+  6 _Script_IfValue_b                                              0009B9 GR
+  6 _Script_IncFlag_b                                              0013CA GR
+  6 _Script_LaunchProjectile_b                                     002C3D GR
+  6 _Script_LoadData_b                                             001A62 GR
+  6 _Script_LoadScene_b                                            000D86 GR
+  6 _Script_LoadVectors_b                                          002599 GR
+  6 _Script_MathAddVal_b                                           0023CA GR
+  6 _Script_MathAdd_b                                              002321 GR
+  6 _Script_MathDivVal_b                                           002497 GR
+  6 _Script_MathDiv_b                                              00237C GR
+  6 _Script_MathModVal_b                                           0024C5 GR
+  6 _Script_MathMod_b                                              0023A3 GR
+  6 _Script_MathMulVal_b                                           002469 GR
+  6 _Script_MathMul_b                                              002355 GR
+  6 _Script_MathSubVal_b                                           002431 GR
+  6 _Script_MathSub_b                                              00233A GR
+  6 _Script_MusicPlay_b                                            001392 GR
+  6 _Script_MusicStop_b                                            0013A7 GR
+  6 _Script_NextFrame_b                                            0013C4 GR
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 3.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+  6 _Script_Noop_b                                                 000937 GR
+  6 _Script_OverlayMoveTo_b                                        00135D GR
+  6 _Script_OverlaySetPos_b                                        001346 GR
+  6 _Script_PalSetBackground_b                                     002D91 GR
+  6 _Script_PalSetSprite_b                                         002DAF GR
+  6 _Script_PalSetUI_b                                             002DC5 GR
+  6 _Script_PlayerBounce_b                                         0015DA GR
+  6 _Script_PlayerSetSprite_b                                      00172D GR
+  6 _Script_RemoveInputScript_b                                    002A24 GR
+  6 _Script_RemoveTimerScript_b                                    002C04 GR
+  6 _Script_ResetTimer_b                                           002BFD GR
+  6 _Script_ResetVariables_b                                       0013B0 GR
+  6 _Script_SaveData_b                                             001963 GR
+  6 _Script_ScenePopAllState_b                                     0028ED GR
+  6 _Script_ScenePopState_b                                        002834 GR
+  6 _Script_ScenePushState_b                                       002762 GR
+  6 _Script_SceneResetStack_b                                      0028E7 GR
+  6 _Script_SetFlagProperty_b                                      001411 GR
+  6 _Script_SetFlagRandomValue_b                                   001E01 GR
+  6 _Script_SetFlagValue_b                                         0013FA GR
+  6 _Script_SetFlag_b                                              000A4F GR
+  6 _Script_SetInputScript_b                                       002997 GR
+  6 _Script_SetTimerScript_b                                       002BD5 GR
+  6 _Script_ShowOverlay_b                                          001319 GR
+  6 _Script_ShowSprites_b                                          001227 GR
+  6 _Script_SoundPlayBeep_b                                        002BC8 GR
+  6 _Script_SoundPlayCrash_b                                       002BD2 GR
+  6 _Script_SoundPlayTone_b                                        002BAB GR
+  6 _Script_SoundStopTone_b                                        002BC5 GR
+  6 _Script_StackPop_b                                             002728 GR
+  6 _Script_StackPush_b                                            0026AF GR
+  6 _Script_TextMenu_b                                             001589 GR
+  6 _Script_TextMulti_b                                            002B37 GR
+  6 _Script_TextSetAnimSpeed_b                                     00264C GR
+  6 _Script_TextWithAvatar_b                                       002C0A GR
+  6 _Script_Text_b                                                 000944 GR
+  6 _Script_VariableAddFlags_b                                     002B78 GR
+  6 _Script_VariableClearFlags_b                                   002B91 GR
+  6 _Script_Wait_b                                                 000D4C GR
+  6 _Script_WeaponAttack_b                                         002D3E GR
+    _SetBankedSpriteData                                           ****** GX
+    _SetScene                                                      ****** GX
+    _SoundPlayBeep                                                 ****** GX
+    _SoundPlayCrash                                                ****** GX
+    _SoundPlayTone                                                 ****** GX
+    _SoundStopTone                                                 ****** GX
+    _UIAtDest                                                      ****** GX
+    _UIIsClosed                                                    ****** GX
+    _UIMoveTo                                                      ****** GX
+    _UISetColor                                                    ****** GX
+    _UISetPos                                                      ****** GX
+    _UIShowAvatar                                                  ****** GX
+    _UIShowChoice                                                  ****** GX
+    _UIShowMenu                                                    ****** GX
+    _UIShowText                                                    ****** GX
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 4.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    _WeaponAttack                                                  ****** GX
+    __cpu                                                          ****** GX
+    __divuchar                                                     ****** GX
+    __moduchar                                                     ****** GX
+    __muluchar                                                     ****** GX
+    __muluschar                                                    ****** GX
+    _active_script_ctx                                             ****** GX
+    _active_script_ctx_index                                       ****** GX
+    _actor_move_settings                                           ****** GX
+    _actors                                                        ****** GX
+  1 _after_lock_camera                                             000047 GR
+    _avatar_enabled                                                ****** GX
+    _await_input                                                   ****** GX
+    _camera_dest                                                   ****** GX
+    _camera_pos                                                    ****** GX
+    _camera_settings                                               ****** GX
+    _camera_speed                                                  ****** GX
+    _current_state                                                 ****** GX
+  6 _emote_offsets                                                 000037 GR
+  1 _emote_timer                                                   000043 GR
+    _engine_fields_addr                                            ****** GX
+    _game_time                                                     ****** GX
+    _hide_sprites                                                  ****** GX
+    _image_height                                                  ****** GX
+    _image_width                                                   ****** GX
+    _input_override_default                                        ****** GX
+    _input_script_persist                                          ****** GX
+    _input_script_ptrs                                             ****** GX
+    _joy                                                           ****** GX
+    _last_joy                                                      ****** GX
+    _map_next_dir                                                  ****** GX
+    _map_next_pos                                                  ****** GX
+    _map_next_sprite                                               ****** GX
+    _palette_update_mask                                           ****** GX
+    _pl_vel_x                                                      ****** GX
+    _pl_vel_y                                                      ****** GX
+    _rand                                                          ****** GX
+  1 _scene_stack                                                   000003 GR
+  1 _scene_stack_ptr                                               000002 GR
+    _script_bank_stack                                             ****** GX
+    _script_cmd_args                                               ****** GX
+    _script_cmd_args_len                                           ****** GX
+  6 _script_cmds                                                   00006F GR
+    _script_ctxs                                                   ****** GX
+    _script_stack                                                  ****** GX
+    _script_stack_ptr                                              ****** GX
+    _script_start_stack                                            ****** GX
+    _script_variables                                              ****** GX
+    _scroll_offset_x                                               ****** GX
+    _scroll_offset_y                                               ****** GX
+    _scroll_x                                                      ****** GX
+    _scroll_y                                                      ****** GX
+    _shadow_OAM                                                    ****** GX
+  1 _shake_time                                                    000044 GR
+  1 _should_shake_x                                                000045 GR
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 5.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+  1 _should_shake_y                                                000046 GR
+    _text_draw_speed                                               ****** GX
+    _text_ff_joypad                                                ****** GX
+    _text_in_speed                                                 ****** GX
+    _text_out_speed                                                ****** GX
+    _timer_script_duration                                         ****** GX
+    _timer_script_ptr                                              ****** GX
+    _timer_script_time                                             ****** GX
+  1 _tmp_actor                                                     000048 GR
+    _tmp_text_in_speed                                             ****** GX
+    _tmp_text_out_speed                                            ****** GX
+    b_ScriptTimerUpdate_b                                       =  000004 G
+    b_Script_StackPop_b                                         =  000004 G
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 6.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size      0   flags    0
+   1 _DATA                                      size     4A   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size     1E   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CODE_4                                    size   2FB6   flags    0
+   7 _CABS                                      size      0   flags    8
+

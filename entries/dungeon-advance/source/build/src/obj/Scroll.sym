@@ -1,0 +1,84 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+    _ActivateActor                                                 ****** GX
+    _ApplyPaletteChange                                            ****** GX
+    _BGP_REG                                                       ****** GX
+    _BkgPaletteBuffer                                              ****** GX
+  0 _InitScroll                                                    0005BF GR
+    _LCDC_REG                                                      ****** GX
+    _OBP0_REG                                                      ****** GX
+    _PopBank                                                       ****** GX
+    _PushBank                                                      ****** GX
+  0 _RefreshScroll                                                 0005B7 GR
+    _RefreshScroll_b                                               ****** GX
+  0 _RenderScreen                                                  0005DA GR
+  0 _ScrollUpdateColumnR                                           00039D GR
+  0 _ScrollUpdateColumnWithDelay                                   0004AD GR
+  0 _ScrollUpdateRow                                               000220 GR
+  0 _ScrollUpdateRowR                                              000000 GR
+  0 _ScrollUpdateRowWithDelay                                      000101 GR
+    _SetTile                                                       ****** GX
+    _VBK_REG                                                       ****** GX
+    ___sdcc_bcall_ehl                                              ****** GX
+    __cpu                                                          ****** GX
+    __mulint                                                       ****** GX
+    _actors                                                        ****** GX
+    _actors_len                                                    ****** GX
+    _display_off                                                   ****** GX
+  1 _draw_scroll_x                                                 000004 GR
+  1 _draw_scroll_y                                                 000006 GR
+    _fade_style                                                    ****** GX
+    _fade_timer                                                    ****** GX
+    _game_time                                                     ****** GX
+    _image_attr_bank                                               ****** GX
+    _image_attr_ptr                                                ****** GX
+    _image_bank                                                    ****** GX
+    _image_height                                                  ****** GX
+    _image_ptr                                                     ****** GX
+    _image_tile_width                                              ****** GX
+  1 _pending_h_cmap                                                000019 GR
+  1 _pending_h_i                                                   000014 GR
+  1 _pending_h_map                                                 000015 GR
+  1 _pending_h_x                                                   000010 GR
+  1 _pending_h_y                                                   000012 GR
+  1 _pending_w_cmap                                                00001B GR
+  1 _pending_w_i                                                   000021 GR
+  1 _pending_w_map                                                 000017 GR
+  1 _pending_w_x                                                   00001D GR
+  1 _pending_w_y                                                   00001F GR
+  1 _scroll_offset_x                                               00000C GR
+  1 _scroll_offset_y                                               00000E GR
+  1 _scroll_target                                                 000022 GR
+  1 _scroll_x                                                      000000 GR
+  1 _scroll_x_max                                                  000008 GR
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+  1 _scroll_y                                                      000002 GR
+  1 _scroll_y_max                                                  00000A GR
+    _set_bkg_palette                                               ****** GX
+    _set_sprite_palette                                            ****** GX
+    b_RefreshScroll_b                                              ****** GX
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 3.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size    6BC   flags    0
+   1 _DATA                                      size     24   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size     68   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CABS                                      size      0   flags    8
+

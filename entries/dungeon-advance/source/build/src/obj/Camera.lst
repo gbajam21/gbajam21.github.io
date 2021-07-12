@@ -1,0 +1,60 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Camera
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _camera_deadzone
+                                     12 	.globl _camera_settings
+                                     13 	.globl _camera_speed
+                                     14 	.globl _camera_offset
+                                     15 	.globl _camera_dest
+                                     16 	.globl _camera_pos
+                                     17 ;--------------------------------------------------------
+                                     18 ; special function registers
+                                     19 ;--------------------------------------------------------
+                                     20 ;--------------------------------------------------------
+                                     21 ; ram data
+                                     22 ;--------------------------------------------------------
+                                     23 	.area _DATA
+      000000                         24 _camera_pos::
+      000000                         25 	.ds 4
+      000004                         26 _camera_dest::
+      000004                         27 	.ds 4
+      000008                         28 _camera_offset::
+      000008                         29 	.ds 2
+      00000A                         30 _camera_speed::
+      00000A                         31 	.ds 1
+      00000B                         32 _camera_settings::
+      00000B                         33 	.ds 1
+      00000C                         34 _camera_deadzone::
+      00000C                         35 	.ds 2
+                                     36 ;--------------------------------------------------------
+                                     37 ; absolute external ram data
+                                     38 ;--------------------------------------------------------
+                                     39 	.area _DABS (ABS)
+                                     40 ;--------------------------------------------------------
+                                     41 ; global & static initialisations
+                                     42 ;--------------------------------------------------------
+                                     43 	.area _HOME
+                                     44 	.area _GSINIT
+                                     45 	.area _GSFINAL
+                                     46 	.area _GSINIT
+                                     47 ;/tmp/_gbsbuild/src/core/Camera.c:7: UBYTE camera_settings = CAMERA_LOCK_FLAG;
+      000000 21r0Br00                48 	ld	hl, #_camera_settings
+      000003 36 10                   49 	ld	(hl), #0x10
+                                     50 ;--------------------------------------------------------
+                                     51 ; Home
+                                     52 ;--------------------------------------------------------
+                                     53 	.area _HOME
+                                     54 	.area _HOME
+                                     55 ;--------------------------------------------------------
+                                     56 ; code
+                                     57 ;--------------------------------------------------------
+                                     58 	.area _CODE
+                                     59 	.area _CODE
+                                     60 	.area _CABS (ABS)

@@ -1,0 +1,233 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Input
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _ScriptStartBg
+                                     12 	.globl _input_override_default
+                                     13 	.globl _input_script_persist
+                                     14 	.globl _input_script_ptrs
+                                     15 	.globl _input_wait
+                                     16 	.globl _await_input
+                                     17 	.globl _recent_joy
+                                     18 	.globl _last_joy
+                                     19 	.globl _joy
+                                     20 	.globl _HandleInputScripts
+                                     21 	.globl _RemoveInputScripts
+                                     22 ;--------------------------------------------------------
+                                     23 ; special function registers
+                                     24 ;--------------------------------------------------------
+                                     25 ;--------------------------------------------------------
+                                     26 ; ram data
+                                     27 ;--------------------------------------------------------
+                                     28 	.area _DATA
+      000000                         29 _joy::
+      000000                         30 	.ds 1
+      000001                         31 _last_joy::
+      000001                         32 	.ds 1
+      000002                         33 _recent_joy::
+      000002                         34 	.ds 1
+      000003                         35 _await_input::
+      000003                         36 	.ds 1
+      000004                         37 _input_wait::
+      000004                         38 	.ds 1
+      000005                         39 _input_script_ptrs::
+      000005                         40 	.ds 24
+      00001D                         41 _input_script_persist::
+      00001D                         42 	.ds 1
+      00001E                         43 _input_override_default::
+      00001E                         44 	.ds 1
+                                     45 ;--------------------------------------------------------
+                                     46 ; absolute external ram data
+                                     47 ;--------------------------------------------------------
+                                     48 	.area _DABS (ABS)
+                                     49 ;--------------------------------------------------------
+                                     50 ; global & static initialisations
+                                     51 ;--------------------------------------------------------
+                                     52 	.area _HOME
+                                     53 	.area _GSINIT
+                                     54 	.area _GSFINAL
+                                     55 	.area _GSINIT
+                                     56 ;/tmp/_gbsbuild/src/core/Input.c:5: UBYTE joy = 0;
+      000000 21r00r00                57 	ld	hl, #_joy
+      000003 36 00                   58 	ld	(hl), #0x00
+                                     59 ;/tmp/_gbsbuild/src/core/Input.c:6: UBYTE last_joy = 0;
+      000005 21r01r00                60 	ld	hl, #_last_joy
+      000008 36 00                   61 	ld	(hl), #0x00
+                                     62 ;/tmp/_gbsbuild/src/core/Input.c:7: UBYTE recent_joy = 0;
+      00000A 21r02r00                63 	ld	hl, #_recent_joy
+      00000D 36 00                   64 	ld	(hl), #0x00
+                                     65 ;/tmp/_gbsbuild/src/core/Input.c:8: UBYTE await_input = 0;
+      00000F 21r03r00                66 	ld	hl, #_await_input
+      000012 36 00                   67 	ld	(hl), #0x00
+                                     68 ;/tmp/_gbsbuild/src/core/Input.c:9: UBYTE input_wait = 0;
+      000014 21r04r00                69 	ld	hl, #_input_wait
+      000017 36 00                   70 	ld	(hl), #0x00
+                                     71 ;/tmp/_gbsbuild/src/core/Input.c:11: UBYTE input_script_persist = 0;
+      000019 21r1Dr00                72 	ld	hl, #_input_script_persist
+      00001C 36 00                   73 	ld	(hl), #0x00
+                                     74 ;/tmp/_gbsbuild/src/core/Input.c:12: UBYTE input_override_default = 0;
+      00001E 21r1Er00                75 	ld	hl, #_input_override_default
+      000021 36 00                   76 	ld	(hl), #0x00
+                                     77 ;--------------------------------------------------------
+                                     78 ; Home
+                                     79 ;--------------------------------------------------------
+                                     80 	.area _HOME
+                                     81 	.area _HOME
+                                     82 ;--------------------------------------------------------
+                                     83 ; code
+                                     84 ;--------------------------------------------------------
+                                     85 	.area _CODE
+                                     86 ;/tmp/_gbsbuild/src/core/Input.c:14: void HandleInputScripts() {
+                                     87 ;	---------------------------------
+                                     88 ; Function HandleInputScripts
+                                     89 ; ---------------------------------
+      000000                         90 _HandleInputScripts::
+      000000 3B                      91 	dec	sp
+                                     92 ;/tmp/_gbsbuild/src/core/Input.c:17: if (input_wait != 0) {
+      000001 21r04r00                93 	ld	hl, #_input_wait
+      000004 7E                      94 	ld	a, (hl)
+      000005 B7                      95 	or	a, a
+      000006 28 03                   96 	jr	Z, 00102$
+                                     97 ;/tmp/_gbsbuild/src/core/Input.c:18: input_wait--;
+      000008 35                      98 	dec	(hl)
+                                     99 ;/tmp/_gbsbuild/src/core/Input.c:19: return;
+      000009 18 53                  100 	jr	00114$
+      00000B                        101 00102$:
+                                    102 ;/tmp/_gbsbuild/src/core/Input.c:22: if (!script_ctxs[0].script_ptr_bank && joy != 0 && joy != last_joy) {
+      00000B FAr0Er00               103 	ld	a, (#(_script_ctxs + 0x000e) + 0)
+      00000E B7                     104 	or	a, a
+      00000F 20 4D                  105 	jr	NZ, 00114$
+      000011 21r00r00               106 	ld	hl, #_joy
+      000014 7E                     107 	ld	a, (hl)
+      000015 B7                     108 	or	a, a
+      000016 28 46                  109 	jr	Z, 00114$
+      000018 7E                     110 	ld	a, (hl)
+      000019 21r01r00               111 	ld	hl, #_last_joy
+      00001C 96                     112 	sub	a, (hl)
+      00001D 28 3F                  113 	jr	Z, 00114$
+                                    114 ;/tmp/_gbsbuild/src/core/Input.c:24: input_joy = joy;
+      00001F FAr00r00               115 	ld	a, (#_joy)
+      000022 F8 00                  116 	ldhl	sp,	#0
+      000024 77                     117 	ld	(hl), a
+      000025 4E                     118 	ld	c, (hl)
+                                    119 ;/tmp/_gbsbuild/src/core/Input.c:25: for (input_index = 0; input_index != 8; ++input_index) {
+      000026 06 00                  120 	ld	b, #0x00
+      000028                        121 00112$:
+                                    122 ;/tmp/_gbsbuild/src/core/Input.c:26: if (input_joy & 1) {
+      000028 CB 41                  123 	bit	0, c
+      00002A 28 2A                  124 	jr	Z, 00106$
+                                    125 ;/tmp/_gbsbuild/src/core/Input.c:27: if (input_script_ptrs[input_index].bank) {
+      00002C 58                     126 	ld	e, b
+      00002D 16 00                  127 	ld	d, #0x00
+      00002F 6B                     128 	ld	l, e
+      000030 62                     129 	ld	h, d
+      000031 29                     130 	add	hl, hl
+      000032 19                     131 	add	hl, de
+      000033 3Er05                  132 	ld	a, #<(_input_script_ptrs)
+      000035 85                     133 	add	a, l
+      000036 5F                     134 	ld	e, a
+      000037 3Es00                  135 	ld	a, #>(_input_script_ptrs)
+      000039 8C                     136 	adc	a, h
+      00003A 57                     137 	ld	d, a
+      00003B 1A                     138 	ld	a, (de)
+      00003C B7                     139 	or	a, a
+      00003D 28 17                  140 	jr	Z, 00106$
+                                    141 ;/tmp/_gbsbuild/src/core/Input.c:28: last_joy = joy;
+      00003F F8 00                  142 	ldhl	sp,	#0
+      000041 7E                     143 	ld	a, (hl)
+      000042 EAr01r00               144 	ld	(#_last_joy),a
+                                    145 ;/tmp/_gbsbuild/src/core/Input.c:29: input_wait = 10;
+      000045 21r04r00               146 	ld	hl, #_input_wait
+      000048 36 0A                  147 	ld	(hl), #0x0a
+                                    148 ;/tmp/_gbsbuild/src/core/Input.c:30: ScriptStartBg(&input_script_ptrs[input_index], 255);
+      00004A 3E FF                  149 	ld	a, #0xff
+      00004C F5                     150 	push	af
+      00004D 33                     151 	inc	sp
+      00004E D5                     152 	push	de
+      00004F CDr00r00               153 	call	_ScriptStartBg
+      000052 E8 03                  154 	add	sp, #3
+                                    155 ;/tmp/_gbsbuild/src/core/Input.c:31: return;
+      000054 18 08                  156 	jr	00114$
+      000056                        157 00106$:
+                                    158 ;/tmp/_gbsbuild/src/core/Input.c:34: input_joy = input_joy >> 1;
+      000056 CB 39                  159 	srl	c
+                                    160 ;/tmp/_gbsbuild/src/core/Input.c:25: for (input_index = 0; input_index != 8; ++input_index) {
+      000058 04                     161 	inc	b
+      000059 78                     162 	ld	a, b
+      00005A D6 08                  163 	sub	a, #0x08
+      00005C 20 CA                  164 	jr	NZ, 00112$
+      00005E                        165 00114$:
+                                    166 ;/tmp/_gbsbuild/src/core/Input.c:37: }
+      00005E 33                     167 	inc	sp
+      00005F C9                     168 	ret
+                                    169 ;/tmp/_gbsbuild/src/core/Input.c:39: void RemoveInputScripts() {
+                                    170 ;	---------------------------------
+                                    171 ; Function RemoveInputScripts
+                                    172 ; ---------------------------------
+      000060                        173 _RemoveInputScripts::
+                                    174 ;/tmp/_gbsbuild/src/core/Input.c:41: for (i = 0; i != 8; ++i) {
+      000060 0E 00                  175 	ld	c, #0x00
+      000062                        176 00104$:
+                                    177 ;/tmp/_gbsbuild/src/core/Input.c:42: if (!GET_BIT(input_script_persist, i)) {
+      000062 79                     178 	ld	a, c
+      000063 F5                     179 	push	af
+      000064 11 01 00               180 	ld	de, #0x0001
+      000067 F1                     181 	pop	af
+      000068 3C                     182 	inc	a
+      000069 18 04                  183 	jr	00120$
+      00006B                        184 00119$:
+      00006B CB 23                  185 	sla	e
+      00006D CB 12                  186 	rl	d
+      00006F                        187 00120$:
+      00006F 3D                     188 	dec	a
+      000070 20 F9                  189 	jr	NZ,00119$
+      000072 21r1Dr00               190 	ld	hl, #_input_script_persist
+      000075 46                     191 	ld	b, (hl)
+      000076 AF                     192 	xor	a, a
+      000077 F5                     193 	push	af
+      000078 78                     194 	ld	a, b
+      000079 A3                     195 	and	a, e
+      00007A 47                     196 	ld	b, a
+      00007B F1                     197 	pop	af
+      00007C A2                     198 	and	a, d
+                                    199 ;/tmp/_gbsbuild/src/core/Input.c:43: input_script_ptrs[i].bank = 0;
+      00007D B0                     200 	or	a,b
+      00007E 20 1B                  201 	jr	NZ, 00105$
+      000080 47                     202 	ld	b,a
+      000081 69                     203 	ld	l, c
+      000082 60                     204 	ld	h, b
+      000083 29                     205 	add	hl, hl
+      000084 09                     206 	add	hl, bc
+      000085 11r05r00               207 	ld	de, #_input_script_ptrs
+      000088 19                     208 	add	hl, de
+      000089 36 00                  209 	ld	(hl), #0x00
+                                    210 ;/tmp/_gbsbuild/src/core/Input.c:44: UNSET_BIT(input_override_default, i);
+      00008B 41                     211 	ld	b, c
+      00008C 3E 01                  212 	ld	a, #0x01
+      00008E 04                     213 	inc	b
+      00008F 18 01                  214 	jr	00122$
+      000091                        215 00121$:
+      000091 87                     216 	add	a, a
+      000092                        217 00122$:
+      000092 05                     218 	dec	b
+      000093 20 FC                  219 	jr	NZ,00121$
+      000095 2F                     220 	cpl
+      000096 21r1Er00               221 	ld	hl, #_input_override_default
+      000099 A6                     222 	and	a, (hl)
+      00009A 77                     223 	ld	(hl), a
+      00009B                        224 00105$:
+                                    225 ;/tmp/_gbsbuild/src/core/Input.c:41: for (i = 0; i != 8; ++i) {
+      00009B 0C                     226 	inc	c
+      00009C 79                     227 	ld	a, c
+      00009D D6 08                  228 	sub	a, #0x08
+      00009F 20 C1                  229 	jr	NZ, 00104$
+                                    230 ;/tmp/_gbsbuild/src/core/Input.c:47: }
+      0000A1 C9                     231 	ret
+                                    232 	.area _CODE
+                                    233 	.area _CABS (ABS)

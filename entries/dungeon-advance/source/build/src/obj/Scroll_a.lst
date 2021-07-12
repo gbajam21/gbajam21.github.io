@@ -1,0 +1,61 @@
+                           00FF40     1 .LCDC = 0xFF40
+                           00FF41     2 .STAT = 0xFF41
+                                      3 
+      000000                          4 _SetTile::
+                                      5         ; de = addr, hl = &t
+      000000 F8 02                    6         ldhl    sp,#2
+      000002 2A                       7         ld      a,(hl+)
+      000003 5F                       8         ld      e, a
+      000004 2A                       9         ld      a,(hl+)
+      000005 57                      10         ld      d, a
+                                     11 
+                                     12         ; while 0xff41 & 02 != 0 (cannot write)
+      000006                         13     1$:
+      000006 F0 41                   14         ldh     a,(.STAT)
+      000008 E6 02                   15         and     a, #0x02
+      00000A 20 FA                   16         jr      NZ,1$
+                                     17 
+                                     18         ; Write tile
+      00000C 7E                      19         ld      a,(hl)
+      00000D 12                      20         ld      (de),a
+      00000E C9                      21         ret
+                                     22 
+      00000F                         23 _WaitForMode0Or1::
+      00000F                         24     1$:
+      00000F F0 41                   25         ldh     a,(.STAT)
+      000011 E6 02                   26         and     a, #0x02
+      000013 20 FA                   27         jr      NZ,1$
+      000015 C9                      28         ret
+                                     29 
+      000016                         30 _GetWinAddr::
+      000016 F0 40                   31         ldh     a,(.LCDC)
+      000018 CB 77                   32         bit     6,a
+      00001A 28 08                   33         jr      Z,.is98
+      00001C 18 0A                   34         jr      .is9c
+      00001E                         35 _GetBkgAddr::
+      00001E F0 40                   36         ldh     a,(.LCDC)
+      000020 CB 5F                   37         bit     3,a
+      000022 20 04                   38         jr      NZ,.is9c
+      000024                         39 .is98:
+      000024 11 00 98                40         ld      DE,#0x9800	; DE = origin
+      000027 C9                      41         ret
+      000028                         42 .is9c:
+      000028 11 00 9C                43         ld      DE,#0x9C00  ; DE = origin
+      00002B C9                      44         ret
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .LCDC   =  00FF40     |     .STAT   =  00FF41     |     .__.$$$.=  002710 L
+    .__.ABS.=  000000 G   |     .__.CPU.=  000000 L   |     .__.H$L.=  000000 L
+  0 .is98      000024 R   |   0 .is9c      000028 R   |   0 _GetBkgA   00001E GR
+  0 _GetWinA   000016 GR  |   0 _SetTile   000000 GR  |   0 _WaitFor   00000F GR
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE      size     2C   flags    0
+

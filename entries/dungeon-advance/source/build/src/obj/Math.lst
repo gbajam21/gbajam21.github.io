@@ -1,0 +1,148 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Math
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _DespRight
+                                     12 	.globl _Lt16
+                                     13 	.globl _Gt16
+                                     14 ;--------------------------------------------------------
+                                     15 ; special function registers
+                                     16 ;--------------------------------------------------------
+                                     17 ;--------------------------------------------------------
+                                     18 ; ram data
+                                     19 ;--------------------------------------------------------
+                                     20 	.area _DATA
+                                     21 ;--------------------------------------------------------
+                                     22 ; absolute external ram data
+                                     23 ;--------------------------------------------------------
+                                     24 	.area _DABS (ABS)
+                                     25 ;--------------------------------------------------------
+                                     26 ; global & static initialisations
+                                     27 ;--------------------------------------------------------
+                                     28 	.area _HOME
+                                     29 	.area _GSINIT
+                                     30 	.area _GSFINAL
+                                     31 	.area _GSINIT
+                                     32 ;--------------------------------------------------------
+                                     33 ; Home
+                                     34 ;--------------------------------------------------------
+                                     35 	.area _HOME
+                                     36 	.area _HOME
+                                     37 ;--------------------------------------------------------
+                                     38 ; code
+                                     39 ;--------------------------------------------------------
+                                     40 	.area _CODE
+                                     41 ;/tmp/_gbsbuild/src/core/Math.c:5: INT16 DespRight(INT16 a, INT16 b) {
+                                     42 ;	---------------------------------
+                                     43 ; Function DespRight
+                                     44 ; ---------------------------------
+      000000                         45 _DespRight::
+                                     46 ;/tmp/_gbsbuild/src/core/Math.c:6: return a >> b;
+      000000 F8 04                   47 	ldhl	sp,	#4
+      000002 7E                      48 	ld	a, (hl)
+      000003 F5                      49 	push	af
+      000004 2B                      50 	dec	hl
+      000005 2B                      51 	dec	hl
+      000006 2A                      52 	ld	a, (hl+)
+      000007 5F                      53 	ld	e, a
+      000008 56                      54 	ld	d, (hl)
+      000009 F1                      55 	pop	af
+      00000A 3C                      56 	inc	a
+      00000B 18 04                   57 	jr	00104$
+      00000D                         58 00103$:
+      00000D CB 2A                   59 	sra	d
+      00000F CB 1B                   60 	rr	e
+      000011                         61 00104$:
+      000011 3D                      62 	dec	a
+      000012 20 F9                   63 	jr	NZ, 00103$
+                                     64 ;/tmp/_gbsbuild/src/core/Math.c:7: }
+      000014 C9                      65 	ret
+                                     66 ;/tmp/_gbsbuild/src/core/Math.c:9: UBYTE Lt16(UINT16 a, UINT16 b) {
+                                     67 ;	---------------------------------
+                                     68 ; Function Lt16
+                                     69 ; ---------------------------------
+      000015                         70 _Lt16::
+      000015 3B                      71 	dec	sp
+                                     72 ;/tmp/_gbsbuild/src/core/Math.c:10: UBYTE a_hi = a >> 8;
+      000016 F8 04                   73 	ldhl	sp,	#4
+                                     74 ;/tmp/_gbsbuild/src/core/Math.c:11: UBYTE b_hi = b >> 8;
+      000018 2A                      75 	ld	a, (hl+)
+      000019 4F                      76 	ld	c, a
+      00001A 23                      77 	inc	hl
+      00001B 46                      78 	ld	b, (hl)
+                                     79 ;/tmp/_gbsbuild/src/core/Math.c:12: UBYTE a_lo = a & 0xFF;
+      00001C F8 03                   80 	ldhl	sp,	#3
+      00001E 7E                      81 	ld	a, (hl)
+      00001F F8 00                   82 	ldhl	sp,	#0
+      000021 77                      83 	ld	(hl), a
+                                     84 ;/tmp/_gbsbuild/src/core/Math.c:13: UBYTE b_lo = b & 0xFF;
+      000022 F8 05                   85 	ldhl	sp,	#5
+      000024 5E                      86 	ld	e, (hl)
+                                     87 ;/tmp/_gbsbuild/src/core/Math.c:14: return a_hi < b_hi || (a_hi == b_hi && a_lo < b_lo);
+      000025 79                      88 	ld	a,c
+      000026 B8                      89 	cp	a,b
+      000027 38 0D                   90 	jr	C, 00104$
+      000029 90                      91 	sub	a, b
+      00002A 20 06                   92 	jr	NZ, 00103$
+      00002C F8 00                   93 	ldhl	sp,	#0
+      00002E 7E                      94 	ld	a, (hl)
+      00002F 93                      95 	sub	a, e
+      000030 38 04                   96 	jr	C, 00104$
+      000032                         97 00103$:
+      000032 1E 00                   98 	ld	e, #0x00
+      000034 18 02                   99 	jr	00105$
+      000036                        100 00104$:
+      000036 1E 01                  101 	ld	e, #0x01
+      000038                        102 00105$:
+                                    103 ;/tmp/_gbsbuild/src/core/Math.c:15: }
+      000038 33                     104 	inc	sp
+      000039 C9                     105 	ret
+                                    106 ;/tmp/_gbsbuild/src/core/Math.c:17: UBYTE Gt16(UINT16 a, UINT16 b) {
+                                    107 ;	---------------------------------
+                                    108 ; Function Gt16
+                                    109 ; ---------------------------------
+      00003A                        110 _Gt16::
+      00003A 3B                     111 	dec	sp
+                                    112 ;/tmp/_gbsbuild/src/core/Math.c:18: UBYTE a_hi = a >> 8;
+      00003B F8 04                  113 	ldhl	sp,	#4
+                                    114 ;/tmp/_gbsbuild/src/core/Math.c:19: UBYTE b_hi = b >> 8;
+      00003D 2A                     115 	ld	a, (hl+)
+      00003E 4F                     116 	ld	c, a
+      00003F 23                     117 	inc	hl
+      000040 46                     118 	ld	b, (hl)
+                                    119 ;/tmp/_gbsbuild/src/core/Math.c:20: UBYTE a_lo = a & 0xFF;
+      000041 F8 03                  120 	ldhl	sp,	#3
+      000043 7E                     121 	ld	a, (hl)
+      000044 F8 00                  122 	ldhl	sp,	#0
+      000046 77                     123 	ld	(hl), a
+                                    124 ;/tmp/_gbsbuild/src/core/Math.c:21: UBYTE b_lo = b & 0xFF;
+      000047 F8 05                  125 	ldhl	sp,	#5
+      000049 5E                     126 	ld	e, (hl)
+                                    127 ;/tmp/_gbsbuild/src/core/Math.c:22: return a_hi > b_hi || (a_hi == b_hi && a_lo > b_lo);
+      00004A 78                     128 	ld	a, b
+      00004B 91                     129 	sub	a, c
+      00004C 38 0E                  130 	jr	C, 00104$
+      00004E 79                     131 	ld	a, c
+      00004F 90                     132 	sub	a, b
+      000050 20 06                  133 	jr	NZ, 00103$
+      000052 7B                     134 	ld	a, e
+      000053 F8 00                  135 	ldhl	sp,	#0
+      000055 96                     136 	sub	a, (hl)
+      000056 38 04                  137 	jr	C, 00104$
+      000058                        138 00103$:
+      000058 1E 00                  139 	ld	e, #0x00
+      00005A 18 02                  140 	jr	00105$
+      00005C                        141 00104$:
+      00005C 1E 01                  142 	ld	e, #0x01
+      00005E                        143 00105$:
+                                    144 ;/tmp/_gbsbuild/src/core/Math.c:23: }
+      00005E 33                     145 	inc	sp
+      00005F C9                     146 	ret
+                                    147 	.area _CODE
+                                    148 	.area _CABS (ABS)

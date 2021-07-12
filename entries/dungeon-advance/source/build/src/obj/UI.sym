@@ -1,0 +1,102 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+    _PopBank                                                       ****** GX
+    _PushBank                                                      ****** GX
+    _ReadBankedBankPtr                                             ****** GX
+    _ReadBankedUBYTE                                               ****** GX
+    _SetBankedBkgData                                              ****** GX
+  0 _UIAtDest                                                      000213 GR
+  0 _UIDrawDialogueFrame                                           00003E GR
+    _UIDrawDialogueFrame_b                                         ****** GX
+  0 _UIDrawFrame                                                   000022 GR
+    _UIDrawFrame_b                                                 ****** GX
+  0 _UIInit                                                        000000 GR
+    _UIInit_b                                                      ****** GX
+  0 _UIIsClosed                                                    0001F7 GR
+  0 _UIMoveTo                                                      0001CA GR
+  0 _UIOnInteract                                                  00020B GR
+    _UIOnInteract_b                                                ****** GX
+  0 _UIReset                                                       00001A GR
+    _UIReset_b                                                     ****** GX
+  0 _UISetColor                                                    00022B GR
+    _UISetColor_b                                                  ****** GX
+  0 _UISetPos                                                      0001B7 GR
+  0 _UIShowAvatar                                                  000082 GR
+  0 _UIShowChoice                                                  00016F GR
+  0 _UIShowMenu                                                    000192 GR
+    _UIShowMenu_b                                                  ****** GX
+  0 _UIShowText                                                    00004D GR
+    _UIShowText_b                                                  ****** GX
+  0 _UIUpdate                                                      000012 GR
+    _UIUpdate_b                                                    ****** GX
+    ___sdcc_bcall_ehl                                              ****** GX
+  0 ___str_0                                                       000081 R
+    _avatar_bank_ptrs                                              ****** GX
+  1 _avatar_enabled                                                000013 GR
+    _memcpy                                                        ****** GX
+  1 _menu_cancel_on_b                                              00001A GR
+  1 _menu_cancel_on_last_option                                    000019 GR
+  1 _menu_enabled                                                  000014 GR
+  1 _menu_flag                                                     000016 GR
+  1 _menu_index                                                    000015 GR
+  1 _menu_layout                                                   00001B GR
+  1 _menu_num_options                                              000018 GR
+    _set_win_tiles                                                 ****** GX
+    _strcat                                                        ****** GX
+    _strcpy                                                        ****** GX
+  1 _text_count                                                    000009 GR
+  1 _text_draw_speed                                               00000E GR
+  1 _text_drawn                                                    000008 GR
+  1 _text_ff_joypad                                                00000F GR
+  1 _text_in_speed                                                 00000C GR
+  1 _text_lines                                                    00001C GR
+  1 _text_num_lines                                                000012 GR
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+  1 _text_out_speed                                                00000D GR
+  1 _text_tile_count                                               00000A GR
+  1 _text_wait                                                     00000B GR
+  1 _text_x                                                        000006 GR
+  1 _text_y                                                        000007 GR
+  1 _tmp_text_in_speed                                             000010 GR
+  1 _tmp_text_lines                                                00006C GR
+  1 _tmp_text_out_speed                                            000011 GR
+  1 _ui_block                                                      000000 GR
+  1 _win_dest_pos_x                                                000003 GR
+  1 _win_dest_pos_y                                                000004 GR
+  1 _win_pos_x                                                     000001 GR
+  1 _win_pos_y                                                     000002 GR
+  1 _win_speed                                                     000005 GR
+    b_UIDrawDialogueFrame_b                                        ****** GX
+    b_UIDrawFrame_b                                                ****** GX
+    b_UIInit_b                                                     ****** GX
+    b_UIOnInteract_b                                               ****** GX
+    b_UIReset_b                                                    ****** GX
+    b_UISetColor_b                                                 ****** GX
+    b_UIShowMenu_b                                                 ****** GX
+    b_UIShowText_b                                                 ****** GX
+    b_UIUpdate_b                                                   ****** GX
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 3.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size    23C   flags    0
+   1 _DATA                                      size     BC   flags    0
+   2 _DABS                                      size      0   flags    8
+   3 _HOME                                      size      0   flags    0
+   4 _GSINIT                                    size    375   flags    0
+   5 _GSFINAL                                   size      0   flags    0
+   6 _CABS                                      size      0   flags    8
+

@@ -1,0 +1,875 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module TopDown
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _ActivateTriggerAt
+                                     12 	.globl _TileAt2x2
+                                     13 	.globl _TileAt2x1
+                                     14 	.globl _ActorRunScript
+                                     15 	.globl _ActorInFrontOfPlayer
+                                     16 	.globl _ActorOverlapsPlayer
+                                     17 	.globl _Start_TopDown
+                                     18 	.globl _Update_TopDown
+                                     19 ;--------------------------------------------------------
+                                     20 ; special function registers
+                                     21 ;--------------------------------------------------------
+                                     22 ;--------------------------------------------------------
+                                     23 ; ram data
+                                     24 ;--------------------------------------------------------
+                                     25 	.area _DATA
+                                     26 ;--------------------------------------------------------
+                                     27 ; absolute external ram data
+                                     28 ;--------------------------------------------------------
+                                     29 	.area _DABS (ABS)
+                                     30 ;--------------------------------------------------------
+                                     31 ; global & static initialisations
+                                     32 ;--------------------------------------------------------
+                                     33 	.area _HOME
+                                     34 	.area _GSINIT
+                                     35 	.area _GSFINAL
+                                     36 	.area _GSINIT
+                                     37 ;--------------------------------------------------------
+                                     38 ; Home
+                                     39 ;--------------------------------------------------------
+                                     40 	.area _HOME
+                                     41 	.area _HOME
+                                     42 ;--------------------------------------------------------
+                                     43 ; code
+                                     44 ;--------------------------------------------------------
+                                     45 	.area _CODE_5
+                                     46 ;/tmp/_gbsbuild/src/states/TopDown.c:13: void Start_TopDown() {
+                                     47 ;	---------------------------------
+                                     48 ; Function Start_TopDown
+                                     49 ; ---------------------------------
+      000000                         50 _Start_TopDown::
+                                     51 ;/tmp/_gbsbuild/src/states/TopDown.c:14: camera_offset.x = 0;
+      000000 21r00r00                52 	ld	hl, #_camera_offset
+      000003 36 00                   53 	ld	(hl), #0x00
+                                     54 ;/tmp/_gbsbuild/src/states/TopDown.c:15: camera_offset.y = 0;
+      000005 21r01r00                55 	ld	hl, #(_camera_offset + 0x0001)
+      000008 36 00                   56 	ld	(hl), #0x00
+                                     57 ;/tmp/_gbsbuild/src/states/TopDown.c:16: camera_deadzone.x = 0;
+      00000A 21r00r00                58 	ld	hl, #_camera_deadzone
+      00000D 36 00                   59 	ld	(hl), #0x00
+                                     60 ;/tmp/_gbsbuild/src/states/TopDown.c:17: camera_deadzone.y = 0;
+      00000F 21r01r00                61 	ld	hl, #(_camera_deadzone + 0x0001)
+      000012 36 00                   62 	ld	(hl), #0x00
+                                     63 ;/tmp/_gbsbuild/src/states/TopDown.c:19: if (topdown_grid == 16) {
+      000014 FAr00r00                64 	ld	a, (#_topdown_grid)
+      000017 D6 10                   65 	sub	a, #0x10
+      000019 C0                      66 	ret	NZ
+                                     67 ;/tmp/_gbsbuild/src/states/TopDown.c:21: player.pos.x = MUL_16(DIV_16(player.pos.x));
+      00001A 21r00r00                68 	ld	hl, #_actors
+      00001D 2A                      69 	ld	a, (hl+)
+      00001E 66                      70 	ld	h, (hl)
+      00001F 6F                      71 	ld	l, a
+      000020 CB 2C                   72 	sra	h
+      000022 CB 1D                   73 	rr	l
+      000024 CB 2C                   74 	sra	h
+      000026 CB 1D                   75 	rr	l
+      000028 CB 2C                   76 	sra	h
+      00002A CB 1D                   77 	rr	l
+      00002C CB 2C                   78 	sra	h
+      00002E CB 1D                   79 	rr	l
+      000030 29                      80 	add	hl, hl
+      000031 29                      81 	add	hl, hl
+      000032 29                      82 	add	hl, hl
+      000033 29                      83 	add	hl, hl
+      000034 4D                      84 	ld	c, l
+      000035 44                      85 	ld	b, h
+      000036 21r00r00                86 	ld	hl, #_actors
+      000039 79                      87 	ld	a, c
+      00003A 22                      88 	ld	(hl+), a
+      00003B 70                      89 	ld	(hl), b
+                                     90 ;/tmp/_gbsbuild/src/states/TopDown.c:22: player.pos.y = 8 + MUL_16(DIV_16(player.pos.y));
+      00003C 21r02r00                91 	ld	hl, #(_actors + 0x0002)
+      00003F 2A                      92 	ld	a, (hl+)
+      000040 66                      93 	ld	h, (hl)
+      000041 6F                      94 	ld	l, a
+      000042 CB 2C                   95 	sra	h
+      000044 CB 1D                   96 	rr	l
+      000046 CB 2C                   97 	sra	h
+      000048 CB 1D                   98 	rr	l
+      00004A CB 2C                   99 	sra	h
+      00004C CB 1D                  100 	rr	l
+      00004E CB 2C                  101 	sra	h
+      000050 CB 1D                  102 	rr	l
+      000052 29                     103 	add	hl, hl
+      000053 29                     104 	add	hl, hl
+      000054 29                     105 	add	hl, hl
+      000055 29                     106 	add	hl, hl
+      000056 01 08 00               107 	ld	bc, #0x0008
+      000059 09                     108 	add	hl,bc
+      00005A 4D                     109 	ld	c, l
+      00005B 44                     110 	ld	b, h
+      00005C 21r02r00               111 	ld	hl, #(_actors + 0x0002)
+      00005F 79                     112 	ld	a, c
+      000060 22                     113 	ld	(hl+), a
+      000061 70                     114 	ld	(hl), b
+                                    115 ;/tmp/_gbsbuild/src/states/TopDown.c:24: }
+      000062 C9                     116 	ret
+                                    117 ;/tmp/_gbsbuild/src/states/TopDown.c:26: void Update_TopDown() {
+                                    118 ;	---------------------------------
+                                    119 ; Function Update_TopDown
+                                    120 ; ---------------------------------
+      000063                        121 _Update_TopDown::
+      000063 E8 F9                  122 	add	sp, #-7
+                                    123 ;/tmp/_gbsbuild/src/states/TopDown.c:29: tile_x = DIV_8(player.pos.x);
+      000065 11r00r00               124 	ld	de, #_actors
+      000068 1A                     125 	ld	a, (de)
+      000069 F8 00                  126 	ldhl	sp,	#0
+      00006B 22                     127 	ld	(hl+), a
+      00006C 13                     128 	inc	de
+      00006D 1A                     129 	ld	a, (de)
+      00006E 77                     130 	ld	(hl), a
+      00006F C1                     131 	pop	bc
+      000070 C5                     132 	push	bc
+      000071 CB 28                  133 	sra	b
+      000073 CB 19                  134 	rr	c
+      000075 CB 28                  135 	sra	b
+      000077 CB 19                  136 	rr	c
+      000079 CB 28                  137 	sra	b
+      00007B CB 19                  138 	rr	c
+      00007D 23                     139 	inc	hl
+      00007E 71                     140 	ld	(hl), c
+                                    141 ;/tmp/_gbsbuild/src/states/TopDown.c:30: tile_y = DIV_8(player.pos.y);
+      00007F 11r02r00               142 	ld	de, #(_actors + 0x0002)
+      000082 1A                     143 	ld	a, (de)
+      000083 F8 05                  144 	ldhl	sp,	#5
+      000085 22                     145 	ld	(hl+), a
+      000086 13                     146 	inc	de
+      000087 1A                     147 	ld	a, (de)
+      000088 32                     148 	ld	(hl-), a
+      000089 2A                     149 	ld	a, (hl+)
+      00008A 4F                     150 	ld	c, a
+      00008B 46                     151 	ld	b, (hl)
+      00008C CB 28                  152 	sra	b
+      00008E CB 19                  153 	rr	c
+      000090 CB 28                  154 	sra	b
+      000092 CB 19                  155 	rr	c
+      000094 CB 28                  156 	sra	b
+      000096 CB 19                  157 	rr	c
+      000098 F8 03                  158 	ldhl	sp,	#3
+      00009A 71                     159 	ld	(hl), c
+                                    160 ;/tmp/_gbsbuild/src/states/TopDown.c:33: if ((topdown_grid == 16 && (MOD_16(player.pos.x) == 0 && MOD_16(player.pos.y) == 8)) ||
+      00009B FAr00r00               161 	ld	a, (#_topdown_grid)
+      00009E D6 10                  162 	sub	a, #0x10
+      0000A0 20 15                  163 	jr	NZ, 00189$
+      0000A2 F8 00                  164 	ldhl	sp,	#0
+      0000A4 7E                     165 	ld	a, (hl)
+      0000A5 E6 0F                  166 	and	a, #0x0f
+      0000A7 20 0E                  167 	jr	NZ, 00189$
+      0000A9 F8 05                  168 	ldhl	sp,	#5
+      0000AB 7E                     169 	ld	a, (hl)
+      0000AC E6 0F                  170 	and	a, #0x0f
+      0000AE 4F                     171 	ld	c, a
+      0000AF 06 00                  172 	ld	b, #0x00
+      0000B1 79                     173 	ld	a, c
+      0000B2 D6 08                  174 	sub	a, #0x08
+      0000B4 B0                     175 	or	a, b
+      0000B5 28 18                  176 	jr	Z, 00183$
+      0000B7                        177 00189$:
+                                    178 ;/tmp/_gbsbuild/src/states/TopDown.c:34: (topdown_grid ==  8 && (MOD_8(player.pos.x)  == 0 && MOD_8(player.pos.y)  == 0))) {
+      0000B7 FAr00r00               179 	ld	a, (#_topdown_grid)
+      0000BA D6 08                  180 	sub	a, #0x08
+      0000BC C2rF9r03               181 	jp	NZ,00184$
+      0000BF F8 00                  182 	ldhl	sp,	#0
+      0000C1 7E                     183 	ld	a, (hl)
+      0000C2 E6 07                  184 	and	a, #0x07
+      0000C4 C2rF9r03               185 	jp	NZ,00184$
+      0000C7 F8 05                  186 	ldhl	sp,	#5
+      0000C9 7E                     187 	ld	a, (hl)
+      0000CA E6 07                  188 	and	a, #0x07
+      0000CC C2rF9r03               189 	jp	NZ,00184$
+      0000CF                        190 00183$:
+                                    191 ;/tmp/_gbsbuild/src/states/TopDown.c:37: player.moving = FALSE;
+      0000CF 21r07r00               192 	ld	hl, #(_actors + 0x0007)
+      0000D2 36 00                  193 	ld	(hl), #0x00
+                                    194 ;/tmp/_gbsbuild/src/states/TopDown.c:40: if (ActivateTriggerAt(tile_x, tile_y, FALSE)) {
+      0000D4 AF                     195 	xor	a, a
+      0000D5 F5                     196 	push	af
+      0000D6 33                     197 	inc	sp
+      0000D7 F8 04                  198 	ldhl	sp,	#4
+      0000D9 7E                     199 	ld	a, (hl)
+      0000DA F5                     200 	push	af
+      0000DB 33                     201 	inc	sp
+      0000DC 2B                     202 	dec	hl
+      0000DD 7E                     203 	ld	a, (hl)
+      0000DE F5                     204 	push	af
+      0000DF 33                     205 	inc	sp
+      0000E0 CDr00r00               206 	call	_ActivateTriggerAt
+      0000E3 E8 03                  207 	add	sp, #3
+      0000E5 7B                     208 	ld	a, e
+      0000E6 B7                     209 	or	a, a
+                                    210 ;/tmp/_gbsbuild/src/states/TopDown.c:42: return;
+      0000E7 C2r84r04               211 	jp	NZ,00197$
+                                    212 ;/tmp/_gbsbuild/src/states/TopDown.c:46: if (INPUT_RECENT_LEFT) {
+      0000EA 21r00r00               213 	ld	hl, #_recent_joy
+      0000ED 4E                     214 	ld	c, (hl)
+      0000EE 21r00r00               215 	ld	hl, #_joy
+      0000F1 5E                     216 	ld	e, (hl)
+                                    217 ;/tmp/_gbsbuild/src/states/TopDown.c:47: player.dir.x = -1;
+                                    218 ;/tmp/_gbsbuild/src/states/TopDown.c:48: player.dir.y = 0;
+                                    219 ;/tmp/_gbsbuild/src/states/TopDown.c:49: player.rerender = TRUE;
+                                    220 ;/tmp/_gbsbuild/src/states/TopDown.c:53: UBYTE tile_left = tile_x - 2;
+      0000F2 F8 02                  221 	ldhl	sp,	#2
+      0000F4 2A                     222 	ld	a, (hl+)
+      0000F5 23                     223 	inc	hl
+                                    224 ;/tmp/_gbsbuild/src/states/TopDown.c:54: if (tile_x != 0 && !(TileAt2x2(tile_left, tile_y-1) & COLLISION_RIGHT)) {
+      0000F6 32                     225 	ld	(hl-), a
+      0000F7 2A                     226 	ld	a, (hl+)
+      0000F8 23                     227 	inc	hl
+      0000F9 77                     228 	ld	(hl), a
+      0000FA C6 FF                  229 	add	a, #0xff
+      0000FC 23                     230 	inc	hl
+      0000FD 77                     231 	ld	(hl), a
+                                    232 ;/tmp/_gbsbuild/src/states/TopDown.c:46: if (INPUT_RECENT_LEFT) {
+      0000FE FAr00r00               233 	ld	a, (#_ui_block)
+      000101 B7                     234 	or	a, a
+      000102 20 07                  235 	jr	NZ, 00165$
+      000104 21r00r00               236 	ld	hl, #_input_override_default
+      000107 CB 4E                  237 	bit	1, (hl)
+      000109 20 6C                  238 	jr	NZ, 00160$
+      00010B                        239 00165$:
+      00010B CB 49                  240 	bit	1, c
+      00010D 20 0A                  241 	jr	NZ, 00159$
+      00010F FAr00r00               242 	ld	a, (#_recent_joy)
+      000112 B7                     243 	or	a, a
+      000113 20 62                  244 	jr	NZ, 00160$
+      000115 CB 4B                  245 	bit	1, e
+      000117 28 5E                  246 	jr	Z, 00160$
+      000119                        247 00159$:
+                                    248 ;/tmp/_gbsbuild/src/states/TopDown.c:47: player.dir.x = -1;
+      000119 21r05r00               249 	ld	hl, #(_actors + 0x0005)
+      00011C 36 FF                  250 	ld	(hl), #0xff
+                                    251 ;/tmp/_gbsbuild/src/states/TopDown.c:48: player.dir.y = 0;
+      00011E 21r06r00               252 	ld	hl, #(_actors + 0x0006)
+      000121 36 00                  253 	ld	(hl), #0x00
+                                    254 ;/tmp/_gbsbuild/src/states/TopDown.c:49: player.rerender = TRUE;
+      000123 21r14r00               255 	ld	hl, #(_actors + 0x0014)
+      000126 36 01                  256 	ld	(hl), #0x01
+                                    257 ;/tmp/_gbsbuild/src/states/TopDown.c:52: if (topdown_grid == 16) {
+      000128 FAr00r00               258 	ld	a, (#_topdown_grid)
+      00012B D6 10                  259 	sub	a, #0x10
+      00012D 20 25                  260 	jr	NZ, 00110$
+                                    261 ;/tmp/_gbsbuild/src/states/TopDown.c:53: UBYTE tile_left = tile_x - 2;
+      00012F F8 04                  262 	ldhl	sp,	#4
+      000131 46                     263 	ld	b, (hl)
+      000132 05                     264 	dec	b
+      000133 05                     265 	dec	b
+                                    266 ;/tmp/_gbsbuild/src/states/TopDown.c:54: if (tile_x != 0 && !(TileAt2x2(tile_left, tile_y-1) & COLLISION_RIGHT)) {
+      000134 2B                     267 	dec	hl
+      000135 2B                     268 	dec	hl
+      000136 7E                     269 	ld	a, (hl)
+      000137 B7                     270 	or	a, a
+      000138 CAr09r03               271 	jp	Z, 00161$
+      00013B F8 06                  272 	ldhl	sp,	#6
+      00013D 7E                     273 	ld	a, (hl)
+      00013E F5                     274 	push	af
+      00013F 33                     275 	inc	sp
+      000140 C5                     276 	push	bc
+      000141 33                     277 	inc	sp
+      000142 CDr00r00               278 	call	_TileAt2x2
+      000145 E8 02                  279 	add	sp, #2
+      000147 CB 5B                  280 	bit	3, e
+      000149 C2r09r03               281 	jp	NZ,00161$
+                                    282 ;/tmp/_gbsbuild/src/states/TopDown.c:55: player.moving = TRUE;
+      00014C 21r07r00               283 	ld	hl, #(_actors + 0x0007)
+      00014F 36 01                  284 	ld	(hl), #0x01
+      000151 C3r09r03               285 	jp	00161$
+      000154                        286 00110$:
+                                    287 ;/tmp/_gbsbuild/src/states/TopDown.c:58: UBYTE tile_left = tile_x - 1;
+      000154 F8 04                  288 	ldhl	sp,	#4
+      000156 46                     289 	ld	b, (hl)
+      000157 05                     290 	dec	b
+                                    291 ;/tmp/_gbsbuild/src/states/TopDown.c:59: if (tile_x != 0 && !(TileAt2x1(tile_left, tile_y) & COLLISION_RIGHT)) {
+      000158 2B                     292 	dec	hl
+      000159 2B                     293 	dec	hl
+      00015A 7E                     294 	ld	a, (hl)
+      00015B B7                     295 	or	a, a
+      00015C CAr09r03               296 	jp	Z, 00161$
+      00015F 23                     297 	inc	hl
+      000160 7E                     298 	ld	a, (hl)
+      000161 F5                     299 	push	af
+      000162 33                     300 	inc	sp
+      000163 C5                     301 	push	bc
+      000164 33                     302 	inc	sp
+      000165 CDr00r00               303 	call	_TileAt2x1
+      000168 E8 02                  304 	add	sp, #2
+      00016A CB 5B                  305 	bit	3, e
+      00016C C2r09r03               306 	jp	NZ,00161$
+                                    307 ;/tmp/_gbsbuild/src/states/TopDown.c:60: player.moving = TRUE;
+      00016F 21r07r00               308 	ld	hl, #(_actors + 0x0007)
+      000172 36 01                  309 	ld	(hl), #0x01
+      000174 C3r09r03               310 	jp	00161$
+      000177                        311 00160$:
+                                    312 ;/tmp/_gbsbuild/src/states/TopDown.c:64: } else if (INPUT_RECENT_RIGHT) {
+      000177 FAr00r00               313 	ld	a, (#_ui_block)
+      00017A B7                     314 	or	a, a
+      00017B 20 08                  315 	jr	NZ, 00158$
+      00017D 21r00r00               316 	ld	hl, #_input_override_default
+      000180 CB 46                  317 	bit	0, (hl)
+      000182 C2r06r02               318 	jp	NZ,00153$
+      000185                        319 00158$:
+      000185 CB 41                  320 	bit	0, c
+      000187 20 0A                  321 	jr	NZ, 00152$
+      000189 FAr00r00               322 	ld	a, (#_recent_joy)
+      00018C B7                     323 	or	a, a
+      00018D 20 77                  324 	jr	NZ, 00153$
+      00018F CB 43                  325 	bit	0, e
+      000191 28 73                  326 	jr	Z, 00153$
+      000193                        327 00152$:
+                                    328 ;/tmp/_gbsbuild/src/states/TopDown.c:65: player.dir.x = 1;
+      000193 21r05r00               329 	ld	hl, #(_actors + 0x0005)
+      000196 36 01                  330 	ld	(hl), #0x01
+                                    331 ;/tmp/_gbsbuild/src/states/TopDown.c:66: player.dir.y = 0;
+      000198 21r06r00               332 	ld	hl, #(_actors + 0x0006)
+      00019B 36 00                  333 	ld	(hl), #0x00
+                                    334 ;/tmp/_gbsbuild/src/states/TopDown.c:67: player.rerender = TRUE;
+      00019D 21r14r00               335 	ld	hl, #(_actors + 0x0014)
+      0001A0 36 01                  336 	ld	(hl), #0x01
+                                    337 ;/tmp/_gbsbuild/src/states/TopDown.c:72: if (tile_x != image_tile_width - 2 && !(TileAt2x2(tile_right, tile_y-1) & COLLISION_LEFT)) {
+      0001A2 21r00r00               338 	ld	hl, #_image_tile_width
+      0001A5 4E                     339 	ld	c, (hl)
+      0001A6 06 00                  340 	ld	b, #0x00
+      0001A8 F8 02                  341 	ldhl	sp,	#2
+      0001AA 5E                     342 	ld	e, (hl)
+      0001AB 16 00                  343 	ld	d, #0x00
+      0001AD 0B                     344 	dec	bc
+      0001AE 0B                     345 	dec	bc
+      0001AF 79                     346 	ld	a, c
+      0001B0 93                     347 	sub	a, e
+      0001B1 20 06                  348 	jr	NZ, 00476$
+      0001B3 78                     349 	ld	a, b
+      0001B4 92                     350 	sub	a, d
+      0001B5 3E 01                  351 	ld	a, #0x01
+      0001B7 28 01                  352 	jr	Z, 00477$
+      0001B9                        353 00476$:
+      0001B9 AF                     354 	xor	a, a
+      0001BA                        355 00477$:
+      0001BA 4F                     356 	ld	c, a
+                                    357 ;/tmp/_gbsbuild/src/states/TopDown.c:70: if (topdown_grid == 16) {
+      0001BB FAr00r00               358 	ld	a, (#_topdown_grid)
+      0001BE D6 10                  359 	sub	a, #0x10
+      0001C0 20 23                  360 	jr	NZ, 00119$
+                                    361 ;/tmp/_gbsbuild/src/states/TopDown.c:71: UBYTE tile_right = tile_x + 2;
+      0001C2 F8 04                  362 	ldhl	sp,	#4
+      0001C4 7E                     363 	ld	a, (hl)
+      0001C5 3C                     364 	inc	a
+      0001C6 3C                     365 	inc	a
+                                    366 ;/tmp/_gbsbuild/src/states/TopDown.c:72: if (tile_x != image_tile_width - 2 && !(TileAt2x2(tile_right, tile_y-1) & COLLISION_LEFT)) {
+      0001C7 CB 41                  367 	bit	0, c
+      0001C9 C2r09r03               368 	jp	NZ, 00161$
+      0001CC 23                     369 	inc	hl
+      0001CD 23                     370 	inc	hl
+      0001CE 66                     371 	ld	h, (hl)
+      0001CF E5                     372 	push	hl
+      0001D0 33                     373 	inc	sp
+      0001D1 F5                     374 	push	af
+      0001D2 33                     375 	inc	sp
+      0001D3 CDr00r00               376 	call	_TileAt2x2
+      0001D6 E8 02                  377 	add	sp, #2
+      0001D8 CB 53                  378 	bit	2, e
+      0001DA C2r09r03               379 	jp	NZ,00161$
+                                    380 ;/tmp/_gbsbuild/src/states/TopDown.c:73: player.moving = TRUE;
+      0001DD 21r07r00               381 	ld	hl, #(_actors + 0x0007)
+      0001E0 36 01                  382 	ld	(hl), #0x01
+      0001E2 C3r09r03               383 	jp	00161$
+      0001E5                        384 00119$:
+                                    385 ;/tmp/_gbsbuild/src/states/TopDown.c:76: UBYTE tile_right = tile_x + 1;
+      0001E5 F8 04                  386 	ldhl	sp,	#4
+      0001E7 7E                     387 	ld	a, (hl)
+      0001E8 3C                     388 	inc	a
+                                    389 ;/tmp/_gbsbuild/src/states/TopDown.c:77: if (tile_x != image_tile_width - 2 && !(TileAt2x1(tile_right, tile_y) & COLLISION_LEFT)) {
+      0001E9 CB 41                  390 	bit	0, c
+      0001EB C2r09r03               391 	jp	NZ, 00161$
+      0001EE 2B                     392 	dec	hl
+      0001EF 66                     393 	ld	h, (hl)
+      0001F0 E5                     394 	push	hl
+      0001F1 33                     395 	inc	sp
+      0001F2 F5                     396 	push	af
+      0001F3 33                     397 	inc	sp
+      0001F4 CDr00r00               398 	call	_TileAt2x1
+      0001F7 E8 02                  399 	add	sp, #2
+      0001F9 CB 53                  400 	bit	2, e
+      0001FB C2r09r03               401 	jp	NZ,00161$
+                                    402 ;/tmp/_gbsbuild/src/states/TopDown.c:78: player.moving = TRUE;
+      0001FE 21r07r00               403 	ld	hl, #(_actors + 0x0007)
+      000201 36 01                  404 	ld	(hl), #0x01
+      000203 C3r09r03               405 	jp	00161$
+      000206                        406 00153$:
+                                    407 ;/tmp/_gbsbuild/src/states/TopDown.c:82: } else if (INPUT_RECENT_UP) {
+      000206 FAr00r00               408 	ld	a, (#_ui_block)
+      000209 B7                     409 	or	a, a
+      00020A 20 07                  410 	jr	NZ, 00151$
+      00020C 21r00r00               411 	ld	hl, #_input_override_default
+      00020F CB 56                  412 	bit	2, (hl)
+      000211 20 6B                  413 	jr	NZ, 00146$
+      000213                        414 00151$:
+      000213 CB 51                  415 	bit	2, c
+      000215 20 0A                  416 	jr	NZ, 00145$
+      000217 FAr00r00               417 	ld	a, (#_recent_joy)
+      00021A B7                     418 	or	a, a
+      00021B 20 61                  419 	jr	NZ, 00146$
+      00021D CB 53                  420 	bit	2, e
+      00021F 28 5D                  421 	jr	Z, 00146$
+      000221                        422 00145$:
+                                    423 ;/tmp/_gbsbuild/src/states/TopDown.c:84: player.dir.x = 0;
+      000221 21r05r00               424 	ld	hl, #(_actors + 0x0005)
+      000224 36 00                  425 	ld	(hl), #0x00
+                                    426 ;/tmp/_gbsbuild/src/states/TopDown.c:85: player.dir.y = -1;
+      000226 21r06r00               427 	ld	hl, #(_actors + 0x0006)
+      000229 36 FF                  428 	ld	(hl), #0xff
+                                    429 ;/tmp/_gbsbuild/src/states/TopDown.c:86: player.rerender = TRUE;
+      00022B 21r14r00               430 	ld	hl, #(_actors + 0x0014)
+      00022E 36 01                  431 	ld	(hl), #0x01
+                                    432 ;/tmp/_gbsbuild/src/states/TopDown.c:89: if (topdown_grid == 16) {
+      000230 FAr00r00               433 	ld	a, (#_topdown_grid)
+      000233 D6 10                  434 	sub	a, #0x10
+      000235 20 25                  435 	jr	NZ, 00128$
+                                    436 ;/tmp/_gbsbuild/src/states/TopDown.c:90: UBYTE tile_up = tile_y - 3;
+      000237 F8 05                  437 	ldhl	sp,	#5
+      000239 7E                     438 	ld	a, (hl)
+      00023A C6 FD                  439 	add	a, #0xfd
+      00023C 47                     440 	ld	b, a
+                                    441 ;/tmp/_gbsbuild/src/states/TopDown.c:91: if (tile_y != 0 && !(TileAt2x2(tile_x, tile_up) & COLLISION_BOTTOM)) {
+      00023D 2B                     442 	dec	hl
+      00023E 2B                     443 	dec	hl
+      00023F 7E                     444 	ld	a, (hl)
+      000240 B7                     445 	or	a, a
+      000241 CAr09r03               446 	jp	Z, 00161$
+      000244 C5                     447 	push	bc
+      000245 33                     448 	inc	sp
+      000246 2B                     449 	dec	hl
+      000247 7E                     450 	ld	a, (hl)
+      000248 F5                     451 	push	af
+      000249 33                     452 	inc	sp
+      00024A CDr00r00               453 	call	_TileAt2x2
+      00024D E8 02                  454 	add	sp, #2
+      00024F CB 4B                  455 	bit	1, e
+      000251 C2r09r03               456 	jp	NZ,00161$
+                                    457 ;/tmp/_gbsbuild/src/states/TopDown.c:92: player.moving = TRUE;
+      000254 21r07r00               458 	ld	hl, #(_actors + 0x0007)
+      000257 36 01                  459 	ld	(hl), #0x01
+      000259 C3r09r03               460 	jp	00161$
+      00025C                        461 00128$:
+                                    462 ;/tmp/_gbsbuild/src/states/TopDown.c:95: UBYTE tile_up = tile_y - 1;
+      00025C F8 06                  463 	ldhl	sp,	#6
+      00025E 46                     464 	ld	b, (hl)
+                                    465 ;/tmp/_gbsbuild/src/states/TopDown.c:96: if (tile_y != 0 && !(TileAt2x1(tile_x, tile_up) & COLLISION_BOTTOM)) {
+      00025F F8 03                  466 	ldhl	sp,	#3
+      000261 7E                     467 	ld	a, (hl)
+      000262 B7                     468 	or	a, a
+      000263 CAr09r03               469 	jp	Z, 00161$
+      000266 C5                     470 	push	bc
+      000267 33                     471 	inc	sp
+      000268 2B                     472 	dec	hl
+      000269 7E                     473 	ld	a, (hl)
+      00026A F5                     474 	push	af
+      00026B 33                     475 	inc	sp
+      00026C CDr00r00               476 	call	_TileAt2x1
+      00026F E8 02                  477 	add	sp, #2
+      000271 CB 4B                  478 	bit	1, e
+      000273 C2r09r03               479 	jp	NZ,00161$
+                                    480 ;/tmp/_gbsbuild/src/states/TopDown.c:97: player.moving = TRUE;
+      000276 21r07r00               481 	ld	hl, #(_actors + 0x0007)
+      000279 36 01                  482 	ld	(hl), #0x01
+      00027B C3r09r03               483 	jp	00161$
+      00027E                        484 00146$:
+                                    485 ;/tmp/_gbsbuild/src/states/TopDown.c:101: } else if (INPUT_RECENT_DOWN) {
+      00027E FAr00r00               486 	ld	a, (#_ui_block)
+      000281 B7                     487 	or	a, a
+      000282 20 08                  488 	jr	NZ, 00144$
+      000284 21r00r00               489 	ld	hl, #_input_override_default
+      000287 CB 5E                  490 	bit	3, (hl)
+      000289 C2r09r03               491 	jp	NZ,00161$
+      00028C                        492 00144$:
+      00028C CB 59                  493 	bit	3, c
+      00028E 20 0A                  494 	jr	NZ, 00139$
+      000290 FAr00r00               495 	ld	a, (#_recent_joy)
+      000293 B7                     496 	or	a, a
+      000294 20 73                  497 	jr	NZ, 00161$
+      000296 CB 5B                  498 	bit	3, e
+      000298 28 6F                  499 	jr	Z, 00161$
+      00029A                        500 00139$:
+                                    501 ;/tmp/_gbsbuild/src/states/TopDown.c:102: player.dir.x = 0;
+      00029A 21r05r00               502 	ld	hl, #(_actors + 0x0005)
+      00029D 36 00                  503 	ld	(hl), #0x00
+                                    504 ;/tmp/_gbsbuild/src/states/TopDown.c:103: player.dir.y = 1;
+      00029F 21r06r00               505 	ld	hl, #(_actors + 0x0006)
+      0002A2 36 01                  506 	ld	(hl), #0x01
+                                    507 ;/tmp/_gbsbuild/src/states/TopDown.c:104: player.rerender = TRUE;
+      0002A4 21r14r00               508 	ld	hl, #(_actors + 0x0014)
+      0002A7 36 01                  509 	ld	(hl), #0x01
+                                    510 ;/tmp/_gbsbuild/src/states/TopDown.c:109: if (tile_y != image_tile_height - 1 && !(TileAt2x2(tile_x, tile_down) & COLLISION_TOP)) {
+      0002A9 21r00r00               511 	ld	hl, #_image_tile_height
+      0002AC 4E                     512 	ld	c, (hl)
+      0002AD 06 00                  513 	ld	b, #0x00
+      0002AF F8 03                  514 	ldhl	sp,	#3
+      0002B1 7E                     515 	ld	a, (hl)
+      0002B2 F8 00                  516 	ldhl	sp,	#0
+      0002B4 77                     517 	ld	(hl), a
+      0002B5 AF                     518 	xor	a, a
+      0002B6 23                     519 	inc	hl
+      0002B7 77                     520 	ld	(hl), a
+                                    521 ;/tmp/_gbsbuild/src/states/TopDown.c:108: UBYTE tile_down = tile_y + 1;
+      0002B8 F8 05                  522 	ldhl	sp,	#5
+      0002BA 5E                     523 	ld	e, (hl)
+      0002BB 1C                     524 	inc	e
+                                    525 ;/tmp/_gbsbuild/src/states/TopDown.c:109: if (tile_y != image_tile_height - 1 && !(TileAt2x2(tile_x, tile_down) & COLLISION_TOP)) {
+      0002BC 0B                     526 	dec	bc
+      0002BD F8 00                  527 	ldhl	sp,	#0
+      0002BF 7E                     528 	ld	a, (hl)
+      0002C0 91                     529 	sub	a, c
+      0002C1 20 07                  530 	jr	NZ, 00500$
+      0002C3 23                     531 	inc	hl
+      0002C4 7E                     532 	ld	a, (hl)
+      0002C5 90                     533 	sub	a, b
+      0002C6 3E 01                  534 	ld	a, #0x01
+      0002C8 28 01                  535 	jr	Z, 00501$
+      0002CA                        536 00500$:
+      0002CA AF                     537 	xor	a, a
+      0002CB                        538 00501$:
+      0002CB 4F                     539 	ld	c, a
+                                    540 ;/tmp/_gbsbuild/src/states/TopDown.c:107: if (topdown_grid == 16) {
+      0002CC FAr00r00               541 	ld	a, (#_topdown_grid)
+      0002CF D6 10                  542 	sub	a, #0x10
+      0002D1 20 1C                  543 	jr	NZ, 00137$
+                                    544 ;/tmp/_gbsbuild/src/states/TopDown.c:108: UBYTE tile_down = tile_y + 1;
+      0002D3 7B                     545 	ld	a, e
+                                    546 ;/tmp/_gbsbuild/src/states/TopDown.c:109: if (tile_y != image_tile_height - 1 && !(TileAt2x2(tile_x, tile_down) & COLLISION_TOP)) {
+      0002D4 CB 41                  547 	bit	0, c
+      0002D6 20 31                  548 	jr	NZ, 00161$
+      0002D8 F5                     549 	push	af
+      0002D9 33                     550 	inc	sp
+      0002DA F8 03                  551 	ldhl	sp,	#3
+      0002DC 7E                     552 	ld	a, (hl)
+      0002DD F5                     553 	push	af
+      0002DE 33                     554 	inc	sp
+      0002DF CDr00r00               555 	call	_TileAt2x2
+      0002E2 E8 02                  556 	add	sp, #2
+      0002E4 7B                     557 	ld	a, e
+      0002E5 0F                     558 	rrca
+      0002E6 38 21                  559 	jr	C, 00161$
+                                    560 ;/tmp/_gbsbuild/src/states/TopDown.c:110: player.moving = TRUE;
+      0002E8 21r07r00               561 	ld	hl, #(_actors + 0x0007)
+      0002EB 36 01                  562 	ld	(hl), #0x01
+      0002ED 18 1A                  563 	jr	00161$
+      0002EF                        564 00137$:
+                                    565 ;/tmp/_gbsbuild/src/states/TopDown.c:113: UBYTE tile_down = tile_y + 1;
+      0002EF 7B                     566 	ld	a, e
+                                    567 ;/tmp/_gbsbuild/src/states/TopDown.c:114: if (tile_y != image_tile_height - 1 && !(TileAt2x1(tile_x, tile_down) & COLLISION_TOP)) {
+      0002F0 CB 41                  568 	bit	0, c
+      0002F2 20 15                  569 	jr	NZ, 00161$
+      0002F4 F5                     570 	push	af
+      0002F5 33                     571 	inc	sp
+      0002F6 F8 03                  572 	ldhl	sp,	#3
+      0002F8 7E                     573 	ld	a, (hl)
+      0002F9 F5                     574 	push	af
+      0002FA 33                     575 	inc	sp
+      0002FB CDr00r00               576 	call	_TileAt2x1
+      0002FE E8 02                  577 	add	sp, #2
+      000300 7B                     578 	ld	a, e
+      000301 0F                     579 	rrca
+      000302 38 05                  580 	jr	C, 00161$
+                                    581 ;/tmp/_gbsbuild/src/states/TopDown.c:115: player.moving = TRUE;
+      000304 21r07r00               582 	ld	hl, #(_actors + 0x0007)
+      000307 36 01                  583 	ld	(hl), #0x01
+      000309                        584 00161$:
+                                    585 ;/tmp/_gbsbuild/src/states/TopDown.c:120: hit_actor = ActorOverlapsPlayer(FALSE);
+      000309 AF                     586 	xor	a, a
+      00030A F5                     587 	push	af
+      00030B 33                     588 	inc	sp
+      00030C CDr00r00               589 	call	_ActorOverlapsPlayer
+      00030F 33                     590 	inc	sp
+      000310 4B                     591 	ld	c, e
+                                    592 ;/tmp/_gbsbuild/src/states/TopDown.c:123: player.hit_actor = 0;
+                                    593 ;/tmp/_gbsbuild/src/states/TopDown.c:121: if (hit_actor && hit_actor != NO_ACTOR_COLLISON) {
+      000311 79                     594 	ld	a, c
+      000312 B7                     595 	or	a, a
+      000313 28 22                  596 	jr	Z, 00169$
+      000315 79                     597 	ld	a, c
+      000316 3C                     598 	inc	a
+      000317 28 1E                  599 	jr	Z, 00169$
+                                    600 ;/tmp/_gbsbuild/src/states/TopDown.c:122: if (actors[hit_actor].collision_group) {
+      000319 06 00                  601 	ld	b, #0x00
+      00031B 69                     602 	ld	l, c
+      00031C 60                     603 	ld	h, b
+      00031D 29                     604 	add	hl, hl
+      00031E 29                     605 	add	hl, hl
+      00031F 09                     606 	add	hl, bc
+      000320 29                     607 	add	hl, hl
+      000321 09                     608 	add	hl, bc
+      000322 29                     609 	add	hl, hl
+      000323 09                     610 	add	hl, bc
+      000324 29                     611 	add	hl, hl
+      000325 11r00r00               612 	ld	de, #_actors
+      000328 19                     613 	add	hl, de
+      000329 11 18 00               614 	ld	de, #0x0018
+      00032C 19                     615 	add	hl, de
+      00032D 7E                     616 	ld	a, (hl)
+      00032E B7                     617 	or	a, a
+      00032F 28 06                  618 	jr	Z, 00169$
+                                    619 ;/tmp/_gbsbuild/src/states/TopDown.c:123: player.hit_actor = 0;
+      000331 21r1Ar00               620 	ld	hl, #(_actors + 0x001a)
+      000334 36 00                  621 	ld	(hl), #0x00
+                                    622 ;/tmp/_gbsbuild/src/states/TopDown.c:124: player.hit_actor = hit_actor;
+      000336 71                     623 	ld	(hl), c
+      000337                        624 00169$:
+                                    625 ;/tmp/_gbsbuild/src/states/TopDown.c:129: if (player.moving) {
+      000337 FAr07r00               626 	ld	a, (#(_actors + 0x0007) + 0)
+      00033A B7                     627 	or	a, a
+      00033B 28 1A                  628 	jr	Z, 00174$
+                                    629 ;/tmp/_gbsbuild/src/states/TopDown.c:130: hit_actor = ActorInFrontOfPlayer(topdown_grid, FALSE);
+      00033D AF                     630 	xor	a, a
+      00033E F5                     631 	push	af
+      00033F 33                     632 	inc	sp
+      000340 FAr00r00               633 	ld	a, (#_topdown_grid)
+      000343 F5                     634 	push	af
+      000344 33                     635 	inc	sp
+      000345 CDr00r00               636 	call	_ActorInFrontOfPlayer
+      000348 E8 02                  637 	add	sp, #2
+      00034A 7B                     638 	ld	a, e
+                                    639 ;/tmp/_gbsbuild/src/states/TopDown.c:131: if (hit_actor != NO_ACTOR_COLLISON) {
+      00034B FE FF                  640 	cp	a, #0xff
+      00034D 28 08                  641 	jr	Z, 00174$
+                                    642 ;/tmp/_gbsbuild/src/states/TopDown.c:132: player.hit_actor = hit_actor;
+      00034F EAr1Ar00               643 	ld	(#(_actors + 0x001a)),a
+                                    644 ;/tmp/_gbsbuild/src/states/TopDown.c:133: player.moving = FALSE;
+      000352 21r07r00               645 	ld	hl, #(_actors + 0x0007)
+      000355 36 00                  646 	ld	(hl), #0x00
+      000357                        647 00174$:
+                                    648 ;/tmp/_gbsbuild/src/states/TopDown.c:137: if (INPUT_A_PRESSED) {
+      000357 FAr00r00               649 	ld	a, (#_ui_block)
+      00035A B7                     650 	or	a, a
+      00035B 20 08                  651 	jr	NZ, 00182$
+      00035D 21r00r00               652 	ld	hl, #_input_override_default
+      000360 CB 66                  653 	bit	4, (hl)
+      000362 C2rF9r03               654 	jp	NZ,00184$
+      000365                        655 00182$:
+      000365 FAr00r00               656 	ld	a, (#_joy)
+      000368 CB 67                  657 	bit	4, a
+      00036A CArF9r03               658 	jp	Z,00184$
+      00036D FAr00r00               659 	ld	a, (#_last_joy)
+      000370 CB 67                  660 	bit	4, a
+      000372 C2rF9r03               661 	jp	NZ,00184$
+                                    662 ;/tmp/_gbsbuild/src/states/TopDown.c:138: hit_actor = ActorInFrontOfPlayer(topdown_grid, TRUE);
+      000375 3E 01                  663 	ld	a, #0x01
+      000377 F5                     664 	push	af
+      000378 33                     665 	inc	sp
+      000379 FAr00r00               666 	ld	a, (#_topdown_grid)
+      00037C F5                     667 	push	af
+      00037D 33                     668 	inc	sp
+      00037E CDr00r00               669 	call	_ActorInFrontOfPlayer
+      000381 E8 02                  670 	add	sp, #2
+      000383 F8 03                  671 	ldhl	sp,	#3
+      000385 73                     672 	ld	(hl), e
+                                    673 ;/tmp/_gbsbuild/src/states/TopDown.c:139: if (hit_actor != NO_ACTOR_COLLISON && !actors[hit_actor].collision_group) {
+      000386 7E                     674 	ld	a, (hl)
+      000387 3C                     675 	inc	a
+      000388 28 6F                  676 	jr	Z, 00184$
+      00038A F8 03                  677 	ldhl	sp,	#3
+      00038C 4E                     678 	ld	c, (hl)
+      00038D 06 00                  679 	ld	b, #0x00
+      00038F 69                     680 	ld	l, c
+      000390 60                     681 	ld	h, b
+      000391 29                     682 	add	hl, hl
+      000392 29                     683 	add	hl, hl
+      000393 09                     684 	add	hl, bc
+      000394 29                     685 	add	hl, hl
+      000395 09                     686 	add	hl, bc
+      000396 29                     687 	add	hl, hl
+      000397 09                     688 	add	hl, bc
+      000398 29                     689 	add	hl, hl
+      000399 3Er00                  690 	ld	a, #<(_actors)
+      00039B 85                     691 	add	a, l
+      00039C 4F                     692 	ld	c, a
+      00039D 3Es00                  693 	ld	a, #>(_actors)
+      00039F 8C                     694 	adc	a, h
+      0003A0 47                     695 	ld	b, a
+      0003A1 21 18 00               696 	ld	hl, #0x0018
+      0003A4 09                     697 	add	hl, bc
+      0003A5 7E                     698 	ld	a, (hl)
+      0003A6 B7                     699 	or	a, a
+      0003A7 20 50                  700 	jr	NZ, 00184$
+                                    701 ;/tmp/_gbsbuild/src/states/TopDown.c:141: actors[hit_actor].dir.x = -player.dir.x;
+      0003A9 21 05 00               702 	ld	hl, #0x0005
+      0003AC 09                     703 	add	hl, bc
+      0003AD E5                     704 	push	hl
+      0003AE 7D                     705 	ld	a, l
+      0003AF F8 06                  706 	ldhl	sp,	#6
+      0003B1 77                     707 	ld	(hl), a
+      0003B2 E1                     708 	pop	hl
+      0003B3 7C                     709 	ld	a, h
+      0003B4 F8 05                  710 	ldhl	sp,	#5
+      0003B6 77                     711 	ld	(hl), a
+      0003B7 21r05r00               712 	ld	hl, #(_actors + 0x0005)
+      0003BA 6E                     713 	ld	l, (hl)
+      0003BB AF                     714 	xor	a, a
+      0003BC 95                     715 	sub	a, l
+      0003BD F8 06                  716 	ldhl	sp,	#6
+      0003BF 32                     717 	ld	(hl-), a
+      0003C0 2B                     718 	dec	hl
+      0003C1 2A                     719 	ld	a, (hl+)
+      0003C2 5F                     720 	ld	e, a
+      0003C3 2A                     721 	ld	a, (hl+)
+      0003C4 57                     722 	ld	d, a
+      0003C5 7E                     723 	ld	a, (hl)
+      0003C6 12                     724 	ld	(de), a
+                                    725 ;/tmp/_gbsbuild/src/states/TopDown.c:142: actors[hit_actor].dir.y = -player.dir.y;
+      0003C7 21 06 00               726 	ld	hl, #0x0006
+      0003CA 09                     727 	add	hl, bc
+      0003CB E5                     728 	push	hl
+      0003CC 7D                     729 	ld	a, l
+      0003CD F8 06                  730 	ldhl	sp,	#6
+      0003CF 77                     731 	ld	(hl), a
+      0003D0 E1                     732 	pop	hl
+      0003D1 7C                     733 	ld	a, h
+      0003D2 F8 05                  734 	ldhl	sp,	#5
+      0003D4 77                     735 	ld	(hl), a
+      0003D5 21r06r00               736 	ld	hl, #(_actors + 0x0006)
+      0003D8 6E                     737 	ld	l, (hl)
+      0003D9 AF                     738 	xor	a, a
+      0003DA 95                     739 	sub	a, l
+      0003DB F8 06                  740 	ldhl	sp,	#6
+      0003DD 32                     741 	ld	(hl-), a
+      0003DE 2B                     742 	dec	hl
+      0003DF 2A                     743 	ld	a, (hl+)
+      0003E0 5F                     744 	ld	e, a
+      0003E1 2A                     745 	ld	a, (hl+)
+      0003E2 57                     746 	ld	d, a
+      0003E3 7E                     747 	ld	a, (hl)
+      0003E4 12                     748 	ld	(de), a
+                                    749 ;/tmp/_gbsbuild/src/states/TopDown.c:143: actors[hit_actor].rerender = TRUE;
+      0003E5 21 14 00               750 	ld	hl, #0x0014
+      0003E8 09                     751 	add	hl, bc
+      0003E9 36 01                  752 	ld	(hl), #0x01
+                                    753 ;/tmp/_gbsbuild/src/states/TopDown.c:146: player.moving = FALSE;
+      0003EB 21r07r00               754 	ld	hl, #(_actors + 0x0007)
+      0003EE 36 00                  755 	ld	(hl), #0x00
+                                    756 ;/tmp/_gbsbuild/src/states/TopDown.c:149: ActorRunScript(hit_actor);
+      0003F0 F8 03                  757 	ldhl	sp,	#3
+      0003F2 7E                     758 	ld	a, (hl)
+      0003F3 F5                     759 	push	af
+      0003F4 33                     760 	inc	sp
+      0003F5 CDr00r00               761 	call	_ActorRunScript
+      0003F8 33                     762 	inc	sp
+      0003F9                        763 00184$:
+                                    764 ;/tmp/_gbsbuild/src/states/TopDown.c:155: if (player.moving) {
+      0003F9 FAr07r00               765 	ld	a, (#(_actors + 0x0007) + 0)
+      0003FC B7                     766 	or	a, a
+      0003FD CAr84r04               767 	jp	Z, 00197$
+                                    768 ;/tmp/_gbsbuild/src/states/TopDown.c:157: if (player.move_speed == 0) {
+      000400 21r04r00               769 	ld	hl, #(_actors + 0x0004)
+      000403 46                     770 	ld	b, (hl)
+                                    771 ;/tmp/_gbsbuild/src/states/TopDown.c:160: player.pos.x += (WORD)player.dir.x;
+                                    772 ;/tmp/_gbsbuild/src/states/TopDown.c:161: player.pos.y += (WORD)player.dir.y;
+                                    773 ;/tmp/_gbsbuild/src/states/TopDown.c:157: if (player.move_speed == 0) {
+      000404 78                     774 	ld	a, b
+      000405 B7                     775 	or	a, a
+      000406 20 34                  776 	jr	NZ, 00193$
+                                    777 ;/tmp/_gbsbuild/src/states/TopDown.c:159: if (IS_FRAME_2) {
+      000408 FAr00r00               778 	ld	a, (#_game_time)
+      00040B 0F                     779 	rrca
+      00040C 38 76                  780 	jr	C, 00197$
+                                    781 ;/tmp/_gbsbuild/src/states/TopDown.c:160: player.pos.x += (WORD)player.dir.x;
+      00040E 21r00r00               782 	ld	hl, #_actors
+      000411 2A                     783 	ld	a, (hl+)
+      000412 4F                     784 	ld	c, a
+      000413 46                     785 	ld	b, (hl)
+      000414 FAr05r00               786 	ld	a, (#(_actors + 0x0005) + 0)
+      000417 6F                     787 	ld	l, a
+      000418 17                     788 	rla
+      000419 9F                     789 	sbc	a, a
+      00041A 67                     790 	ld	h, a
+      00041B 09                     791 	add	hl, bc
+      00041C 4D                     792 	ld	c, l
+      00041D 44                     793 	ld	b, h
+      00041E 21r00r00               794 	ld	hl, #_actors
+      000421 79                     795 	ld	a, c
+      000422 22                     796 	ld	(hl+), a
+      000423 70                     797 	ld	(hl), b
+                                    798 ;/tmp/_gbsbuild/src/states/TopDown.c:161: player.pos.y += (WORD)player.dir.y;
+      000424 21r02r00               799 	ld	hl, #(_actors + 0x0002)
+      000427 2A                     800 	ld	a, (hl+)
+      000428 4F                     801 	ld	c, a
+      000429 46                     802 	ld	b, (hl)
+      00042A FAr06r00               803 	ld	a, (#(_actors + 0x0006) + 0)
+      00042D 6F                     804 	ld	l, a
+      00042E 17                     805 	rla
+      00042F 9F                     806 	sbc	a, a
+      000430 67                     807 	ld	h, a
+      000431 09                     808 	add	hl, bc
+      000432 4D                     809 	ld	c, l
+      000433 44                     810 	ld	b, h
+      000434 21r02r00               811 	ld	hl, #(_actors + 0x0002)
+      000437 79                     812 	ld	a, c
+      000438 22                     813 	ld	(hl+), a
+      000439 70                     814 	ld	(hl), b
+      00043A 18 48                  815 	jr	00197$
+      00043C                        816 00193$:
+                                    817 ;/tmp/_gbsbuild/src/states/TopDown.c:164: player.pos.x += (WORD)(player.dir.x * player.move_speed);
+      00043C 11r00r00               818 	ld	de, #_actors
+      00043F 1A                     819 	ld	a, (de)
+      000440 F8 05                  820 	ldhl	sp,	#5
+      000442 22                     821 	ld	(hl+), a
+      000443 13                     822 	inc	de
+      000444 1A                     823 	ld	a, (de)
+      000445 77                     824 	ld	(hl), a
+      000446 FAr05r00               825 	ld	a, (#(_actors + 0x0005) + 0)
+      000449 C5                     826 	push	bc
+      00044A 33                     827 	inc	sp
+      00044B F5                     828 	push	af
+      00044C 33                     829 	inc	sp
+      00044D CDr00r00               830 	call	__muluschar
+      000450 E8 02                  831 	add	sp, #2
+                                    832 ;c
+      000452 F8 05                  833 	ldhl	sp,	#5
+      000454 2A                     834 	ld	a, (hl+)
+      000455 66                     835 	ld	h, (hl)
+      000456 6F                     836 	ld	l, a
+      000457 19                     837 	add	hl, de
+      000458 4D                     838 	ld	c, l
+      000459 44                     839 	ld	b, h
+      00045A 21r00r00               840 	ld	hl, #_actors
+      00045D 79                     841 	ld	a, c
+      00045E 22                     842 	ld	(hl+), a
+      00045F 70                     843 	ld	(hl), b
+                                    844 ;/tmp/_gbsbuild/src/states/TopDown.c:165: player.pos.y += (WORD)(player.dir.y * player.move_speed);
+      000460 21r02r00               845 	ld	hl, #(_actors + 0x0002)
+      000463 2A                     846 	ld	a, (hl+)
+      000464 4F                     847 	ld	c, a
+      000465 46                     848 	ld	b, (hl)
+      000466 FAr06r00               849 	ld	a, (#(_actors + 0x0006) + 0)
+      000469 21r04r00               850 	ld	hl, #(_actors + 0x0004)
+      00046C 66                     851 	ld	h, (hl)
+      00046D C5                     852 	push	bc
+      00046E E5                     853 	push	hl
+      00046F 33                     854 	inc	sp
+      000470 F5                     855 	push	af
+      000471 33                     856 	inc	sp
+      000472 CDr00r00               857 	call	__muluschar
+      000475 E8 02                  858 	add	sp, #2
+      000477 C1                     859 	pop	bc
+      000478 7B                     860 	ld	a, e
+      000479 81                     861 	add	a, c
+      00047A 4F                     862 	ld	c, a
+      00047B 7A                     863 	ld	a, d
+      00047C 88                     864 	adc	a, b
+      00047D 47                     865 	ld	b, a
+      00047E 21r02r00               866 	ld	hl, #(_actors + 0x0002)
+      000481 79                     867 	ld	a, c
+      000482 22                     868 	ld	(hl+), a
+      000483 70                     869 	ld	(hl), b
+      000484                        870 00197$:
+                                    871 ;/tmp/_gbsbuild/src/states/TopDown.c:168: }
+      000484 E8 07                  872 	add	sp, #7
+      000486 C9                     873 	ret
+                                    874 	.area _CODE_5
+                                    875 	.area _CABS (ABS)

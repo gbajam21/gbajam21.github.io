@@ -1,0 +1,148 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Stack
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _StackPush
+                                     12 	.globl _StackPop
+                                     13 	.globl _StackShift
+                                     14 ;--------------------------------------------------------
+                                     15 ; special function registers
+                                     16 ;--------------------------------------------------------
+                                     17 ;--------------------------------------------------------
+                                     18 ; ram data
+                                     19 ;--------------------------------------------------------
+                                     20 	.area _DATA
+                                     21 ;--------------------------------------------------------
+                                     22 ; absolute external ram data
+                                     23 ;--------------------------------------------------------
+                                     24 	.area _DABS (ABS)
+                                     25 ;--------------------------------------------------------
+                                     26 ; global & static initialisations
+                                     27 ;--------------------------------------------------------
+                                     28 	.area _HOME
+                                     29 	.area _GSINIT
+                                     30 	.area _GSFINAL
+                                     31 	.area _GSINIT
+                                     32 ;--------------------------------------------------------
+                                     33 ; Home
+                                     34 ;--------------------------------------------------------
+                                     35 	.area _HOME
+                                     36 	.area _HOME
+                                     37 ;--------------------------------------------------------
+                                     38 ; code
+                                     39 ;--------------------------------------------------------
+                                     40 	.area _CODE
+                                     41 ;/tmp/_gbsbuild/src/core/Stack.c:3: void StackPush(UINT8* stack, UINT8 elem) {
+                                     42 ;	---------------------------------
+                                     43 ; Function StackPush
+                                     44 ; ---------------------------------
+      000000                         45 _StackPush::
+                                     46 ;/tmp/_gbsbuild/src/core/Stack.c:4: stack[++stack[0]] = elem;
+      000000 C1                      47 	pop	bc
+      000001 D1                      48 	pop	de
+      000002 D5                      49 	push	de
+      000003 C5                      50 	push	bc
+      000004 1A                      51 	ld	a, (de)
+      000005 3C                      52 	inc	a
+      000006 12                      53 	ld	(de), a
+      000007 83                      54 	add	a, e
+      000008 4F                      55 	ld	c, a
+      000009 3E 00                   56 	ld	a, #0x00
+      00000B 8A                      57 	adc	a, d
+      00000C 47                      58 	ld	b, a
+      00000D F8 04                   59 	ldhl	sp,	#4
+      00000F 7E                      60 	ld	a, (hl)
+      000010 02                      61 	ld	(bc), a
+                                     62 ;/tmp/_gbsbuild/src/core/Stack.c:5: }
+      000011 C9                      63 	ret
+                                     64 ;/tmp/_gbsbuild/src/core/Stack.c:7: UINT8 StackPop(UINT8* stack) {
+                                     65 ;	---------------------------------
+                                     66 ; Function StackPop
+                                     67 ; ---------------------------------
+      000012                         68 _StackPop::
+                                     69 ;/tmp/_gbsbuild/src/core/Stack.c:8: return stack[(stack[0]--)];
+      000012 C1                      70 	pop	bc
+      000013 D1                      71 	pop	de
+      000014 D5                      72 	push	de
+      000015 C5                      73 	push	bc
+      000016 1A                      74 	ld	a, (de)
+      000017 4F                      75 	ld	c, a
+      000018 3D                      76 	dec	a
+      000019 12                      77 	ld	(de), a
+      00001A 69                      78 	ld	l, c
+      00001B 26 00                   79 	ld	h, #0x00
+      00001D 19                      80 	add	hl, de
+      00001E 5E                      81 	ld	e, (hl)
+                                     82 ;/tmp/_gbsbuild/src/core/Stack.c:9: }
+      00001F C9                      83 	ret
+                                     84 ;/tmp/_gbsbuild/src/core/Stack.c:11: UINT8 StackShift(UINT8* stack) {
+                                     85 ;	---------------------------------
+                                     86 ; Function StackShift
+                                     87 ; ---------------------------------
+      000020                         88 _StackShift::
+      000020 E8 FE                   89 	add	sp, #-2
+                                     90 ;/tmp/_gbsbuild/src/core/Stack.c:13: UBYTE elem = stack[1];
+      000022 F8 04                   91 	ldhl	sp,#4
+      000024 2A                      92 	ld	a, (hl+)
+      000025 5F                      93 	ld	e, a
+      000026 56                      94 	ld	d, (hl)
+      000027 13                      95 	inc	de
+      000028 1A                      96 	ld	a, (de)
+      000029 F8 00                   97 	ldhl	sp,	#0
+      00002B 77                      98 	ld	(hl), a
+                                     99 ;/tmp/_gbsbuild/src/core/Stack.c:14: for (i = 0; i != stack[0]; i++) {
+      00002C F8 04                  100 	ldhl	sp,#4
+      00002E 2A                     101 	ld	a, (hl+)
+      00002F 5F                     102 	ld	e, a
+      000030 56                     103 	ld	d, (hl)
+      000031 AF                     104 	xor	a, a
+      000032 F8 01                  105 	ldhl	sp,	#1
+      000034 77                     106 	ld	(hl), a
+      000035                        107 00103$:
+      000035 1A                     108 	ld	a, (de)
+      000036 4F                     109 	ld	c, a
+      000037 F8 01                  110 	ldhl	sp,	#1
+      000039 7E                     111 	ld	a, (hl)
+      00003A 91                     112 	sub	a, c
+      00003B 28 18                  113 	jr	Z, 00101$
+                                    114 ;/tmp/_gbsbuild/src/core/Stack.c:15: stack[i + 1] = stack[i + 2];
+      00003D F8 01                  115 	ldhl	sp,	#1
+      00003F 4E                     116 	ld	c, (hl)
+      000040 06 00                  117 	ld	b, #0x00
+      000042 69                     118 	ld	l, c
+      000043 60                     119 	ld	h, b
+      000044 23                     120 	inc	hl
+      000045 19                     121 	add	hl, de
+      000046 03                     122 	inc	bc
+      000047 03                     123 	inc	bc
+      000048 79                     124 	ld	a, c
+      000049 83                     125 	add	a, e
+      00004A 4F                     126 	ld	c, a
+      00004B 78                     127 	ld	a, b
+      00004C 8A                     128 	adc	a, d
+      00004D 47                     129 	ld	b, a
+      00004E 0A                     130 	ld	a, (bc)
+      00004F 77                     131 	ld	(hl), a
+                                    132 ;/tmp/_gbsbuild/src/core/Stack.c:14: for (i = 0; i != stack[0]; i++) {
+      000050 F8 01                  133 	ldhl	sp,	#1
+      000052 34                     134 	inc	(hl)
+      000053 18 E0                  135 	jr	00103$
+      000055                        136 00101$:
+                                    137 ;/tmp/_gbsbuild/src/core/Stack.c:17: stack[0]--;
+      000055 79                     138 	ld	a, c
+      000056 3D                     139 	dec	a
+      000057 12                     140 	ld	(de), a
+                                    141 ;/tmp/_gbsbuild/src/core/Stack.c:18: return elem;
+      000058 F8 00                  142 	ldhl	sp,	#0
+      00005A 5E                     143 	ld	e, (hl)
+                                    144 ;/tmp/_gbsbuild/src/core/Stack.c:19: }
+      00005B E8 02                  145 	add	sp, #2
+      00005D C9                     146 	ret
+                                    147 	.area _CODE
+                                    148 	.area _CABS (ABS)

@@ -1,0 +1,1534 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module Scroll
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _ScrollUpdateColumnWithDelay
+                                     12 	.globl _ScrollUpdateColumnR
+                                     13 	.globl _ScrollUpdateRowWithDelay
+                                     14 	.globl _ScrollUpdateRowR
+                                     15 	.globl b_RefreshScroll_b
+                                     16 	.globl _RefreshScroll_b
+                                     17 	.globl _ApplyPaletteChange
+                                     18 	.globl _PopBank
+                                     19 	.globl _PushBank
+                                     20 	.globl _ActivateActor
+                                     21 	.globl _SetTile
+                                     22 	.globl _display_off
+                                     23 	.globl _set_sprite_palette
+                                     24 	.globl _set_bkg_palette
+                                     25 	.globl _scroll_target
+                                     26 	.globl _pending_w_i
+                                     27 	.globl _pending_w_y
+                                     28 	.globl _pending_w_x
+                                     29 	.globl _pending_w_cmap
+                                     30 	.globl _pending_h_cmap
+                                     31 	.globl _pending_w_map
+                                     32 	.globl _pending_h_map
+                                     33 	.globl _pending_h_i
+                                     34 	.globl _pending_h_y
+                                     35 	.globl _pending_h_x
+                                     36 	.globl _scroll_offset_y
+                                     37 	.globl _scroll_offset_x
+                                     38 	.globl _scroll_y_max
+                                     39 	.globl _scroll_x_max
+                                     40 	.globl _draw_scroll_y
+                                     41 	.globl _draw_scroll_x
+                                     42 	.globl _scroll_y
+                                     43 	.globl _scroll_x
+                                     44 	.globl _ScrollUpdateRow
+                                     45 	.globl _RefreshScroll
+                                     46 	.globl _InitScroll
+                                     47 	.globl _RenderScreen
+                                     48 ;--------------------------------------------------------
+                                     49 ; special function registers
+                                     50 ;--------------------------------------------------------
+                                     51 ;--------------------------------------------------------
+                                     52 ; ram data
+                                     53 ;--------------------------------------------------------
+                                     54 	.area _DATA
+      000000                         55 _scroll_x::
+      000000                         56 	.ds 2
+      000002                         57 _scroll_y::
+      000002                         58 	.ds 2
+      000004                         59 _draw_scroll_x::
+      000004                         60 	.ds 2
+      000006                         61 _draw_scroll_y::
+      000006                         62 	.ds 2
+      000008                         63 _scroll_x_max::
+      000008                         64 	.ds 2
+      00000A                         65 _scroll_y_max::
+      00000A                         66 	.ds 2
+      00000C                         67 _scroll_offset_x::
+      00000C                         68 	.ds 2
+      00000E                         69 _scroll_offset_y::
+      00000E                         70 	.ds 2
+      000010                         71 _pending_h_x::
+      000010                         72 	.ds 2
+      000012                         73 _pending_h_y::
+      000012                         74 	.ds 2
+      000014                         75 _pending_h_i::
+      000014                         76 	.ds 1
+      000015                         77 _pending_h_map::
+      000015                         78 	.ds 2
+      000017                         79 _pending_w_map::
+      000017                         80 	.ds 2
+      000019                         81 _pending_h_cmap::
+      000019                         82 	.ds 2
+      00001B                         83 _pending_w_cmap::
+      00001B                         84 	.ds 2
+      00001D                         85 _pending_w_x::
+      00001D                         86 	.ds 2
+      00001F                         87 _pending_w_y::
+      00001F                         88 	.ds 2
+      000021                         89 _pending_w_i::
+      000021                         90 	.ds 1
+      000022                         91 _scroll_target::
+      000022                         92 	.ds 2
+                                     93 ;--------------------------------------------------------
+                                     94 ; absolute external ram data
+                                     95 ;--------------------------------------------------------
+                                     96 	.area _DABS (ABS)
+                                     97 ;--------------------------------------------------------
+                                     98 ; global & static initialisations
+                                     99 ;--------------------------------------------------------
+                                    100 	.area _HOME
+                                    101 	.area _GSINIT
+                                    102 	.area _GSFINAL
+                                    103 	.area _GSINIT
+                                    104 ;/tmp/_gbsbuild/src/core/Scroll.c:12: INT16 scroll_x = 0;
+      000000 21r00r00               105 	ld	hl, #_scroll_x
+      000003 36 00                  106 	ld	(hl), #0x00
+      000005 23                     107 	inc	hl
+      000006 36 00                  108 	ld	(hl), #0x00
+                                    109 ;/tmp/_gbsbuild/src/core/Scroll.c:13: INT16 scroll_y = 0;
+      000008 21r02r00               110 	ld	hl, #_scroll_y
+      00000B 36 00                  111 	ld	(hl), #0x00
+      00000D 23                     112 	inc	hl
+      00000E 36 00                  113 	ld	(hl), #0x00
+                                    114 ;/tmp/_gbsbuild/src/core/Scroll.c:14: INT16 draw_scroll_x = 0;
+      000010 21r04r00               115 	ld	hl, #_draw_scroll_x
+      000013 36 00                  116 	ld	(hl), #0x00
+      000015 23                     117 	inc	hl
+      000016 36 00                  118 	ld	(hl), #0x00
+                                    119 ;/tmp/_gbsbuild/src/core/Scroll.c:15: INT16 draw_scroll_y = 0;
+      000018 21r06r00               120 	ld	hl, #_draw_scroll_y
+      00001B 36 00                  121 	ld	(hl), #0x00
+      00001D 23                     122 	inc	hl
+      00001E 36 00                  123 	ld	(hl), #0x00
+                                    124 ;/tmp/_gbsbuild/src/core/Scroll.c:16: UINT16 scroll_x_max = 0;
+      000020 21r08r00               125 	ld	hl, #_scroll_x_max
+      000023 36 00                  126 	ld	(hl), #0x00
+      000025 23                     127 	inc	hl
+      000026 36 00                  128 	ld	(hl), #0x00
+                                    129 ;/tmp/_gbsbuild/src/core/Scroll.c:17: UINT16 scroll_y_max = 0;
+      000028 21r0Ar00               130 	ld	hl, #_scroll_y_max
+      00002B 36 00                  131 	ld	(hl), #0x00
+      00002D 23                     132 	inc	hl
+      00002E 36 00                  133 	ld	(hl), #0x00
+                                    134 ;/tmp/_gbsbuild/src/core/Scroll.c:19: INT16 scroll_offset_x = 0;
+      000030 21r0Cr00               135 	ld	hl, #_scroll_offset_x
+      000033 36 00                  136 	ld	(hl), #0x00
+      000035 23                     137 	inc	hl
+      000036 36 00                  138 	ld	(hl), #0x00
+                                    139 ;/tmp/_gbsbuild/src/core/Scroll.c:20: INT16 scroll_offset_y = 0;
+      000038 21r0Er00               140 	ld	hl, #_scroll_offset_y
+      00003B 36 00                  141 	ld	(hl), #0x00
+      00003D 23                     142 	inc	hl
+      00003E 36 00                  143 	ld	(hl), #0x00
+                                    144 ;/tmp/_gbsbuild/src/core/Scroll.c:24: unsigned char* pending_h_map = 0;
+      000040 21r15r00               145 	ld	hl, #_pending_h_map
+      000043 36 00                  146 	ld	(hl), #0x00
+      000045 23                     147 	inc	hl
+      000046 36 00                  148 	ld	(hl), #0x00
+                                    149 ;/tmp/_gbsbuild/src/core/Scroll.c:25: unsigned char* pending_w_map = 0;
+      000048 21r17r00               150 	ld	hl, #_pending_w_map
+      00004B 36 00                  151 	ld	(hl), #0x00
+      00004D 23                     152 	inc	hl
+      00004E 36 00                  153 	ld	(hl), #0x00
+                                    154 ;/tmp/_gbsbuild/src/core/Scroll.c:27: unsigned char* pending_h_cmap = 0;
+      000050 21r19r00               155 	ld	hl, #_pending_h_cmap
+      000053 36 00                  156 	ld	(hl), #0x00
+      000055 23                     157 	inc	hl
+      000056 36 00                  158 	ld	(hl), #0x00
+                                    159 ;/tmp/_gbsbuild/src/core/Scroll.c:28: unsigned char* pending_w_cmap = 0;
+      000058 21r1Br00               160 	ld	hl, #_pending_w_cmap
+      00005B 36 00                  161 	ld	(hl), #0x00
+      00005D 23                     162 	inc	hl
+      00005E 36 00                  163 	ld	(hl), #0x00
+                                    164 ;/tmp/_gbsbuild/src/core/Scroll.c:32: Pos* scroll_target = 0;
+      000060 21r22r00               165 	ld	hl, #_scroll_target
+      000063 36 00                  166 	ld	(hl), #0x00
+      000065 23                     167 	inc	hl
+      000066 36 00                  168 	ld	(hl), #0x00
+                                    169 ;--------------------------------------------------------
+                                    170 ; Home
+                                    171 ;--------------------------------------------------------
+                                    172 	.area _HOME
+                                    173 	.area _HOME
+                                    174 ;--------------------------------------------------------
+                                    175 ; code
+                                    176 ;--------------------------------------------------------
+                                    177 	.area _CODE
+                                    178 ;/tmp/_gbsbuild/src/core/Scroll.c:38: void ScrollUpdateRowR() {
+                                    179 ;	---------------------------------
+                                    180 ; Function ScrollUpdateRowR
+                                    181 ; ---------------------------------
+      000000                        182 _ScrollUpdateRowR::
+      000000 E8 FD                  183 	add	sp, #-3
+                                    184 ;/tmp/_gbsbuild/src/core/Scroll.c:43: y_offset = MOD_32(pending_w_y);
+      000002 FAr1Fr00               185 	ld	a, (#_pending_w_y)
+      000005 E6 1F                  186 	and	a, #0x1f
+      000007 4F                     187 	ld	c, a
+                                    188 ;/tmp/_gbsbuild/src/core/Scroll.c:45: PUSH_BANK(image_bank);
+      000008 C5                     189 	push	bc
+      000009 FAr00r00               190 	ld	a, (#_image_bank)
+      00000C F5                     191 	push	af
+      00000D 33                     192 	inc	sp
+      00000E CDr00r00               193 	call	_PushBank
+      000011 33                     194 	inc	sp
+      000012 C1                     195 	pop	bc
+                                    196 ;/tmp/_gbsbuild/src/core/Scroll.c:50: id = 0x9800 + MOD_32(pending_w_x++) + ((UINT16)y_offset << 5);
+      000013 AF                     197 	xor	a, a
+      000014 CB 21                  198 	sla	c
+      000016 8F                     199 	adc	a, a
+      000017 CB 21                  200 	sla	c
+      000019 8F                     201 	adc	a, a
+      00001A CB 21                  202 	sla	c
+      00001C 8F                     203 	adc	a, a
+      00001D CB 21                  204 	sla	c
+      00001F 8F                     205 	adc	a, a
+      000020 CB 21                  206 	sla	c
+      000022 8F                     207 	adc	a, a
+      000023 F8 00                  208 	ldhl	sp,	#0
+      000025 71                     209 	ld	(hl), c
+      000026 23                     210 	inc	hl
+      000027 77                     211 	ld	(hl), a
+                                    212 ;/tmp/_gbsbuild/src/core/Scroll.c:48: if (_cpu == CGB_TYPE) {  // Color Row Load
+      000028 FAr00r00               213 	ld	a, (#__cpu)
+      00002B D6 11                  214 	sub	a, #0x11
+      00002D C2rAEr00               215 	jp	NZ,00122$
+                                    216 ;/tmp/_gbsbuild/src/core/Scroll.c:49: for (i = 0u; i != 5 && pending_w_i != 0; ++i, --pending_w_i) {
+      000030 AF                     217 	xor	a, a
+      000031 F8 02                  218 	ldhl	sp,	#2
+      000033 77                     219 	ld	(hl), a
+      000034                        220 00108$:
+      000034 F8 02                  221 	ldhl	sp,	#2
+      000036 7E                     222 	ld	a, (hl)
+      000037 D6 05                  223 	sub	a, #0x05
+      000039 CArFBr00               224 	jp	Z,00105$
+      00003C FAr21r00               225 	ld	a, (#_pending_w_i)
+      00003F B7                     226 	or	a, a
+      000040 CArFBr00               227 	jp	Z, 00105$
+                                    228 ;/tmp/_gbsbuild/src/core/Scroll.c:50: id = 0x9800 + MOD_32(pending_w_x++) + ((UINT16)y_offset << 5);
+      000043 21r1Er00               229 	ld	hl, #_pending_w_x + 1
+      000046 2B                     230 	dec	hl
+      000047 2A                     231 	ld	a, (hl+)
+      000048 4F                     232 	ld	c, a
+      000049 3A                     233 	ld	a, (hl-)
+      00004A 34                     234 	inc	(hl)
+      00004B 20 02                  235 	jr	NZ, 00157$
+      00004D 23                     236 	inc	hl
+      00004E 34                     237 	inc	(hl)
+      00004F                        238 00157$:
+      00004F 79                     239 	ld	a, c
+      000050 E6 1F                  240 	and	a, #0x1f
+      000052 6F                     241 	ld	l, a
+      000053 26 00                  242 	ld	h, #0x00
+      000055 4D                     243 	ld	c, l
+      000056 7C                     244 	ld	a, h
+      000057 C6 98                  245 	add	a, #0x98
+      000059 47                     246 	ld	b, a
+      00005A E1                     247 	pop	hl
+      00005B E5                     248 	push	hl
+      00005C 09                     249 	add	hl, bc
+                                    250 ;/tmp/_gbsbuild/src/core/Scroll.c:51: PUSH_BANK(image_attr_bank);
+      00005D E5                     251 	push	hl
+      00005E FAr00r00               252 	ld	a, (#_image_attr_bank)
+      000061 F5                     253 	push	af
+      000062 33                     254 	inc	sp
+      000063 CDr00r00               255 	call	_PushBank
+      000066 33                     256 	inc	sp
+      000067 C1                     257 	pop	bc
+                                    258 ;/tmp/_gbsbuild/src/core/Scroll.c:52: VBK_REG = 1;
+      000068 3E 01                  259 	ld	a, #0x01
+      00006A E0r00                  260 	ldh	(_VBK_REG+0),a
+                                    261 ;/tmp/_gbsbuild/src/core/Scroll.c:54: SetTile(id, *pending_w_cmap);
+      00006C 21r1Cr00               262 	ld	hl, #_pending_w_cmap + 1
+      00006F 2B                     263 	dec	hl
+      000070 2A                     264 	ld	a, (hl+)
+      000071 5F                     265 	ld	e, a
+      000072 56                     266 	ld	d, (hl)
+      000073 1A                     267 	ld	a, (de)
+      000074 F5                     268 	push	af
+      000075 33                     269 	inc	sp
+      000076 C5                     270 	push	bc
+      000077 CDr00r00               271 	call	_SetTile
+      00007A E8 03                  272 	add	sp, #3
+                                    273 ;/tmp/_gbsbuild/src/core/Scroll.c:55: VBK_REG = 0;
+      00007C 3E 00                  274 	ld	a, #0x00
+      00007E E0r00                  275 	ldh	(_VBK_REG+0),a
+                                    276 ;/tmp/_gbsbuild/src/core/Scroll.c:56: POP_BANK;
+      000080 C5                     277 	push	bc
+      000081 CDr00r00               278 	call	_PopBank
+      000084 C1                     279 	pop	bc
+                                    280 ;/tmp/_gbsbuild/src/core/Scroll.c:58: SetTile(id, *pending_w_map);
+      000085 21r18r00               281 	ld	hl, #_pending_w_map + 1
+      000088 2B                     282 	dec	hl
+      000089 2A                     283 	ld	a, (hl+)
+      00008A 5F                     284 	ld	e, a
+      00008B 56                     285 	ld	d, (hl)
+      00008C 1A                     286 	ld	a, (de)
+      00008D F5                     287 	push	af
+      00008E 33                     288 	inc	sp
+      00008F C5                     289 	push	bc
+      000090 CDr00r00               290 	call	_SetTile
+      000093 E8 03                  291 	add	sp, #3
+                                    292 ;/tmp/_gbsbuild/src/core/Scroll.c:59: pending_w_map++;
+      000095 21r17r00               293 	ld	hl, #_pending_w_map
+      000098 34                     294 	inc	(hl)
+      000099 20 02                  295 	jr	NZ, 00158$
+      00009B 23                     296 	inc	hl
+      00009C 34                     297 	inc	(hl)
+      00009D                        298 00158$:
+                                    299 ;/tmp/_gbsbuild/src/core/Scroll.c:60: pending_w_cmap++;
+      00009D 21r1Br00               300 	ld	hl, #_pending_w_cmap
+      0000A0 34                     301 	inc	(hl)
+      0000A1 20 02                  302 	jr	NZ, 00159$
+      0000A3 23                     303 	inc	hl
+      0000A4 34                     304 	inc	(hl)
+      0000A5                        305 00159$:
+                                    306 ;/tmp/_gbsbuild/src/core/Scroll.c:49: for (i = 0u; i != 5 && pending_w_i != 0; ++i, --pending_w_i) {
+      0000A5 F8 02                  307 	ldhl	sp,	#2
+      0000A7 34                     308 	inc	(hl)
+      0000A8 21r21r00               309 	ld	hl, #_pending_w_i
+      0000AB 35                     310 	dec	(hl)
+      0000AC 18 86                  311 	jr	00108$
+                                    312 ;/tmp/_gbsbuild/src/core/Scroll.c:65: for (i = 0u; i != 5 && pending_w_i != 0; ++i, --pending_w_i) {
+      0000AE                        313 00122$:
+      0000AE AF                     314 	xor	a, a
+      0000AF F8 02                  315 	ldhl	sp,	#2
+      0000B1 77                     316 	ld	(hl), a
+      0000B2                        317 00112$:
+      0000B2 F8 02                  318 	ldhl	sp,	#2
+      0000B4 7E                     319 	ld	a, (hl)
+      0000B5 D6 05                  320 	sub	a, #0x05
+      0000B7 28 42                  321 	jr	Z, 00105$
+      0000B9 FAr21r00               322 	ld	a, (#_pending_w_i)
+      0000BC B7                     323 	or	a, a
+      0000BD 28 3C                  324 	jr	Z, 00105$
+                                    325 ;/tmp/_gbsbuild/src/core/Scroll.c:67: id = 0x9800 + MOD_32(pending_w_x++) + ((UINT16)y_offset << 5);
+      0000BF 21r1Er00               326 	ld	hl, #_pending_w_x + 1
+      0000C2 2B                     327 	dec	hl
+      0000C3 2A                     328 	ld	a, (hl+)
+      0000C4 4F                     329 	ld	c, a
+      0000C5 3A                     330 	ld	a, (hl-)
+      0000C6 34                     331 	inc	(hl)
+      0000C7 20 02                  332 	jr	NZ, 00161$
+      0000C9 23                     333 	inc	hl
+      0000CA 34                     334 	inc	(hl)
+      0000CB                        335 00161$:
+      0000CB 79                     336 	ld	a, c
+      0000CC E6 1F                  337 	and	a, #0x1f
+      0000CE 26 00                  338 	ld	h, #0x00
+      0000D0 4F                     339 	ld	c, a
+      0000D1 7C                     340 	ld	a, h
+      0000D2 C6 98                  341 	add	a, #0x98
+      0000D4 47                     342 	ld	b, a
+      0000D5 E1                     343 	pop	hl
+      0000D6 E5                     344 	push	hl
+      0000D7 09                     345 	add	hl, bc
+      0000D8 4D                     346 	ld	c, l
+      0000D9 44                     347 	ld	b, h
+                                    348 ;/tmp/_gbsbuild/src/core/Scroll.c:68: SetTile(id, *pending_w_map);
+      0000DA 21r18r00               349 	ld	hl, #_pending_w_map + 1
+      0000DD 2B                     350 	dec	hl
+      0000DE 2A                     351 	ld	a, (hl+)
+      0000DF 5F                     352 	ld	e, a
+      0000E0 56                     353 	ld	d, (hl)
+      0000E1 1A                     354 	ld	a, (de)
+      0000E2 F5                     355 	push	af
+      0000E3 33                     356 	inc	sp
+      0000E4 C5                     357 	push	bc
+      0000E5 CDr00r00               358 	call	_SetTile
+      0000E8 E8 03                  359 	add	sp, #3
+                                    360 ;/tmp/_gbsbuild/src/core/Scroll.c:69: pending_w_map++;
+      0000EA 21r17r00               361 	ld	hl, #_pending_w_map
+      0000ED 34                     362 	inc	(hl)
+      0000EE 20 02                  363 	jr	NZ, 00162$
+      0000F0 23                     364 	inc	hl
+      0000F1 34                     365 	inc	(hl)
+      0000F2                        366 00162$:
+                                    367 ;/tmp/_gbsbuild/src/core/Scroll.c:65: for (i = 0u; i != 5 && pending_w_i != 0; ++i, --pending_w_i) {
+      0000F2 F8 02                  368 	ldhl	sp,	#2
+      0000F4 34                     369 	inc	(hl)
+      0000F5 21r21r00               370 	ld	hl, #_pending_w_i
+      0000F8 35                     371 	dec	(hl)
+      0000F9 18 B7                  372 	jr	00112$
+      0000FB                        373 00105$:
+                                    374 ;/tmp/_gbsbuild/src/core/Scroll.c:73: POP_BANK;
+      0000FB CDr00r00               375 	call	_PopBank
+                                    376 ;/tmp/_gbsbuild/src/core/Scroll.c:74: }
+      0000FE E8 03                  377 	add	sp, #3
+      000100 C9                     378 	ret
+                                    379 ;/tmp/_gbsbuild/src/core/Scroll.c:76: void ScrollUpdateRowWithDelay(INT16 x, INT16 y) {
+                                    380 ;	---------------------------------
+                                    381 ; Function ScrollUpdateRowWithDelay
+                                    382 ; ---------------------------------
+      000101                        383 _ScrollUpdateRowWithDelay::
+      000101 E8 F9                  384 	add	sp, #-7
+                                    385 ;/tmp/_gbsbuild/src/core/Scroll.c:79: while (pending_w_i) {
+      000103                        386 00101$:
+      000103 FAr21r00               387 	ld	a, (#_pending_w_i)
+      000106 B7                     388 	or	a, a
+      000107 28 05                  389 	jr	Z, 00103$
+                                    390 ;/tmp/_gbsbuild/src/core/Scroll.c:80: ScrollUpdateRowR();
+      000109 CDr00r00               391 	call	_ScrollUpdateRowR
+      00010C 18 F5                  392 	jr	00101$
+      00010E                        393 00103$:
+                                    394 ;/tmp/_gbsbuild/src/core/Scroll.c:83: pending_w_x = x;
+      00010E F8 09                  395 	ldhl	sp,	#9
+      000110 2A                     396 	ld	a, (hl+)
+      000111 5E                     397 	ld	e, (hl)
+      000112 21r1Dr00               398 	ld	hl, #_pending_w_x
+      000115 22                     399 	ld	(hl+), a
+      000116 73                     400 	ld	(hl), e
+                                    401 ;/tmp/_gbsbuild/src/core/Scroll.c:84: pending_w_y = y;
+      000117 F8 0B                  402 	ldhl	sp,	#11
+      000119 2A                     403 	ld	a, (hl+)
+      00011A 5E                     404 	ld	e, (hl)
+      00011B 21r1Fr00               405 	ld	hl, #_pending_w_y
+      00011E 22                     406 	ld	(hl+), a
+      00011F 73                     407 	ld	(hl), e
+                                    408 ;/tmp/_gbsbuild/src/core/Scroll.c:86: pending_w_i = SCREEN_TILE_REFRES_W;
+      000120 21r21r00               409 	ld	hl, #_pending_w_i
+      000123 36 17                  410 	ld	(hl), #0x17
+                                    411 ;/tmp/_gbsbuild/src/core/Scroll.c:87: pending_w_map = image_ptr + image_tile_width * y + x;
+      000125 21r00r00               412 	ld	hl, #_image_tile_width
+      000128 4E                     413 	ld	c, (hl)
+      000129 06 00                  414 	ld	b, #0x00
+      00012B F8 0B                  415 	ldhl	sp,	#11
+      00012D 2A                     416 	ld	a, (hl+)
+      00012E 66                     417 	ld	h, (hl)
+      00012F 6F                     418 	ld	l, a
+      000130 E5                     419 	push	hl
+      000131 C5                     420 	push	bc
+      000132 CDr00r00               421 	call	__mulint
+      000135 E8 04                  422 	add	sp, #4
+      000137 7B                     423 	ld	a, e
+      000138 21r00r00               424 	ld	hl, #_image_ptr
+      00013B 86                     425 	add	a, (hl)
+      00013C 4F                     426 	ld	c, a
+      00013D 7A                     427 	ld	a, d
+      00013E 23                     428 	inc	hl
+      00013F 8E                     429 	adc	a, (hl)
+      000140 47                     430 	ld	b, a
+      000141 F8 09                  431 	ldhl	sp,	#9
+      000143 2A                     432 	ld	a, (hl+)
+      000144 66                     433 	ld	h, (hl)
+      000145 6F                     434 	ld	l, a
+      000146 09                     435 	add	hl, bc
+      000147 7D                     436 	ld	a, l
+      000148 EAr17r00               437 	ld	(_pending_w_map), a
+      00014B 7C                     438 	ld	a, h
+      00014C EAr18r00               439 	ld	(_pending_w_map + 1), a
+                                    440 ;/tmp/_gbsbuild/src/core/Scroll.c:90: for (i = 1; i != actors_len; i++) {
+                                    441 ;c
+      00014F F8 09                  442 	ldhl	sp,#9
+      000151 2A                     443 	ld	a, (hl+)
+      000152 5F                     444 	ld	e, a
+      000153 56                     445 	ld	d, (hl)
+      000154 21 17 00               446 	ld	hl, #0x0017
+      000157 19                     447 	add	hl, de
+      000158 33                     448 	inc	sp
+      000159 33                     449 	inc	sp
+      00015A E5                     450 	push	hl
+      00015B F8 06                  451 	ldhl	sp,	#6
+      00015D 36 01                  452 	ld	(hl), #0x01
+      00015F                        453 00111$:
+      00015F FAr00r00               454 	ld	a, (#_actors_len)
+      000162 F8 06                  455 	ldhl	sp,	#6
+      000164 96                     456 	sub	a, (hl)
+      000165 CArF3r01               457 	jp	Z,00109$
+                                    458 ;/tmp/_gbsbuild/src/core/Scroll.c:91: if (actors[i].pos.y >> 3 == y) {
+      000168 F8 06                  459 	ldhl	sp,	#6
+      00016A 4E                     460 	ld	c, (hl)
+      00016B 06 00                  461 	ld	b, #0x00
+      00016D 69                     462 	ld	l, c
+      00016E 60                     463 	ld	h, b
+      00016F 29                     464 	add	hl, hl
+      000170 29                     465 	add	hl, hl
+      000171 09                     466 	add	hl, bc
+      000172 29                     467 	add	hl, hl
+      000173 09                     468 	add	hl, bc
+      000174 29                     469 	add	hl, hl
+      000175 09                     470 	add	hl, bc
+      000176 29                     471 	add	hl, hl
+      000177 E5                     472 	push	hl
+      000178 7D                     473 	ld	a, l
+      000179 F8 04                  474 	ldhl	sp,	#4
+      00017B 77                     475 	ld	(hl), a
+      00017C E1                     476 	pop	hl
+      00017D 7C                     477 	ld	a, h
+      00017E F8 03                  478 	ldhl	sp,	#3
+                                    479 ;c
+      000180 32                     480 	ld	(hl-), a
+      000181 2A                     481 	ld	a, (hl+)
+      000182 5F                     482 	ld	e, a
+      000183 56                     483 	ld	d, (hl)
+      000184 21r00r00               484 	ld	hl, #_actors
+      000187 19                     485 	add	hl, de
+      000188 E5                     486 	push	hl
+      000189 7D                     487 	ld	a, l
+      00018A F8 06                  488 	ldhl	sp,	#6
+      00018C 77                     489 	ld	(hl), a
+      00018D E1                     490 	pop	hl
+      00018E 7C                     491 	ld	a, h
+      00018F F8 05                  492 	ldhl	sp,	#5
+      000191 32                     493 	ld	(hl-), a
+      000192 2A                     494 	ld	a, (hl+)
+      000193 66                     495 	ld	h, (hl)
+      000194 6F                     496 	ld	l, a
+      000195 23                     497 	inc	hl
+      000196 23                     498 	inc	hl
+      000197 2A                     499 	ld	a, (hl+)
+      000198 4F                     500 	ld	c, a
+      000199 46                     501 	ld	b, (hl)
+      00019A CB 28                  502 	sra	b
+      00019C CB 19                  503 	rr	c
+      00019E CB 28                  504 	sra	b
+      0001A0 CB 19                  505 	rr	c
+      0001A2 CB 28                  506 	sra	b
+      0001A4 CB 19                  507 	rr	c
+      0001A6 F8 0B                  508 	ldhl	sp,	#11
+      0001A8 7E                     509 	ld	a, (hl)
+      0001A9 91                     510 	sub	a, c
+      0001AA 20 41                  511 	jr	NZ, 00112$
+      0001AC 23                     512 	inc	hl
+      0001AD 7E                     513 	ld	a, (hl)
+      0001AE 90                     514 	sub	a, b
+      0001AF 20 3C                  515 	jr	NZ, 00112$
+                                    516 ;/tmp/_gbsbuild/src/core/Scroll.c:92: INT16 tx = actors[i].pos.x >> 3;
+      0001B1 F8 04                  517 	ldhl	sp,#4
+      0001B3 2A                     518 	ld	a, (hl+)
+      0001B4 5F                     519 	ld	e, a
+      0001B5 56                     520 	ld	d, (hl)
+      0001B6 1A                     521 	ld	a, (de)
+      0001B7 4F                     522 	ld	c, a
+      0001B8 13                     523 	inc	de
+      0001B9 1A                     524 	ld	a, (de)
+      0001BA 47                     525 	ld	b, a
+      0001BB CB 28                  526 	sra	b
+      0001BD CB 19                  527 	rr	c
+      0001BF CB 28                  528 	sra	b
+      0001C1 CB 19                  529 	rr	c
+      0001C3 CB 28                  530 	sra	b
+      0001C5 CB 19                  531 	rr	c
+                                    532 ;/tmp/_gbsbuild/src/core/Scroll.c:93: if (U_LESS_THAN(x, tx) && U_LESS_THAN(tx, x + SCREEN_TILE_REFRES_W)) {
+      0001C7 F8 09                  533 	ldhl	sp,#9
+      0001C9 2A                     534 	ld	a, (hl+)
+      0001CA 5F                     535 	ld	e, a
+      0001CB 56                     536 	ld	d, (hl)
+      0001CC 7B                     537 	ld	a, e
+      0001CD 91                     538 	sub	a, c
+      0001CE 5F                     539 	ld	e, a
+      0001CF 7A                     540 	ld	a, d
+      0001D0 98                     541 	sbc	a, b
+      0001D1 F8 05                  542 	ldhl	sp,	#5
+      0001D3 32                     543 	ld	(hl-), a
+      0001D4 7B                     544 	ld	a, e
+      0001D5 22                     545 	ld	(hl+), a
+      0001D6 CB 7E                  546 	bit	7, (hl)
+      0001D8 28 13                  547 	jr	Z, 00112$
+      0001DA D1                     548 	pop	de
+      0001DB D5                     549 	push	de
+      0001DC 79                     550 	ld	a, c
+      0001DD 93                     551 	sub	a, e
+      0001DE 78                     552 	ld	a, b
+      0001DF 9A                     553 	sbc	a, d
+      0001E0 CB 7F                  554 	bit	7, a
+      0001E2 28 09                  555 	jr	Z, 00112$
+                                    556 ;/tmp/_gbsbuild/src/core/Scroll.c:94: ActivateActor(i);
+      0001E4 F8 06                  557 	ldhl	sp,	#6
+      0001E6 7E                     558 	ld	a, (hl)
+      0001E7 F5                     559 	push	af
+      0001E8 33                     560 	inc	sp
+      0001E9 CDr00r00               561 	call	_ActivateActor
+      0001EC 33                     562 	inc	sp
+      0001ED                        563 00112$:
+                                    564 ;/tmp/_gbsbuild/src/core/Scroll.c:90: for (i = 1; i != actors_len; i++) {
+      0001ED F8 06                  565 	ldhl	sp,	#6
+      0001EF 34                     566 	inc	(hl)
+      0001F0 C3r5Fr01               567 	jp	00111$
+      0001F3                        568 00109$:
+                                    569 ;/tmp/_gbsbuild/src/core/Scroll.c:100: pending_w_cmap = image_attr_ptr + image_tile_width * y + x;
+      0001F3 21r00r00               570 	ld	hl, #_image_tile_width
+      0001F6 4E                     571 	ld	c, (hl)
+      0001F7 06 00                  572 	ld	b, #0x00
+      0001F9 F8 0B                  573 	ldhl	sp,	#11
+      0001FB 2A                     574 	ld	a, (hl+)
+      0001FC 66                     575 	ld	h, (hl)
+      0001FD 6F                     576 	ld	l, a
+      0001FE E5                     577 	push	hl
+      0001FF C5                     578 	push	bc
+      000200 CDr00r00               579 	call	__mulint
+      000203 E8 04                  580 	add	sp, #4
+      000205 7B                     581 	ld	a, e
+      000206 21r00r00               582 	ld	hl, #_image_attr_ptr
+      000209 86                     583 	add	a, (hl)
+      00020A 4F                     584 	ld	c, a
+      00020B 7A                     585 	ld	a, d
+      00020C 23                     586 	inc	hl
+      00020D 8E                     587 	adc	a, (hl)
+      00020E 47                     588 	ld	b, a
+      00020F F8 09                  589 	ldhl	sp,	#9
+      000211 2A                     590 	ld	a, (hl+)
+      000212 66                     591 	ld	h, (hl)
+      000213 6F                     592 	ld	l, a
+      000214 09                     593 	add	hl, bc
+      000215 7D                     594 	ld	a, l
+      000216 EAr1Br00               595 	ld	(_pending_w_cmap), a
+      000219 7C                     596 	ld	a, h
+      00021A EAr1Cr00               597 	ld	(_pending_w_cmap + 1), a
+                                    598 ;/tmp/_gbsbuild/src/core/Scroll.c:102: }
+      00021D E8 07                  599 	add	sp, #7
+      00021F C9                     600 	ret
+                                    601 ;/tmp/_gbsbuild/src/core/Scroll.c:104: void ScrollUpdateRow(INT16 x, INT16 y) {
+                                    602 ;	---------------------------------
+                                    603 ; Function ScrollUpdateRow
+                                    604 ; ---------------------------------
+      000220                        605 _ScrollUpdateRow::
+      000220 E8 F9                  606 	add	sp, #-7
+                                    607 ;/tmp/_gbsbuild/src/core/Scroll.c:108: unsigned char* map = image_ptr + image_tile_width * y + x;
+      000222 21r00r00               608 	ld	hl, #_image_tile_width
+      000225 4E                     609 	ld	c, (hl)
+      000226 06 00                  610 	ld	b, #0x00
+      000228 F8 0B                  611 	ldhl	sp,	#11
+      00022A 2A                     612 	ld	a, (hl+)
+      00022B 66                     613 	ld	h, (hl)
+      00022C 6F                     614 	ld	l, a
+      00022D E5                     615 	push	hl
+      00022E C5                     616 	push	bc
+      00022F CDr00r00               617 	call	__mulint
+      000232 E8 04                  618 	add	sp, #4
+      000234 7B                     619 	ld	a, e
+      000235 21r00r00               620 	ld	hl, #_image_ptr
+      000238 86                     621 	add	a, (hl)
+      000239 4F                     622 	ld	c, a
+      00023A 7A                     623 	ld	a, d
+      00023B 23                     624 	inc	hl
+      00023C 8E                     625 	adc	a, (hl)
+      00023D 47                     626 	ld	b, a
+      00023E F8 09                  627 	ldhl	sp,	#9
+      000240 2A                     628 	ld	a, (hl+)
+      000241 66                     629 	ld	h, (hl)
+      000242 6F                     630 	ld	l, a
+      000243 09                     631 	add	hl, bc
+      000244 4D                     632 	ld	c, l
+      000245 44                     633 	ld	b, h
+                                    634 ;/tmp/_gbsbuild/src/core/Scroll.c:110: unsigned char* cmap = image_attr_ptr + image_tile_width * y + x;
+      000246 7B                     635 	ld	a, e
+      000247 21r00r00               636 	ld	hl, #_image_attr_ptr
+      00024A 86                     637 	add	a, (hl)
+      00024B 5F                     638 	ld	e, a
+      00024C 7A                     639 	ld	a, d
+      00024D 23                     640 	inc	hl
+      00024E 8E                     641 	adc	a, (hl)
+      00024F 57                     642 	ld	d, a
+                                    643 ;c
+      000250 F8 09                  644 	ldhl	sp,	#9
+      000252 2A                     645 	ld	a, (hl+)
+      000253 66                     646 	ld	h, (hl)
+      000254 6F                     647 	ld	l, a
+      000255 19                     648 	add	hl, de
+      000256 5D                     649 	ld	e, l
+      000257 54                     650 	ld	d, h
+                                    651 ;/tmp/_gbsbuild/src/core/Scroll.c:113: PUSH_BANK(image_bank);
+      000258 C5                     652 	push	bc
+      000259 D5                     653 	push	de
+      00025A FAr00r00               654 	ld	a, (#_image_bank)
+      00025D F5                     655 	push	af
+      00025E 33                     656 	inc	sp
+      00025F CDr00r00               657 	call	_PushBank
+      000262 33                     658 	inc	sp
+      000263 D1                     659 	pop	de
+      000264 C1                     660 	pop	bc
+                                    661 ;/tmp/_gbsbuild/src/core/Scroll.c:115: screen_x = x;
+      000265 F8 09                  662 	ldhl	sp,	#9
+      000267 7E                     663 	ld	a, (hl)
+      000268 F8 01                  664 	ldhl	sp,	#1
+      00026A 77                     665 	ld	(hl), a
+                                    666 ;/tmp/_gbsbuild/src/core/Scroll.c:116: screen_y = MOD_32(y);
+      00026B F8 0B                  667 	ldhl	sp,	#11
+      00026D 7E                     668 	ld	a, (hl)
+      00026E E6 1F                  669 	and	a, #0x1f
+      000270 F8 00                  670 	ldhl	sp,	#0
+                                    671 ;/tmp/_gbsbuild/src/core/Scroll.c:118: for (i = 0; i != 23; i++) {
+      000272 22                     672 	ld	(hl+), a
+      000273 23                     673 	inc	hl
+      000274 7B                     674 	ld	a, e
+      000275 22                     675 	ld	(hl+), a
+      000276 7A                     676 	ld	a, d
+      000277 22                     677 	ld	(hl+), a
+      000278 79                     678 	ld	a, c
+      000279 22                     679 	ld	(hl+), a
+      00027A 70                     680 	ld	(hl), b
+      00027B AF                     681 	xor	a, a
+      00027C 23                     682 	inc	hl
+      00027D 77                     683 	ld	(hl), a
+      00027E                        684 00108$:
+                                    685 ;/tmp/_gbsbuild/src/core/Scroll.c:119: id = 0x9800 + MOD_32(screen_x++) + ((UINT16)screen_y << 5);
+      00027E F8 01                  686 	ldhl	sp,	#1
+      000280 4E                     687 	ld	c, (hl)
+      000281 34                     688 	inc	(hl)
+      000282 79                     689 	ld	a, c
+      000283 E6 1F                  690 	and	a, #0x1f
+      000285 6F                     691 	ld	l, a
+      000286 26 00                  692 	ld	h, #0x00
+      000288 4D                     693 	ld	c, l
+      000289 7C                     694 	ld	a, h
+      00028A C6 98                  695 	add	a, #0x98
+      00028C 47                     696 	ld	b, a
+      00028D F8 00                  697 	ldhl	sp,	#0
+      00028F 5E                     698 	ld	e, (hl)
+      000290 AF                     699 	xor	a, a
+      000291 6B                     700 	ld	l, e
+      000292 67                     701 	ld	h, a
+      000293 29                     702 	add	hl, hl
+      000294 29                     703 	add	hl, hl
+      000295 29                     704 	add	hl, hl
+      000296 29                     705 	add	hl, hl
+      000297 29                     706 	add	hl, hl
+      000298 09                     707 	add	hl, bc
+                                    708 ;/tmp/_gbsbuild/src/core/Scroll.c:122: PUSH_BANK(image_attr_bank);
+      000299 E5                     709 	push	hl
+      00029A FAr00r00               710 	ld	a, (#_image_attr_bank)
+      00029D F5                     711 	push	af
+      00029E 33                     712 	inc	sp
+      00029F CDr00r00               713 	call	_PushBank
+      0002A2 33                     714 	inc	sp
+      0002A3 C1                     715 	pop	bc
+                                    716 ;/tmp/_gbsbuild/src/core/Scroll.c:123: VBK_REG = 1;
+      0002A4 3E 01                  717 	ld	a, #0x01
+      0002A6 E0r00                  718 	ldh	(_VBK_REG+0),a
+                                    719 ;/tmp/_gbsbuild/src/core/Scroll.c:124: SetTile(id, *(cmap++));
+      0002A8 F8 02                  720 	ldhl	sp,#2
+      0002AA 2A                     721 	ld	a, (hl+)
+      0002AB 5F                     722 	ld	e, a
+      0002AC 56                     723 	ld	d, (hl)
+      0002AD 1A                     724 	ld	a, (de)
+      0002AE 2B                     725 	dec	hl
+      0002AF 34                     726 	inc	(hl)
+      0002B0 20 02                  727 	jr	NZ, 00152$
+      0002B2 23                     728 	inc	hl
+      0002B3 34                     729 	inc	(hl)
+      0002B4                        730 00152$:
+      0002B4 F5                     731 	push	af
+      0002B5 33                     732 	inc	sp
+      0002B6 C5                     733 	push	bc
+      0002B7 CDr00r00               734 	call	_SetTile
+      0002BA E8 03                  735 	add	sp, #3
+                                    736 ;/tmp/_gbsbuild/src/core/Scroll.c:125: VBK_REG = 0;
+      0002BC 3E 00                  737 	ld	a, #0x00
+      0002BE E0r00                  738 	ldh	(_VBK_REG+0),a
+                                    739 ;/tmp/_gbsbuild/src/core/Scroll.c:126: POP_BANK;
+      0002C0 C5                     740 	push	bc
+      0002C1 CDr00r00               741 	call	_PopBank
+      0002C4 C1                     742 	pop	bc
+                                    743 ;/tmp/_gbsbuild/src/core/Scroll.c:128: SetTile(id, *(map++));
+      0002C5 F8 04                  744 	ldhl	sp,#4
+      0002C7 2A                     745 	ld	a, (hl+)
+      0002C8 5F                     746 	ld	e, a
+      0002C9 56                     747 	ld	d, (hl)
+      0002CA 1A                     748 	ld	a, (de)
+      0002CB 2B                     749 	dec	hl
+      0002CC 34                     750 	inc	(hl)
+      0002CD 20 02                  751 	jr	NZ, 00153$
+      0002CF 23                     752 	inc	hl
+      0002D0 34                     753 	inc	(hl)
+      0002D1                        754 00153$:
+      0002D1 F5                     755 	push	af
+      0002D2 33                     756 	inc	sp
+      0002D3 C5                     757 	push	bc
+      0002D4 CDr00r00               758 	call	_SetTile
+      0002D7 E8 03                  759 	add	sp, #3
+                                    760 ;/tmp/_gbsbuild/src/core/Scroll.c:118: for (i = 0; i != 23; i++) {
+      0002D9 F8 06                  761 	ldhl	sp,	#6
+      0002DB 34                     762 	inc	(hl)
+      0002DC 7E                     763 	ld	a, (hl)
+      0002DD D6 17                  764 	sub	a, #0x17
+      0002DF 20 9D                  765 	jr	NZ, 00108$
+                                    766 ;/tmp/_gbsbuild/src/core/Scroll.c:132: for (i = 1; i != actors_len; i++) {
+                                    767 ;c
+      0002E1 F8 09                  768 	ldhl	sp,#9
+      0002E3 2A                     769 	ld	a, (hl+)
+      0002E4 5F                     770 	ld	e, a
+      0002E5 56                     771 	ld	d, (hl)
+      0002E6 21 18 00               772 	ld	hl, #0x0018
+      0002E9 19                     773 	add	hl, de
+      0002EA 33                     774 	inc	sp
+      0002EB 33                     775 	inc	sp
+      0002EC E5                     776 	push	hl
+      0002ED F8 06                  777 	ldhl	sp,	#6
+      0002EF 36 01                  778 	ld	(hl), #0x01
+      0002F1                        779 00111$:
+      0002F1 FAr00r00               780 	ld	a, (#_actors_len)
+      0002F4 F8 06                  781 	ldhl	sp,	#6
+      0002F6 96                     782 	sub	a, (hl)
+      0002F7 CAr97r03               783 	jp	Z,00107$
+                                    784 ;/tmp/_gbsbuild/src/core/Scroll.c:133: if (actors[i].pos.y >> 3 == y) {
+      0002FA F8 06                  785 	ldhl	sp,	#6
+      0002FC 4E                     786 	ld	c, (hl)
+      0002FD 06 00                  787 	ld	b, #0x00
+      0002FF 69                     788 	ld	l, c
+      000300 60                     789 	ld	h, b
+      000301 29                     790 	add	hl, hl
+      000302 29                     791 	add	hl, hl
+      000303 09                     792 	add	hl, bc
+      000304 29                     793 	add	hl, hl
+      000305 09                     794 	add	hl, bc
+      000306 29                     795 	add	hl, hl
+      000307 09                     796 	add	hl, bc
+      000308 29                     797 	add	hl, hl
+      000309 E5                     798 	push	hl
+      00030A 7D                     799 	ld	a, l
+      00030B F8 04                  800 	ldhl	sp,	#4
+      00030D 77                     801 	ld	(hl), a
+      00030E E1                     802 	pop	hl
+      00030F 7C                     803 	ld	a, h
+      000310 F8 03                  804 	ldhl	sp,	#3
+                                    805 ;c
+      000312 32                     806 	ld	(hl-), a
+      000313 2A                     807 	ld	a, (hl+)
+      000314 5F                     808 	ld	e, a
+      000315 56                     809 	ld	d, (hl)
+      000316 21r00r00               810 	ld	hl, #_actors
+      000319 19                     811 	add	hl, de
+      00031A E5                     812 	push	hl
+      00031B 7D                     813 	ld	a, l
+      00031C F8 06                  814 	ldhl	sp,	#6
+      00031E 77                     815 	ld	(hl), a
+      00031F E1                     816 	pop	hl
+      000320 7C                     817 	ld	a, h
+      000321 F8 05                  818 	ldhl	sp,	#5
+      000323 32                     819 	ld	(hl-), a
+      000324 2A                     820 	ld	a, (hl+)
+      000325 66                     821 	ld	h, (hl)
+      000326 6F                     822 	ld	l, a
+      000327 23                     823 	inc	hl
+      000328 23                     824 	inc	hl
+      000329 2A                     825 	ld	a, (hl+)
+      00032A 4F                     826 	ld	c, a
+      00032B 46                     827 	ld	b, (hl)
+      00032C CB 28                  828 	sra	b
+      00032E CB 19                  829 	rr	c
+      000330 CB 28                  830 	sra	b
+      000332 CB 19                  831 	rr	c
+      000334 CB 28                  832 	sra	b
+      000336 CB 19                  833 	rr	c
+      000338 F8 0B                  834 	ldhl	sp,	#11
+      00033A 7E                     835 	ld	a, (hl)
+      00033B 91                     836 	sub	a, c
+      00033C 20 53                  837 	jr	NZ, 00112$
+      00033E 23                     838 	inc	hl
+      00033F 7E                     839 	ld	a, (hl)
+      000340 90                     840 	sub	a, b
+      000341 20 4E                  841 	jr	NZ, 00112$
+                                    842 ;/tmp/_gbsbuild/src/core/Scroll.c:134: INT16 tx = actors[i].pos.x >> 3;
+      000343 F8 04                  843 	ldhl	sp,#4
+      000345 2A                     844 	ld	a, (hl+)
+      000346 5F                     845 	ld	e, a
+      000347 56                     846 	ld	d, (hl)
+      000348 1A                     847 	ld	a, (de)
+      000349 4F                     848 	ld	c, a
+      00034A 13                     849 	inc	de
+      00034B 1A                     850 	ld	a, (de)
+      00034C 47                     851 	ld	b, a
+      00034D CB 28                  852 	sra	b
+      00034F CB 19                  853 	rr	c
+      000351 CB 28                  854 	sra	b
+      000353 CB 19                  855 	rr	c
+      000355 CB 28                  856 	sra	b
+      000357 CB 19                  857 	rr	c
+                                    858 ;/tmp/_gbsbuild/src/core/Scroll.c:135: if (U_LESS_THAN(x, tx + 1) && U_LESS_THAN(tx, x + 24)) {
+      000359 69                     859 	ld	l, c
+      00035A 60                     860 	ld	h, b
+      00035B 23                     861 	inc	hl
+      00035C E5                     862 	push	hl
+      00035D 7D                     863 	ld	a, l
+      00035E F8 04                  864 	ldhl	sp,	#4
+      000360 77                     865 	ld	(hl), a
+      000361 E1                     866 	pop	hl
+      000362 7C                     867 	ld	a, h
+      000363 F8 03                  868 	ldhl	sp,	#3
+      000365 77                     869 	ld	(hl), a
+      000366 F8 09                  870 	ldhl	sp,#9
+      000368 2A                     871 	ld	a, (hl+)
+      000369 5F                     872 	ld	e, a
+      00036A 56                     873 	ld	d, (hl)
+      00036B F8 02                  874 	ldhl	sp,	#2
+      00036D 2A                     875 	ld	a, (hl+)
+      00036E 66                     876 	ld	h, (hl)
+      00036F 6F                     877 	ld	l, a
+      000370 7B                     878 	ld	a, e
+      000371 95                     879 	sub	a, l
+      000372 5F                     880 	ld	e, a
+      000373 7A                     881 	ld	a, d
+      000374 9C                     882 	sbc	a, h
+      000375 F8 05                  883 	ldhl	sp,	#5
+      000377 32                     884 	ld	(hl-), a
+      000378 7B                     885 	ld	a, e
+      000379 22                     886 	ld	(hl+), a
+      00037A CB 7E                  887 	bit	7, (hl)
+      00037C 28 13                  888 	jr	Z, 00112$
+      00037E D1                     889 	pop	de
+      00037F D5                     890 	push	de
+      000380 79                     891 	ld	a, c
+      000381 93                     892 	sub	a, e
+      000382 78                     893 	ld	a, b
+      000383 9A                     894 	sbc	a, d
+      000384 CB 7F                  895 	bit	7, a
+      000386 28 09                  896 	jr	Z, 00112$
+                                    897 ;/tmp/_gbsbuild/src/core/Scroll.c:136: ActivateActor(i);
+      000388 F8 06                  898 	ldhl	sp,	#6
+      00038A 7E                     899 	ld	a, (hl)
+      00038B F5                     900 	push	af
+      00038C 33                     901 	inc	sp
+      00038D CDr00r00               902 	call	_ActivateActor
+      000390 33                     903 	inc	sp
+      000391                        904 00112$:
+                                    905 ;/tmp/_gbsbuild/src/core/Scroll.c:132: for (i = 1; i != actors_len; i++) {
+      000391 F8 06                  906 	ldhl	sp,	#6
+      000393 34                     907 	inc	(hl)
+      000394 C3rF1r02               908 	jp	00111$
+      000397                        909 00107$:
+                                    910 ;/tmp/_gbsbuild/src/core/Scroll.c:141: POP_BANK;
+      000397 CDr00r00               911 	call	_PopBank
+                                    912 ;/tmp/_gbsbuild/src/core/Scroll.c:142: }
+      00039A E8 07                  913 	add	sp, #7
+      00039C C9                     914 	ret
+                                    915 ;/tmp/_gbsbuild/src/core/Scroll.c:144: void ScrollUpdateColumnR() {
+                                    916 ;	---------------------------------
+                                    917 ; Function ScrollUpdateColumnR
+                                    918 ; ---------------------------------
+      00039D                        919 _ScrollUpdateColumnR::
+      00039D E8 FD                  920 	add	sp, #-3
+                                    921 ;/tmp/_gbsbuild/src/core/Scroll.c:150: PUSH_BANK(image_bank);
+      00039F FAr00r00               922 	ld	a, (#_image_bank)
+      0003A2 F5                     923 	push	af
+      0003A3 33                     924 	inc	sp
+      0003A4 CDr00r00               925 	call	_PushBank
+      0003A7 33                     926 	inc	sp
+                                    927 ;/tmp/_gbsbuild/src/core/Scroll.c:152: x_offset = MOD_32(pending_h_x);
+      0003A8 FAr10r00               928 	ld	a, (#_pending_h_x)
+      0003AB E6 1F                  929 	and	a, #0x1f
+                                    930 ;/tmp/_gbsbuild/src/core/Scroll.c:157: id = 0x9800 + (0x1F & (x_offset)) + ((0x1F & (MOD_32(pending_h_y))) << 5);
+      0003AD E6 1F                  931 	and	a, #0x1f
+      0003AF 06 00                  932 	ld	b, #0x00
+      0003B1 4F                     933 	ld	c, a
+      0003B2 21 00 98               934 	ld	hl, #0x9800
+      0003B5 09                     935 	add	hl, bc
+      0003B6 33                     936 	inc	sp
+      0003B7 33                     937 	inc	sp
+      0003B8 E5                     938 	push	hl
+                                    939 ;/tmp/_gbsbuild/src/core/Scroll.c:155: if (_cpu == CGB_TYPE) {  // Color Column Load
+      0003B9 FAr00r00               940 	ld	a, (#__cpu)
+      0003BC D6 11                  941 	sub	a, #0x11
+      0003BE C2r50r04               942 	jp	NZ,00122$
+                                    943 ;/tmp/_gbsbuild/src/core/Scroll.c:156: for (i = 0u; i != 5 && pending_h_i != 0; ++i, pending_h_i--) {
+      0003C1 AF                     944 	xor	a, a
+      0003C2 F8 02                  945 	ldhl	sp,	#2
+      0003C4 77                     946 	ld	(hl), a
+      0003C5                        947 00108$:
+      0003C5 F8 02                  948 	ldhl	sp,	#2
+      0003C7 7E                     949 	ld	a, (hl)
+      0003C8 D6 05                  950 	sub	a, #0x05
+      0003CA CArA7r04               951 	jp	Z,00105$
+      0003CD FAr14r00               952 	ld	a, (#_pending_h_i)
+      0003D0 B7                     953 	or	a, a
+      0003D1 CArA7r04               954 	jp	Z, 00105$
+                                    955 ;/tmp/_gbsbuild/src/core/Scroll.c:157: id = 0x9800 + (0x1F & (x_offset)) + ((0x1F & (MOD_32(pending_h_y))) << 5);
+      0003D4 FAr12r00               956 	ld	a, (#_pending_h_y)
+      0003D7 E6 1F                  957 	and	a, #0x1f
+      0003D9 4F                     958 	ld	c, a
+      0003DA 06 00                  959 	ld	b, #0x00
+      0003DC 69                     960 	ld	l, c
+      0003DD 60                     961 	ld	h, b
+      0003DE 29                     962 	add	hl, hl
+      0003DF 29                     963 	add	hl, hl
+      0003E0 29                     964 	add	hl, hl
+      0003E1 29                     965 	add	hl, hl
+      0003E2 29                     966 	add	hl, hl
+      0003E3 4D                     967 	ld	c, l
+      0003E4 44                     968 	ld	b, h
+      0003E5 E1                     969 	pop	hl
+      0003E6 E5                     970 	push	hl
+      0003E7 09                     971 	add	hl, bc
+                                    972 ;/tmp/_gbsbuild/src/core/Scroll.c:158: PUSH_BANK(image_attr_bank);
+      0003E8 E5                     973 	push	hl
+      0003E9 FAr00r00               974 	ld	a, (#_image_attr_bank)
+      0003EC F5                     975 	push	af
+      0003ED 33                     976 	inc	sp
+      0003EE CDr00r00               977 	call	_PushBank
+      0003F1 33                     978 	inc	sp
+      0003F2 C1                     979 	pop	bc
+                                    980 ;/tmp/_gbsbuild/src/core/Scroll.c:159: VBK_REG = 1;
+      0003F3 3E 01                  981 	ld	a, #0x01
+      0003F5 E0r00                  982 	ldh	(_VBK_REG+0),a
+                                    983 ;/tmp/_gbsbuild/src/core/Scroll.c:161: SetTile(id, *pending_h_cmap);
+      0003F7 21r1Ar00               984 	ld	hl, #_pending_h_cmap + 1
+      0003FA 2B                     985 	dec	hl
+      0003FB 2A                     986 	ld	a, (hl+)
+      0003FC 5F                     987 	ld	e, a
+      0003FD 56                     988 	ld	d, (hl)
+      0003FE 1A                     989 	ld	a, (de)
+      0003FF F5                     990 	push	af
+      000400 33                     991 	inc	sp
+      000401 C5                     992 	push	bc
+      000402 CDr00r00               993 	call	_SetTile
+      000405 E8 03                  994 	add	sp, #3
+                                    995 ;/tmp/_gbsbuild/src/core/Scroll.c:162: VBK_REG = 0;
+      000407 3E 00                  996 	ld	a, #0x00
+      000409 E0r00                  997 	ldh	(_VBK_REG+0),a
+                                    998 ;/tmp/_gbsbuild/src/core/Scroll.c:163: POP_BANK;
+      00040B C5                     999 	push	bc
+      00040C CDr00r00              1000 	call	_PopBank
+      00040F C1                    1001 	pop	bc
+                                   1002 ;/tmp/_gbsbuild/src/core/Scroll.c:165: SetTile(id, *pending_h_map);
+      000410 21r16r00              1003 	ld	hl, #_pending_h_map + 1
+      000413 2B                    1004 	dec	hl
+      000414 2A                    1005 	ld	a, (hl+)
+      000415 5F                    1006 	ld	e, a
+      000416 56                    1007 	ld	d, (hl)
+      000417 1A                    1008 	ld	a, (de)
+      000418 F5                    1009 	push	af
+      000419 33                    1010 	inc	sp
+      00041A C5                    1011 	push	bc
+      00041B CDr00r00              1012 	call	_SetTile
+      00041E E8 03                 1013 	add	sp, #3
+                                   1014 ;/tmp/_gbsbuild/src/core/Scroll.c:166: pending_h_y++;
+      000420 21r12r00              1015 	ld	hl, #_pending_h_y
+      000423 34                    1016 	inc	(hl)
+      000424 20 02                 1017 	jr	NZ, 00156$
+      000426 23                    1018 	inc	hl
+      000427 34                    1019 	inc	(hl)
+      000428                       1020 00156$:
+                                   1021 ;/tmp/_gbsbuild/src/core/Scroll.c:167: pending_h_map += image_tile_width;
+      000428 FAr15r00              1022 	ld	a, (#_pending_h_map)
+      00042B 21r00r00              1023 	ld	hl, #_image_tile_width
+      00042E 86                    1024 	add	a, (hl)
+      00042F 21r15r00              1025 	ld	hl, #_pending_h_map
+      000432 22                    1026 	ld	(hl+), a
+      000433 7E                    1027 	ld	a, (hl)
+      000434 CE 00                 1028 	adc	a, #0x00
+      000436 77                    1029 	ld	(hl), a
+                                   1030 ;/tmp/_gbsbuild/src/core/Scroll.c:168: pending_h_cmap += image_tile_width;
+      000437 FAr19r00              1031 	ld	a, (#_pending_h_cmap)
+      00043A 21r00r00              1032 	ld	hl, #_image_tile_width
+      00043D 86                    1033 	add	a, (hl)
+      00043E 21r19r00              1034 	ld	hl, #_pending_h_cmap
+      000441 22                    1035 	ld	(hl+), a
+      000442 7E                    1036 	ld	a, (hl)
+      000443 CE 00                 1037 	adc	a, #0x00
+      000445 77                    1038 	ld	(hl), a
+                                   1039 ;/tmp/_gbsbuild/src/core/Scroll.c:156: for (i = 0u; i != 5 && pending_h_i != 0; ++i, pending_h_i--) {
+      000446 F8 02                 1040 	ldhl	sp,	#2
+      000448 34                    1041 	inc	(hl)
+      000449 21r14r00              1042 	ld	hl, #_pending_h_i
+      00044C 35                    1043 	dec	(hl)
+      00044D C3rC5r03              1044 	jp	00108$
+                                   1045 ;/tmp/_gbsbuild/src/core/Scroll.c:173: for (i = 0u; i != 5 && pending_h_i != 0; ++i, pending_h_i--) {
+      000450                       1046 00122$:
+      000450 AF                    1047 	xor	a, a
+      000451 F8 02                 1048 	ldhl	sp,	#2
+      000453 77                    1049 	ld	(hl), a
+      000454                       1050 00112$:
+      000454 F8 02                 1051 	ldhl	sp,	#2
+      000456 7E                    1052 	ld	a, (hl)
+      000457 D6 05                 1053 	sub	a, #0x05
+      000459 28 4C                 1054 	jr	Z, 00105$
+      00045B FAr14r00              1055 	ld	a, (#_pending_h_i)
+      00045E B7                    1056 	or	a, a
+      00045F 28 46                 1057 	jr	Z, 00105$
+                                   1058 ;/tmp/_gbsbuild/src/core/Scroll.c:175: id = 0x9800 + (0x1F & (x_offset)) + ((0x1F & (MOD_32(pending_h_y++))) << 5);
+      000461 21r13r00              1059 	ld	hl, #_pending_h_y + 1
+      000464 2B                    1060 	dec	hl
+      000465 2A                    1061 	ld	a, (hl+)
+      000466 4F                    1062 	ld	c, a
+      000467 3A                    1063 	ld	a, (hl-)
+      000468 34                    1064 	inc	(hl)
+      000469 20 02                 1065 	jr	NZ, 00158$
+      00046B 23                    1066 	inc	hl
+      00046C 34                    1067 	inc	(hl)
+      00046D                       1068 00158$:
+      00046D 79                    1069 	ld	a, c
+      00046E E6 1F                 1070 	and	a, #0x1f
+      000470 26 00                 1071 	ld	h, #0x00
+      000472 6F                    1072 	ld	l, a
+      000473 29                    1073 	add	hl, hl
+      000474 29                    1074 	add	hl, hl
+      000475 29                    1075 	add	hl, hl
+      000476 29                    1076 	add	hl, hl
+      000477 29                    1077 	add	hl, hl
+      000478 4D                    1078 	ld	c, l
+      000479 44                    1079 	ld	b, h
+      00047A E1                    1080 	pop	hl
+      00047B E5                    1081 	push	hl
+      00047C 09                    1082 	add	hl, bc
+      00047D 4D                    1083 	ld	c, l
+      00047E 44                    1084 	ld	b, h
+                                   1085 ;/tmp/_gbsbuild/src/core/Scroll.c:176: SetTile(id, *pending_h_map);
+      00047F 21r16r00              1086 	ld	hl, #_pending_h_map + 1
+      000482 2B                    1087 	dec	hl
+      000483 2A                    1088 	ld	a, (hl+)
+      000484 5F                    1089 	ld	e, a
+      000485 56                    1090 	ld	d, (hl)
+      000486 1A                    1091 	ld	a, (de)
+      000487 F5                    1092 	push	af
+      000488 33                    1093 	inc	sp
+      000489 C5                    1094 	push	bc
+      00048A CDr00r00              1095 	call	_SetTile
+      00048D E8 03                 1096 	add	sp, #3
+                                   1097 ;/tmp/_gbsbuild/src/core/Scroll.c:177: pending_h_map += image_tile_width;
+      00048F FAr15r00              1098 	ld	a, (#_pending_h_map)
+      000492 21r00r00              1099 	ld	hl, #_image_tile_width
+      000495 86                    1100 	add	a, (hl)
+      000496 21r15r00              1101 	ld	hl, #_pending_h_map
+      000499 22                    1102 	ld	(hl+), a
+      00049A 7E                    1103 	ld	a, (hl)
+      00049B CE 00                 1104 	adc	a, #0x00
+      00049D 77                    1105 	ld	(hl), a
+                                   1106 ;/tmp/_gbsbuild/src/core/Scroll.c:173: for (i = 0u; i != 5 && pending_h_i != 0; ++i, pending_h_i--) {
+      00049E F8 02                 1107 	ldhl	sp,	#2
+      0004A0 34                    1108 	inc	(hl)
+      0004A1 21r14r00              1109 	ld	hl, #_pending_h_i
+      0004A4 35                    1110 	dec	(hl)
+      0004A5 18 AD                 1111 	jr	00112$
+      0004A7                       1112 00105$:
+                                   1113 ;/tmp/_gbsbuild/src/core/Scroll.c:181: POP_BANK;
+      0004A7 CDr00r00              1114 	call	_PopBank
+                                   1115 ;/tmp/_gbsbuild/src/core/Scroll.c:182: }
+      0004AA E8 03                 1116 	add	sp, #3
+      0004AC C9                    1117 	ret
+                                   1118 ;/tmp/_gbsbuild/src/core/Scroll.c:184: void ScrollUpdateColumnWithDelay(INT16 x, INT16 y) {
+                                   1119 ;	---------------------------------
+                                   1120 ; Function ScrollUpdateColumnWithDelay
+                                   1121 ; ---------------------------------
+      0004AD                       1122 _ScrollUpdateColumnWithDelay::
+      0004AD E8 F9                 1123 	add	sp, #-7
+                                   1124 ;/tmp/_gbsbuild/src/core/Scroll.c:187: while (pending_h_i) {
+      0004AF                       1125 00101$:
+      0004AF FAr14r00              1126 	ld	a, (#_pending_h_i)
+      0004B2 B7                    1127 	or	a, a
+      0004B3 28 05                 1128 	jr	Z, 00121$
+                                   1129 ;/tmp/_gbsbuild/src/core/Scroll.c:190: ScrollUpdateColumnR();
+      0004B5 CDr9Dr03              1130 	call	_ScrollUpdateColumnR
+      0004B8 18 F5                 1131 	jr	00101$
+                                   1132 ;/tmp/_gbsbuild/src/core/Scroll.c:194: for (i = 1; i != actors_len; i++) {
+      0004BA                       1133 00121$:
+                                   1134 ;c
+      0004BA F8 0B                 1135 	ldhl	sp,#11
+      0004BC 2A                    1136 	ld	a, (hl+)
+      0004BD 5F                    1137 	ld	e, a
+      0004BE 56                    1138 	ld	d, (hl)
+      0004BF 21 15 00              1139 	ld	hl, #0x0015
+      0004C2 19                    1140 	add	hl, de
+      0004C3 33                    1141 	inc	sp
+      0004C4 33                    1142 	inc	sp
+      0004C5 E5                    1143 	push	hl
+      0004C6 F8 06                 1144 	ldhl	sp,	#6
+      0004C8 36 01                 1145 	ld	(hl), #0x01
+      0004CA                       1146 00111$:
+      0004CA FAr00r00              1147 	ld	a, (#_actors_len)
+      0004CD F8 06                 1148 	ldhl	sp,	#6
+      0004CF 96                    1149 	sub	a, (hl)
+      0004D0 CAr5Er05              1150 	jp	Z,00109$
+                                   1151 ;/tmp/_gbsbuild/src/core/Scroll.c:195: if (actors[i].pos.x >> 3 == x) {
+      0004D3 F8 06                 1152 	ldhl	sp,	#6
+      0004D5 4E                    1153 	ld	c, (hl)
+      0004D6 06 00                 1154 	ld	b, #0x00
+      0004D8 69                    1155 	ld	l, c
+      0004D9 60                    1156 	ld	h, b
+      0004DA 29                    1157 	add	hl, hl
+      0004DB 29                    1158 	add	hl, hl
+      0004DC 09                    1159 	add	hl, bc
+      0004DD 29                    1160 	add	hl, hl
+      0004DE 09                    1161 	add	hl, bc
+      0004DF 29                    1162 	add	hl, hl
+      0004E0 09                    1163 	add	hl, bc
+      0004E1 29                    1164 	add	hl, hl
+      0004E2 E5                    1165 	push	hl
+      0004E3 7D                    1166 	ld	a, l
+      0004E4 F8 04                 1167 	ldhl	sp,	#4
+      0004E6 77                    1168 	ld	(hl), a
+      0004E7 E1                    1169 	pop	hl
+      0004E8 7C                    1170 	ld	a, h
+      0004E9 F8 03                 1171 	ldhl	sp,	#3
+                                   1172 ;c
+      0004EB 32                    1173 	ld	(hl-), a
+      0004EC 2A                    1174 	ld	a, (hl+)
+      0004ED 5F                    1175 	ld	e, a
+      0004EE 56                    1176 	ld	d, (hl)
+      0004EF 21r00r00              1177 	ld	hl, #_actors
+      0004F2 19                    1178 	add	hl, de
+      0004F3 E5                    1179 	push	hl
+      0004F4 7D                    1180 	ld	a, l
+      0004F5 F8 06                 1181 	ldhl	sp,	#6
+      0004F7 77                    1182 	ld	(hl), a
+      0004F8 E1                    1183 	pop	hl
+      0004F9 7C                    1184 	ld	a, h
+      0004FA F8 05                 1185 	ldhl	sp,	#5
+      0004FC 32                    1186 	ld	(hl-), a
+      0004FD 2A                    1187 	ld	a, (hl+)
+      0004FE 5F                    1188 	ld	e, a
+      0004FF 56                    1189 	ld	d, (hl)
+      000500 1A                    1190 	ld	a, (de)
+      000501 4F                    1191 	ld	c, a
+      000502 13                    1192 	inc	de
+      000503 1A                    1193 	ld	a, (de)
+      000504 47                    1194 	ld	b, a
+      000505 CB 28                 1195 	sra	b
+      000507 CB 19                 1196 	rr	c
+      000509 CB 28                 1197 	sra	b
+      00050B CB 19                 1198 	rr	c
+      00050D CB 28                 1199 	sra	b
+      00050F CB 19                 1200 	rr	c
+      000511 F8 09                 1201 	ldhl	sp,	#9
+      000513 7E                    1202 	ld	a, (hl)
+      000514 91                    1203 	sub	a, c
+      000515 20 41                 1204 	jr	NZ, 00112$
+      000517 23                    1205 	inc	hl
+      000518 7E                    1206 	ld	a, (hl)
+      000519 90                    1207 	sub	a, b
+      00051A 20 3C                 1208 	jr	NZ, 00112$
+                                   1209 ;/tmp/_gbsbuild/src/core/Scroll.c:196: INT16 ty = actors[i].pos.y >> 3;
+      00051C F8 04                 1210 	ldhl	sp,	#4
+      00051E 2A                    1211 	ld	a, (hl+)
+      00051F 66                    1212 	ld	h, (hl)
+      000520 6F                    1213 	ld	l, a
+      000521 23                    1214 	inc	hl
+      000522 23                    1215 	inc	hl
+      000523 2A                    1216 	ld	a, (hl+)
+      000524 4F                    1217 	ld	c, a
+      000525 46                    1218 	ld	b, (hl)
+      000526 CB 28                 1219 	sra	b
+      000528 CB 19                 1220 	rr	c
+      00052A CB 28                 1221 	sra	b
+      00052C CB 19                 1222 	rr	c
+      00052E CB 28                 1223 	sra	b
+      000530 CB 19                 1224 	rr	c
+                                   1225 ;/tmp/_gbsbuild/src/core/Scroll.c:197: if (U_LESS_THAN(y, ty) && U_LESS_THAN(ty, y + SCREEN_TILE_REFRES_H)) {
+      000532 F8 0B                 1226 	ldhl	sp,#11
+      000534 2A                    1227 	ld	a, (hl+)
+      000535 5F                    1228 	ld	e, a
+      000536 56                    1229 	ld	d, (hl)
+      000537 7B                    1230 	ld	a, e
+      000538 91                    1231 	sub	a, c
+      000539 5F                    1232 	ld	e, a
+      00053A 7A                    1233 	ld	a, d
+      00053B 98                    1234 	sbc	a, b
+      00053C F8 05                 1235 	ldhl	sp,	#5
+      00053E 32                    1236 	ld	(hl-), a
+      00053F 7B                    1237 	ld	a, e
+      000540 22                    1238 	ld	(hl+), a
+      000541 CB 7E                 1239 	bit	7, (hl)
+      000543 28 13                 1240 	jr	Z, 00112$
+      000545 D1                    1241 	pop	de
+      000546 D5                    1242 	push	de
+      000547 79                    1243 	ld	a, c
+      000548 93                    1244 	sub	a, e
+      000549 78                    1245 	ld	a, b
+      00054A 9A                    1246 	sbc	a, d
+      00054B CB 7F                 1247 	bit	7, a
+      00054D 28 09                 1248 	jr	Z, 00112$
+                                   1249 ;/tmp/_gbsbuild/src/core/Scroll.c:198: ActivateActor(i);
+      00054F F8 06                 1250 	ldhl	sp,	#6
+      000551 7E                    1251 	ld	a, (hl)
+      000552 F5                    1252 	push	af
+      000553 33                    1253 	inc	sp
+      000554 CDr00r00              1254 	call	_ActivateActor
+      000557 33                    1255 	inc	sp
+      000558                       1256 00112$:
+                                   1257 ;/tmp/_gbsbuild/src/core/Scroll.c:194: for (i = 1; i != actors_len; i++) {
+      000558 F8 06                 1258 	ldhl	sp,	#6
+      00055A 34                    1259 	inc	(hl)
+      00055B C3rCAr04              1260 	jp	00111$
+      00055E                       1261 00109$:
+                                   1262 ;/tmp/_gbsbuild/src/core/Scroll.c:203: pending_h_x = x;
+      00055E F8 09                 1263 	ldhl	sp,	#9
+      000560 2A                    1264 	ld	a, (hl+)
+      000561 5E                    1265 	ld	e, (hl)
+      000562 21r10r00              1266 	ld	hl, #_pending_h_x
+      000565 22                    1267 	ld	(hl+), a
+      000566 73                    1268 	ld	(hl), e
+                                   1269 ;/tmp/_gbsbuild/src/core/Scroll.c:204: pending_h_y = y;
+      000567 F8 0B                 1270 	ldhl	sp,#11
+      000569 2A                    1271 	ld	a, (hl+)
+      00056A 4F                    1272 	ld	c, a
+      00056B 46                    1273 	ld	b, (hl)
+      00056C 21r12r00              1274 	ld	hl, #_pending_h_y
+      00056F 79                    1275 	ld	a, c
+      000570 22                    1276 	ld	(hl+), a
+      000571 70                    1277 	ld	(hl), b
+                                   1278 ;/tmp/_gbsbuild/src/core/Scroll.c:205: pending_h_i = SCREEN_TILE_REFRES_H;
+      000572 21r14r00              1279 	ld	hl, #_pending_h_i
+      000575 36 15                 1280 	ld	(hl), #0x15
+                                   1281 ;/tmp/_gbsbuild/src/core/Scroll.c:206: pending_h_map = image_ptr + image_tile_width * y + x;
+      000577 21r00r00              1282 	ld	hl, #_image_tile_width
+      00057A 5E                    1283 	ld	e, (hl)
+      00057B 16 00                 1284 	ld	d, #0x00
+      00057D C5                    1285 	push	bc
+      00057E D5                    1286 	push	de
+      00057F CDr00r00              1287 	call	__mulint
+      000582 E8 04                 1288 	add	sp, #4
+      000584 7B                    1289 	ld	a, e
+      000585 21r00r00              1290 	ld	hl, #_image_ptr
+      000588 86                    1291 	add	a, (hl)
+      000589 4F                    1292 	ld	c, a
+      00058A 7A                    1293 	ld	a, d
+      00058B 23                    1294 	inc	hl
+      00058C 8E                    1295 	adc	a, (hl)
+      00058D 47                    1296 	ld	b, a
+      00058E F8 09                 1297 	ldhl	sp,	#9
+      000590 2A                    1298 	ld	a, (hl+)
+      000591 66                    1299 	ld	h, (hl)
+      000592 6F                    1300 	ld	l, a
+      000593 09                    1301 	add	hl, bc
+      000594 7D                    1302 	ld	a, l
+      000595 EAr15r00              1303 	ld	(_pending_h_map), a
+      000598 7C                    1304 	ld	a, h
+      000599 EAr16r00              1305 	ld	(_pending_h_map + 1), a
+                                   1306 ;/tmp/_gbsbuild/src/core/Scroll.c:209: pending_h_cmap = image_attr_ptr + image_tile_width * y + x;
+      00059C 7B                    1307 	ld	a, e
+      00059D 21r00r00              1308 	ld	hl, #_image_attr_ptr
+      0005A0 86                    1309 	add	a, (hl)
+      0005A1 4F                    1310 	ld	c, a
+      0005A2 7A                    1311 	ld	a, d
+      0005A3 23                    1312 	inc	hl
+      0005A4 8E                    1313 	adc	a, (hl)
+      0005A5 47                    1314 	ld	b, a
+      0005A6 F8 09                 1315 	ldhl	sp,	#9
+      0005A8 2A                    1316 	ld	a, (hl+)
+      0005A9 66                    1317 	ld	h, (hl)
+      0005AA 6F                    1318 	ld	l, a
+      0005AB 09                    1319 	add	hl, bc
+      0005AC 7D                    1320 	ld	a, l
+      0005AD EAr19r00              1321 	ld	(_pending_h_cmap), a
+      0005B0 7C                    1322 	ld	a, h
+      0005B1 EAr1Ar00              1323 	ld	(_pending_h_cmap + 1), a
+                                   1324 ;/tmp/_gbsbuild/src/core/Scroll.c:211: }
+      0005B4 E8 07                 1325 	add	sp, #7
+      0005B6 C9                    1326 	ret
+                                   1327 ;/tmp/_gbsbuild/src/core/Scroll.c:213: void RefreshScroll() {
+                                   1328 ;	---------------------------------
+                                   1329 ; Function RefreshScroll
+                                   1330 ; ---------------------------------
+      0005B7                       1331 _RefreshScroll::
+                                   1332 ;/tmp/_gbsbuild/src/core/Scroll.c:214: RefreshScroll_b();
+      0005B7 1Er00                 1333 	ld	e, #b_RefreshScroll_b
+      0005B9 21r00r00              1334 	ld	hl, #_RefreshScroll_b
+                                   1335 ;/tmp/_gbsbuild/src/core/Scroll.c:215: }
+      0005BC C3r00r00              1336 	jp  ___sdcc_bcall_ehl
+                                   1337 ;/tmp/_gbsbuild/src/core/Scroll.c:217: void InitScroll() {
+                                   1338 ;	---------------------------------
+                                   1339 ; Function InitScroll
+                                   1340 ; ---------------------------------
+      0005BF                       1341 _InitScroll::
+                                   1342 ;/tmp/_gbsbuild/src/core/Scroll.c:218: pending_w_i = 0;
+      0005BF 21r21r00              1343 	ld	hl, #_pending_w_i
+      0005C2 36 00                 1344 	ld	(hl), #0x00
+                                   1345 ;/tmp/_gbsbuild/src/core/Scroll.c:219: pending_h_i = 0;
+      0005C4 21r14r00              1346 	ld	hl, #_pending_h_i
+      0005C7 36 00                 1347 	ld	(hl), #0x00
+                                   1348 ;/tmp/_gbsbuild/src/core/Scroll.c:220: scroll_x = 0x7FFF;
+      0005C9 21r00r00              1349 	ld	hl, #_scroll_x
+      0005CC 3E FF                 1350 	ld	a, #0xff
+      0005CE 22                    1351 	ld	(hl+), a
+      0005CF 36 7F                 1352 	ld	(hl), #0x7f
+                                   1353 ;/tmp/_gbsbuild/src/core/Scroll.c:221: scroll_y = 0x7FFF;
+      0005D1 21r02r00              1354 	ld	hl, #_scroll_y
+      0005D4 3E FF                 1355 	ld	a, #0xff
+      0005D6 22                    1356 	ld	(hl+), a
+      0005D7 36 7F                 1357 	ld	(hl), #0x7f
+                                   1358 ;/tmp/_gbsbuild/src/core/Scroll.c:222: }
+      0005D9 C9                    1359 	ret
+                                   1360 ;/tmp/_gbsbuild/src/core/Scroll.c:224: void RenderScreen() {
+                                   1361 ;	---------------------------------
+                                   1362 ; Function RenderScreen
+                                   1363 ; ---------------------------------
+      0005DA                       1364 _RenderScreen::
+      0005DA E8 FD                 1365 	add	sp, #-3
+                                   1366 ;/tmp/_gbsbuild/src/core/Scroll.c:228: if (!fade_style)
+      0005DC FAr00r00              1367 	ld	a, (#_fade_style)
+      0005DF B7                    1368 	or	a, a
+      0005E0 20 05                 1369 	jr	NZ, 00108$
+                                   1370 ;/tmp/_gbsbuild/src/core/Scroll.c:230: DISPLAY_OFF
+      0005E2 CDr00r00              1371 	call	_display_off
+      0005E5 18 48                 1372 	jr	00109$
+      0005E7                       1373 00108$:
+                                   1374 ;/tmp/_gbsbuild/src/core/Scroll.c:231: } else if (!fade_timer == 0)
+      0005E7 FAr00r00              1375 	ld	a, (#_fade_timer)
+      0005EA B7                    1376 	or	a, a
+      0005EB 28 42                 1377 	jr	Z, 00109$
+                                   1378 ;/tmp/_gbsbuild/src/core/Scroll.c:235: if (_cpu == CGB_TYPE) {
+      0005ED FAr00r00              1379 	ld	a, (#__cpu)
+      0005F0 D6 11                 1380 	sub	a, #0x11
+      0005F2 20 33                 1381 	jr	NZ, 00103$
+                                   1382 ;/tmp/_gbsbuild/src/core/Scroll.c:236: for (UBYTE c = 0; c != 32; ++c) {
+      0005F4 01r00r00              1383 	ld	bc, #_BkgPaletteBuffer+0
+      0005F7 1E 00                 1384 	ld	e, #0x00
+      0005F9                       1385 00114$:
+      0005F9 7B                    1386 	ld	a, e
+      0005FA D6 20                 1387 	sub	a, #0x20
+      0005FC 28 0B                 1388 	jr	Z, 00101$
+                                   1389 ;/tmp/_gbsbuild/src/core/Scroll.c:237: BkgPaletteBuffer[c] = RGB_BLACK;
+      0005FE 6B                    1390 	ld	l, e
+      0005FF 26 00                 1391 	ld	h, #0x00
+      000601 29                    1392 	add	hl, hl
+      000602 09                    1393 	add	hl, bc
+      000603 AF                    1394 	xor	a, a
+      000604 22                    1395 	ld	(hl+), a
+      000605 77                    1396 	ld	(hl), a
+                                   1397 ;/tmp/_gbsbuild/src/core/Scroll.c:236: for (UBYTE c = 0; c != 32; ++c) {
+      000606 1C                    1398 	inc	e
+      000607 18 F0                 1399 	jr	00114$
+      000609                       1400 00101$:
+                                   1401 ;/tmp/_gbsbuild/src/core/Scroll.c:239: set_bkg_palette(0, 8, BkgPaletteBuffer);
+      000609 59                    1402 	ld	e, c
+      00060A 50                    1403 	ld	d, b
+      00060B C5                    1404 	push	bc
+      00060C D5                    1405 	push	de
+      00060D 3E 08                 1406 	ld	a, #0x08
+      00060F F5                    1407 	push	af
+      000610 33                    1408 	inc	sp
+      000611 AF                    1409 	xor	a, a
+      000612 F5                    1410 	push	af
+      000613 33                    1411 	inc	sp
+      000614 CDr00r00              1412 	call	_set_bkg_palette
+      000617 E8 04                 1413 	add	sp, #4
+      000619 3E 08                 1414 	ld	a, #0x08
+      00061B F5                    1415 	push	af
+      00061C 33                    1416 	inc	sp
+      00061D AF                    1417 	xor	a, a
+      00061E F5                    1418 	push	af
+      00061F 33                    1419 	inc	sp
+      000620 CDr00r00              1420 	call	_set_sprite_palette
+      000623 E8 04                 1421 	add	sp, #4
+      000625 18 04                 1422 	jr	00104$
+      000627                       1423 00103$:
+                                   1424 ;/tmp/_gbsbuild/src/core/Scroll.c:243: OBP0_REG = 0xFF;
+      000627 3E FF                 1425 	ld	a, #0xff
+      000629 E0r00                 1426 	ldh	(_OBP0_REG+0),a
+      00062B                       1427 00104$:
+                                   1428 ;/tmp/_gbsbuild/src/core/Scroll.c:244: BGP_REG = 0xFF;
+      00062B 3E FF                 1429 	ld	a, #0xff
+      00062D E0r00                 1430 	ldh	(_BGP_REG+0),a
+      00062F                       1431 00109$:
+                                   1432 ;/tmp/_gbsbuild/src/core/Scroll.c:248: pending_w_i = 0;
+      00062F 21r21r00              1433 	ld	hl, #_pending_w_i
+      000632 36 00                 1434 	ld	(hl), #0x00
+                                   1435 ;/tmp/_gbsbuild/src/core/Scroll.c:249: pending_h_i = 0;
+      000634 21r14r00              1436 	ld	hl, #_pending_h_i
+      000637 36 00                 1437 	ld	(hl), #0x00
+                                   1438 ;/tmp/_gbsbuild/src/core/Scroll.c:251: PUSH_BANK(image_bank);
+      000639 FAr00r00              1439 	ld	a, (#_image_bank)
+      00063C F5                    1440 	push	af
+      00063D 33                    1441 	inc	sp
+      00063E CDr00r00              1442 	call	_PushBank
+      000641 33                    1443 	inc	sp
+                                   1444 ;/tmp/_gbsbuild/src/core/Scroll.c:252: y = scroll_y >> 3;
+      000642 21r03r00              1445 	ld	hl, #_scroll_y + 1
+      000645 2B                    1446 	dec	hl
+      000646 2A                    1447 	ld	a, (hl+)
+      000647 4F                    1448 	ld	c, a
+      000648 46                    1449 	ld	b, (hl)
+      000649 CB 28                 1450 	sra	b
+      00064B CB 19                 1451 	rr	c
+      00064D CB 28                 1452 	sra	b
+      00064F CB 19                 1453 	rr	c
+      000651 CB 28                 1454 	sra	b
+      000653 CB 19                 1455 	rr	c
+                                   1456 ;/tmp/_gbsbuild/src/core/Scroll.c:253: for (i = 0u; i != (SCREEN_TILE_REFRES_H) && y != image_height; ++i, y++) {
+      000655 AF                    1457 	xor	a, a
+      000656 F8 02                 1458 	ldhl	sp,	#2
+      000658 77                    1459 	ld	(hl), a
+      000659                       1460 00118$:
+      000659 F8 02                 1461 	ldhl	sp,	#2
+      00065B 7E                    1462 	ld	a, (hl)
+      00065C D6 15                 1463 	sub	a, #0x15
+      00065E 28 42                 1464 	jr	Z, 00110$
+      000660 59                    1465 	ld	e, c
+      000661 50                    1466 	ld	d, b
+      000662 21r00r00              1467 	ld	hl, #_image_height
+      000665 7E                    1468 	ld	a, (hl)
+      000666 93                    1469 	sub	a, e
+      000667 20 05                 1470 	jr	NZ, 00173$
+      000669 23                    1471 	inc	hl
+      00066A 7E                    1472 	ld	a, (hl)
+      00066B 92                    1473 	sub	a, d
+      00066C 28 34                 1474 	jr	Z, 00110$
+      00066E                       1475 00173$:
+                                   1476 ;/tmp/_gbsbuild/src/core/Scroll.c:254: ScrollUpdateRow((scroll_x >> 3) - SCREEN_PAD_LEFT, y - SCREEN_PAD_TOP);
+      00066E 11 01 00              1477 	ld	de, #0x0001
+      000671 79                    1478 	ld	a, c
+      000672 93                    1479 	sub	a, e
+      000673 5F                    1480 	ld	e, a
+      000674 78                    1481 	ld	a, b
+      000675 9A                    1482 	sbc	a, d
+      000676 F8 01                 1483 	ldhl	sp,	#1
+      000678 32                    1484 	ld	(hl-), a
+      000679 73                    1485 	ld	(hl), e
+      00067A 21r01r00              1486 	ld	hl, #_scroll_x + 1
+      00067D 2B                    1487 	dec	hl
+      00067E 2A                    1488 	ld	a, (hl+)
+      00067F 5F                    1489 	ld	e, a
+      000680 56                    1490 	ld	d, (hl)
+      000681 CB 2A                 1491 	sra	d
+      000683 CB 1B                 1492 	rr	e
+      000685 CB 2A                 1493 	sra	d
+      000687 CB 1B                 1494 	rr	e
+      000689 CB 2A                 1495 	sra	d
+      00068B CB 1B                 1496 	rr	e
+      00068D 1B                    1497 	dec	de
+      00068E C5                    1498 	push	bc
+      00068F F8 02                 1499 	ldhl	sp,	#2
+      000691 2A                    1500 	ld	a, (hl+)
+      000692 66                    1501 	ld	h, (hl)
+      000693 6F                    1502 	ld	l, a
+      000694 E5                    1503 	push	hl
+      000695 D5                    1504 	push	de
+      000696 CDr20r02              1505 	call	_ScrollUpdateRow
+      000699 E8 04                 1506 	add	sp, #4
+      00069B C1                    1507 	pop	bc
+                                   1508 ;/tmp/_gbsbuild/src/core/Scroll.c:253: for (i = 0u; i != (SCREEN_TILE_REFRES_H) && y != image_height; ++i, y++) {
+      00069C F8 02                 1509 	ldhl	sp,	#2
+      00069E 34                    1510 	inc	(hl)
+      00069F 03                    1511 	inc	bc
+      0006A0 18 B7                 1512 	jr	00118$
+      0006A2                       1513 00110$:
+                                   1514 ;/tmp/_gbsbuild/src/core/Scroll.c:256: POP_BANK;
+      0006A2 CDr00r00              1515 	call	_PopBank
+                                   1516 ;/tmp/_gbsbuild/src/core/Scroll.c:258: game_time = 0;
+      0006A5 21r00r00              1517 	ld	hl, #_game_time
+      0006A8 36 00                 1518 	ld	(hl), #0x00
+                                   1519 ;/tmp/_gbsbuild/src/core/Scroll.c:260: DISPLAY_ON;
+      0006AA F0r00                 1520 	ldh	a, (_LCDC_REG+0)
+      0006AC F6 80                 1521 	or	a, #0x80
+      0006AE E0r00                 1522 	ldh	(_LCDC_REG+0),a
+                                   1523 ;/tmp/_gbsbuild/src/core/Scroll.c:261: if (!fade_timer == 0) {
+      0006B0 FAr00r00              1524 	ld	a, (#_fade_timer)
+      0006B3 B7                    1525 	or	a, a
+      0006B4 28 03                 1526 	jr	Z, 00120$
+                                   1527 ;/tmp/_gbsbuild/src/core/Scroll.c:263: ApplyPaletteChange();
+      0006B6 CDr00r00              1528 	call	_ApplyPaletteChange
+      0006B9                       1529 00120$:
+                                   1530 ;/tmp/_gbsbuild/src/core/Scroll.c:265: }
+      0006B9 E8 03                 1531 	add	sp, #3
+      0006BB C9                    1532 	ret
+                                   1533 	.area _CODE
+                                   1534 	.area _CABS (ABS)

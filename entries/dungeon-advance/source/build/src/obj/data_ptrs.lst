@@ -1,0 +1,290 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.4 #11952 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module data_ptrs
+                                      6 	.optsdcc -mgbz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _music_banks
+                                     12 	.globl _music_tracks
+                                     13 	.globl _avatar_bank_ptrs
+                                     14 	.globl _collision_bank_ptrs
+                                     15 	.globl _scene_bank_ptrs
+                                     16 	.globl _sprite_bank_ptrs
+                                     17 	.globl _palette_bank_ptrs
+                                     18 	.globl _background_attr_bank_ptrs
+                                     19 	.globl _background_bank_ptrs
+                                     20 	.globl _tileset_bank_ptrs
+                                     21 	.globl _script_variables
+                                     22 	.globl _engine_fields_addr
+                                     23 	.globl _fade_style
+                                     24 	.globl _topdown_grid
+                                     25 	.globl _plat_max_fall_vel
+                                     26 	.globl _plat_hold_grav
+                                     27 	.globl _plat_grav
+                                     28 	.globl _plat_jump_vel
+                                     29 	.globl _plat_dec
+                                     30 	.globl _plat_run_acc
+                                     31 	.globl _plat_walk_acc
+                                     32 	.globl _plat_run_vel
+                                     33 	.globl _plat_walk_vel
+                                     34 	.globl _plat_min_vel
+                                     35 	.globl _start_player_anim_speed
+                                     36 	.globl _start_player_move_speed
+                                     37 	.globl _start_player_sprite
+                                     38 	.globl _start_scene_dir_y
+                                     39 	.globl _start_scene_dir_x
+                                     40 	.globl _start_scene_y
+                                     41 	.globl _start_scene_x
+                                     42 	.globl _start_scene_index
+                                     43 ;--------------------------------------------------------
+                                     44 ; special function registers
+                                     45 ;--------------------------------------------------------
+                                     46 ;--------------------------------------------------------
+                                     47 ; ram data
+                                     48 ;--------------------------------------------------------
+                                     49 	.area _DATA
+      000000                         50 _start_scene_index::
+      000000                         51 	.ds 2
+      000002                         52 _start_scene_x::
+      000002                         53 	.ds 2
+      000004                         54 _start_scene_y::
+      000004                         55 	.ds 2
+      000006                         56 _start_scene_dir_x::
+      000006                         57 	.ds 1
+      000007                         58 _start_scene_dir_y::
+      000007                         59 	.ds 1
+      000008                         60 _start_player_sprite::
+      000008                         61 	.ds 2
+      00000A                         62 _start_player_move_speed::
+      00000A                         63 	.ds 1
+      00000B                         64 _start_player_anim_speed::
+      00000B                         65 	.ds 1
+      00000C                         66 _plat_min_vel::
+      00000C                         67 	.ds 2
+      00000E                         68 _plat_walk_vel::
+      00000E                         69 	.ds 2
+      000010                         70 _plat_run_vel::
+      000010                         71 	.ds 2
+      000012                         72 _plat_walk_acc::
+      000012                         73 	.ds 2
+      000014                         74 _plat_run_acc::
+      000014                         75 	.ds 2
+      000016                         76 _plat_dec::
+      000016                         77 	.ds 2
+      000018                         78 _plat_jump_vel::
+      000018                         79 	.ds 2
+      00001A                         80 _plat_grav::
+      00001A                         81 	.ds 2
+      00001C                         82 _plat_hold_grav::
+      00001C                         83 	.ds 2
+      00001E                         84 _plat_max_fall_vel::
+      00001E                         85 	.ds 2
+      000020                         86 _topdown_grid::
+      000020                         87 	.ds 1
+      000021                         88 _fade_style::
+      000021                         89 	.ds 1
+      000022                         90 _engine_fields_addr::
+      000022                         91 	.ds 2
+      000024                         92 _script_variables::
+      000024                         93 	.ds 500
+                                     94 ;--------------------------------------------------------
+                                     95 ; absolute external ram data
+                                     96 ;--------------------------------------------------------
+                                     97 	.area _DABS (ABS)
+                                     98 ;--------------------------------------------------------
+                                     99 ; global & static initialisations
+                                    100 ;--------------------------------------------------------
+                                    101 	.area _HOME
+                                    102 	.area _GSINIT
+                                    103 	.area _GSFINAL
+                                    104 	.area _GSINIT
+                                    105 ;/tmp/_gbsbuild/src/data/data_ptrs.c:51: unsigned int start_scene_index = 0x0000;
+      000000 21r00r00               106 	ld	hl, #_start_scene_index
+      000003 36 00                  107 	ld	(hl), #0x00
+      000005 23                     108 	inc	hl
+      000006 36 00                  109 	ld	(hl), #0x00
+                                    110 ;/tmp/_gbsbuild/src/data/data_ptrs.c:52: int start_scene_x = 0x0000;
+      000008 21r02r00               111 	ld	hl, #_start_scene_x
+      00000B 36 00                  112 	ld	(hl), #0x00
+      00000D 23                     113 	inc	hl
+      00000E 36 00                  114 	ld	(hl), #0x00
+                                    115 ;/tmp/_gbsbuild/src/data/data_ptrs.c:53: int start_scene_y = 0x0000;
+      000010 21r04r00               116 	ld	hl, #_start_scene_y
+      000013 36 00                  117 	ld	(hl), #0x00
+      000015 23                     118 	inc	hl
+      000016 36 00                  119 	ld	(hl), #0x00
+                                    120 ;/tmp/_gbsbuild/src/data/data_ptrs.c:55: char start_scene_dir_x = 1;
+      000018 21r06r00               121 	ld	hl, #_start_scene_dir_x
+      00001B 36 01                  122 	ld	(hl), #0x01
+                                    123 ;/tmp/_gbsbuild/src/data/data_ptrs.c:56: char start_scene_dir_y = 0;
+      00001D 21r07r00               124 	ld	hl, #_start_scene_dir_y
+      000020 36 00                  125 	ld	(hl), #0x00
+                                    126 ;/tmp/_gbsbuild/src/data/data_ptrs.c:57: unsigned int start_player_sprite = 0;
+      000022 21r08r00               127 	ld	hl, #_start_player_sprite
+      000025 36 00                  128 	ld	(hl), #0x00
+      000027 23                     129 	inc	hl
+      000028 36 00                  130 	ld	(hl), #0x00
+                                    131 ;/tmp/_gbsbuild/src/data/data_ptrs.c:58: unsigned char start_player_move_speed = 1;
+      00002A 21r0Ar00               132 	ld	hl, #_start_player_move_speed
+      00002D 36 01                  133 	ld	(hl), #0x01
+                                    134 ;/tmp/_gbsbuild/src/data/data_ptrs.c:59: unsigned char start_player_anim_speed = 3;
+      00002F 21r0Br00               135 	ld	hl, #_start_player_anim_speed
+      000032 36 03                  136 	ld	(hl), #0x03
+                                    137 ;/tmp/_gbsbuild/src/data/data_ptrs.c:60: WORD plat_min_vel = 304;
+      000034 21r0Cr00               138 	ld	hl, #_plat_min_vel
+      000037 36 30                  139 	ld	(hl), #0x30
+      000039 23                     140 	inc	hl
+      00003A 36 01                  141 	ld	(hl), #0x01
+                                    142 ;/tmp/_gbsbuild/src/data/data_ptrs.c:61: WORD plat_walk_vel = 6400;
+      00003C 21r0Er00               143 	ld	hl, #_plat_walk_vel
+      00003F 36 00                  144 	ld	(hl), #0x00
+      000041 23                     145 	inc	hl
+      000042 36 19                  146 	ld	(hl), #0x19
+                                    147 ;/tmp/_gbsbuild/src/data/data_ptrs.c:62: WORD plat_run_vel = 6400;
+      000044 21r10r00               148 	ld	hl, #_plat_run_vel
+      000047 36 00                  149 	ld	(hl), #0x00
+      000049 23                     150 	inc	hl
+      00004A 36 19                  151 	ld	(hl), #0x19
+                                    152 ;/tmp/_gbsbuild/src/data/data_ptrs.c:63: WORD plat_walk_acc = 152;
+      00004C 21r12r00               153 	ld	hl, #_plat_walk_acc
+      00004F 36 98                  154 	ld	(hl), #0x98
+      000051 23                     155 	inc	hl
+      000052 36 00                  156 	ld	(hl), #0x00
+                                    157 ;/tmp/_gbsbuild/src/data/data_ptrs.c:64: WORD plat_run_acc = 152;
+      000054 21r14r00               158 	ld	hl, #_plat_run_acc
+      000057 36 98                  159 	ld	(hl), #0x98
+      000059 23                     160 	inc	hl
+      00005A 36 00                  161 	ld	(hl), #0x00
+                                    162 ;/tmp/_gbsbuild/src/data/data_ptrs.c:65: WORD plat_dec = 208;
+      00005C 21r16r00               163 	ld	hl, #_plat_dec
+      00005F 36 D0                  164 	ld	(hl), #0xd0
+      000061 23                     165 	inc	hl
+      000062 36 00                  166 	ld	(hl), #0x00
+                                    167 ;/tmp/_gbsbuild/src/data/data_ptrs.c:66: WORD plat_jump_vel = 16384;
+      000064 21r18r00               168 	ld	hl, #_plat_jump_vel
+      000067 36 00                  169 	ld	(hl), #0x00
+      000069 23                     170 	inc	hl
+      00006A 36 40                  171 	ld	(hl), #0x40
+                                    172 ;/tmp/_gbsbuild/src/data/data_ptrs.c:67: WORD plat_grav = 1792;
+      00006C 21r1Ar00               173 	ld	hl, #_plat_grav
+      00006F 36 00                  174 	ld	(hl), #0x00
+      000071 23                     175 	inc	hl
+      000072 36 07                  176 	ld	(hl), #0x07
+                                    177 ;/tmp/_gbsbuild/src/data/data_ptrs.c:68: WORD plat_hold_grav = 512;
+      000074 21r1Cr00               178 	ld	hl, #_plat_hold_grav
+      000077 36 00                  179 	ld	(hl), #0x00
+      000079 23                     180 	inc	hl
+      00007A 36 02                  181 	ld	(hl), #0x02
+                                    182 ;/tmp/_gbsbuild/src/data/data_ptrs.c:69: WORD plat_max_fall_vel = 20000;
+      00007C 21r1Er00               183 	ld	hl, #_plat_max_fall_vel
+      00007F 36 20                  184 	ld	(hl), #0x20
+      000081 23                     185 	inc	hl
+      000082 36 4E                  186 	ld	(hl), #0x4e
+                                    187 ;/tmp/_gbsbuild/src/data/data_ptrs.c:70: UBYTE topdown_grid = 8;
+      000084 21r20r00               188 	ld	hl, #_topdown_grid
+      000087 36 08                  189 	ld	(hl), #0x08
+                                    190 ;/tmp/_gbsbuild/src/data/data_ptrs.c:72: UBYTE *engine_fields_addr = &plat_min_vel;
+      000089 21r22r00               191 	ld	hl, #_engine_fields_addr
+      00008C 36r0C                  192 	ld	(hl), #<(_plat_min_vel)
+      00008E 23                     193 	inc	hl
+      00008F 36s00                  194 	ld	(hl), #>(_plat_min_vel)
+                                    195 ;/tmp/_gbsbuild/src/data/data_ptrs.c:74: unsigned char script_variables[500] = { 0 };
+      000091 21r24r00               196 	ld	hl, #_script_variables
+      000094 36 00                  197 	ld	(hl), #0x00
+                                    198 ;--------------------------------------------------------
+                                    199 ; Home
+                                    200 ;--------------------------------------------------------
+                                    201 	.area _HOME
+                                    202 	.area _HOME
+                                    203 ;--------------------------------------------------------
+                                    204 ; code
+                                    205 ;--------------------------------------------------------
+                                    206 	.area _CODE_5
+                                    207 	.area _CODE_5
+      000000                        208 _tileset_bank_ptrs:
+      000000 06                     209 	.db #0x06	; 6
+      000001 20 12                  210 	.dw #0x1220
+      000003 06                     211 	.db #0x06	; 6
+      000004 B1 1C                  212 	.dw #0x1cb1
+      000006                        213 _background_bank_ptrs:
+      000006 06                     214 	.db #0x06	; 6
+      000007 B2 24                  215 	.dw #0x24b2
+      000009 06                     216 	.db #0x06	; 6
+      00000A 35 31                  217 	.dw #0x3135
+      00000C 06                     218 	.db #0x06	; 6
+      00000D A0 32                  219 	.dw #0x32a0
+      00000F 06                     220 	.db #0x06	; 6
+      000010 0B 34                  221 	.dw #0x340b
+      000012 06                     222 	.db #0x06	; 6
+      000013 76 35                  223 	.dw #0x3576
+      000015                        224 _background_attr_bank_ptrs:
+      000015 06                     225 	.db #0x06	; 6
+      000016 43 3E                  226 	.dw #0x3e43
+      000018 07                     227 	.db #0x07	; 7
+      000019 80 0C                  228 	.dw #0x0c80
+      00001B 07                     229 	.db #0x07	; 7
+      00001C E8 0D                  230 	.dw #0x0de8
+      00001E 07                     231 	.db #0x07	; 7
+      00001F 68 1A                  232 	.dw #0x1a68
+      000021 07                     233 	.db #0x07	; 7
+      000022 D0 1B                  234 	.dw #0x1bd0
+      000024                        235 _palette_bank_ptrs:
+      000024 06                     236 	.db #0x06	; 6
+      000025 12 24                  237 	.dw #0x2412
+      000027 06                     238 	.db #0x06	; 6
+      000028 1A 24                  239 	.dw #0x241a
+      00002A 06                     240 	.db #0x06	; 6
+      00002B 22 24                  241 	.dw #0x2422
+      00002D 06                     242 	.db #0x06	; 6
+      00002E 52 24                  243 	.dw #0x2452
+      000030 06                     244 	.db #0x06	; 6
+      000031 52 24                  245 	.dw #0x2452
+      000033 06                     246 	.db #0x06	; 6
+      000034 82 24                  247 	.dw #0x2482
+      000036                        248 _sprite_bank_ptrs:
+      000036 06                     249 	.db #0x06	; 6
+      000037 E1 36                  250 	.dw #0x36e1
+      000039 06                     251 	.db #0x06	; 6
+      00003A 62 38                  252 	.dw #0x3862
+      00003C                        253 _scene_bank_ptrs:
+      00003C 06                     254 	.db #0x06	; 6
+      00003D AB 3F                  255 	.dw #0x3fab
+      00003F 06                     256 	.db #0x06	; 6
+      000040 C1 3F                  257 	.dw #0x3fc1
+      000042 07                     258 	.db #0x07	; 7
+      000043 38 1D                  259 	.dw #0x1d38
+      000045 06                     260 	.db #0x06	; 6
+      000046 D7 3F                  261 	.dw #0x3fd7
+      000048 07                     262 	.db #0x07	; 7
+      000049 CE 1D                  263 	.dw #0x1dce
+      00004B                        264 _collision_bank_ptrs:
+      00004B 06                     265 	.db #0x06	; 6
+      00004C A3 38                  266 	.dw #0x38a3
+      00004E 06                     267 	.db #0x06	; 6
+      00004F 0B 3A                  268 	.dw #0x3a0b
+      000051 07                     269 	.db #0x07	; 7
+      000052 00 00                  270 	.dw #0x0000
+      000054 06                     271 	.db #0x06	; 6
+      000055 73 3B                  272 	.dw #0x3b73
+      000057 06                     273 	.db #0x06	; 6
+      000058 DB 3C                  274 	.dw #0x3cdb
+      00005A                        275 _avatar_bank_ptrs:
+      00005A 00                     276 	.db #0x00	; 0
+      00005B 00 00                  277 	.dw #0x0000
+      00005D                        278 _music_tracks:
+      00005D 47 5B                  279 	.dw #0x5b47
+      00005F 51 5B                  280 	.dw #0x5b51
+      000061 5B 5B                  281 	.dw #0x5b5b
+      000063 6F 5B                  282 	.dw #0x5b6f
+      000065 00 00                  283 	.dw #0x0000
+      000067                        284 _music_banks:
+      000067 08                     285 	.db #0x08	; 8
+      000068 08                     286 	.db #0x08	; 8
+      000069 08                     287 	.db #0x08	; 8
+      00006A 08                     288 	.db #0x08	; 8
+      00006B 00                     289 	.db #0x00	; 0
+                                    290 	.area _CABS (ABS)

@@ -1,0 +1,135 @@
+                                      1 .macro _signed_add_a regH regL ?lbl
+                                      2         ; If A is negative, we need
+                                      3         ; to substract $100 from HL
+                                      4         ; (since A's "upper byte" is
+                                      5         ; $FF00)
+                                      6         bit 7, a                    ; set z if a signed bit is 0
+                                      7         jr z, lbl                   ; if z is set jump to positive
+                                      8         dec   regH                  ; if negative decrement upper byte
+                                      9     lbl:
+                                     10         ; Then do addition as usual
+                                     11         ; (to handle the "lower byte")
+                                     12         add   a, regL
+                                     13         ld    regL, a
+                                     14         adc   a, regH
+                                     15         sub   regL
+                                     16         ld    regH, a
+                                     17 .endm
+                                     18 
+                                     19 .macro _signed_sub_a regH regL ?lbl
+                                     20 
+                                     21         ; If A is negative, we need
+                                     22         ; to substract $100 from HL
+                                     23         ; (since A's "upper byte" is
+                                     24         ; $FF00)
+                                     25         bit 7, a                    ; set z if a signed bit is 0
+                                     26         jr z, lbl                   ; if z is set jump to positive
+                                     27         dec   regH                  ; if negative decrement upper byte
+                                     28     lbl:
+                                     29         ; Then do addition as usual
+                                     30         ; (to handle the "lower byte")
+                                     31         add   a, regL
+                                     32         ld    regL, a
+                                     33         adc   a, regH
+                                     34         sub   regL
+                                     35         ld    regH, a
+                                     36 
+                                     37 
+                                     38         ; We negate A (since HL - A
+                                     39         ; is the same as HL + -A)
+                                     40         ; neg
+                                     41         ; _signed_sub_a regH, regL
+                                     42     ;     ; Now add the "upper byte"
+                                     43     ;     ; The flags are already set by NEG
+                                     44     ;     ; The JP PE is because -$80 becomes
+                                     45     ;     ; +$80 so we need to handle it too
+                                     46     ;     jp    p, lbl
+                                     47     ;     jp    pe, lbl
+                                     48     ;     dec   h
+                                     49     ; lbl:
+                                     50         
+                                     51     ;     ; Then add the low byte
+                                     52     ;     add   a, l
+                                     53     ;     ld    l, a
+                                     54     ;     adc   a, h
+                                     55     ;     sub   l
+                                     56     ;     ld    h, a
+                                     57 .endm
+                                     58 
+                                     59 .macro _add_a regH regL
+                                     60         ; Then do addition as usual
+                                     61         ; (to handle the "lower byte")
+                                     62         add   a, regL
+                                     63         ld    regL, a
+                                     64         adc   a, regH
+                                     65         sub   regL
+                                     66         ld    regH, a
+                                     67 .endm
+                                     68 
+                                     69 .macro _sub16 h1 l1 h2 l2
+                                     70     ld a, l1
+                                     71     sub a, l2
+                                     72     ld l1, A
+                                     73 
+                                     74     ld a, h1
+                                     75     sbc h2
+                                     76     ld h1, A
+                                     77 .endm
+                                     78 
+                                     79 .macro _if_lt_16 h2 l2 h1 l1 tmp lbl
+                                     80         ld a, l1
+                                     81         sub a, l2
+                                     82         ld	tmp, a
+                                     83         ld	a, h1
+                                     84         sbc	a, h2
+                                     85         ld	tmp, a
+                                     86         bit	7, tmp
+                                     87         jr	Z, lbl    
+                                     88 .endm
+                                     89 
+                                     90 .macro _if_lt_u16 h1 l1 h2 l2 lbl
+                                     91         ld	a, l1
+                                     92         sub	a, l2
+                                     93         ld	a, h1
+                                     94         sbc	a, h2
+                                     95         jr	c, lbl
+                                     96 .endm
+                                     97 
+                                     98 .macro _if_gt_16 h1 l1 h2 l2 tmp lbl
+                                     99         ld a, l1
+                                    100         sub a, l2
+                                    101         ld	tmp, a
+                                    102         ld	a, h1
+                                    103         sbc	a, h2
+                                    104         ld	tmp, a
+                                    105         bit	7, tmp
+                                    106         jr	Z, lbl    
+                                    107 .endm
+                                    108 
+                                    109 ;    0000 21r00r00             62 	ld	hl, #_camera_tmp_a
+                                    110 ;    0003 7E                   63 	ld	a, (hl)
+                                    111 ;    0004 21r02r00             64 	ld	hl, #_camera_tmp_b
+                                    112 ;    0007 96                   65 	sub	a, (hl)
+                                    113 ;    0008 4F                   66 	ld	c, a
+                                    114 ;    0009 21r01r00             67 	ld	hl, #_camera_tmp_a + 1
+                                    115 ;    000C 7E                   68 	ld	a, (hl)
+                                    116 ;    000D 21r03r00             69 	ld	hl, #_camera_tmp_b + 1
+                                    117 ;    0010 9E                   70 	sbc	a, (hl)
+                                    118 ;    0011 47                   71 	ld	b, a
+                                    119 ;    0012 CB 78                72 	bit	7, b
+                                    120 ;    0014 28 08                73 	jr	Z,00102$
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.=  002710 L   |     .__.ABS.=  000000 G   |     .__.CPU.=  000000 L
+    .__.H$L.=  000000 L
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy Z80-like CPU), page 2.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE      size      0   flags    0
+
