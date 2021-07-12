@@ -12,26 +12,26 @@ This page collects every entry submitted, providing the final released ROMs and 
 
 #### µCity Advance
 
-- Play online
-- ROM File
-- Source Code
-- Itch.io page
-- Developer home page
+- [Play online](https://gbhh.avivace.com/game/ucity-advance)
+- [ROM File](./entries/ucity-advance/ucity-advance-v1.0.1.gba)
+- [Source Code](https://github.com/gbajam21/ucity-advance)
+- [Itch.io page](https://skylyrac.itch.io/ucity-advance)
+- [Developer home page](http://www.skylyrac.net/)
 
 #### Varooom 3D
 
 - Play online
 - ROM File
 - Source Code
-- Itch.io page
+- [Itch.io page](https://gvaliente.itch.io/varooom-3d)
 - Developer home page
 
 #### Skyland
 
 - Play online
-- ROM File
-- Source Code
-- Itch.io page
+- [ROM File](entries/skyland/Skyland.gba)
+- [Source Code](https://github.com/gbajam21/skyland)
+- [Itch.io page](https://evanbowman.itch.io/skyland)
 - Developer home page
 
 #### BridgeQuestGBA
