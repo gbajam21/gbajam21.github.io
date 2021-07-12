@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  release:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        rust:
+          - { toolchain: nightly }
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install Apt Dependencies
+        run: sudo apt-get update && sudo apt-get install binutils-arm-none-eabi
+
+      - name: Install Rust toolchain and Component(s)
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust.toolchain }}
+          override: true
+          profile: minimal
+          components: rust-src
+          default: true
+      
+      - name: Install gbafix
+        run: cargo install gbafix
+      
+      - name: Get cargo-make
+        uses: davidB/rust-cargo-make@v1
+
+      - name: Make ROM
+        run: cargo make justrelease
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./gba-dvd.gba
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

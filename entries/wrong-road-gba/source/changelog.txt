@@ -1,0 +1,147 @@
+CHANGELOG:
+==========
+
+TODO
+  preload sprites on startup and only switch BG image on start?
+  or just load the tile images on start ...
+
+  the number of samples in a wave file should be a multiple of 16
+  and the sample length in seconds should be a multiple of 1/60th.
+
+0.41
+  2021-07-11
+  Removed the sfx debugging code on A and B keys.
+  Added the lowbleep sample.
+  Added the padmb.bat with pad.txt for padding when the code binary
+  is smaller after a new compile with the right previous size.
+
+0.40
+  2021-07-11
+  Added the new way of passing the sample length to the sfx system.
+  Removed Timer1 interrupt enable and service rountine code.
+  Removed Timer1 code from the sfx system.
+
+0.39
+  2021-07-11
+  Added an auxiliary sample counter on vblank
+  So the samples will be halted after play.
+  This is to circumvent the Timer1 interrupt problem.
+
+0.38
+  2021-07-11
+  Added a binary sample and the A channel sound system.
+  The sample plays but with noise behind it.
+  Probably because the Timer1 interrupt won't fire.
+
+0.37
+  2021-07-10
+  Removed the mosaic effect along with the mosaic header file.
+  Added a pausemenu picture and pausemenu cursor.
+  Added the pausemenu functionality.
+
+0.34
+  2021-07-10
+  Added an awesome mosaic fade effect on pause,
+  but the background isn't suitable for it.
+
+0.33
+  2021-07-10
+  Added a pause function, but not as game state.
+
+0.32
+  2021-07-10
+  Added collision detection with a game reset on impact.
+
+0.30
+  2021-07-10
+  Outer lanes move twice as fast as inner lanes.
+
+0.29
+  2021-07-10
+  Added the speed system, based on the level number, based on the score.
+  And global.vblanks became global.gameloops.
+
+0.28
+  2021-07-10
+  Changed the number graphics a little bit.
+  Added the point scoring system.
+
+0.26
+  2021-07-10
+  Added the score counter system with three three digit counters.  
+
+0.25
+  2021-07-10
+  Added the numbers for displaying scores, although the score counter
+  system isn't up yet nor the point scoring system.
+
+0.24
+  2021-07-10
+  Removed the scoreliveslevel sprite and added the S, H and L characters
+  for score, hiscore and level.
+  Moved the binary filesystem defines into bfs.h.
+
+0.23
+  2021-07-01
+  Added the scoreliveslevel sprite, which overlaps with the game view.
+
+0.22
+  2021-07-01
+  Added the random code and let the oppossing cars appear random in their lanes.
+
+0.21
+  2021-06-26
+  Added ten opposing cars that have a basic movement, not the final movement yet.
+
+0.20
+  2021-06-26
+  Put all variables in a global struct.
+  Added a single opposing car.
+
+0.19
+  2021-06-26
+  Movable racer.
+
+0.18
+  2021-06-26
+  Added the racer sprite.
+
+0.17
+  2021-06-25
+  Added interrupts.
+  Enabled compiler ARM code generation for letting interrupts work.
+  Disabled compiler optimization for letting the wake up from sleep work.
+
+0.16
+  2021-06-25
+  Added the soft reset function.
+
+0.15
+  2021-06-25
+  Enabled the soft reset code on A+B+START+SELECT.
+
+0.14
+  2021-06-25
+  Added the keyboard functions, which needed a little adjustment for usage in plain C.
+  (added the boolean type and rewrote the structure a litte bit)
+  The binary boots up with the title and pressing start loads the track.
+
+0.13
+  2021-06-25
+  Added the sprite picture, but it wasn't converted to binary, so it's not working yet.
+  Added the compressed title screen binary picture, which works.
+
+0.12
+  2021-06-24
+  Added the compressed binary picture, but it doesn't work.
+  Which needs the 'interwork' commands on in the compiler.
+
+0.11
+  2021-06-24
+  Cut the palette out from the binary picture.
+
+0.10
+  2021-06-24
+  Created a basic appendable mode 4 8 bit picture viewer.
+
+Jenswa

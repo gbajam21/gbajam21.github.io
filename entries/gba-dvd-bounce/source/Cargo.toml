@@ -1,0 +1,28 @@
+[package]
+name = "gba-dvd"
+description = "A Gamebody Advance ROM that's just a dvd bounce screen saver"
+version = "0.1.0"
+authors = ["Mason Ginter <mason@dagint.com>"]
+repository = "https://github.com/Hpmason/gba-dvd"
+readme = "README.md"
+edition = "2018"
+license = "Zlib OR Apache-2.0 OR MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# gba = "0.4"
+# Due to this issue with bitfield ints https://github.com/rust-console/gba/issues/145
+# Waiting until next cargo version release
+gba = {git = "https://github.com/rust-console/gba", branch = "main"}
+voladdress = "0.4"
+
+[build-dependencies]
+# Personal crate for converting grit bin files to rust constants
+gba-image-macros = {git = "https://github.com/Hpmason/gba-image-macros"}
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
