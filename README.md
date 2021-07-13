@@ -89,7 +89,8 @@ This page collects every entry submitted, providing the final released ROMs and 
 ### varooom-3d
 <img height="150px" src="https://gbajam21.github.io/entries/varooom-3d/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/varooom-3d/2.png"/>&nbsp;
 
-- [ROM File](https://gbajam21.github.io/entries/varooom-3d/varooom-3d.gba)
+- [ROM File (high audio quality)](https://gbajam21.github.io/entries/varooom-3d/varooom-3d.gba)
+- [ROM File (SuperCard SD compatible)](https://gbajam21.github.io/entries/varooom-3d/varooom-3d_slow.gba)
 - [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/varooom-3d)
 
 
