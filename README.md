@@ -259,7 +259,7 @@ This page collects every entry submitted, providing the final released ROMs and 
 ### toadally-awesome
 <img height="150px" src="https://gbajam21.github.io/entries/toadally-awesome/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/toadally-awesome/2.png"/>&nbsp;
 
-- [ROM File](https://gbajam21.github.io/entries/toadally-awesome/Toadally Awesome (Jam Build) [Unlocked].gba)
+- [ROM File](https://gbajam21.github.io/entries/toadally-awesome/Toadally-Awesome-(Jam-Build)-[Unlocked].gba)
 - [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/toadally-awesome)
 
 
