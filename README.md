@@ -33,7 +33,7 @@ This page collects every entry submitted, providing the final released ROMs and 
 ### gba-mmo
 <img height="150px" src="https://gbajam21.github.io/entries/gba-mmo/1.jpg"/>&nbsp;
 
-- [ROM File](https://gbajam21.github.io/entries/gba-mmo/gba_mmo.gba)
+- [ROM File](https://gbajam21.github.io/entries/gba-mmo/gba-mmo.zip)
 - [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/gba-mmo)
 
 
