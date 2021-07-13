@@ -11,8 +11,8 @@ This page collects every entry submitted, providing the final released ROMs and 
 ## Games
 
 {% for entry in entries %}
-#### {{entry.title}}
-{% for screenshot in entry.screenshots[0:2] %}<img height="150px" src="{{screenshot}}"/>{% endfor %}
+### {{entry.title}}
+{% for screenshot in entry.screenshots[0:2] %}<img height="150px" src="{{screenshot}}"/>&nbsp;{% endfor %}
 
 - [ROM File]({{entry.rom}})
 - [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/{{entry.foldername}})
