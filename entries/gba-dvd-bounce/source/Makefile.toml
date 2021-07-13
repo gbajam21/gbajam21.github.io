@@ -1,0 +1,67 @@
+[config]
+skip_core_tasks = true
+
+[tasks.verify-toolchain]
+script_runner = "@duckscript"
+script = [
+'''
+channel = get_env CARGO_MAKE_RUST_CHANNEL
+echo "Toolchain channel: ${channel}"
+assert_eq ${channel} nightly "Rust toolchain must be set to nightly"
+'''
+]
+
+
+[tasks.build-rom-debug]
+dependencies = ["verify-toolchain"]
+command = "cargo"
+args = ["build", "--target=thumbv4t-none-eabi", "-Zbuild-std=core"]
+
+[tasks.build-rom-release]
+dependencies = ["verify-toolchain"]
+command = "cargo"
+args = ["build",  "--release", "--target=thumbv4t-none-eabi", "-Zbuild-std=core"]
+
+[tasks.pack-rom]
+script_runner = "@duckscript"
+script = [
+'''
+bin_name = set gba-dvd
+release_target = get_env RELEASE_TARGET
+path = set ./target/thumbv4t-none-eabi/${release_target}
+
+path_exists = is_path_exists ${path}/${bin_name}.gba
+if {path_exists}
+    echo "Packing: ${path}/${example} to ${path}/${bin_name}.gba"
+    exec arm-none-eabi-objcopy -O binary ${path}/${bin_name} ${path}/${bin_name}.gba
+    echo "Fixing headers: ${path}/${bin_name}.gba"
+    exec gbafix ${path}/${bin_name}.gba
+    echo "Copying ${path}/${bin_name}.gba to ./${bin_name}.gba"
+    exec cp ${path}/${bin_name}.gba ./${bin_name}.gba
+end
+'''
+]
+
+[tasks.pack-rom-release]
+dependencies = ["build-rom-release"]
+env = { RELEASE_TARGET = "release" }
+run_task = "pack-rom"
+
+[tasks.pack-rom-debug]
+dependencies = ["build-rom-debug"]
+env = { RELEASE_TARGET = "debug" }
+run_task = "pack-rom"
+
+[tasks.test]
+dependencies = ["verify-toolchain"]
+command = "cargo"
+args = ["test", "--lib"]
+
+[tasks.justrelease]
+dependencies = ["pack-rom-release"]
+
+[tasks.build-all]
+dependencies = ["pack-rom-debug", "pack-rom-release"]
+
+[tasks.default]
+alias = "build-all"

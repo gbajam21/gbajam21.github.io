@@ -1,0 +1,76 @@
+name: ci
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        rust:
+          - { toolchain: nightly }
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: Install Apt Dependencies
+        run: sudo apt-get update && sudo apt-get install binutils-arm-none-eabi
+
+      - name: Install Rust toolchain and Component(s)
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust.toolchain }}
+          profile: minimal
+          components: rust-src
+          default: true
+
+      - name: Cargo Check
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: ${{ matrix.rust.toolchain }}
+          command: check
+
+      - name: Check That Docs Compile
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: ${{ matrix.rust.toolchain }}
+          command: test
+          args: --doc
+  docs:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        rust:
+          - { toolchain: nightly }
+    needs: test
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install Apt Dependencies
+        run: sudo apt-get update && sudo apt-get install binutils-arm-none-eabi
+
+      - name: Install Rust toolchain and Component(s)
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust.toolchain }}
+          profile: minimal
+          components: rust-src
+          default: true
+      
+      - name: Build Docs
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: ${{ matrix.rust.toolchain }}
+          command: doc
+          args: --all --no-deps
+      
+      - name: Deploy Docs
+        uses: peaceiris/actions-gh-pages@v3.7.3
+
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./target/thumbv4t-none-eabi/doc
+          force_orphan: true
