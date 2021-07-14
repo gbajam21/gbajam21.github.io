@@ -153,7 +153,7 @@ This page collects every entry submitted, providing the final released ROMs and 
 ### gba-remote-play
 <img height="150px" src="https://gbajam21.github.io/entries/gba-remote-play/1.png"/>&nbsp;
 
-- [ROM File](https://gbajam21.github.io/entries/gba-remote-play/receiver.gba)
+- [ROM File](https://gbajam21.github.io/entries/gba-remote-play/sender-and-receiver.gba)
 - [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/gba-remote-play)
 
 
