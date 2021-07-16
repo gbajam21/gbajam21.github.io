@@ -192,9 +192,8 @@ by JayroJones
 <img height="150px" src="https://gbajam21.github.io/entries/gba-remote-play/1.png"/>&nbsp;  
 by [r]labs  
 [Project Page](https://r-labs.itch.io/gba-remote-play) |
-[ROM File](https://gbajam21.github.io/entries/gba-remote-play/receiver.gba) |
-[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/gba-remote-play)
-
+- [ROM File](https://gbajam21.github.io/entries/gba-remote-play/sender-and-receiver.gba)
+- [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/gba-remote-play)
 
 ### Necropolis
 
