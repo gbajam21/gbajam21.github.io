@@ -183,7 +183,7 @@ by kevin20012
 <img height="150px" src="https://gbajam21.github.io/entries/gba-video-test/2.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/gba-video-test/1.png"/>&nbsp;  
 by JayroJones  
 [Project Page](https://jayrojones.itch.io/jayros-gba-video-test-cartridge) |
-[ROM File](https://gbajam21.github.io/entries/gba-video-test/Jayro's GBA VIDEO Test Cartridge v1.0.gba) |
+[ROM File](https://gbajam21.github.io/entries/gba-video-test/Jayro%27s%20GBA%20VIDEO%20Test%20Cartridge%20v1.0.gba) |
 [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/gba-video-test)
 
 
@@ -192,8 +192,8 @@ by JayroJones
 <img height="150px" src="https://gbajam21.github.io/entries/gba-remote-play/1.png"/>&nbsp;  
 by [r]labs  
 [Project Page](https://r-labs.itch.io/gba-remote-play) |
-- [ROM File](https://gbajam21.github.io/entries/gba-remote-play/sender-and-receiver.gba)
-- [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/gba-remote-play)
+[ROM File](https://gbajam21.github.io/entries/gba-remote-play/sender-and-receiver.gba) |
+[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/gba-remote-play)
 
 ### Necropolis
 
