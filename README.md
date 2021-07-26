@@ -8,6 +8,10 @@ To learn more about GBA development, visit [gbadev.net](https://gbadev.net) and 
 
 This page collects every entry submitted, providing the final released ROMs and the sources.
 
+## Results
+
+The winners, alongside full leaderboards were announced [here](https://gbajam21.github.io/results)
+
 ## Downloads
 
 - Full releases (contains screenshots, sources, ..): [gbajam21.zip](https://github.com/gbajam21/gbajam21.github.io/archive/refs/tags/final.zip)
