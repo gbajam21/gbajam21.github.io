@@ -8,6 +8,10 @@ To learn more about GBA development, visit [gbadev.net](https://gbadev.net) and 
 
 This page collects every entry submitted, providing the final released ROMs and the sources.
 
+## Acknowledgements
+
+The prize pool was way over $1000! We're extremely grateful to the following donators: exelotl, AntonioND, Mte90, klomp, GValiente, oshf, fleroviux, avivace, sunbro, MagicBottle, mnktuk, 10v5m1ch9n5, Evan Bowman, Garcia, JoaoBapt, hot_pengu, [gbdev community](https://gbdev.io).
+
 ## Results
 
 The winners, alongside full leaderboards were announced [here](https://gbajam21.github.io/results)
@@ -17,8 +21,70 @@ The winners, alongside full leaderboards were announced [here](https://gbajam21.
 - Full releases (contains screenshots, sources, ..): [gbajam21.zip](https://github.com/gbajam21/gbajam21.github.io/archive/refs/tags/final.zip)
 - GBA ROMs only : [gbajam21_roms.zip](https://github.com/gbajam21/gbajam21.github.io/releases/download/final/gbajam21_roms.zip)
 
+A lot of the entries continued to receive updates and development after the end of the competition. Check the following links for the updated releases.
+
 ## Games
 
+### Varooom 3D
+
+<img height="150px" src="https://gbajam21.github.io/entries/varooom-3d/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/varooom-3d/2.png"/>&nbsp;  
+by GValiente, tempest, Kaappis  
+[Project Page](https://gvaliente.itch.io/varooom-3d) |
+[ROM File (high audio quality)](https://gbajam21.github.io/entries/varooom-3d/varooom-3d.gba) |
+[ROM File (SuperCard SD compatible)](https://gbajam21.github.io/entries/varooom-3d/varooom-3d_slow.gba) |
+[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/varooom-3d)
+
+### Inheritors of the Oubliette
+
+<img height="150px" src="https://gbajam21.github.io/entries/inheritors-of-the-oubliette/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/inheritors-of-the-oubliette/2.png"/>&nbsp;  
+by Mahou Shoujo ☆ Magical Moestar, one60hp  
+[Project Page](https://mahoushoujomagicalmoestar.itch.io/inheritors-of-the-oubliette) |
+[ROM File](https://gbajam21.github.io/entries/inheritors-of-the-oubliette/inheritors-of-the-oubliette.gba) |
+[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/inheritors-of-the-oubliette)
+
+### Feline
+
+<img height="150px" src="https://gbajam21.github.io/entries/feline/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/feline/2.png"/>&nbsp;  
+by foopod  
+[Project Page](https://foopod.itch.io/feline) |
+[ROM File](https://gbajam21.github.io/entries/feline/feline.gba) |
+[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/feline)
+
+### Symbol★Merged
+
+<img height="150px" src="https://gbajam21.github.io/entries/symbol-merged/1.png"/>&nbsp;  
+by copyrat90  
+[Project Page](https://copyrat90.itch.io/sym-merged) |
+[ROM File](https://gbajam21.github.io/entries/symbol-merged/sym_merged.gba) |
+[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/symbol-merged)
+
+
+### µCity Advance
+
+<img height="150px" src="https://gbajam21.github.io/entries/ucity-advance/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/ucity-advance/2.png"/>&nbsp;  
+by skylyrac  
+[Project Page](https://skylyrac.itch.io/ucity-advance) |
+[ROM File](https://gbajam21.github.io/entries/ucity-advance/ucity-advance-v1.0.1.gba) |
+[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/ucity-advance)
+
+### Skyland
+
+<img height="150px" src="https://gbajam21.github.io/entries/skyland/1.png"/>&nbsp;  
+by evanbowman  
+[Project Page](https://evanbowman.itch.io/skyland) |
+[ROM File](https://gbajam21.github.io/entries/skyland/Skyland.gba) |
+[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/skyland)
+
+
+### Toadally Awesome Game 
+
+<img height="150px" src="https://gbajam21.github.io/entries/toadally-awesome/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/toadally-awesome/2.png"/>&nbsp;  
+by squishyfrogs  
+[Project Page](https://squishyfrogs.itch.io/toadally-awesome) |
+[ROM File](https://gbajam21.github.io/entries/toadally-awesome/Toadally-Awesome-(Jam-Build)-[Unlocked].gba) |
+[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/toadally-awesome)
+
+---
 
 ### Thanx GBA
 
@@ -47,15 +113,6 @@ by maciel310
 [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/gba-mmo)
 
 
-### Feline
-
-<img height="150px" src="https://gbajam21.github.io/entries/feline/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/feline/2.png"/>&nbsp;  
-by foopod  
-[Project Page](https://foopod.itch.io/feline) |
-[ROM File](https://gbajam21.github.io/entries/feline/feline.gba) |
-[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/feline)
-
-
 ### GeBurtstAg
 
 <img height="150px" src="https://gbajam21.github.io/entries/geburtstag/1.png"/>&nbsp;  
@@ -64,14 +121,6 @@ by zeichensystem
 [ROM File](https://gbajam21.github.io/entries/geburtstag/GeBurtstAg.gba) |
 [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/geburtstag)
 
-
-### µCity Advance
-
-<img height="150px" src="https://gbajam21.github.io/entries/ucity-advance/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/ucity-advance/2.png"/>&nbsp;  
-by skylyrac  
-[Project Page](https://skylyrac.itch.io/ucity-advance) |
-[ROM File](https://gbajam21.github.io/entries/ucity-advance/ucity-advance-v1.0.1.gba) |
-[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/ucity-advance)
 
 
 ### Nuthouse
@@ -108,17 +157,6 @@ by kva64
 [Project Page](https://kva64.itch.io/advance-demo-adventures-of-the-math-logic-club) |
 [ROM File](https://gbajam21.github.io/entries/advance-adventures/advance_demo.gba) |
 [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/advance-adventures)
-
-
-### Varooom 3D
-
-<img height="150px" src="https://gbajam21.github.io/entries/varooom-3d/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/varooom-3d/2.png"/>&nbsp;  
-by GValiente, tempest, Kaappis  
-[Project Page](https://gvaliente.itch.io/varooom-3d) |
-[ROM File (high audio quality)](https://gbajam21.github.io/entries/varooom-3d/varooom-3d.gba) |
-[ROM File (SuperCard SD compatible)](https://gbajam21.github.io/entries/varooom-3d/varooom-3d_slow.gba) |
-[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/varooom-3d)
-
 
 ### Dungeon Advance
 
@@ -270,24 +308,6 @@ by ipatix
 [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/firemania)
 
 
-### Skyland
-
-<img height="150px" src="https://gbajam21.github.io/entries/skyland/1.png"/>&nbsp;  
-by evanbowman  
-[Project Page](https://evanbowman.itch.io/skyland) |
-[ROM File](https://gbajam21.github.io/entries/skyland/Skyland.gba) |
-[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/skyland)
-
-
-### Inheritors of the Oubliette
-
-<img height="150px" src="https://gbajam21.github.io/entries/inheritors-of-the-oubliette/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/inheritors-of-the-oubliette/2.png"/>&nbsp;  
-by Mahou Shoujo ☆ Magical Moestar, one60hp  
-[Project Page](https://mahoushoujomagicalmoestar.itch.io/inheritors-of-the-oubliette) |
-[ROM File](https://gbajam21.github.io/entries/inheritors-of-the-oubliette/inheritors-of-the-oubliette.gba) |
-[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/inheritors-of-the-oubliette)
-
-
 ### Wrong Road GBA
 
 <img height="150px" src="https://gbajam21.github.io/entries/wrong-road-gba/2.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/wrong-road-gba/screenshot_240x160.png"/>&nbsp;  
@@ -295,15 +315,6 @@ by jenswa
 [Project Page](https://jenswa.itch.io/wrong-road-gba) |
 [ROM File](https://gbajam21.github.io/entries/wrong-road-gba/wrong-road_mb.gba) |
 [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/wrong-road-gba)
-
-
-### Symbol★Merged
-
-<img height="150px" src="https://gbajam21.github.io/entries/symbol-merged/1.png"/>&nbsp;  
-by copyrat90  
-[Project Page](https://copyrat90.itch.io/sym-merged) |
-[ROM File](https://gbajam21.github.io/entries/symbol-merged/sym_merged.gba) |
-[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/symbol-merged)
 
 
 ### libsavgba
@@ -331,15 +342,6 @@ by PogeSoft
 [Project Page](https://pogesoft.itch.io/587-squadron-advance) |
 [ROM File](https://gbajam21.github.io/entries/squadron-advance/587SQN.gba) |
 [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/squadron-advance)
-
-
-### Toadally Awesome Game 
-
-<img height="150px" src="https://gbajam21.github.io/entries/toadally-awesome/5.png"/>&nbsp;<img height="150px" src="https://gbajam21.github.io/entries/toadally-awesome/2.png"/>&nbsp;  
-by squishyfrogs  
-[Project Page](https://squishyfrogs.itch.io/toadally-awesome) |
-[ROM File](https://gbajam21.github.io/entries/toadally-awesome/Toadally-Awesome-(Jam-Build)-[Unlocked].gba) |
-[Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/toadally-awesome)
 
 
 ### Individuation
