@@ -414,9 +414,3 @@ by Stormplay Games, Sharkhat
 [Project Page](https://stormplay.itch.io/untitled-volleyball-game) |
 [ROM File](https://gbajam21.github.io/entries/volleyball/Volleyball.gba) |
 [Release](https://github.com/gbajam21/gbajam21.github.io/tree/main/entries/volleyball)
-
-
-
-## Results
-
-The entries are still being judged by the jury. Check back later.
